@@ -185,26 +185,16 @@ def validate_test_console_startup(
 def validate_staging_real_provider_configuration(runtime: AppRuntimeConfig) -> None:
     if not runtime.is_staging:
         return
-    if not runtime.staging_allowed_email_recipients and not runtime.staging_allowed_email_domains:
+    outlook_requested = _outlook_real_provider_requested(runtime)
+    asana_requested = _asana_real_provider_requested(runtime)
+    if not outlook_requested and not asana_requested:
         raise RuntimeConfigurationError(
-            "Staging real Outlook execution requires STAGING_ALLOWED_EMAIL_RECIPIENTS "
-            "or STAGING_ALLOWED_EMAIL_DOMAINS."
+            "Staging real provider mode requires real Outlook or real Asana configuration."
         )
-    _require_env_values(
-        MICROSOFT_TENANT_ID_ENV,
-        MICROSOFT_CLIENT_ID_ENV,
-        MICROSOFT_CLIENT_SECRET_ENV,
-        OUTLOOK_SENDER_MAILBOX_ENV,
-    )
-    if not runtime.staging_allowed_asana_project_gids:
-        raise RuntimeConfigurationError(
-            "Staging real Asana execution requires STAGING_ALLOWED_ASANA_PROJECT_GIDS."
-        )
-    _require_env_values(
-        ASANA_ACCESS_TOKEN_ENV,
-        ASANA_WORKSPACE_GID_ENV,
-        ASANA_DEFAULT_PROJECT_GID_ENV,
-    )
+    if outlook_requested:
+        _validate_staging_outlook_configuration(runtime)
+    if asana_requested:
+        _validate_staging_asana_configuration(runtime)
 
 
 def validate_bootstrap_environment(
@@ -231,6 +221,57 @@ def _require_env_values(*names: str) -> None:
         raise RuntimeConfigurationError(
             f"Missing required environment configuration: {joined}."
         )
+
+
+def _any_env_values(*names: str) -> bool:
+    return any(_normalize_optional_text(load_env_value(name)) is not None for name in names)
+
+
+def _outlook_real_provider_requested(runtime: AppRuntimeConfig) -> bool:
+    if runtime.staging_allowed_email_recipients or runtime.staging_allowed_email_domains:
+        return True
+    return _any_env_values(
+        MICROSOFT_TENANT_ID_ENV,
+        MICROSOFT_CLIENT_ID_ENV,
+        MICROSOFT_CLIENT_SECRET_ENV,
+        OUTLOOK_SENDER_MAILBOX_ENV,
+    )
+
+
+def _asana_real_provider_requested(runtime: AppRuntimeConfig) -> bool:
+    if runtime.staging_allowed_asana_project_gids:
+        return True
+    return _any_env_values(
+        ASANA_ACCESS_TOKEN_ENV,
+        ASANA_WORKSPACE_GID_ENV,
+        ASANA_DEFAULT_PROJECT_GID_ENV,
+    )
+
+
+def _validate_staging_outlook_configuration(runtime: AppRuntimeConfig) -> None:
+    if not runtime.staging_allowed_email_recipients and not runtime.staging_allowed_email_domains:
+        raise RuntimeConfigurationError(
+            "Staging real Outlook execution requires STAGING_ALLOWED_EMAIL_RECIPIENTS "
+            "or STAGING_ALLOWED_EMAIL_DOMAINS."
+        )
+    _require_env_values(
+        MICROSOFT_TENANT_ID_ENV,
+        MICROSOFT_CLIENT_ID_ENV,
+        MICROSOFT_CLIENT_SECRET_ENV,
+        OUTLOOK_SENDER_MAILBOX_ENV,
+    )
+
+
+def _validate_staging_asana_configuration(runtime: AppRuntimeConfig) -> None:
+    if not runtime.staging_allowed_asana_project_gids:
+        raise RuntimeConfigurationError(
+            "Staging real Asana execution requires STAGING_ALLOWED_ASANA_PROJECT_GIDS."
+        )
+    _require_env_values(
+        ASANA_ACCESS_TOKEN_ENV,
+        ASANA_WORKSPACE_GID_ENV,
+        ASANA_DEFAULT_PROJECT_GID_ENV,
+    )
 
 
 def _normalize_optional_text(value: str | None) -> str | None:

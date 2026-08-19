@@ -273,6 +273,75 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(report.providers["outlook"], "disabled")
         self.assertEqual(report.providers["asana"], "disabled")
 
+    def test_health_report_supports_real_asana_only_staging_posture(self) -> None:
+        def query_runner(sql: str, *, expect_json: bool):
+            self.assertTrue(expect_json)
+            if sql == "select 1 as ok;":
+                return {"rows": [{"ok": 1}]}
+            if "current_knowledge_chunk_embedding_inputs" in sql and "knowledge_embedding_models" in sql:
+                return {
+                    "rows": [
+                        {
+                            "eligible_chunks": 112,
+                            "active_model_count": 0,
+                            "active_model_id": None,
+                            "embedded_chunks": 0,
+                        }
+                    ]
+                }
+            if "current_historical_case_embedding_inputs" in sql and "historical_case_embedding_models" in sql:
+                return {
+                    "rows": [
+                        {
+                            "eligible_units": 12,
+                            "active_model_count": 1,
+                            "active_model_id": 7,
+                            "embedded_units": 12,
+                            "stale_units": 0,
+                        }
+                    ]
+                }
+            raise AssertionError(f"Unexpected health SQL: {sql}")
+
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_asana_project_gids=("project-123",),
+                ),
+                allow_real_providers=True,
+            ),
+            query_runner=query_runner,
+        )
+
+        with patch(
+            "tools.phase_08_workflow.test_console_service.OutlookAdapterConfig.from_env",
+            return_value=OutlookAdapterConfig(
+                tenant_id=None,
+                client_id=None,
+                client_secret=None,
+                sender_mailbox=None,
+            ),
+        ), patch(
+            "tools.phase_08_workflow.test_console_service.AsanaAdapterConfig.from_env",
+            return_value=AsanaAdapterConfig(
+                access_token="token",
+                workspace_gid="workspace-123",
+                default_project_gid="project-123",
+            ),
+        ):
+            report = service.get_health_report()
+
+        self.assertEqual(report.overall_status, "warn")
+        self.assertEqual(report.providers["outlook"], "disabled")
+        self.assertEqual(report.providers["asana"], "configured")
+
     def test_set_test_clock_accepts_datetime_local_input(self) -> None:
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),

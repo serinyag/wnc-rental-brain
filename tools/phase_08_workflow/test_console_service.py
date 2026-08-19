@@ -743,8 +743,10 @@ left join stale_units su on true;
                 config.sender_mailbox,
             )
         )
+        if not any_configuration:
+            return "disabled"
         if not self.config.allow_real_providers:
-            return "configured_but_disabled" if any_configuration else "disabled"
+            return "configured_but_disabled"
         if runtime.is_staging and not allowlist_configured:
             return "misconfigured"
         return "configured" if fully_configured else "misconfigured"
@@ -765,8 +767,10 @@ left join stale_units su on true;
                 config.default_project_gid,
             )
         )
+        if not any_configuration:
+            return "disabled"
         if not self.config.allow_real_providers:
-            return "configured_but_disabled" if any_configuration else "disabled"
+            return "configured_but_disabled"
         if runtime.is_staging and not allowlist_configured:
             return "misconfigured"
         return "configured" if fully_configured else "misconfigured"

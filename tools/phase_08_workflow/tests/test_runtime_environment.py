@@ -5,6 +5,9 @@ from unittest.mock import patch
 
 from tools.runtime_environment import (
     APP_ENV_ENV,
+    ASANA_ACCESS_TOKEN_ENV,
+    ASANA_DEFAULT_PROJECT_GID_ENV,
+    ASANA_WORKSPACE_GID_ENV,
     AppEnvironment,
     AppRuntimeConfig,
     RuntimeConfigurationError,
@@ -78,6 +81,33 @@ class RuntimeEnvironmentTests(unittest.TestCase):
             staging_basic_auth_password="stage-pass",
         )
         with self.assertRaises(RuntimeConfigurationError):
+            validate_test_console_startup(
+                runtime=runtime,
+                host="0.0.0.0",
+                allow_non_local_bind=False,
+                allow_real_providers=True,
+            )
+
+    def test_staging_real_providers_allow_asana_only_configuration(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_basic_auth_username="stage-user",
+            staging_basic_auth_password="stage-pass",
+            staging_allowed_asana_project_gids=("project-123",),
+        )
+
+        def fake_env(name: str) -> str | None:
+            if name == ASANA_ACCESS_TOKEN_ENV:
+                return "token"
+            if name == ASANA_WORKSPACE_GID_ENV:
+                return "workspace-123"
+            if name == ASANA_DEFAULT_PROJECT_GID_ENV:
+                return "project-123"
+            return None
+
+        with patch("tools.runtime_environment.load_env_value", side_effect=fake_env):
             validate_test_console_startup(
                 runtime=runtime,
                 host="0.0.0.0",
