@@ -1,0 +1,158 @@
+{
+  "date": "2026-08-14",
+  "operational_assessment": "TEST_CONSOLE_REQUIRES_REMEDIATION_BEFORE_INQUIRY_WORKFLOW_BUILD",
+  "counts": {
+    "attempted": 20,
+    "pass": 0,
+    "partial": 9,
+    "fail": 1,
+    "not_currently_supported": 7,
+    "blocked_by_missing_governed_rule": 3
+  },
+  "bugs": {
+    "critical": 0,
+    "high": 5
+  },
+  "strongest_parts": [
+    "provider safety defaults remain fake-only",
+    "approval-gated case decision persistence exists",
+    "reschedule requests are stored separately from active truth",
+    "execution attempts are persisted on the internal success path",
+    "the console exposes a meaningful case-scoped workflow surface"
+  ],
+  "weakest_missing_connection": "Structured observations do not yet become a truthful, operator-usable inquiry overview and next-step workflow.",
+  "recommended_immediate_next_task": "Stabilize the console request path and repair the Working Proposal projection so persisted structured state, approvals, blockers, and active-vs-proposed schedule are surfaced truthfully.",
+  "scenarios": [
+    {
+      "number": 1,
+      "name": "Straightforward Venue Inquiry",
+      "result": "PARTIAL",
+      "main_finding": "Evidence persisted, but the operator-facing case never became a useful inquiry view.",
+      "cases": [146, 147]
+    },
+    {
+      "number": 2,
+      "name": "Incomplete Inquiry",
+      "result": "PARTIAL",
+      "main_finding": "No obvious fabricated truth was observed, but useful open-question handling was not surfaced.",
+      "cases": [148]
+    },
+    {
+      "number": 3,
+      "name": "Capacity / Large Guest Count",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "Whole-venue feasibility and capacity evaluation are not wired into the current console path.",
+      "cases": [145]
+    },
+    {
+      "number": 4,
+      "name": "Unsupported Exact Request but Possible Alternative",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "Alternative-first feasibility is not yet exposed as a usable console behavior."
+    },
+    {
+      "number": 5,
+      "name": "Booking Fee Waiver",
+      "result": "PARTIAL",
+      "main_finding": "Pre-approval safety worked, but the commercial state remained too opaque for a human operator.",
+      "cases": [145]
+    },
+    {
+      "number": 6,
+      "name": "Historical Storage Price Trap",
+      "result": "BLOCKED BY MISSING GOVERNED RULE",
+      "main_finding": "No current governed storage-price authority was available to validate against."
+    },
+    {
+      "number": 7,
+      "name": "Material Guest Count Change",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "Change-impact handling is not yet surfaced through a proposed-change path."
+    },
+    {
+      "number": 8,
+      "name": "Reschedule Request",
+      "result": "PARTIAL",
+      "main_finding": "The backend safely created a reschedule request, but the Working Proposal did not explain it clearly.",
+      "cases": [145]
+    },
+    {
+      "number": 9,
+      "name": "Minor Operational Change",
+      "result": "BLOCKED BY MISSING GOVERNED RULE",
+      "main_finding": "No governed minor-change classification path was available to evaluate."
+    },
+    {
+      "number": 10,
+      "name": "Clearly Material Operational Change",
+      "result": "BLOCKED BY MISSING GOVERNED RULE",
+      "main_finding": "No governed materiality boundary was available for this kind of operational escalation."
+    },
+    {
+      "number": 11,
+      "name": "Follow-Up",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "Follow-up evaluation exists, but no usable follow-up creation/progression path was exposed.",
+      "cases": [143]
+    },
+    {
+      "number": 12,
+      "name": "Stale Client Email Action",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "The current audit surface did not expose the needed stale client-email action path."
+    },
+    {
+      "number": 13,
+      "name": "Superseded Action",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "The current console did not provide a reliable way to create and compare superseding actions."
+    },
+    {
+      "number": 14,
+      "name": "Approval-Required Action",
+      "result": "PARTIAL",
+      "main_finding": "Approval controls exist, but the full blocked-then-approved execution path was not completed reliably.",
+      "cases": [145]
+    },
+    {
+      "number": 15,
+      "name": "Fake Provider Failure",
+      "result": "PARTIAL",
+      "main_finding": "Failure modes are exposed in the console, but the operator-path failure run could not be completed after instability began.",
+      "cases": [143, 145]
+    },
+    {
+      "number": 16,
+      "name": "Fake Timeout / Ambiguous Result",
+      "result": "NOT CURRENTLY SUPPORTED",
+      "main_finding": "Timeout and ambiguous modes are selectable, but not fully operationally validated through the live console path."
+    },
+    {
+      "number": 17,
+      "name": "Cross-Case Isolation",
+      "result": "PARTIAL",
+      "main_finding": "Normal UI routes are strongly case-scoped, but a deliberate two-case integrity attempt was not completed cleanly."
+    },
+    {
+      "number": 18,
+      "name": "Human Working Proposal Audit",
+      "result": "PARTIAL",
+      "main_finding": "The proposal shows blockers and next actions, but still hides too much known rental truth.",
+      "cases": [145]
+    },
+    {
+      "number": 19,
+      "name": "Asana Human Work Projection",
+      "result": "PARTIAL",
+      "main_finding": "Human-work preview exists and is directionally useful, but not yet sufficient for a staff handoff.",
+      "cases": [145]
+    },
+    {
+      "number": 20,
+      "name": "Empty / New Rental",
+      "result": "FAIL",
+      "main_finding": "The empty-state flow is not operationally reliable because the console repeatedly timed out at root and case-page level.",
+      "cases": [143]
+    }
+  ]
+}

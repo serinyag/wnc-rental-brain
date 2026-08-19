@@ -1,0 +1,434 @@
+{
+  "date": "2026-08-14",
+  "operational_assessment": "TEST_CONSOLE_READY_FOR_INQUIRY_WORKFLOW_BUILD",
+  "counts": {
+    "attempted": 20,
+    "pass": 6,
+    "partial": 6,
+    "fail": 0,
+    "not_currently_supported": 5,
+    "blocked_by_missing_governed_rule": 3
+  },
+  "triple_comparison": {
+    "original": {
+      "pass": 0,
+      "partial": 9,
+      "fail": 1,
+      "not_currently_supported": 7,
+      "blocked_by_missing_governed_rule": 3,
+      "critical_bugs": 0,
+      "high_bugs": 5
+    },
+    "rerun_1": {
+      "pass": 3,
+      "partial": 7,
+      "fail": 2,
+      "not_currently_supported": 5,
+      "blocked_by_missing_governed_rule": 3,
+      "critical_bugs": 0,
+      "high_bugs": 2
+    },
+    "final_rerun": {
+      "pass": 6,
+      "partial": 6,
+      "fail": 0,
+      "not_currently_supported": 5,
+      "blocked_by_missing_governed_rule": 3,
+      "critical_bugs": 0,
+      "high_bugs": 0
+    }
+  },
+  "bugs": {
+    "critical": 0,
+    "high": 0
+  },
+  "console_hangs_observed": 0,
+  "request_path_validation": {
+    "port": 8768,
+    "root_repeated_loads": 10,
+    "root_failures": 0,
+    "root_median_seconds": 0.083,
+    "root_slowest_seconds": 0.427,
+    "rich_case_repeated_loads": 10,
+    "rich_case_failures": 0,
+    "rich_case_median_seconds": 0.65,
+    "rich_case_slowest_seconds": 0.928,
+    "restart_required": false,
+    "reconciliation_round_trip_seconds_observed": [
+      8.7,
+      9.1,
+      9.6,
+      8.6,
+      8.7,
+      9.0,
+      8.7,
+      8.7,
+      9.7,
+      10.4,
+      11.1,
+      24.5
+    ]
+  },
+  "strongest_improvements_remediation_c": [
+    "Fresh console-created cases now persist custom_scope and project Rental Type and Requested Spaces as Not established instead of fabricating Studio Space.",
+    "Approved booking-fee overrides now keep the Phase 4 baseline visible while correctly projecting the case-effective fee as EUR 0 after activation.",
+    "The same fresh-case safety fix held across empty, incomplete, large-guest, and unsupported-request scenarios rather than only in one narrow fixture."
+  ],
+  "strongest_parts": [
+    "Provider safety defaults remained fake-only throughout the final rerun.",
+    "Root and rich-case GET request stability remained strong enough for sustained console-driven validation with zero hangs and zero restarts.",
+    "Approval, blocker, decision, and action state transitions remained coherent and auditable on the rich waiver case.",
+    "Superseded actions failed closed with action_superseded and created zero execution-attempt rows.",
+    "Retryable failure, timeout, and ambiguous execution outcomes all persisted as non-success results with audit trails.",
+    "Human Work Preview is now sufficiently clear for staff-facing internal work understanding without real Asana execution."
+  ],
+  "weakest_missing_connection": "There is still no governed path that promotes structured inquiry observations into established current facts, open questions, and follow-up-capable workflow for core intake fields.",
+  "recommended_immediate_next_task": "Implement the first governed inquiry intake slice that converts structured observations for requested schedule, guest count, requested space, and event type into current facts or explicit OpenQuestions without enabling provider sends.",
+  "remaining_bugs": [],
+  "remaining_ux_gaps": [
+    {
+      "id": "UX-RERUN-001",
+      "category": "UX_GAP",
+      "severity": "MEDIUM",
+      "scenarios": [
+        13,
+        16,
+        18
+      ],
+      "finding": "Ambiguous or superseded execution outcomes fail closed, but they are not surfaced strongly enough in top-level current attention."
+    },
+    {
+      "id": "UX-RERUN-002",
+      "category": "UX_GAP",
+      "severity": "MEDIUM",
+      "scenarios": [
+        17
+      ],
+      "finding": "Wrong-case approval challenges fail closed with approval_target_invalid, but they still render a normal 200 case page instead of a stronger error response."
+    },
+    {
+      "id": "UX-RERUN-003",
+      "category": "UX_GAP",
+      "severity": "MEDIUM",
+      "scenarios": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        9,
+        10,
+        15,
+        16,
+        17
+      ],
+      "finding": "Mutation round trips remained safe but slow, with reconciliation requests ranging from about 8.6s to 24.5s and action execution long tails up to about 20.7s."
+    }
+  ],
+  "not_yet_implemented_capabilities": [
+    "Governed promotion of structured inquiry observations into established facts and open questions for requested schedule, guest count, requested space, and event type.",
+    "Capacity and alternative-feasibility orchestration for large-guest and unsupported-exact-request scenarios.",
+    "Follow-up creation/progression and client-email workflow-action formation for stale-email validation."
+  ],
+  "business_rule_gaps": [
+    "Current governed storage-pricing authority for storage-price scenarios.",
+    "Governed low-impact versus material operational-change classification boundary."
+  ],
+  "scenarios": [
+    {
+      "number": 1,
+      "name": "Straightforward Venue Inquiry",
+      "original": "PARTIAL",
+      "rerun_1": "PARTIAL",
+      "final": "PARTIAL",
+      "change": "IMPROVED",
+      "main_finding": "Fresh post-remediation inquiry cases now preserve proposed timing, observed guest count, catering context, and a review action without fabricating current scope, but they still do not become governed current facts or open questions.",
+      "cases": [
+        246
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-OBSERVATION_PROMOTION"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Incomplete Inquiry",
+      "original": "PARTIAL",
+      "rerun_1": "FAIL",
+      "final": "PARTIAL",
+      "change": "IMPROVED",
+      "main_finding": "The fabricated Studio Space defect is gone on a fresh incomplete inquiry, but the console still does not promote uncertainty into governed open-question workflow.",
+      "cases": [
+        239
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-OBSERVATION_PROMOTION"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Capacity / Large Guest Count",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "NOT CURRENTLY SUPPORTED",
+      "final": "NOT CURRENTLY SUPPORTED",
+      "change": "IMPROVED",
+      "main_finding": "The observed 85-guest request remains visible and current scope is no longer fabricated, but capacity authority and whole-venue feasibility are still unwired.",
+      "cases": [
+        240
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-CAPACITY"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Unsupported Exact Request but Possible Alternative",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "NOT CURRENTLY SUPPORTED",
+      "final": "NOT CURRENTLY SUPPORTED",
+      "change": "IMPROVED",
+      "main_finding": "The kitchen request no longer inherits a false Studio Space current scope, but exact-infeasibility and alternative-feasibility workflow is still absent.",
+      "cases": [
+        241
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-CAPACITY"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Booking Fee Waiver",
+      "original": "PARTIAL",
+      "rerun_1": "PARTIAL",
+      "final": "PASS",
+      "change": "IMPROVED",
+      "main_finding": "Before approval the pending exception remains non-effective, and after approval the case-specific waiver correctly projects Effective booking fee = EUR 0 while preserving the EUR 75 excl. VAT baseline.",
+      "cases": [
+        145,
+        197
+      ],
+      "issues": []
+    },
+    {
+      "number": 6,
+      "name": "Historical Storage Price Trap",
+      "original": "BLOCKED BY MISSING GOVERNED RULE",
+      "rerun_1": "BLOCKED BY MISSING GOVERNED RULE",
+      "final": "BLOCKED BY MISSING GOVERNED RULE",
+      "change": "UNCHANGED",
+      "main_finding": "No current governed storage-price authority surfaced on the fresh storage inquiry, and the historical EUR 300 mention did not leak into current truth.",
+      "cases": [
+        242
+      ],
+      "issues": [
+        "BUSINESS_RULE_GAP-STORAGE_AUTHORITY"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Material Guest Count Change",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "NOT CURRENTLY SUPPORTED",
+      "final": "NOT CURRENTLY SUPPORTED",
+      "change": "IMPROVED",
+      "main_finding": "The latest 60-guest update stays visible as the current observed candidate and does not overwrite truth, but no governed current-vs-proposed change object or impact workflow exists yet.",
+      "cases": [
+        243
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-OBSERVATION_PROMOTION"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Reschedule Request",
+      "original": "PARTIAL",
+      "rerun_1": "PARTIAL",
+      "final": "PARTIAL",
+      "change": "UNCHANGED",
+      "main_finding": "Proposed event date and time remain clearly separate from current truth and the reschedule review action is readable, but the current active schedule is still unset in the live console path.",
+      "cases": [
+        145
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-OBSERVATION_PROMOTION"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Minor Operational Change",
+      "original": "BLOCKED BY MISSING GOVERNED RULE",
+      "rerun_1": "BLOCKED BY MISSING GOVERNED RULE",
+      "final": "BLOCKED BY MISSING GOVERNED RULE",
+      "change": "IMPROVED",
+      "main_finding": "A small flower-arrangement request now stays visible as proposed context with observation effect no_workflow_effect and no fabricated scope, but the governed low-impact boundary is still unresolved.",
+      "cases": [
+        244
+      ],
+      "issues": [
+        "BUSINESS_RULE_GAP-OPERATIONAL_MATERIALITY"
+      ]
+    },
+    {
+      "number": 10,
+      "name": "Clearly Material Operational Change",
+      "original": "BLOCKED BY MISSING GOVERNED RULE",
+      "rerun_1": "BLOCKED BY MISSING GOVERNED RULE",
+      "final": "BLOCKED BY MISSING GOVERNED RULE",
+      "change": "IMPROVED",
+      "main_finding": "The clearly material floral-installation escalation is preserved as proposed context with no_workflow_effect and no unsafe mutation, proving the materiality boundary is still a governed-rule gap rather than a console bug.",
+      "cases": [
+        245
+      ],
+      "issues": [
+        "BUSINESS_RULE_GAP-OPERATIONAL_MATERIALITY"
+      ]
+    },
+    {
+      "number": 11,
+      "name": "Follow-Up",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "NOT CURRENTLY SUPPORTED",
+      "final": "NOT CURRENTLY SUPPORTED",
+      "change": "UNCHANGED",
+      "main_finding": "Follow-up evaluation remains safe and provider-free on the incomplete inquiry case, but it still creates no follow-up state or workflow progression.",
+      "cases": [
+        239
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-FOLLOWUP_PATH"
+      ]
+    },
+    {
+      "number": 12,
+      "name": "Stale Client Email Action",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "NOT CURRENTLY SUPPORTED",
+      "final": "NOT CURRENTLY SUPPORTED",
+      "change": "UNCHANGED",
+      "main_finding": "The final rerun still could not form a client-email stale-action path through the console surface; the available live actions remained internal task-surface reviews only.",
+      "issues": [
+        "NOT_YET_IMPLEMENTED-FOLLOWUP_PATH"
+      ]
+    },
+    {
+      "number": 13,
+      "name": "Superseded Action",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "PARTIAL",
+      "final": "PARTIAL",
+      "change": "UNCHANGED",
+      "main_finding": "Superseded actions 95 and 96 still fail closed with action_superseded, create zero execution-attempt rows, and stay out of current attention, but the same flow still does not surface a clearer replacement action story.",
+      "cases": [
+        197
+      ],
+      "issues": [
+        "UX-RERUN-001"
+      ]
+    },
+    {
+      "number": 14,
+      "name": "Approval-Required Action",
+      "original": "PARTIAL",
+      "rerun_1": "PARTIAL",
+      "final": "PASS",
+      "change": "IMPROVED",
+      "main_finding": "Approval activation, blocker resolution, decision activation, obsolete-action supersession, and post-approval commercial truth are now all consistent on the waiver case.",
+      "cases": [
+        145,
+        197
+      ],
+      "issues": []
+    },
+    {
+      "number": 15,
+      "name": "Fake Provider Failure",
+      "original": "PARTIAL",
+      "rerun_1": "PASS",
+      "final": "PASS",
+      "change": "UNCHANGED",
+      "main_finding": "Fresh retryable-failure execution created attempt 59 with fake_retryable_failure, kept action 113 ready_to_execute, and produced no false success or lifecycle drift.",
+      "cases": [
+        247
+      ],
+      "issues": []
+    },
+    {
+      "number": 16,
+      "name": "Fake Timeout / Ambiguous Result",
+      "original": "NOT CURRENTLY SUPPORTED",
+      "rerun_1": "PARTIAL",
+      "final": "PARTIAL",
+      "change": "UNCHANGED",
+      "main_finding": "Fresh timeout and ambiguous runs still persist correctly as non-success outcomes, but ambiguous execution again disappears from top-level current attention after failure.",
+      "cases": [
+        248,
+        249
+      ],
+      "issues": [
+        "UX-RERUN-001"
+      ]
+    },
+    {
+      "number": 17,
+      "name": "Cross-Case Isolation",
+      "original": "PARTIAL",
+      "rerun_1": "PASS",
+      "final": "PASS",
+      "change": "UNCHANGED",
+      "main_finding": "A wrong-case approval challenge returned approval_target_invalid on a 200 page and a wrong-case action challenge returned 400, with zero mutation to the target case.",
+      "cases": [
+        145,
+        250
+      ],
+      "issues": [
+        "UX-RERUN-002"
+      ]
+    },
+    {
+      "number": 18,
+      "name": "Human Working Proposal Audit",
+      "original": "PARTIAL",
+      "rerun_1": "PARTIAL",
+      "final": "PARTIAL",
+      "change": "IMPROVED",
+      "main_finding": "Rich-case readability is now trustworthy for commercial truth and fresh-case defaults, but current active schedule and top-level stale/ambiguous surfacing remain only partially complete.",
+      "cases": [
+        145,
+        197,
+        238
+      ],
+      "issues": [
+        "NOT_YET_IMPLEMENTED-OBSERVATION_PROMOTION",
+        "UX-RERUN-001"
+      ]
+    },
+    {
+      "number": 19,
+      "name": "Asana Human Work Projection",
+      "original": "PARTIAL",
+      "rerun_1": "PASS",
+      "final": "PASS",
+      "change": "UNCHANGED",
+      "main_finding": "Human Work Preview remains good enough for a staff member to understand blockers, approvals, and internal next-step work without real Asana execution.",
+      "cases": [
+        145
+      ],
+      "issues": []
+    },
+    {
+      "number": 20,
+      "name": "Empty / New Rental",
+      "original": "FAIL",
+      "rerun_1": "FAIL",
+      "final": "PASS",
+      "change": "IMPROVED",
+      "main_finding": "Fresh empty cases are now stable, action-free, and truth-safe: no fabricated scope, no blockers, no approvals, no follow-ups, and no accidental workflow work.",
+      "cases": [
+        238
+      ],
+      "issues": []
+    }
+  ]
+}

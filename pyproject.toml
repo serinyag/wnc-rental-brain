@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wnc-rental-brain"
+version = "0.0.0"
+description = "WNC Rental Brain governed knowledge, retrieval, reasoning, and workflow tooling."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "certifi",
+  "openpyxl",
+  "psycopg[binary]",
+  "python-docx",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
+
+[tool.setuptools.packages.find]
+include = ["tools*"]
+namespaces = true
