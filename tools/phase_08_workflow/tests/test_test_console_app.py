@@ -31,9 +31,7 @@ class _FakeService:
             real_current_time="2026-08-15T10:00:00Z",
             simulated=False,
         )
-
-    def list_test_cases(self) -> tuple[TestCaseSummary, ...]:
-        return (
+        self._cases = [
             TestCaseSummary(
                 rental_case_id=1,
                 case_reference_code="RC-9001",
@@ -50,18 +48,49 @@ class _FakeService:
                 pending_approval_count=0,
                 executable_action_count=0,
             ),
-        )
+        ]
+
+    def list_test_cases(self) -> tuple[TestCaseSummary, ...]:
+        return tuple(self._cases)
 
     def create_test_case(self, **kwargs) -> OperationReport:
         del kwargs
+        self._cases.insert(
+            0,
+            TestCaseSummary(
+                rental_case_id=2,
+                case_reference_code="RC-9002",
+                lifecycle_state="inquiry_active",
+                case_revision=0,
+                display_name="New Inquiry",
+                client_label="North Star Events",
+                contact_email="client@example.test",
+                event_reference="Autumn social",
+                active_event_start=None,
+                last_activity="2026-08-15T10:00:00Z",
+                open_blocker_count=0,
+                open_question_count=0,
+                pending_approval_count=0,
+                executable_action_count=0,
+            ),
+        )
         return OperationReport(title="Test Rental Created", success=True, lines=("RentalCase: RC-9002",))
 
     def load_case_detail(self, rental_case_id: int) -> CaseConsoleSnapshot:
-        del rental_case_id
+        if rental_case_id == 2:
+            case_reference_code = "RC-9002"
+            label = "New Inquiry"
+            client_label = "North Star Events"
+            event_reference = "Autumn social"
+        else:
+            case_reference_code = "RC-9001"
+            label = "Autumn Inquiry"
+            client_label = "Acme Events"
+            event_reference = "October social"
         rental_case = RentalCase(
-            rental_case_id=1,
-            rental_case_uuid="case-1",
-            case_reference_code="RC-9001",
+            rental_case_id=rental_case_id,
+            rental_case_uuid=f"case-{rental_case_id}",
+            case_reference_code=case_reference_code,
             lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
             case_revision=0,
             rental_type_code="studio_space",
@@ -73,15 +102,15 @@ class _FakeService:
         )
         return CaseConsoleSnapshot(
             metadata=TestConsoleCaseMetadata(
-                label="Autumn Inquiry",
-                client_label="Acme Events",
+                label=label,
+                client_label=client_label,
                 contact_email="client@example.test",
-                event_reference="October social",
+                event_reference=event_reference,
                 created_by="test_console:operator",
             ),
             orchestration_snapshot=WorkflowOrchestrationCaseSnapshot(rental_case=rental_case),
             evidence_bundles=(),
-            test_metadata_lines=("Label: Autumn Inquiry", "Client / company: Acme Events"),
+            test_metadata_lines=(f"Label: {label}", f"Client / company: {client_label}"),
             working_proposal=WorkingProposalProjection(
                 rental_snapshot=(ProjectionItem(label="Guest count", value="Not provided", state="unresolved"),),
                 commercial_snapshot=(ProjectionItem(label="Booking fee baseline", value="Not established", state="unresolved"),),
@@ -369,6 +398,46 @@ class TestConsoleAppTests(unittest.TestCase):
         self.assertEqual(payload["providers"]["outlook"], "disabled")
         self.assertNotIn("stage-pass", body)
 
+    def test_operator_api_returns_json_case_list(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, headers, body = call_app_response(app, "GET", "/api/operator/cases")
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertEqual(payload["environment"], "local")
+        self.assertTrue(payload["clock_controls_enabled"])
+        self.assertEqual(payload["cases"][0]["case_reference_code"], "RC-9001")
+
+    def test_operator_api_mutation_returns_report_and_case_snapshot(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, headers, body = call_app_response(app, "POST", "/api/operator/cases/1/inquiry-waiting", body=b"{}")
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["title"], "Inquiry Waiting Evaluated")
+        self.assertEqual(payload["case"]["orchestration_snapshot"]["rental_case"]["case_reference_code"], "RC-9001")
+
+    def test_operator_api_create_case_returns_created_case_context(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, _headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases",
+            body=json.dumps({"label": "New Inquiry"}).encode("utf-8"),
+        )
+
+        self.assertEqual(status, "200 OK")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["created_case"]["case_reference_code"], "RC-9002")
+        self.assertEqual(payload["case"]["orchestration_snapshot"]["rental_case"]["rental_case_id"], 2)
+
     def test_staging_requires_basic_auth_for_console_routes(self) -> None:
         staging_config = TestConsoleConfig(
             runtime=AppRuntimeConfig(
@@ -396,6 +465,51 @@ class TestConsoleAppTests(unittest.TestCase):
 
         self.assertEqual(status, "200 OK")
         self.assertIn("Create Test Rental", body)
+
+    def test_staging_requires_basic_auth_for_operator_api_routes(self) -> None:
+        staging_config = TestConsoleConfig(
+            runtime=AppRuntimeConfig(
+                app_env=AppEnvironment.STAGING,
+                app_env_explicit=True,
+                database_url="postgresql://staging-db",
+                staging_basic_auth_username="stage-user",
+                staging_basic_auth_password="stage-pass",
+            )
+        )
+        app = TestConsoleApp(_FakeService(config=staging_config))
+
+        status, headers, body = call_app_response(app, "GET", "/api/operator/cases")
+
+        self.assertEqual(status, "401 Unauthorized")
+        self.assertEqual(headers["WWW-Authenticate"], 'Basic realm="WNC Rental Test Console", charset="UTF-8"')
+        payload = json.loads(body)
+        self.assertEqual(payload["error"]["failure_code"], "AUTHENTICATION_REQUIRED")
+
+        status, _headers, body = call_app_response(
+            app,
+            "GET",
+            "/api/operator/cases",
+            headers=_basic_auth_header("stage-user", "stage-pass"),
+        )
+
+        self.assertEqual(status, "200 OK")
+        payload = json.loads(body)
+        self.assertEqual(payload["environment"], "staging")
+
+    def test_operator_api_invalid_json_returns_structured_error(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/1/structured-observations",
+            body=b"{not-json",
+        )
+
+        self.assertEqual(status, "400 Bad Request")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertEqual(payload["error"]["failure_code"], "INVALID_JSON_REQUEST")
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(

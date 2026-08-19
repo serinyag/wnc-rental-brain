@@ -10,7 +10,7 @@ import logging
 import hmac
 import time
 import traceback
-from dataclasses import replace
+from dataclasses import asdict, is_dataclass, replace
 from http import HTTPStatus
 from socketserver import ThreadingMixIn
 from typing import Any, Callable
@@ -54,6 +54,7 @@ class TestConsoleApp:
         started = time.perf_counter()
         method = environ.get("REQUEST_METHOD", "GET").upper()
         path = environ.get("PATH_INFO", "/")
+        api_request = self._is_operator_api_path(path)
         status = HTTPStatus.OK
         failure_code = "OK"
         try:
@@ -65,7 +66,17 @@ class TestConsoleApp:
             if self._requires_authentication(path) and not self._is_authenticated(environ):
                 status = HTTPStatus.UNAUTHORIZED
                 failure_code = "AUTHENTICATION_REQUIRED"
+                if api_request:
+                    return self._respond_json_error(
+                        start_response,
+                        status=status,
+                        message="Authentication required.",
+                        failure_code=failure_code,
+                        www_authenticate=True,
+                    )
                 return self._respond_unauthorized(start_response)
+            if path.startswith("/api/operator/"):
+                return self._handle_operator_api(environ, start_response, method, path)
             if path.startswith("/clock/") and not self._clock_controls_enabled():
                 status = HTTPStatus.NOT_FOUND
                 failure_code = "CLOCK_CONTROLS_DISABLED"
@@ -88,6 +99,13 @@ class TestConsoleApp:
         except TestConsoleError as error:
             status = error.status
             failure_code = error.failure_code
+            if api_request:
+                return self._respond_json_error(
+                    start_response,
+                    status=error.status,
+                    message=str(error),
+                    failure_code=error.failure_code,
+                )
             return self._respond_html(
                 start_response,
                 self._render_error(
@@ -101,6 +119,13 @@ class TestConsoleApp:
             status = HTTPStatus.INTERNAL_SERVER_ERROR
             failure_code = "UNEXPECTED_SERVER_ERROR"
             LOGGER.exception("test_console_http_unexpected_error method=%s path=%s", method, path)
+            if api_request:
+                return self._respond_json_error(
+                    start_response,
+                    status=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    message="Console request failed.\n\nReason:\nUNEXPECTED_SERVER_ERROR",
+                    failure_code=failure_code,
+                )
             return self._respond_html(
                 start_response,
                 self._render_error(
@@ -119,6 +144,162 @@ class TestConsoleApp:
                 failure_code,
                 (time.perf_counter() - started) * 1000,
             )
+
+    def _handle_operator_api(
+        self,
+        environ: dict[str, Any],
+        start_response: Callable[..., Any],
+        method: str,
+        path: str,
+    ) -> list[bytes]:
+        parts = [part for part in path.split("/") if part]
+        if parts[:3] != ["api", "operator", "cases"]:
+            return self._respond_json_error(
+                start_response,
+                status=HTTPStatus.NOT_FOUND,
+                message="Not found.",
+                failure_code="NOT_FOUND",
+            )
+        if len(parts) == 3 and method == "GET":
+            return self._respond_json(
+                start_response,
+                {
+                    **self._base_operator_payload(),
+                    "cases": self._serialize_for_json(self.service.list_test_cases()),
+                },
+            )
+        if len(parts) == 3 and method == "POST":
+            payload = self._parse_json(environ)
+            report = self.service.create_test_case(
+                label=payload.get("label"),
+                client_label=payload.get("client_label"),
+                contact_email=payload.get("contact_email"),
+                event_reference=payload.get("event_reference"),
+            )
+            created_case = self._find_created_case_summary(report)
+            detail = None if created_case is None else self.service.load_case_detail(created_case.rental_case_id)
+            return self._respond_json(
+                start_response,
+                {
+                    **self._base_operator_payload(),
+                    "ok": report.success,
+                    "report": self._serialize_for_json(report),
+                    "created_case": self._serialize_for_json(created_case),
+                    "case": self._serialize_for_json(detail),
+                },
+            )
+        if len(parts) < 4:
+            return self._respond_json_error(
+                start_response,
+                status=HTTPStatus.NOT_FOUND,
+                message="Not found.",
+                failure_code="NOT_FOUND",
+            )
+        try:
+            rental_case_id = int(parts[3])
+        except ValueError:
+            return self._respond_json_error(
+                start_response,
+                status=HTTPStatus.NOT_FOUND,
+                message="Not found.",
+                failure_code="NOT_FOUND",
+            )
+        if len(parts) == 4 and method == "GET":
+            return self._respond_json(
+                start_response,
+                {
+                    **self._base_operator_payload(),
+                    "case": self._serialize_for_json(self.service.load_case_detail(rental_case_id)),
+                },
+            )
+
+        if len(parts) == 5 and parts[4] == "inquiry-intake" and method == "POST":
+            report = self.service.run_inquiry_intake(rental_case_id=rental_case_id)
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 5 and parts[4] == "inquiry-waiting" and method == "POST":
+            report = self.service.run_inquiry_waiting(rental_case_id=rental_case_id)
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 5 and parts[4] == "reconcile" and method == "POST":
+            report = self.service.run_reconciliation(rental_case_id=rental_case_id)
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 6 and parts[4] == "followups" and parts[5] == "evaluate" and method == "POST":
+            report = self.service.evaluate_followups(rental_case_id=rental_case_id)
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 5 and parts[4] == "raw-evidence" and method == "POST":
+            payload = self._parse_json(environ)
+            report = self.service.inject_raw_test_evidence(
+                rental_case_id=rental_case_id,
+                source_label=payload.get("source_label"),
+                sender=payload.get("sender"),
+                subject=payload.get("subject"),
+                body=payload.get("body"),
+                received_at=payload.get("received_at"),
+                external_test_reference=payload.get("external_test_reference"),
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 5 and parts[4] == "structured-observations" and method == "POST":
+            payload = self._parse_json(environ)
+            report = self.service.inject_structured_test_observation(
+                rental_case_id=rental_case_id,
+                field_code=self._required_json_field(payload, "field_code"),
+                observation_type=self._required_json_field(payload, "observation_type"),
+                claim_kind=self._required_json_field(payload, "claim_kind"),
+                value_text=self._required_json_field(payload, "value_text"),
+                source_excerpt=payload.get("source_excerpt"),
+                sender_reference=payload.get("sender_reference"),
+                external_test_reference=payload.get("external_test_reference"),
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "actions" and parts[7] == "generate" and method == "POST":
+            workflow_action_id = int(parts[6])
+            report = self.service.generate_inquiry_response_draft(
+                rental_case_id=rental_case_id,
+                workflow_action_id=workflow_action_id,
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "drafts" and parts[7] == "edit" and method == "POST":
+            draft_revision_id = int(parts[6])
+            payload = self._parse_json(environ)
+            report = self.service.edit_inquiry_response_draft(
+                rental_case_id=rental_case_id,
+                draft_revision_id=draft_revision_id,
+                subject=self._required_json_field(payload, "subject"),
+                salutation=self._required_json_field(payload, "salutation"),
+                intro_text=self._required_json_field(payload, "intro_text"),
+                closing_text=self._required_json_field(payload, "closing_text"),
+                signoff_text=self._required_json_field(payload, "signoff_text"),
+                question_prompt_text_by_id=self._parse_question_prompt_payload(payload.get("question_prompt_text_by_id")),
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 7 and parts[4] == "approvals" and method == "POST":
+            approval_request_id = int(parts[5])
+            if parts[6] == "approve":
+                report = self.service.approve_request(rental_case_id=rental_case_id, approval_request_id=approval_request_id)
+            elif parts[6] == "reject":
+                report = self.service.reject_request(rental_case_id=rental_case_id, approval_request_id=approval_request_id)
+            else:
+                return self._respond_json_error(
+                    start_response,
+                    status=HTTPStatus.NOT_FOUND,
+                    message="Not found.",
+                    failure_code="NOT_FOUND",
+                )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 7 and parts[4] == "actions" and parts[6] == "execute" and method == "POST":
+            workflow_action_id = int(parts[5])
+            payload = self._parse_json(environ)
+            report = self.service.execute_action(
+                rental_case_id=rental_case_id,
+                workflow_action_id=workflow_action_id,
+                execution_mode=str(payload.get("execution_mode", "success")),
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        return self._respond_json_error(
+            start_response,
+            status=HTTPStatus.NOT_FOUND,
+            message="Not found.",
+            failure_code="NOT_FOUND",
+        )
 
     def _handle_case_route(
         self,
@@ -1195,6 +1376,47 @@ class TestConsoleApp:
     def _requires_authentication(self, path: str) -> bool:
         return self.config.runtime.requires_basic_auth() and path != "/healthz"
 
+    def _is_operator_api_path(self, path: str) -> bool:
+        return path == "/api/operator/cases" or path.startswith("/api/operator/cases/")
+
+    def _base_operator_payload(self) -> dict[str, Any]:
+        return {
+            "environment": self.config.runtime.app_env.value,
+            "clock": self._serialize_for_json(self.service.get_clock_status()),
+            "clock_controls_enabled": self._clock_controls_enabled(),
+        }
+
+    def _operator_case_payload(self, rental_case_id: int, report: OperationReport) -> dict[str, Any]:
+        return {
+            **self._base_operator_payload(),
+            "ok": report.success,
+            "report": self._serialize_for_json(report),
+            "case": self._serialize_for_json(self.service.load_case_detail(rental_case_id)),
+        }
+
+    def _find_created_case_summary(self, report: OperationReport) -> TestCaseSummary | None:
+        case_reference = next(
+            (line.removeprefix("RentalCase: ").strip() for line in report.lines if line.startswith("RentalCase: ")),
+            None,
+        )
+        if not case_reference:
+            return None
+        for summary in self.service.list_test_cases():
+            if summary.case_reference_code == case_reference:
+                return summary
+        return None
+
+    def _serialize_for_json(self, value: Any) -> Any:
+        if value is None:
+            return None
+        if is_dataclass(value):
+            return self._serialize_for_json(asdict(value))
+        if isinstance(value, dict):
+            return {str(key): self._serialize_for_json(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple, set, frozenset)):
+            return [self._serialize_for_json(item) for item in value]
+        return value
+
     def _is_authenticated(self, environ: dict[str, Any]) -> bool:
         credentials = self.config.runtime.basic_auth_credentials()
         if credentials is None:
@@ -1222,6 +1444,62 @@ class TestConsoleApp:
         body = environ["wsgi.input"].read(size) if size > 0 else b""
         parsed = parse_qs(body.decode("utf-8"), keep_blank_values=True)
         return {key: values[-1] for key, values in parsed.items()}
+
+    def _parse_json(self, environ: dict[str, Any]) -> dict[str, Any]:
+        try:
+            size = int(environ.get("CONTENT_LENGTH") or "0")
+        except ValueError:
+            size = 0
+        raw_body = environ["wsgi.input"].read(size) if size > 0 else b""
+        if not raw_body:
+            return {}
+        try:
+            parsed = json.loads(raw_body.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise TestConsoleError(
+                "Request body must be valid JSON.",
+                failure_code="INVALID_JSON_REQUEST",
+            ) from exc
+        if not isinstance(parsed, dict):
+            raise TestConsoleError(
+                "Request body must decode to a JSON object.",
+                failure_code="INVALID_JSON_REQUEST",
+            )
+        return parsed
+
+    def _required_json_field(self, payload: dict[str, Any], field_name: str) -> str:
+        value = payload.get(field_name)
+        if not isinstance(value, str):
+            raise TestConsoleError(
+                f"{field_name} is required.",
+                failure_code="INVALID_JSON_REQUEST",
+            )
+        return value
+
+    def _parse_question_prompt_payload(self, payload: Any) -> dict[int, str]:
+        if payload is None:
+            return {}
+        if not isinstance(payload, dict):
+            raise TestConsoleError(
+                "question_prompt_text_by_id must be a JSON object.",
+                failure_code="INVALID_JSON_REQUEST",
+            )
+        parsed: dict[int, str] = {}
+        for key, value in payload.items():
+            try:
+                question_id = int(str(key))
+            except ValueError as exc:
+                raise TestConsoleError(
+                    "question_prompt_text_by_id keys must be integer question ids.",
+                    failure_code="INVALID_JSON_REQUEST",
+                ) from exc
+            if not isinstance(value, str):
+                raise TestConsoleError(
+                    "question_prompt_text_by_id values must be strings.",
+                    failure_code="INVALID_JSON_REQUEST",
+                )
+            parsed[question_id] = value
+        return parsed
 
     def _respond_html(
         self,
@@ -1257,6 +1535,33 @@ class TestConsoleApp:
             f"{status.value} {status.phrase}",
             [("Content-Type", "application/json; charset=utf-8"), ("Content-Length", str(len(encoded)))],
         )
+        return [encoded]
+
+    def _respond_json_error(
+        self,
+        start_response: Callable[..., Any],
+        *,
+        status: HTTPStatus,
+        message: str,
+        failure_code: str,
+        www_authenticate: bool = False,
+    ) -> list[bytes]:
+        payload = {
+            "ok": False,
+            "error": {
+                "message": message,
+                "failure_code": failure_code,
+                "status": status.value,
+            },
+        }
+        encoded = json.dumps(payload, sort_keys=True, ensure_ascii=True).encode("utf-8")
+        headers = [
+            ("Content-Type", "application/json; charset=utf-8"),
+            ("Content-Length", str(len(encoded))),
+        ]
+        if www_authenticate:
+            headers.append(("WWW-Authenticate", 'Basic realm="WNC Rental Test Console", charset="UTF-8"'))
+        start_response(f"{status.value} {status.phrase}", headers)
         return [encoded]
 
     def _respond_unauthorized(self, start_response: Callable[..., Any]) -> list[bytes]:
