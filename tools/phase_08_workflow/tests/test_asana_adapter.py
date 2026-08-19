@@ -103,6 +103,7 @@ def make_asana_action(
     status: str = WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
     approval_posture: str = APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     source_case_revision: int = 0,
+    target_adapter_code: str = "asana",
     structured_payload: dict[str, object] | None = None,
 ) -> WorkflowAction:
     payload = {
@@ -118,7 +119,7 @@ def make_asana_action(
         rental_case_id=rental_case_id,
         action_type=ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
         action_category=ACTION_CATEGORY_COORDINATION,
-        target_adapter_code="asana",
+        target_adapter_code=target_adapter_code,
         reason_entity_type="review_item",
         reason_entity_reference=f"review_item:{action_id}",
         approval_posture=approval_posture,
@@ -563,6 +564,36 @@ class AsanaAdapterTests(unittest.TestCase):
         self.assertEqual(len(transport.requests), 1)
         attempts = repo.list_execution_attempts(rental_case_id=1, workflow_action_id=11)
         self.assertEqual(attempts[0].external_reference, "asana:task:task-abc")
+
+    def test_runtime_task_surface_alias_succeeds_with_asana_adapter(self) -> None:
+        transport = StubAsanaTransport(
+            response=(201, json.dumps({"data": {"gid": "task-task-surface"}}), {"Content-Type": "application/json"})
+        )
+        adapter = AsanaExecutionAdapter(
+            config=AsanaAdapterConfig(
+                access_token="token",
+                workspace_gid="workspace-123",
+                default_project_gid="project-321",
+            ),
+            transport=transport,
+        )
+        repo = make_repo(make_case(), actions=(make_asana_action(12, target_adapter_code="task_surface"),))
+
+        result = execute_workflow_action(
+            repo,
+            WorkflowActionExecutionRequest(
+                rental_case_id=1,
+                workflow_action_id=12,
+                actor_reference="system:test",
+            ),
+            adapter_registry=ExecutionAdapterRegistry({"task_surface": adapter}),
+        )
+
+        self.assertEqual(result.action_status_after, WORKFLOW_ACTION_STATUS_SUCCEEDED)
+        attempts = repo.list_execution_attempts(rental_case_id=1, workflow_action_id=12)
+        self.assertEqual(len(attempts), 1)
+        self.assertEqual(attempts[0].status, EXECUTION_ATTEMPT_STATUS_SUCCEEDED)
+        self.assertEqual(attempts[0].external_reference, "asana:task:task-task-surface")
 
     def test_runtime_external_reference_conflict_is_rejected(self) -> None:
         case_one = make_case(rental_case_id=1)

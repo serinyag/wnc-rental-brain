@@ -146,7 +146,7 @@ class AsanaExecutionAdapter:
             )
         except AsanaActionInputError as exc:
             return NormalizedExecutionResult(
-                adapter_code="asana",
+                adapter_code=action.target_adapter_code,
                 attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
                 response_snapshot={"provider": "asana", "reason": exc.reason},
                 retry_eligible=False,
@@ -167,7 +167,7 @@ class AsanaExecutionAdapter:
             )
         except AsanaAmbiguousTransportError as exc:
             return NormalizedExecutionResult(
-                adapter_code="asana",
+                adapter_code=action.target_adapter_code,
                 attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
                 response_snapshot={
                     "provider": "asana",
@@ -182,7 +182,7 @@ class AsanaExecutionAdapter:
             parsed = json.loads(body_text) if body_text.strip() else {}
         except json.JSONDecodeError:
             return NormalizedExecutionResult(
-                adapter_code="asana",
+                adapter_code=action.target_adapter_code,
                 attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
                 response_snapshot={
                     "provider": "asana",
@@ -198,7 +198,7 @@ class AsanaExecutionAdapter:
             task_gid = task_payload.get("gid") if isinstance(task_payload, dict) else None
             if not isinstance(task_gid, str) or not task_gid.strip():
                 return NormalizedExecutionResult(
-                    adapter_code="asana",
+                    adapter_code=action.target_adapter_code,
                     attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
                     response_snapshot={
                         "provider": "asana",
@@ -209,7 +209,7 @@ class AsanaExecutionAdapter:
                     failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
                 )
             return NormalizedExecutionResult(
-                adapter_code="asana",
+                adapter_code=action.target_adapter_code,
                 attempt_status=EXECUTION_ATTEMPT_STATUS_SUCCEEDED,
                 response_snapshot={
                     "provider": "asana",
