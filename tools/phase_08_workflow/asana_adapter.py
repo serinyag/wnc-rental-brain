@@ -230,7 +230,7 @@ class AsanaExecutionAdapter:
         if retry_after_seconds is not None:
             snapshot["retry_after_seconds"] = retry_after_seconds
         return NormalizedExecutionResult(
-            adapter_code="asana",
+            adapter_code=action.target_adapter_code,
             attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
             response_snapshot=snapshot,
             retry_eligible=retry_eligible,

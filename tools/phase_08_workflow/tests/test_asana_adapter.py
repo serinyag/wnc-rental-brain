@@ -404,6 +404,27 @@ class AsanaAdapterTests(unittest.TestCase):
                 self.assertEqual(result.retry_eligible, expected_retry_eligible)
                 self.assertNotIn("token-value", json.dumps(result.response_snapshot, sort_keys=True))
 
+    def test_execute_http_failures_preserve_task_surface_alias(self) -> None:
+        adapter = AsanaExecutionAdapter(
+            config=AsanaAdapterConfig(
+                access_token="token-value",
+                workspace_gid="workspace-123",
+                default_project_gid="project-321",
+            ),
+            transport=StubAsanaTransport(
+                response=(403, json.dumps({"errors": [{"message": "forbidden"}]}), {})
+            ),
+        )
+
+        result = adapter.execute(
+            action=make_asana_action(1, target_adapter_code="task_surface"),
+            execution_context=make_execution_context(),
+            idempotency=make_idempotency(),
+        )
+
+        self.assertEqual(result.adapter_code, "task_surface")
+        self.assertEqual(result.failure_code, EXECUTION_FAILURE_ADAPTER_FORBIDDEN)
+
     def test_execute_timeout_is_ambiguous_and_not_retryable(self) -> None:
         adapter = AsanaExecutionAdapter(
             config=AsanaAdapterConfig(
