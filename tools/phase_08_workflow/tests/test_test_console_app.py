@@ -150,6 +150,10 @@ class _FakeService:
         del kwargs
         return OperationReport(title="Structured Test Observation Injected", success=True, lines=("Observation id: 1",))
 
+    def create_task_surface_test_action(self, **kwargs) -> OperationReport:
+        self.last_task_surface_kwargs = kwargs
+        return OperationReport(title="Task-Surface Test Action Created", success=True, lines=("Workflow action id: 11",))
+
     def generate_inquiry_response_draft(self, **kwargs) -> OperationReport:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Generated", success=True, lines=("Draft revision id: 9",))
@@ -421,6 +425,34 @@ class TestConsoleAppTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["report"]["title"], "Inquiry Waiting Evaluated")
         self.assertEqual(payload["case"]["orchestration_snapshot"]["rental_case"]["case_reference_code"], "RC-9001")
+
+    def test_operator_api_can_create_task_surface_test_action(self) -> None:
+        service = _FakeService()
+        app = TestConsoleApp(service)
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/1/task-surface-actions",
+            body=json.dumps(
+                {
+                    "summary": "[STAGING TEST] WNC Rental Brain Asana Adapter Validation",
+                    "reason": "Synthetic staging validation only.",
+                    "task_kind": "asana_staging_validation",
+                    "project_gid_override": "project-123",
+                    "context_lines": ["Synthetic only."],
+                    "external_test_reference": "s6-asana-001",
+                }
+            ).encode("utf-8"),
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["title"], "Task-Surface Test Action Created")
+        self.assertEqual(service.last_task_surface_kwargs["project_gid_override"], "project-123")
+        self.assertEqual(service.last_task_surface_kwargs["context_lines"], ["Synthetic only."])
 
     def test_operator_api_create_case_returns_created_case_context(self) -> None:
         app = TestConsoleApp(_FakeService())

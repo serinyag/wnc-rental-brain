@@ -131,6 +131,41 @@ class OperatorHarnessTests(unittest.TestCase):
         with self.assertRaisesRegex(OperatorHarnessError, "timed out after 5 seconds"):
             client.list_cases()
 
+    def test_create_task_surface_action_posts_expected_payload(self) -> None:
+        captured: dict[str, object] = {}
+
+        def opener(request, timeout, context):
+            captured["url"] = request.full_url
+            captured["method"] = request.get_method()
+            captured["body"] = request.data.decode("utf-8") if request.data else None
+            captured["timeout"] = timeout
+            captured["context"] = context
+            return _FakeResponse(json.dumps({"ok": True}))
+
+        client = OperatorHarnessClient(
+            OperatorHarnessConfig(
+                base_url="https://stage.example.test",
+                username="stage-user",
+                password="stage-pass",
+            ),
+            opener=opener,
+        )
+
+        payload = client.create_task_surface_action(
+            rental_case_id=6,
+            summary="[STAGING TEST] WNC Rental Brain Asana Adapter Validation",
+            reason="Synthetic staging validation only.",
+            task_kind="asana_staging_validation",
+            project_gid_override="project-123",
+            context_lines=["Synthetic only."],
+            external_test_reference="s6-asana-001",
+        )
+
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(captured["url"], "https://stage.example.test/api/operator/cases/6/task-surface-actions")
+        self.assertEqual(captured["method"], "POST")
+        self.assertIn('"project_gid_override": "project-123"', str(captured["body"]))
+
 
 if __name__ == "__main__":
     unittest.main()

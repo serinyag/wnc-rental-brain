@@ -134,6 +134,30 @@ class OperatorHarnessClient:
             },
         )
 
+    def create_task_surface_action(
+        self,
+        *,
+        rental_case_id: int,
+        summary: str,
+        reason: str,
+        task_kind: str | None = None,
+        project_gid_override: str | None = None,
+        context_lines: list[str] | None = None,
+        external_test_reference: str | None = None,
+    ) -> dict[str, Any]:
+        return self.request(
+            "POST",
+            f"/api/operator/cases/{rental_case_id}/task-surface-actions",
+            {
+                "summary": summary,
+                "reason": reason,
+                "task_kind": task_kind,
+                "project_gid_override": project_gid_override,
+                "context_lines": context_lines,
+                "external_test_reference": external_test_reference,
+            },
+        )
+
     def generate_draft(self, *, rental_case_id: int, workflow_action_id: int) -> dict[str, Any]:
         return self.request(
             "POST",
@@ -281,6 +305,20 @@ def build_parser() -> argparse.ArgumentParser:
     structured.add_argument("--sender-reference")
     structured.add_argument("--external-test-reference")
 
+    task_surface = subparsers.add_parser("create-task-surface-action", help="Create a synthetic task-surface action.")
+    task_surface.add_argument("--case-id", type=int, required=True)
+    task_surface.add_argument("--summary", required=True)
+    task_surface.add_argument("--reason", required=True)
+    task_surface.add_argument("--task-kind")
+    task_surface.add_argument("--project-gid-override")
+    task_surface.add_argument(
+        "--context-line",
+        action="append",
+        default=[],
+        help="Context line to include in the Asana task notes. Repeat as needed.",
+    )
+    task_surface.add_argument("--external-test-reference")
+
     for command_name, help_text in (
         ("run-inquiry-intake", "Run Inquiry Intake."),
         ("run-inquiry-waiting", "Run Inquiry Waiting."),
@@ -382,6 +420,16 @@ def _dispatch_command(client: OperatorHarnessClient, args: argparse.Namespace) -
             value_text=args.value_text,
             source_excerpt=args.source_excerpt,
             sender_reference=args.sender_reference,
+            external_test_reference=args.external_test_reference,
+        )
+    if args.command == "create-task-surface-action":
+        return client.create_task_surface_action(
+            rental_case_id=args.case_id,
+            summary=args.summary,
+            reason=args.reason,
+            task_kind=args.task_kind,
+            project_gid_override=args.project_gid_override,
+            context_lines=args.context_line or None,
             external_test_reference=args.external_test_reference,
         )
     if args.command == "run-inquiry-intake":

@@ -250,6 +250,18 @@ class TestConsoleApp:
                 external_test_reference=payload.get("external_test_reference"),
             )
             return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 5 and parts[4] == "task-surface-actions" and method == "POST":
+            payload = self._parse_json(environ)
+            report = self.service.create_task_surface_test_action(
+                rental_case_id=rental_case_id,
+                summary=self._required_json_field(payload, "summary"),
+                reason=self._required_json_field(payload, "reason"),
+                task_kind=payload.get("task_kind"),
+                project_gid_override=payload.get("project_gid_override"),
+                context_lines=payload.get("context_lines"),
+                external_test_reference=payload.get("external_test_reference"),
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "actions" and parts[7] == "generate" and method == "POST":
             workflow_action_id = int(parts[6])
             report = self.service.generate_inquiry_response_draft(

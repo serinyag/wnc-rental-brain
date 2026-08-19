@@ -6,7 +6,9 @@ from unittest.mock import patch
 
 from tools.runtime_environment import AppEnvironment, AppRuntimeConfig
 from tools.phase_08_workflow.contracts import (
+    ACTION_CATEGORY_COORDINATION,
     ACTION_CATEGORY_COMMUNICATION,
+    ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     EXECUTION_ATTEMPT_STATUS_SUCCEEDED,
@@ -442,6 +444,127 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(len(snapshot.follow_ups), 1)
         self.assertEqual(len(snapshot.workflow_actions), 1)
         self.assertEqual(snapshot.workflow_actions[0].action_type, ACTION_TYPE_REQUEST_CLIENT_INFORMATION)
+
+    def test_staging_operator_can_create_task_surface_test_action(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=3,
+            rental_type_code="custom_scope",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        orchestration_repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={1: rental_case},
+            rental_case_facts={1: []},
+            blockers={1: []},
+            requirements={1: []},
+            open_questions={1: []},
+            approval_requests={1: []},
+            proposed_changes={1: []},
+            reschedule_requests={1: []},
+            case_decisions={1: []},
+            workflow_actions={1: []},
+            execution_attempts={1: []},
+            follow_ups={1: []},
+            milestones={1: []},
+            artifacts={1: []},
+            reasoning_projections={1: []},
+            workflow_events={1: []},
+        )
+        service = _MetadataService(
+            orchestration_repository=orchestration_repository,
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                )
+            ),
+            now=lambda: "2026-08-19T14:15:00Z",
+            query_runner=lambda sql, *, expect_json: {} if not expect_json else {"rows": []},
+        )
+
+        report = service.create_task_surface_test_action(
+            rental_case_id=1,
+            summary="[STAGING TEST] WNC Rental Brain Asana Adapter Validation",
+            reason="Synthetic staging validation only. No client action is required.",
+            task_kind="asana_staging_validation",
+            project_gid_override="project-override-123",
+            context_lines=["Synthetic staging task.", "Safe to delete after validation."],
+            external_test_reference="s6-asana-test-001",
+        )
+
+        snapshot = orchestration_repository.load_case_snapshot(1)
+        self.assertEqual(report.title, "Task-Surface Test Action Created")
+        self.assertEqual(len(snapshot.workflow_actions), 1)
+        action = snapshot.workflow_actions[0]
+        self.assertEqual(action.action_type, ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM)
+        self.assertEqual(action.action_category, ACTION_CATEGORY_COORDINATION)
+        self.assertEqual(action.target_adapter_code, "task_surface")
+        self.assertEqual(action.status, WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE)
+        self.assertEqual(action.source_case_revision, 3)
+        self.assertEqual(action.structured_payload["summary"], "[STAGING TEST] WNC Rental Brain Asana Adapter Validation")
+        self.assertEqual(action.structured_payload["task_surface_project_id"], "project-override-123")
+        self.assertEqual(
+            action.structured_payload["task_surface_context_lines"],
+            ["Synthetic staging task.", "Safe to delete after validation."],
+        )
+
+    def test_task_surface_test_action_creation_requires_staging(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=0,
+            rental_type_code="custom_scope",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        orchestration_repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={1: rental_case},
+            rental_case_facts={1: []},
+            blockers={1: []},
+            requirements={1: []},
+            open_questions={1: []},
+            approval_requests={1: []},
+            proposed_changes={1: []},
+            reschedule_requests={1: []},
+            case_decisions={1: []},
+            workflow_actions={1: []},
+            execution_attempts={1: []},
+            follow_ups={1: []},
+            milestones={1: []},
+            artifacts={1: []},
+            reasoning_projections={1: []},
+            workflow_events={1: []},
+        )
+        service = _MetadataService(
+            orchestration_repository=orchestration_repository,
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+        )
+
+        with self.assertRaisesRegex(TestConsoleError, "APP_ENV=staging"):
+            service.create_task_surface_test_action(
+                rental_case_id=1,
+                summary="Synthetic task",
+                reason="Synthetic only.",
+            )
 
     def test_invalid_structured_observation_operator_input_returns_test_console_error(self) -> None:
         rental_case = RentalCase(

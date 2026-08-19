@@ -21,7 +21,10 @@ from tools.runtime_environment import (
 from .asana_adapter import AsanaAdapterConfig, build_asana_execution_adapter_from_env
 from .clock import CallableClock, Clock, MutableTestClock, SystemClock
 from .contracts import (
+    ACTION_CATEGORY_COORDINATION,
+    ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+    APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     APPROVAL_REQUEST_STATUS_OPEN,
     OPEN_QUESTION_STATUS_OPEN,
     ApprovalRequest,
@@ -1257,6 +1260,102 @@ limit 1;
             success=success,
             lines=lines,
             failure_codes=result.failure_codes,
+        )
+
+    def create_task_surface_test_action(
+        self,
+        *,
+        rental_case_id: int,
+        summary: str,
+        reason: str,
+        task_kind: str | None = None,
+        project_gid_override: str | None = None,
+        context_lines: list[str] | None = None,
+        external_test_reference: str | None = None,
+    ) -> OperationReport:
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError(
+                "Synthetic task-surface action creation is only available when APP_ENV=staging.",
+                failure_code="TASK_SURFACE_STAGING_ONLY",
+            )
+        snapshot = self._require_case_snapshot(rental_case_id)
+        normalized_summary = _normalize_optional_text(summary)
+        normalized_reason = _normalize_optional_text(reason)
+        normalized_task_kind = _normalize_optional_text(task_kind) or "asana_staging_validation"
+        normalized_project_gid = _normalize_optional_text(project_gid_override)
+        normalized_reference = _normalize_optional_text(external_test_reference)
+        if normalized_summary is None:
+            raise TestConsoleError("summary is required.", failure_code="TASK_SURFACE_SUMMARY_REQUIRED")
+        if normalized_reason is None:
+            raise TestConsoleError("reason is required.", failure_code="TASK_SURFACE_REASON_REQUIRED")
+        normalized_context_lines = _normalize_task_surface_context_lines(context_lines)
+        dedupe_basis = normalized_reference or _json_digest(
+            {
+                "rental_case_id": rental_case_id,
+                "summary": normalized_summary,
+                "reason": normalized_reason,
+                "task_kind": normalized_task_kind,
+                "project_gid_override": normalized_project_gid,
+                "context_lines": normalized_context_lines,
+            }
+        )
+        timestamp = self.now()
+        structured_payload: dict[str, Any] = {
+            "summary": normalized_summary,
+            "reason": normalized_reason,
+            "task_kind": normalized_task_kind,
+        }
+        if normalized_project_gid is not None:
+            structured_payload["task_surface_project_id"] = normalized_project_gid
+        if normalized_context_lines:
+            structured_payload["task_surface_context_lines"] = list(normalized_context_lines)
+        workflow_action = self.orchestration_repository.create_workflow_action(
+            WorkflowAction(
+                workflow_action_id=1,
+                workflow_action_uuid="workflow-action",
+                rental_case_id=rental_case_id,
+                action_type=ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
+                action_category=ACTION_CATEGORY_COORDINATION,
+                target_adapter_code="task_surface",
+                reason_entity_type="review_item",
+                reason_entity_reference=f"operator_task_surface_test:{dedupe_basis}",
+                approval_posture=APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+                status=WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
+                semantic_subject_hash=f"task_surface_test:{_json_digest({'case': rental_case_id, 'summary': normalized_summary, 'task_kind': normalized_task_kind, 'project_gid': normalized_project_gid})}",
+                source_case_revision=snapshot.rental_case.case_revision,
+                idempotency_key=f"task_surface_test:{rental_case_id}:{dedupe_basis}",
+                structured_payload=structured_payload,
+                created_at=timestamp,
+                updated_at=timestamp,
+            )
+        )
+        self._create_console_event(
+            rental_case_id=rental_case_id,
+            event_type_code="task_surface_test_action_created",
+            source_reference=f"workflow_action:{workflow_action.workflow_action_id}",
+            occurred_at=timestamp,
+            structured_payload={
+                "workflow_action_id": workflow_action.workflow_action_id,
+                "workflow_action_uuid": workflow_action.workflow_action_uuid,
+                "source_case_revision": workflow_action.source_case_revision,
+                "target_adapter_code": workflow_action.target_adapter_code,
+                "task_kind": normalized_task_kind,
+                "summary": normalized_summary,
+                "project_gid_override": normalized_project_gid,
+                "external_test_reference": normalized_reference,
+            },
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+        )
+        return OperationReport(
+            title="Task-Surface Test Action Created",
+            success=True,
+            lines=(
+                f"Workflow action id: {workflow_action.workflow_action_id}",
+                f"Action status: {workflow_action.status}",
+                f"Target adapter: {workflow_action.target_adapter_code}",
+                f"Project override: {normalized_project_gid or 'default_project'}",
+            ),
         )
 
     def run_reconciliation(self, *, rental_case_id: int) -> OperationReport:
@@ -3155,6 +3254,31 @@ def _normalize_optional_text(value: str | None) -> str | None:
         return None
     trimmed = value.strip()
     return trimmed or None
+
+
+def _normalize_task_surface_context_lines(value: list[str] | None) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise TestConsoleError(
+            "context_lines must be a JSON array of strings.",
+            failure_code="TASK_SURFACE_CONTEXT_LINES_INVALID",
+        )
+    normalized: list[str] = []
+    for item in value:
+        if not isinstance(item, str):
+            raise TestConsoleError(
+                "context_lines must be a JSON array of strings.",
+                failure_code="TASK_SURFACE_CONTEXT_LINES_INVALID",
+            )
+        normalized_item = _normalize_optional_text(item)
+        if normalized_item is None:
+            raise TestConsoleError(
+                "context_lines entries must not be blank.",
+                failure_code="TASK_SURFACE_CONTEXT_LINES_INVALID",
+            )
+        normalized.append(normalized_item)
+    return tuple(normalized)
 
 
 def _is_safe_test_email(value: str) -> bool:
