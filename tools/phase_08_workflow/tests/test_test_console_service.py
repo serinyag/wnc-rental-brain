@@ -15,6 +15,7 @@ from tools.phase_08_workflow.contracts import (
     LIFECYCLE_STATE_INQUIRY_ACTIVE,
     ExecutionAttempt,
     FollowUp,
+    OpenQuestion,
     RentalCase,
     WorkflowAction,
     WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
@@ -26,6 +27,7 @@ from tools.phase_08_workflow.observation_repository import InMemoryObservationRe
 from tools.phase_08_workflow.orchestration_repository import InMemoryWorkflowOrchestrationRepository, WorkflowOrchestrationCaseSnapshot
 from tools.phase_08_workflow.test_console_projection import TestConsoleCaseMetadata
 from tools.phase_08_workflow.test_console_service import (
+    TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV,
     HealthComponentReport,
     TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV,
     TEST_CONSOLE_DEFAULT_WORKFLOW_EVENT_LIMIT,
@@ -147,6 +149,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(config.port, 8765)
         self.assertFalse(config.allow_real_providers)
         self.assertFalse(config.allow_non_local_bind)
+        self.assertEqual(config.inquiry_cold_follow_up_delay_days, 7)
 
     def test_non_local_bind_requires_explicit_override(self) -> None:
         with self.assertRaises(TestConsoleError):
@@ -300,6 +303,144 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         )
         with self.assertRaises(TestConsoleError):
             service._parse_observation_value("boolean", "maybe")
+        with self.assertRaises(TestConsoleError):
+            service._parse_observation_value("integer", "forty five")
+        with self.assertRaises(TestConsoleError):
+            service._parse_observation_value("json_object", '{"active_event_start"')
+
+    def test_negative_inquiry_follow_up_delay_is_rejected(self) -> None:
+        with self.assertRaisesRegex(TestConsoleError, TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV):
+            TestConsoleConfig(inquiry_cold_follow_up_delay_days=-1).validate()
+
+    def test_zero_day_inquiry_follow_up_can_create_immediate_client_action(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=0,
+            rental_type_code="custom_scope",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            primary_contact_ref="contact:1",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        question = OpenQuestion(
+            open_question_id=1,
+            rental_case_id=1,
+            question_type="requested_event_timing",
+            domain_code="event_profile",
+            human_question_text="What date and time is the client requesting for the event?",
+            blocking_scope="transition",
+            status="open",
+            created_at="2026-08-14T09:00:00Z",
+            requested_from_role="client",
+            source_reference="open_question:1",
+        )
+        orchestration_repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={1: rental_case},
+            rental_case_facts={1: []},
+            blockers={1: []},
+            requirements={1: []},
+            open_questions={1: [question]},
+            approval_requests={1: []},
+            proposed_changes={1: []},
+            reschedule_requests={1: []},
+            case_decisions={1: []},
+            workflow_actions={1: []},
+            execution_attempts={1: []},
+            follow_ups={1: []},
+            milestones={1: []},
+            artifacts={1: []},
+            reasoning_projections={1: []},
+            workflow_events={1: []},
+        )
+        service = _MetadataService(
+            orchestration_repository=orchestration_repository,
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(inquiry_cold_follow_up_delay_days=0),
+            now=lambda: "2026-08-19T09:43:36Z",
+        )
+
+        report = service.run_inquiry_waiting(rental_case_id=1)
+        snapshot = orchestration_repository.load_case_snapshot(1)
+
+        self.assertIn("Created actions: 1", report.lines)
+        self.assertIn("Action formation eligible: yes", report.lines)
+        self.assertEqual(len(snapshot.follow_ups), 1)
+        self.assertEqual(len(snapshot.workflow_actions), 1)
+        self.assertEqual(snapshot.workflow_actions[0].action_type, ACTION_TYPE_REQUEST_CLIENT_INFORMATION)
+
+    def test_invalid_structured_observation_operator_input_returns_test_console_error(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=0,
+            rental_type_code="custom_scope",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        orchestration_repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={1: rental_case},
+            rental_case_facts={1: []},
+            blockers={1: []},
+            requirements={1: []},
+            open_questions={1: []},
+            approval_requests={1: []},
+            proposed_changes={1: []},
+            reschedule_requests={1: []},
+            case_decisions={1: []},
+            workflow_actions={1: []},
+            execution_attempts={1: []},
+            follow_ups={1: []},
+            milestones={1: []},
+            artifacts={1: []},
+            reasoning_projections={1: []},
+            workflow_events={1: []},
+        )
+        observation_repository = InMemoryObservationRepository(
+            rental_cases={1: rental_case},
+            rental_case_facts={1: []},
+            open_questions={1: []},
+            requirements={1: []},
+            proposed_changes={1: []},
+            case_decisions={1: []},
+            reschedule_requests={1: []},
+            workflow_events={1: []},
+            inbound_source_records={},
+            inbound_observations={},
+            inbound_observation_effects={},
+            source_ids_by_dedupe={},
+            observation_ids_by_identity={},
+            observation_ids_by_source={},
+            observation_failure_codes={},
+        )
+        service = _MetadataService(
+            orchestration_repository=orchestration_repository,
+            observation_repository=observation_repository,
+            config=TestConsoleConfig(),
+        )
+
+        with self.assertRaisesRegex(TestConsoleError, "observation_type must be one of"):
+            service.inject_structured_test_observation(
+                rental_case_id=1,
+                field_code="guest_count",
+                observation_type="assertion",
+                claim_kind="new_information",
+                value_text="25",
+                source_excerpt="25 guests expected",
+                sender_reference="fixture:test",
+                external_test_reference="bad-observation-type",
+            )
 
     def test_load_case_detail_uses_batched_console_readers_when_available(self) -> None:
         rental_case = RentalCase(

@@ -90,7 +90,7 @@ class InquiryFollowUpPolicy:
     urgent_event_threshold_days: int = 3
 
     def __post_init__(self) -> None:
-        ensure_positive_int("cold_follow_up_delay_days", self.cold_follow_up_delay_days)
+        ensure_non_negative_int("cold_follow_up_delay_days", self.cold_follow_up_delay_days)
         ensure_positive_int("max_cold_follow_ups", self.max_cold_follow_ups)
         ensure_positive_int("urgent_event_threshold_days", self.urgent_event_threshold_days)
 

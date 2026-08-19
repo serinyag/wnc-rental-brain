@@ -81,7 +81,7 @@ from .inquiry_intake import (
     INQUIRY_INTAKE_OUTCOME_PROMOTED,
     apply_inquiry_intake,
 )
-from .inquiry_waiting import reconcile_inquiry_waiting
+from .inquiry_waiting import InquiryFollowUpPolicy, reconcile_inquiry_waiting
 from .lifecycle_repository import _sql_int, _sql_json, _sql_timestamptz, sql_text
 from .observation_contracts import (
     InboundObservation,
@@ -133,6 +133,7 @@ from .test_console_projection import (
     infer_asana_master_task_reference,
     summarize_test_metadata,
 )
+from .validation import Phase8ContractError
 
 
 TEST_CONSOLE_CASE_REGISTERED_EVENT = "test_console_case_registered"
@@ -144,10 +145,12 @@ TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV = "WORKFLOW_TEST_CONSOLE_ALLOW_REAL_PROVID
 TEST_CONSOLE_ALLOW_NON_LOCAL_BIND_ENV = "WORKFLOW_TEST_CONSOLE_ALLOW_NON_LOCAL_BIND"
 TEST_CONSOLE_QUERY_TIMEOUT_ENV = "WORKFLOW_TEST_CONSOLE_QUERY_TIMEOUT_SECONDS"
 TEST_CONSOLE_WORKFLOW_EVENT_LIMIT_ENV = "WORKFLOW_TEST_CONSOLE_WORKFLOW_EVENT_LIMIT"
+TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV = "WORKFLOW_TEST_CONSOLE_INQUIRY_COLD_FOLLOW_UP_DELAY_DAYS"
 TEST_CONSOLE_DEFAULT_HOST = "127.0.0.1"
 TEST_CONSOLE_DEFAULT_PORT = 8765
 TEST_CONSOLE_DEFAULT_QUERY_TIMEOUT_SECONDS = 10.0
 TEST_CONSOLE_DEFAULT_WORKFLOW_EVENT_LIMIT = 100
+TEST_CONSOLE_DEFAULT_INQUIRY_FOLLOW_UP_DELAY_DAYS = 7
 TEST_CONSOLE_DEFAULT_RENTAL_TYPE_CODE = "custom_scope"
 TEST_CONSOLE_OPERATOR_REFERENCE = "test_console:operator"
 TEST_CONSOLE_OPERATOR_TYPE = "operator"
@@ -182,6 +185,7 @@ class TestConsoleConfig:
     allow_non_local_bind: bool = False
     query_timeout_seconds: float = TEST_CONSOLE_DEFAULT_QUERY_TIMEOUT_SECONDS
     workflow_event_limit: int = TEST_CONSOLE_DEFAULT_WORKFLOW_EVENT_LIMIT
+    inquiry_cold_follow_up_delay_days: int = TEST_CONSOLE_DEFAULT_INQUIRY_FOLLOW_UP_DELAY_DAYS
 
     @classmethod
     def from_env(cls) -> TestConsoleConfig:
@@ -203,6 +207,12 @@ class TestConsoleConfig:
                     str(TEST_CONSOLE_DEFAULT_WORKFLOW_EVENT_LIMIT),
                 )
             ),
+            inquiry_cold_follow_up_delay_days=int(
+                os.environ.get(
+                    TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV,
+                    str(TEST_CONSOLE_DEFAULT_INQUIRY_FOLLOW_UP_DELAY_DAYS),
+                )
+            ),
         )
 
     def validate(self) -> None:
@@ -210,6 +220,10 @@ class TestConsoleConfig:
             raise TestConsoleError(f"{TEST_CONSOLE_QUERY_TIMEOUT_ENV} must be greater than 0.")
         if self.workflow_event_limit <= 0:
             raise TestConsoleError(f"{TEST_CONSOLE_WORKFLOW_EVENT_LIMIT_ENV} must be greater than 0.")
+        if self.inquiry_cold_follow_up_delay_days < 0:
+            raise TestConsoleError(
+                f"{TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV} must be greater than or equal to 0."
+            )
         try:
             validate_test_console_startup(
                 runtime=self.runtime,
@@ -219,6 +233,11 @@ class TestConsoleConfig:
             )
         except RuntimeConfigurationError as exc:
             raise TestConsoleError(str(exc)) from exc
+
+    def inquiry_follow_up_policy(self) -> InquiryFollowUpPolicy:
+        return InquiryFollowUpPolicy(
+            cold_follow_up_delay_days=self.inquiry_cold_follow_up_delay_days,
+        )
 
 
 @dataclass(frozen=True)
@@ -1172,53 +1191,56 @@ limit 1;
         field_definition = get_field_definition(field_code)
         if field_definition is None:
             raise TestConsoleError(f"Unknown observation field code: {field_code}")
-        candidate_value = self._parse_observation_value(field_definition.value_type_code, value_text)
-        dedupe_payload = {
-            "field_code": field_code,
-            "observation_type": observation_type,
-            "claim_kind": claim_kind,
-            "candidate_value": candidate_value,
-            "source_excerpt": source_excerpt,
-            "sender_reference": sender_reference,
-            "external_test_reference": external_test_reference,
-            "rental_case_id": rental_case_id,
-        }
-        now_value = self.now()
-        request = StructuredObservationIngestionRequest(
-            source_record=InboundSourceRecordInput(
-                source_system_code="manual_input",
-                source_record_type="operator_note",
-                occurred_at=now_value,
-                dedupe_key=_normalize_optional_text(external_test_reference) or f"structured:{_json_digest(dedupe_payload)}",
-                source_hash=f"sha256:{_json_digest(dedupe_payload)}",
-                external_source_id=_normalize_optional_text(external_test_reference),
-                sender_actor_type="operator",
-                sender_actor_reference=_normalize_optional_text(sender_reference) or TEST_CONSOLE_OPERATOR_REFERENCE,
-                received_at=now_value,
-                evidence_excerpt=_normalize_optional_text(source_excerpt),
-            ),
-            case_association=CaseAssociationInput(rental_case_id=rental_case_id),
-            observations=(
-                StructuredObservationCandidate(
-                    reported_field_code=field_code,
-                    reported_domain_code=field_definition.domain_code,
-                    observation_type=observation_type,
-                    claim_kind=claim_kind,
-                    candidate_value_payload=candidate_value,
-                    source_evidence_reference=f"test_console:{field_code}",
-                    asserted_by_party_type="operator",
-                    asserted_by_reference=_normalize_optional_text(sender_reference) or TEST_CONSOLE_OPERATOR_REFERENCE,
-                    source_excerpt=_normalize_optional_text(source_excerpt),
-                    observed_against_case_revision=self.orchestration_repository.load_case_snapshot(rental_case_id).rental_case.case_revision,
-                    extraction_confidence=1.0,
+        try:
+            candidate_value = self._parse_observation_value(field_definition.value_type_code, value_text)
+            dedupe_payload = {
+                "field_code": field_code,
+                "observation_type": observation_type,
+                "claim_kind": claim_kind,
+                "candidate_value": candidate_value,
+                "source_excerpt": source_excerpt,
+                "sender_reference": sender_reference,
+                "external_test_reference": external_test_reference,
+                "rental_case_id": rental_case_id,
+            }
+            now_value = self.now()
+            request = StructuredObservationIngestionRequest(
+                source_record=InboundSourceRecordInput(
+                    source_system_code="manual_input",
+                    source_record_type="operator_note",
+                    occurred_at=now_value,
+                    dedupe_key=_normalize_optional_text(external_test_reference) or f"structured:{_json_digest(dedupe_payload)}",
+                    source_hash=f"sha256:{_json_digest(dedupe_payload)}",
+                    external_source_id=_normalize_optional_text(external_test_reference),
+                    sender_actor_type="operator",
+                    sender_actor_reference=_normalize_optional_text(sender_reference) or TEST_CONSOLE_OPERATOR_REFERENCE,
+                    received_at=now_value,
+                    evidence_excerpt=_normalize_optional_text(source_excerpt),
                 ),
-            ),
-        )
-        result = ingest_structured_observations(
-            request=request,
-            repository=self.observation_repository,
-            now=self.now,
-        )
+                case_association=CaseAssociationInput(rental_case_id=rental_case_id),
+                observations=(
+                    StructuredObservationCandidate(
+                        reported_field_code=field_code,
+                        reported_domain_code=field_definition.domain_code,
+                        observation_type=observation_type,
+                        claim_kind=claim_kind,
+                        candidate_value_payload=candidate_value,
+                        source_evidence_reference=f"test_console:{field_code}",
+                        asserted_by_party_type="operator",
+                        asserted_by_reference=_normalize_optional_text(sender_reference) or TEST_CONSOLE_OPERATOR_REFERENCE,
+                        source_excerpt=_normalize_optional_text(source_excerpt),
+                        observed_against_case_revision=self.orchestration_repository.load_case_snapshot(rental_case_id).rental_case.case_revision,
+                        extraction_confidence=1.0,
+                    ),
+                ),
+            )
+            result = ingest_structured_observations(
+                request=request,
+                repository=self.observation_repository,
+                now=self.now,
+            )
+        except Phase8ContractError as exc:
+            raise TestConsoleError(exc.safe_message) from exc
         first = result.observation_results[0]
         success = not result.failure_codes
         lines = (
@@ -1266,6 +1288,7 @@ limit 1;
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             expected_case_revision=snapshot.rental_case.case_revision,
             now=self.now,
+            policy=self.config.inquiry_follow_up_policy(),
         )
         desired_follow_up = result.plan.desired_follow_up
         lines = [
@@ -3092,27 +3115,34 @@ on conflict (rental_case_id, event_identity_key) do nothing;
         return snapshot
 
     def _parse_observation_value(self, value_type_code: str, raw_value: str) -> Any:
-        if value_type_code == OBSERVATION_VALUE_TYPE_INTEGER:
-            return int(raw_value.strip())
-        if value_type_code == OBSERVATION_VALUE_TYPE_BOOLEAN:
-            normalized = raw_value.strip().lower()
-            if normalized in {"true", "1", "yes"}:
-                return True
-            if normalized in {"false", "0", "no"}:
-                return False
-            raise TestConsoleError("Boolean observation values must be true/false.")
-        if value_type_code == OBSERVATION_VALUE_TYPE_JSON_OBJECT:
-            parsed = json.loads(raw_value)
-            if not isinstance(parsed, dict):
-                raise TestConsoleError("JSON-object observation values must parse to an object.")
-            return parsed
-        if value_type_code == OBSERVATION_VALUE_TYPE_ENUM_ARRAY:
-            parsed = json.loads(raw_value)
-            if not isinstance(parsed, list) or not all(isinstance(item, str) for item in parsed):
-                raise TestConsoleError("Enum-array observation values must be a JSON array of strings.")
-            return parsed
-        if value_type_code in {OBSERVATION_VALUE_TYPE_ENUM, "text"}:
-            return raw_value.strip()
+        try:
+            if value_type_code == OBSERVATION_VALUE_TYPE_INTEGER:
+                return int(raw_value.strip())
+            if value_type_code == OBSERVATION_VALUE_TYPE_BOOLEAN:
+                normalized = raw_value.strip().lower()
+                if normalized in {"true", "1", "yes"}:
+                    return True
+                if normalized in {"false", "0", "no"}:
+                    return False
+                raise TestConsoleError("Boolean observation values must be true/false.")
+            if value_type_code == OBSERVATION_VALUE_TYPE_JSON_OBJECT:
+                parsed = json.loads(raw_value)
+                if not isinstance(parsed, dict):
+                    raise TestConsoleError("JSON-object observation values must parse to an object.")
+                return parsed
+            if value_type_code == OBSERVATION_VALUE_TYPE_ENUM_ARRAY:
+                parsed = json.loads(raw_value)
+                if not isinstance(parsed, list) or not all(isinstance(item, str) for item in parsed):
+                    raise TestConsoleError("Enum-array observation values must be a JSON array of strings.")
+                return parsed
+            if value_type_code in {OBSERVATION_VALUE_TYPE_ENUM, "text"}:
+                return raw_value.strip()
+        except json.JSONDecodeError as exc:
+            raise TestConsoleError("Observation value JSON is malformed.") from exc
+        except ValueError as exc:
+            if value_type_code == OBSERVATION_VALUE_TYPE_INTEGER:
+                raise TestConsoleError("Integer observation values must parse to a whole number.") from exc
+            raise
         raise TestConsoleError(f"Unsupported observation value type: {value_type_code}")
 
 
