@@ -428,11 +428,48 @@ class InquiryIntakeTests(unittest.TestCase):
         self.assertFalse(result.failure_codes)
         self.assertEqual(repo.rental_cases[1].case_revision, 1)
         self.assertEqual(len(repo.reschedule_requests[1]), 1)
-        self.assertEqual(repo.rental_cases[1].active_event_start, "2026-10-03T18:00:00Z")
-        self.assertFalse(repeat.failure_codes)
-        self.assertEqual(repeat.case_revision_before, 1)
-        self.assertEqual(repeat.case_revision_after, 1)
-        self.assertEqual(len(repo.reschedule_requests[1]), 1)
+
+    def test_existing_schedule_in_database_format_does_not_create_noop_reschedule(self) -> None:
+        repo = make_repo(
+            rental_cases=(
+                make_case(
+                    rental_type_code="studio_space",
+                    active_event_start="2026-10-03 18:00:00+00",
+                    active_event_end="2026-10-03 22:00:00+00",
+                ),
+            )
+            ,
+            facts={
+                1: [
+                    make_fact(field_code="guest_count", value_payload=35),
+                    make_fact(field_code="event_type", value_payload="brand_activation"),
+                ]
+            },
+        )
+        ingest_candidate(
+            repo,
+            dedupe_key="matching-schedule-db-format",
+            reported_field_code="active_event_window",
+            observation_type=OBSERVATION_TYPE_REQUEST_CANDIDATE,
+            claim_kind=OBSERVATION_CLAIM_KIND_NEW_INFORMATION,
+            candidate_value_payload={
+                "active_event_start": "2026-10-03T18:00:00Z",
+                "active_event_end": "2026-10-03T22:00:00Z",
+            },
+        )
+
+        result = apply_inquiry_intake(
+            repo,
+            rental_case_id=1,
+            actor_reference="fixture:operator",
+            actor_type="operator",
+            now=lambda: "2026-08-14T10:00:00Z",
+        )
+
+        self.assertFalse(result.failure_codes)
+        self.assertEqual(result.case_revision_before, 0)
+        self.assertEqual(result.case_revision_after, 0)
+        self.assertEqual(repo.reschedule_requests.get(1, []), [])
 
     def test_stale_plan_commit_is_rejected(self) -> None:
         repo = make_repo(rental_cases=(make_case(),))

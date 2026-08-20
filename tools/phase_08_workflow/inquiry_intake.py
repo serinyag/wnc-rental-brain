@@ -567,9 +567,13 @@ def _is_eligible_observation(
 def _current_value(snapshot: ObservationCaseSnapshot, inquiry_field_code: str) -> Any:
     if inquiry_field_code == INQUIRY_FIELD_REQUESTED_SCHEDULE:
         if snapshot.rental_case.active_event_start and snapshot.rental_case.active_event_end:
+            normalized_start = _normalize_iso_timestamp(snapshot.rental_case.active_event_start)
+            normalized_end = _normalize_iso_timestamp(snapshot.rental_case.active_event_end)
+            if normalized_start is None or normalized_end is None:
+                return None
             return {
-                "active_event_start": snapshot.rental_case.active_event_start,
-                "active_event_end": snapshot.rental_case.active_event_end,
+                "active_event_start": normalized_start,
+                "active_event_end": normalized_end,
             }
         return None
     if inquiry_field_code == INQUIRY_FIELD_GUEST_COUNT:

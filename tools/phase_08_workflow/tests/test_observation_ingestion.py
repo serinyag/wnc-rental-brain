@@ -248,6 +248,34 @@ class ObservationIngestionTests(unittest.TestCase):
         self.assertEqual(result.observation_results[0].effect.disposition_code, OBSERVATION_DISPOSITION_NO_WORKFLOW_EFFECT)
         self.assertEqual(repo.reschedule_requests.get(1), None)
 
+    def test_matching_schedule_in_database_format_creates_no_reschedule_request(self) -> None:
+        repo = make_repo(
+            rental_cases=(
+                make_case(
+                    active_event_start="2026-10-03 12:00:00+00",
+                    active_event_end="2026-10-03 18:00:00+00",
+                ),
+            )
+        )
+        request = make_request(
+            dedupe_key="matching-schedule-db-format",
+            candidate=StructuredObservationCandidate(
+                reported_field_code="active_event_window",
+                observation_type=OBSERVATION_TYPE_REQUEST_CANDIDATE,
+                claim_kind=OBSERVATION_CLAIM_KIND_NEW_INFORMATION,
+                candidate_value_payload={
+                    "active_event_start": "2026-10-03T12:00:00Z",
+                    "active_event_end": "2026-10-03T18:00:00Z",
+                },
+                source_evidence_reference="client:matching-schedule",
+            ),
+        )
+
+        result = ingest_structured_observations(request=request, repository=repo)
+
+        self.assertEqual(result.observation_results[0].effect.disposition_code, OBSERVATION_DISPOSITION_NO_WORKFLOW_EFFECT)
+        self.assertEqual(repo.reschedule_requests.get(1), None)
+
     def test_incomplete_schedule_candidate_creates_no_reschedule_request(self) -> None:
         repo = make_repo(rental_cases=(make_case(active_event_start=None, active_event_end=None),))
         request = make_request(

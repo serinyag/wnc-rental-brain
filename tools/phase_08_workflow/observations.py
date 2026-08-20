@@ -774,9 +774,13 @@ def _build_case_association_from_source(
 
 
 def _current_active_date_snapshot(case_snapshot: ObservationCaseSnapshot) -> dict[str, Any]:
+    start = case_snapshot.rental_case.active_event_start
+    end = case_snapshot.rental_case.active_event_end
+    normalized_start = _normalize_iso_timestamp(start) if isinstance(start, str) and start.strip() else None
+    normalized_end = _normalize_iso_timestamp(end) if isinstance(end, str) and end.strip() else None
     return {
-        "active_event_start": case_snapshot.rental_case.active_event_start,
-        "active_event_end": case_snapshot.rental_case.active_event_end,
+        "active_event_start": normalized_start or start,
+        "active_event_end": normalized_end or end,
     }
 
 
