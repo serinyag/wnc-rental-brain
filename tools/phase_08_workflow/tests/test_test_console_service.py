@@ -15,6 +15,7 @@ from tools.phase_08_workflow.contracts import (
     FOLLOW_UP_STATUS_SCHEDULED,
     FOLLOW_UP_URGENCY_MEDIUM,
     LIFECYCLE_STATE_INQUIRY_ACTIVE,
+    OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     ExecutionAttempt,
     FollowUp,
     OpenQuestion,
@@ -444,6 +445,204 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(len(snapshot.follow_ups), 1)
         self.assertEqual(len(snapshot.workflow_actions), 1)
         self.assertEqual(snapshot.workflow_actions[0].action_type, ACTION_TYPE_REQUEST_CLIENT_INFORMATION)
+
+    def test_run_reconciliation_creates_capacity_confirmation_blocker_for_studio_over_max(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=0,
+            rental_type_code="studio_space",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        orchestration_repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={1: rental_case},
+            rental_case_facts={1: []},
+            blockers={1: []},
+            requirements={1: []},
+            open_questions={1: []},
+            approval_requests={1: []},
+            proposed_changes={1: []},
+            reschedule_requests={1: []},
+            case_decisions={1: []},
+            workflow_actions={1: []},
+            execution_attempts={1: []},
+            follow_ups={1: []},
+            milestones={1: []},
+            artifacts={1: []},
+            reasoning_projections={1: []},
+            workflow_events={1: []},
+        )
+        orchestration_repository.upsert_rental_case_fact(
+            rental_case_id=1,
+            field_code="guest_count",
+            domain_code="event_profile",
+            value_payload=48,
+            source_reference="fact:guest_count",
+            established_case_revision=0,
+            timestamp="2026-08-14T09:00:00Z",
+        )
+        service = _MetadataService(
+            orchestration_repository=orchestration_repository,
+            observation_repository=InMemoryObservationRepository(
+                rental_cases={1: rental_case},
+                rental_case_facts={1: []},
+                open_questions={1: []},
+                requirements={1: []},
+                proposed_changes={1: []},
+                case_decisions={1: []},
+                reschedule_requests={1: []},
+                workflow_events={1: []},
+                inbound_source_records={},
+                inbound_observations={},
+                inbound_observation_effects={},
+                source_ids_by_dedupe={},
+                observation_ids_by_identity={},
+                observation_ids_by_source={},
+                observation_failure_codes={},
+            ),
+            config=TestConsoleConfig(),
+            now=lambda: "2026-08-20T10:00:00Z",
+            query_runner=lambda sql, *, expect_json: {"rows": [{"max_guests": 40}]} if "max(max_guests)" in sql else {"rows": []},
+        )
+
+        report = service.run_reconciliation(rental_case_id=1)
+        snapshot = orchestration_repository.load_case_snapshot(1)
+
+        self.assertTrue(report.success)
+        self.assertEqual(len(snapshot.reasoning_projections), 1)
+        self.assertEqual(len(snapshot.blockers), 1)
+        self.assertEqual(snapshot.blockers[0].blocker_type, "confirmation_required")
+
+    def test_run_reconciliation_creates_technical_confirmation_blocker(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=0,
+            rental_type_code="studio_space",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        source_record = InboundSourceRecord(
+            inbound_source_record_id=30,
+            source_system_code="manual_input",
+            source_record_type="operator_note",
+            dedupe_key="src:30",
+            source_hash="sha256:30",
+            occurred_at="2026-08-14T09:00:00Z",
+            association_status="resolved",
+            created_at="2026-08-14T09:00:00Z",
+            resolved_rental_case_id=1,
+        )
+        observation = InboundObservation(
+            inbound_observation_id=40,
+            inbound_source_record_id=30,
+            reported_field_code="technical_requirements",
+            observation_type="fact_candidate",
+            claim_kind="new_information",
+            candidate_value_payload=["microphones"],
+            source_evidence_reference="fixture:technical",
+            status="validated",
+            observation_identity_key="obs:40",
+            created_at="2026-08-14T09:00:00Z",
+            rental_case_id=1,
+        )
+        effect = InboundObservationEffect(
+            inbound_observation_effect_id=50,
+            inbound_observation_id=40,
+            rental_case_id=1,
+            disposition_code="no_workflow_effect",
+            revalidation_required=False,
+            stale_observation=False,
+            reason_codes=("fixture",),
+            created_at="2026-08-14T09:00:00Z",
+        )
+        service = _MetadataService(
+            orchestration_repository=InMemoryWorkflowOrchestrationRepository(
+                rental_cases={1: rental_case},
+                rental_case_facts={1: []},
+                blockers={1: []},
+                requirements={1: []},
+                open_questions={1: []},
+                approval_requests={1: []},
+                proposed_changes={1: []},
+                reschedule_requests={1: []},
+                case_decisions={1: []},
+                workflow_actions={1: []},
+                execution_attempts={1: []},
+                follow_ups={1: []},
+                milestones={1: []},
+                artifacts={1: []},
+                reasoning_projections={1: []},
+                workflow_events={1: []},
+            ),
+            observation_repository=_BatchedObservationRepository((source_record,), (observation,), (effect,)),
+            config=TestConsoleConfig(),
+            now=lambda: "2026-08-20T10:00:00Z",
+            query_runner=lambda sql, *, expect_json: {"rows": [{"support_status": "external_supplier_required", "requires_confirmation": False}]} if "api.get_technical_capability" in sql else {"rows": []},
+        )
+        service._load_raw_evidence_by_source = lambda rental_case_id: {30: None}  # type: ignore[method-assign]
+
+        report = service.run_reconciliation(rental_case_id=1)
+        snapshot = service.orchestration_repository.load_case_snapshot(1)
+
+        self.assertTrue(report.success)
+        self.assertEqual(len(snapshot.reasoning_projections), 1)
+        self.assertEqual(len(snapshot.blockers), 1)
+        self.assertEqual(len(snapshot.workflow_actions), 1)
+
+    def test_current_inquiry_questions_include_answered_pending_validation(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+        )
+        snapshot = WorkflowOrchestrationCaseSnapshot(
+            rental_case=RentalCase(
+                rental_case_id=1,
+                rental_case_uuid="case-1",
+                case_reference_code="RC-9001",
+                lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+                case_revision=0,
+                rental_type_code="custom_scope",
+                commercial_summary_status="unknown",
+                operational_summary_status="unknown",
+                is_active=True,
+                created_at="2026-08-14T09:00:00Z",
+                updated_at="2026-08-14T09:00:00Z",
+            ),
+            open_questions=(
+                OpenQuestion(
+                    open_question_id=1,
+                    rental_case_id=1,
+                    question_type="requested_rental_scope",
+                    domain_code="event_profile",
+                    human_question_text="Which space or rental scope is the client requesting?",
+                    blocking_scope="transition",
+                    status=OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
+                    created_at="2026-08-14T09:00:00Z",
+                    requested_from_role="client",
+                    proposed_answer_payload="custom_scope",
+                    source_reference="open_question:1",
+                ),
+            ),
+        )
+
+        questions = service._current_inquiry_questions(snapshot)
+
+        self.assertEqual([question.open_question_id for question in questions], [1])
 
     def test_staging_operator_can_create_task_surface_test_action(self) -> None:
         rental_case = RentalCase(

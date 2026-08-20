@@ -7,6 +7,7 @@ from tools.phase_08_workflow.contracts import (
     ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
     FOLLOW_UP_REASON_INQUIRY_MISSING_INFORMATION,
+    OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     FOLLOW_UP_STATUS_CANCELLED,
     FOLLOW_UP_STATUS_ESCALATED,
     FOLLOW_UP_STATUS_SCHEDULED,
@@ -52,7 +53,7 @@ def make_case(*, active_event_start: str | None = None) -> RentalCase:
     )
 
 
-def make_open_question(field_code: str, question_id: int) -> OpenQuestion:
+def make_open_question(field_code: str, question_id: int, *, status: str = OPEN_QUESTION_STATUS_OPEN) -> OpenQuestion:
     rule = CORE_INQUIRY_FIELD_RULES[field_code]
     return OpenQuestion(
         open_question_id=question_id,
@@ -61,7 +62,7 @@ def make_open_question(field_code: str, question_id: int) -> OpenQuestion:
         domain_code=rule.domain_code,
         human_question_text=rule.human_question_text,
         blocking_scope="transition",
-        status=OPEN_QUESTION_STATUS_OPEN,
+        status=status,
         created_at="2026-08-14T09:00:00Z",
         requested_from_role="client",
         source_reference=f"open_question:{question_id}",
@@ -144,6 +145,28 @@ class InquiryWaitingTests(unittest.TestCase):
         self.assertEqual(follow_up.status, FOLLOW_UP_STATUS_SCHEDULED)
         self.assertEqual(follow_up.sequence_number, 1)
         self.assertEqual(follow_up.context_payload["open_question_ids"], [1, 2, 3, 4])
+
+    def test_answered_pending_validation_question_still_requires_follow_up(self) -> None:
+        repo = make_repo(
+            questions=(
+                make_open_question(
+                    "requested_space",
+                    3,
+                    status=OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
+                ),
+            )
+        )
+
+        result = reconcile_inquiry_waiting(
+            repo,
+            rental_case_id=1,
+            actor_reference="system:test",
+            actor_type="system",
+            now=lambda: "2026-08-14T10:00:00Z",
+        )
+
+        self.assertTrue(result.plan.waiting_required)
+        self.assertEqual(result.plan.open_question_ids, (3,))
 
     def test_repeated_waiting_evaluation_is_idempotent(self) -> None:
         repo = make_repo(questions=tuple(make_open_question(field_code, question_id) for field_code, question_id in QUESTION_FIXTURES))

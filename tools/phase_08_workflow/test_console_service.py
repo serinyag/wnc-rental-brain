@@ -12,6 +12,10 @@ from http import HTTPStatus
 from typing import Any, Callable
 
 from tools.phase_05_chunking.generate_pilot import find_local_db_container, run_supabase_query
+from tools.phase_07_reasoning.contracts import (
+    AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION,
+    PHASE_7_CONTEXT_CONTRACT_VERSION,
+)
 from tools.runtime_environment import (
     AppRuntimeConfig,
     RuntimeConfigurationError,
@@ -26,8 +30,16 @@ from .contracts import (
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     APPROVAL_REQUEST_STATUS_OPEN,
+    OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
+    PHASE_7_REASONING_STATE_MANUAL_REVIEW_REQUIRED,
+    PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+    PHASE_8_PHASE7_WORKFLOW_CONSUMPTION_CONTRACT_VERSION,
+    REASONING_PURPOSE_FEASIBILITY_REVIEW,
     OPEN_QUESTION_STATUS_OPEN,
+    WORKFLOW_CONFIDENTIALITY_LEVEL_INTERNAL,
+    WORKFLOW_REASONING_POSTURE_REVIEW_REQUIRED,
     ApprovalRequest,
+    WorkflowReasoningProjection,
     WorkflowAction,
     WORKFLOW_ACTION_STATUS_APPROVED,
     WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
@@ -118,10 +130,18 @@ from .observation_types import (
     StructuredObservationIngestionRequest,
 )
 from .observations import ingest_structured_observations
-from .orchestration_repository import SupabaseWorkflowOrchestrationRepository, WorkflowOrchestrationCaseSnapshot
+from .orchestration_repository import (
+    InMemoryWorkflowOrchestrationRepository,
+    SupabaseWorkflowOrchestrationRepository,
+    WorkflowOrchestrationCaseSnapshot,
+)
 from .orchestration_runtime import apply_approval_decision, reconcile_workflow_orchestration
 from .orchestration_types import ApprovalDecisionInput, ORCHESTRATION_DECISION_APPROVED, ORCHESTRATION_DECISION_REJECTED
 from .outlook_adapter import OutlookAdapterConfig, build_outlook_execution_adapter_from_env
+from .phase7_consumption_repository import (
+    InMemoryPhase7ConsumptionRepository,
+    SupabasePhase7ConsumptionRepository,
+)
 from .provider_safety import guard_asana_execution_adapter, guard_outlook_execution_adapter
 from .supabase_observation_repository import SupabaseObservationRepository
 from .test_console_projection import (
@@ -177,6 +197,16 @@ class TestConsoleError(RuntimeError):
 class TestConsoleReadError(TestConsoleError):
     def __init__(self, message: str, *, failure_code: str) -> None:
         super().__init__(message, failure_code=failure_code, status=HTTPStatus.SERVICE_UNAVAILABLE)
+
+
+@dataclass(frozen=True)
+class SyntheticAuthorityIssue:
+    domain_code: str
+    issue_code: str
+    reasoning_state_code: str
+    source_label: str
+    source_value: Any
+    source_snapshot: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -1360,6 +1390,7 @@ limit 1;
 
     def run_reconciliation(self, *, rental_case_id: int) -> OperationReport:
         snapshot = self._require_case_snapshot(rental_case_id)
+        self._synthesize_authority_confirmation_projections(snapshot)
         result = reconcile_workflow_orchestration(
             self.orchestration_repository,
             rental_case_id=rental_case_id,
@@ -1380,6 +1411,402 @@ limit 1;
             ),
             failure_codes=result.failure_codes,
         )
+
+    def _synthesize_authority_confirmation_projections(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+    ) -> None:
+        repository = self._phase7_consumption_repository()
+        if repository is None:
+            return
+        try:
+            bundles = self._load_case_evidence_bundles(snapshot.rental_case.rental_case_id)
+        except TestConsoleError:
+            bundles = ()
+        observed_field_candidates = self._build_observed_field_candidates(tuple(bundles))
+        issues = self._collect_synthetic_authority_issues(
+            snapshot,
+            observed_field_candidates=observed_field_candidates,
+        )
+        if not issues:
+            return
+        created_at = self.now()
+        for issue in issues:
+            repository.create_reasoning_projection(
+                WorkflowReasoningProjection(
+                    reasoning_projection_id=1,
+                    rental_case_id=snapshot.rental_case.rental_case_id,
+                    reasoning_purpose=REASONING_PURPOSE_FEASIBILITY_REVIEW,
+                    phase_7_context_contract_version=PHASE_7_CONTEXT_CONTRACT_VERSION,
+                    phase_8_workflow_contract_version=PHASE_8_PHASE7_WORKFLOW_CONSUMPTION_CONTRACT_VERSION,
+                    source_case_revision=snapshot.rental_case.case_revision,
+                    authority_outcome_classification=AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION,
+                    degraded_retrieval_summary={
+                        "any_degradation": False,
+                        "materially_affects_answer_completeness": False,
+                        "affected_layers": [],
+                        "per_layer_execution_states": {},
+                        "fallback_reasons": {},
+                        "generator_warnings": [],
+                    },
+                    created_at=created_at,
+                    projection_identity_key=self._synthetic_projection_identity_key(snapshot, issue),
+                    reasoning_state_code=issue.reasoning_state_code,
+                    workflow_posture=WORKFLOW_REASONING_POSTURE_REVIEW_REQUIRED,
+                    effective_confidentiality_level=WORKFLOW_CONFIDENTIALITY_LEVEL_INTERNAL,
+                    unresolved_authority_codes=(f"{issue.domain_code}|{issue.reasoning_state_code}",),
+                    grounding_reference_keys=(f"test_console:{issue.issue_code}",),
+                )
+            )
+
+    def _phase7_consumption_repository(self) -> InMemoryPhase7ConsumptionRepository | SupabasePhase7ConsumptionRepository | None:
+        repository = self.orchestration_repository
+        if isinstance(repository, SupabaseWorkflowOrchestrationRepository):
+            return SupabasePhase7ConsumptionRepository(query_runner=self.query_runner)
+        if not isinstance(repository, InMemoryWorkflowOrchestrationRepository):
+            return None
+        projection_ids_by_identity: dict[tuple[int, str], int] = {}
+        max_projection_id = 90_000
+        for rental_case_id, projections in repository.reasoning_projections.items():
+            for projection in projections:
+                max_projection_id = max(max_projection_id, projection.reasoning_projection_id)
+                if projection.projection_identity_key:
+                    projection_ids_by_identity[(rental_case_id, projection.projection_identity_key)] = (
+                        projection.reasoning_projection_id
+                    )
+        return InMemoryPhase7ConsumptionRepository(
+            rental_cases=repository.rental_cases,
+            reasoning_projections=repository.reasoning_projections,
+            projection_ids_by_identity=projection_ids_by_identity,
+            _reasoning_projection_id=max_projection_id,
+        )
+
+    def _collect_synthetic_authority_issues(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        observed_field_candidates: tuple[ObservedFieldCandidate, ...],
+    ) -> tuple[SyntheticAuthorityIssue, ...]:
+        observed_by_field = {candidate.field_code: candidate for candidate in observed_field_candidates}
+        issues: list[SyntheticAuthorityIssue] = []
+        capacity_issue = self._capacity_authority_issue(snapshot, observed_by_field=observed_by_field)
+        if capacity_issue is not None:
+            issues.append(capacity_issue)
+        technical_issue = self._technical_authority_issue(observed_by_field=observed_by_field)
+        if technical_issue is not None:
+            issues.append(technical_issue)
+        facilitator_issue = self._facilitator_authority_issue(observed_by_field=observed_by_field)
+        if facilitator_issue is not None:
+            issues.append(facilitator_issue)
+        return tuple(issues)
+
+    def _capacity_authority_issue(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        observed_by_field: dict[str, ObservedFieldCandidate],
+    ) -> SyntheticAuthorityIssue | None:
+        rental_type_code = snapshot.rental_case.rental_type_code
+        guest_count = self._current_guest_count(snapshot)
+        if guest_count is None or rental_type_code not in {"studio_space", "entire_venue", "one_to_one_room"}:
+            return None
+        as_of_date = self.now()[:10]
+        if rental_type_code == "entire_venue":
+            row = self._first_row(
+                f"""
+select applicability_status, capacity_evaluation_status, within_capacity
+from api.evaluate_capacity(
+  null,
+  'entire_venue',
+  null,
+  {guest_count},
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+            )
+            if row is None or row.get("capacity_evaluation_status") == "within_capacity":
+                return None
+            return SyntheticAuthorityIssue(
+                domain_code="capacity",
+                issue_code="capacity_entire_venue_confirmation",
+                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                source_label="entire_venue_capacity",
+                source_value=guest_count,
+                source_snapshot={
+                    "rental_type_code": rental_type_code,
+                    "guest_count": guest_count,
+                    "capacity_evaluation_status": row.get("capacity_evaluation_status"),
+                    "applicability_status": row.get("applicability_status"),
+                },
+            )
+        if rental_type_code == "one_to_one_room":
+            row = self._first_row(
+                f"""
+select applicability_status, capacity_evaluation_status, within_capacity
+from api.evaluate_capacity(
+  'one_to_one_room',
+  null,
+  null,
+  {guest_count},
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+            )
+            if row is None or row.get("capacity_evaluation_status") == "within_capacity":
+                return None
+            return SyntheticAuthorityIssue(
+                domain_code="capacity",
+                issue_code="capacity_one_to_one_confirmation",
+                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                source_label="one_to_one_capacity",
+                source_value=guest_count,
+                source_snapshot={
+                    "rental_type_code": rental_type_code,
+                    "guest_count": guest_count,
+                    "capacity_evaluation_status": row.get("capacity_evaluation_status"),
+                    "applicability_status": row.get("applicability_status"),
+                },
+            )
+        configuration_type = self._layout_configuration_type(snapshot, observed_by_field=observed_by_field)
+        if configuration_type:
+            row = self._first_row(
+                f"""
+select applicability_status, capacity_evaluation_status, within_capacity
+from api.evaluate_capacity(
+  'studio_space',
+  null,
+  {sql_text(configuration_type)},
+  {guest_count},
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+            )
+            if row is None or row.get("capacity_evaluation_status") == "within_capacity":
+                return None
+            return SyntheticAuthorityIssue(
+                domain_code="capacity",
+                issue_code="capacity_studio_configuration_confirmation",
+                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                source_label="studio_capacity_configuration",
+                source_value=guest_count,
+                source_snapshot={
+                    "rental_type_code": rental_type_code,
+                    "guest_count": guest_count,
+                    "configuration_type": configuration_type,
+                    "capacity_evaluation_status": row.get("capacity_evaluation_status"),
+                    "applicability_status": row.get("applicability_status"),
+                },
+            )
+        max_capacity_row = self._first_row(
+            """
+select max(max_guests) as max_guests
+from public.current_capacity_rules
+where scope_code = 'studio_space'
+  and max_guests is not null;
+""".strip()
+        )
+        max_capacity = max_capacity_row.get("max_guests") if max_capacity_row is not None else None
+        if isinstance(max_capacity, int) and guest_count > max_capacity:
+            return SyntheticAuthorityIssue(
+                domain_code="capacity",
+                issue_code="capacity_studio_over_published_max",
+                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                source_label="studio_capacity_upper_bound",
+                source_value=guest_count,
+                source_snapshot={
+                    "rental_type_code": rental_type_code,
+                    "guest_count": guest_count,
+                    "published_max_guests": max_capacity,
+                    "configuration_type": None,
+                },
+            )
+        return None
+
+    def _technical_authority_issue(
+        self,
+        *,
+        observed_by_field: dict[str, ObservedFieldCandidate],
+    ) -> SyntheticAuthorityIssue | None:
+        candidate = observed_by_field.get("technical_requirements")
+        if candidate is None or not isinstance(candidate.value_payload, list):
+            return None
+        as_of_date = self.now()[:10]
+        triggered: list[dict[str, Any]] = []
+        for value in candidate.value_payload:
+            if value == "microphones":
+                row = self._first_row(
+                    f"""
+select support_status, requires_confirmation
+from api.get_technical_capability(
+  'capability_availability',
+  'microphones',
+  null,
+  'audio',
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+                )
+            elif value == "dj_sound_booth":
+                row = self._first_row(
+                    f"""
+select support_status, requires_confirmation
+from api.evaluate_technical_requirement(
+  'amplified_event_sound',
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+                )
+            elif value == "power_requirements":
+                row = self._first_row(
+                    f"""
+select support_status, requires_confirmation
+from api.evaluate_technical_requirement(
+  'high_load_power',
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+                )
+            elif value == "other_technical":
+                row = self._first_row(
+                    f"""
+select support_status, requires_confirmation
+from api.evaluate_technical_requirement(
+  'custom_technical_setup',
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+                )
+            else:
+                row = None
+            if row is None:
+                continue
+            support_status = row.get("support_status")
+            if support_status in {"external_supplier_required", "requires_confirmation"} or bool(row.get("requires_confirmation")):
+                triggered.append(
+                    {
+                        "observed_requirement": value,
+                        "support_status": support_status,
+                        "requires_confirmation": bool(row.get("requires_confirmation")),
+                    }
+                )
+        if not triggered:
+            return None
+        return SyntheticAuthorityIssue(
+            domain_code="technical",
+            issue_code="technical_requirements_confirmation",
+            reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+            source_label="technical_requirements",
+            source_value=list(candidate.value_payload),
+            source_snapshot={"triggered_requirements": triggered},
+        )
+
+    def _facilitator_authority_issue(
+        self,
+        *,
+        observed_by_field: dict[str, ObservedFieldCandidate],
+    ) -> SyntheticAuthorityIssue | None:
+        candidate = observed_by_field.get("facilitator_arrangement")
+        if candidate is None or not isinstance(candidate.value_payload, str):
+            return None
+        if candidate.value_payload not in {"wnc_provided", "custom_experience_design"}:
+            return None
+        row = self._first_row(
+            f"""
+select arrangement_status, requires_confirmation, requires_availability_confirmation,
+       client_commitment_requires_facilitator_confirmation, manual_review_required
+from api.get_facilitator_requirements(
+  {sql_text(candidate.value_payload)},
+  {sql_text(self.now()[:10])}::date
+)
+limit 1;
+""".strip()
+        )
+        if row is None:
+            return None
+        manual_review = bool(row.get("manual_review_required")) or row.get("arrangement_status") == "manual_review_required"
+        confirmation_required = (
+            bool(row.get("requires_confirmation"))
+            or bool(row.get("requires_availability_confirmation"))
+            or bool(row.get("client_commitment_requires_facilitator_confirmation"))
+            or row.get("arrangement_status") == "conditional"
+        )
+        if not manual_review and not confirmation_required:
+            return None
+        return SyntheticAuthorityIssue(
+            domain_code="facilitator",
+            issue_code=f"facilitator_{candidate.value_payload}_confirmation",
+            reasoning_state_code=(
+                PHASE_7_REASONING_STATE_MANUAL_REVIEW_REQUIRED
+                if manual_review
+                else PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION
+            ),
+            source_label="facilitator_arrangement",
+            source_value=candidate.value_payload,
+            source_snapshot={
+                "arrangement_status": row.get("arrangement_status"),
+                "requires_confirmation": bool(row.get("requires_confirmation")),
+                "requires_availability_confirmation": bool(row.get("requires_availability_confirmation")),
+                "manual_review_required": manual_review,
+            },
+        )
+
+    def _synthetic_projection_identity_key(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        issue: SyntheticAuthorityIssue,
+    ) -> str:
+        payload = {
+            "rental_case_id": snapshot.rental_case.rental_case_id,
+            "source_case_revision": snapshot.rental_case.case_revision,
+            "reasoning_purpose": REASONING_PURPOSE_FEASIBILITY_REVIEW,
+            "domain_code": issue.domain_code,
+            "issue_code": issue.issue_code,
+            "reasoning_state_code": issue.reasoning_state_code,
+            "source_label": issue.source_label,
+            "source_value": issue.source_value,
+            "source_snapshot": issue.source_snapshot,
+        }
+        digest = hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+        ).hexdigest()
+        return f"test-console-projection:{digest}"
+
+    def _current_guest_count(self, snapshot: WorkflowOrchestrationCaseSnapshot) -> int | None:
+        fact = snapshot.find_rental_case_fact("guest_count")
+        value = None if fact is None else fact.value_payload
+        return value if isinstance(value, int) and not isinstance(value, bool) and value > 0 else None
+
+    def _layout_configuration_type(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        observed_by_field: dict[str, ObservedFieldCandidate],
+    ) -> str | None:
+        fact = snapshot.find_rental_case_fact("layout_requirements")
+        payload = None if fact is None else fact.value_payload
+        if payload is None:
+            candidate = observed_by_field.get("layout_requirements")
+            payload = None if candidate is None else candidate.value_payload
+        if not isinstance(payload, dict):
+            return None
+        for key in ("configuration_type", "layout_type", "layout", "setup_type"):
+            value = payload.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        return None
+
+    def _first_row(self, sql: str) -> dict[str, Any] | None:
+        rows = self.query_runner(sql, expect_json=True)["rows"]
+        if not rows:
+            return None
+        return rows[0]
 
     def run_inquiry_waiting(self, *, rental_case_id: int) -> OperationReport:
         snapshot = self._require_case_snapshot(rental_case_id)
@@ -2693,7 +3120,7 @@ returning
                 (
                     question
                     for question in snapshot.open_questions
-                    if question.status == OPEN_QUESTION_STATUS_OPEN
+                    if question.status in {OPEN_QUESTION_STATUS_OPEN, OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION}
                     and (question.requested_from_role or "").startswith("client")
                 ),
                 key=lambda question: question.open_question_id,

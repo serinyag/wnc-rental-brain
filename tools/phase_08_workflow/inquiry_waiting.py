@@ -21,6 +21,7 @@ from .contracts import (
     LIFECYCLE_STATE_CLOSED,
     LIFECYCLE_STATE_CLOSED_LOST,
     LIFECYCLE_STATE_INQUIRY_ACTIVE,
+    OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     OPEN_QUESTION_STATUS_OPEN,
     FollowUp,
 )
@@ -549,7 +550,7 @@ def _relevant_inquiry_questions(snapshot: WorkflowOrchestrationCaseSnapshot) -> 
         [
             question
             for question in snapshot.open_questions
-            if question.status == OPEN_QUESTION_STATUS_OPEN
+            if question.status in {OPEN_QUESTION_STATUS_OPEN, OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION}
             and (question.requested_from_role or "").startswith("client")
             and question.question_type in INQUIRY_QUESTION_TYPES
         ],

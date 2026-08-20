@@ -47,6 +47,7 @@ from .contracts import (
     FOLLOW_UP_STATUS_ESCALATED,
     FOLLOW_UP_STATUS_OVERDUE,
     FOLLOW_UP_STATUS_SCHEDULED,
+    OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     OPEN_QUESTION_STATUS_OPEN,
     PROPOSED_CHANGE_STATUS_ACCEPTED,
     PROPOSED_CHANGE_STATUS_PROPOSED,
@@ -994,7 +995,7 @@ def _apply_open_question_rules(
     rule_codes: list[str],
 ) -> None:
     for question in context.open_questions:
-        if question.status != OPEN_QUESTION_STATUS_OPEN:
+        if question.status not in {OPEN_QUESTION_STATUS_OPEN, OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION}:
             continue
         semantic_key = f"blocker:question:{question.open_question_id}"
         blocker_changes.append(

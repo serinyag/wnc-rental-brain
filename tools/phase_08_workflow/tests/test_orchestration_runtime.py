@@ -17,6 +17,7 @@ from tools.phase_08_workflow.contracts import (
     CASE_DECISION_STATUS_ACTIVE,
     CASE_DECISION_STATUS_PROPOSED,
     LIFECYCLE_STATE_PROPOSAL_IN_PROGRESS,
+    OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     OPEN_QUESTION_STATUS_OPEN,
     PROPOSED_CHANGE_STATUS_PROPOSED,
     RESCHEDULE_STATUS_PROPOSED,
@@ -112,7 +113,12 @@ def make_repo(
     )
 
 
-def make_question(question_id: int, *, requested_from_role: str = "client") -> OpenQuestion:
+def make_question(
+    question_id: int,
+    *,
+    requested_from_role: str = "client",
+    status: str = OPEN_QUESTION_STATUS_OPEN,
+) -> OpenQuestion:
     return OpenQuestion(
         open_question_id=question_id,
         rental_case_id=1,
@@ -121,7 +127,7 @@ def make_question(question_id: int, *, requested_from_role: str = "client") -> O
         human_question_text="What is the expected guest count?",
         requested_from_role=requested_from_role,
         blocking_scope="transition",
-        status=OPEN_QUESTION_STATUS_OPEN,
+        status=status,
         created_at="2026-08-13T10:00:00Z",
     )
 
@@ -258,7 +264,24 @@ class OrchestrationRuntimeTests(unittest.TestCase):
         self.assertEqual(len(first.created_blocker_ids), 1)
         self.assertEqual(first.created_action_ids, ())
         self.assertEqual(second.created_blocker_ids, ())
-        self.assertEqual(second.created_action_ids, ())
+
+    def test_answered_pending_validation_still_blocks_transition(self) -> None:
+        repo = make_repo(
+            make_case(),
+            questions=(
+                make_question(
+                    1,
+                    status=OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
+                ),
+            ),
+        )
+
+        result = reconcile_workflow_orchestration(repo, rental_case_id=1, actor_reference="system:orchestration")
+        snapshot = repo.load_case_snapshot(1)
+
+        self.assertEqual(len(result.created_blocker_ids), 1)
+        self.assertEqual(result.created_action_ids, ())
+        self.assertEqual(len(snapshot.blockers), 1)
         self.assertEqual(repo.rental_cases[1].case_revision, 0)
 
     def test_resolved_question_resolves_blocker_without_emitting_client_action(self) -> None:

@@ -495,13 +495,24 @@ def _build_feasibility_snapshot(snapshot: WorkflowOrchestrationCaseSnapshot) -> 
         for question in snapshot.open_questions
         if question.status in {OPEN_QUESTION_STATUS_OPEN, OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION}
     ]
+    confirmation_blockers = [
+        blocker
+        for blocker in snapshot.blockers
+        if blocker.status == BLOCKER_STATUS_OPEN
+        and blocker.blocker_type in {"confirmation_required", "current_authority_missing"}
+    ]
+    confirmation_required = bool(open_questions or confirmation_blockers)
     items = [
-        _item("Feasibility as requested", NOT_YET_EVALUATED_VALUE, state=DISPLAY_STATE_UNRESOLVED),
+        _item(
+            "Feasibility as requested",
+            "Requires confirmation" if confirmation_blockers else NOT_YET_EVALUATED_VALUE,
+            state=DISPLAY_STATE_UNRESOLVED,
+        ),
         _item("Supported alternative", NOT_ESTABLISHED_VALUE, state=DISPLAY_STATE_UNRESOLVED),
         _item(
             "Confirmation still required",
-            "Yes" if open_questions else "No",
-            state=DISPLAY_STATE_UNRESOLVED if open_questions else DISPLAY_STATE_NONE,
+            "Yes" if confirmation_required else "No",
+            state=DISPLAY_STATE_UNRESOLVED if confirmation_required else DISPLAY_STATE_NONE,
         ),
     ]
     open_readiness_blockers = [blocker for blocker in snapshot.blockers if blocker.status == BLOCKER_STATUS_OPEN]
