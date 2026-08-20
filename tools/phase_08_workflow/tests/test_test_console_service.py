@@ -446,7 +446,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(len(snapshot.workflow_actions), 1)
         self.assertEqual(snapshot.workflow_actions[0].action_type, ACTION_TYPE_REQUEST_CLIENT_INFORMATION)
 
-    def test_run_reconciliation_creates_capacity_confirmation_blocker_for_studio_over_max(self) -> None:
+    def test_run_reconciliation_creates_capacity_restriction_for_studio_over_max(self) -> None:
         rental_case = RentalCase(
             rental_case_id=1,
             rental_case_uuid="case-1",
@@ -518,9 +518,10 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertTrue(report.success)
         self.assertEqual(len(snapshot.reasoning_projections), 1)
         self.assertEqual(len(snapshot.blockers), 1)
-        self.assertEqual(snapshot.blockers[0].blocker_type, "confirmation_required")
+        self.assertEqual(snapshot.blockers[0].blocker_type, "deterministic_restriction")
+        self.assertEqual(len(snapshot.workflow_actions), 0)
 
-    def test_run_reconciliation_creates_technical_confirmation_blocker(self) -> None:
+    def test_run_reconciliation_creates_technical_restriction_blocker(self) -> None:
         rental_case = RentalCase(
             rental_case_id=1,
             rental_case_uuid="case-1",
@@ -591,7 +592,11 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             observation_repository=_BatchedObservationRepository((source_record,), (observation,), (effect,)),
             config=TestConsoleConfig(),
             now=lambda: "2026-08-20T10:00:00Z",
-            query_runner=lambda sql, *, expect_json: {"rows": [{"support_status": "external_supplier_required", "requires_confirmation": False}]} if "api.get_technical_capability" in sql else {"rows": []},
+            query_runner=lambda sql, *, expect_json: (
+                {"rows": [{"applicability_status": "applies", "support_status": "external_supplier_required", "requires_confirmation": False}]}
+                if "api.evaluate_technical_requirement" in sql
+                else {"rows": []}
+            ),
         )
         service._load_raw_evidence_by_source = lambda rental_case_id: {30: None}  # type: ignore[method-assign]
 
@@ -601,6 +606,91 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertTrue(report.success)
         self.assertEqual(len(snapshot.reasoning_projections), 1)
         self.assertEqual(len(snapshot.blockers), 1)
+        self.assertEqual(snapshot.blockers[0].blocker_type, "deterministic_restriction")
+        self.assertEqual(len(snapshot.workflow_actions), 0)
+
+    def test_run_reconciliation_creates_internal_review_for_unknown_technical_requirement(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=0,
+            rental_type_code="studio_space",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            service_level_or_type="studio_rental",
+            created_at="2026-08-14T09:00:00Z",
+            updated_at="2026-08-14T09:00:00Z",
+        )
+        source_record = InboundSourceRecord(
+            inbound_source_record_id=31,
+            source_system_code="manual_input",
+            source_record_type="operator_note",
+            dedupe_key="src:31",
+            source_hash="sha256:31",
+            occurred_at="2026-08-14T09:00:00Z",
+            association_status="resolved",
+            created_at="2026-08-14T09:00:00Z",
+            resolved_rental_case_id=1,
+        )
+        observation = InboundObservation(
+            inbound_observation_id=41,
+            inbound_source_record_id=31,
+            reported_field_code="technical_requirements",
+            observation_type="fact_candidate",
+            claim_kind="new_information",
+            candidate_value_payload=["acoustic_noise"],
+            source_evidence_reference="fixture:technical",
+            status="validated",
+            observation_identity_key="obs:41",
+            created_at="2026-08-14T09:00:00Z",
+            rental_case_id=1,
+        )
+        effect = InboundObservationEffect(
+            inbound_observation_effect_id=51,
+            inbound_observation_id=41,
+            rental_case_id=1,
+            disposition_code="no_workflow_effect",
+            revalidation_required=False,
+            stale_observation=False,
+            reason_codes=("fixture",),
+            created_at="2026-08-14T09:00:00Z",
+        )
+        service = _MetadataService(
+            orchestration_repository=InMemoryWorkflowOrchestrationRepository(
+                rental_cases={1: rental_case},
+                rental_case_facts={1: []},
+                blockers={1: []},
+                requirements={1: []},
+                open_questions={1: []},
+                approval_requests={1: []},
+                proposed_changes={1: []},
+                reschedule_requests={1: []},
+                case_decisions={1: []},
+                workflow_actions={1: []},
+                execution_attempts={1: []},
+                follow_ups={1: []},
+                milestones={1: []},
+                artifacts={1: []},
+                reasoning_projections={1: []},
+                workflow_events={1: []},
+            ),
+            observation_repository=_BatchedObservationRepository((source_record,), (observation,), (effect,)),
+            config=TestConsoleConfig(),
+            now=lambda: "2026-08-20T10:00:00Z",
+            query_runner=lambda sql, *, expect_json: {"rows": []},
+        )
+        service._load_raw_evidence_by_source = lambda rental_case_id: {31: None}  # type: ignore[method-assign]
+
+        report = service.run_reconciliation(rental_case_id=1)
+        snapshot = service.orchestration_repository.load_case_snapshot(1)
+
+        self.assertTrue(report.success)
+        self.assertEqual(len(snapshot.reasoning_projections), 1)
+        self.assertEqual(len(snapshot.blockers), 1)
+        self.assertEqual(snapshot.blockers[0].blocker_type, "current_authority_missing")
         self.assertEqual(len(snapshot.workflow_actions), 1)
 
     def test_current_inquiry_questions_include_answered_pending_validation(self) -> None:

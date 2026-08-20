@@ -113,6 +113,7 @@ from .orchestration_types import (
 from .phase7_consumption_types import (
     WORKFLOW_REASONING_EFFECT_CONFIRMATION_REQUIRED,
     WORKFLOW_REASONING_EFFECT_CURRENT_AUTHORITY_MISSING,
+    WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
     WORKFLOW_REASONING_EFFECT_REQUIREMENT_CANDIDATE,
     WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED,
     WorkflowReasoningEffect,
@@ -124,6 +125,7 @@ RULE_MISSING_CLIENT_INFORMATION = "RULE_MISSING_CLIENT_INFORMATION"
 RULE_INTERNAL_CONFIRMATION_REQUEST = "RULE_INTERNAL_CONFIRMATION_REQUEST"
 RULE_AUTHORITY_GAP_BLOCK = "RULE_AUTHORITY_GAP_BLOCK"
 RULE_CONFIRMATION_REQUIRED_BLOCK = "RULE_CONFIRMATION_REQUIRED_BLOCK"
+RULE_DETERMINISTIC_RESTRICTION = "RULE_DETERMINISTIC_RESTRICTION"
 RULE_CASE_DECISION_APPROVAL = "RULE_CASE_DECISION_APPROVAL"
 RULE_CASE_DECISION_CONFLICT = "RULE_CASE_DECISION_CONFLICT"
 RULE_PROPOSED_CHANGE_REVIEW = "RULE_PROPOSED_CHANGE_REVIEW"
@@ -1126,9 +1128,27 @@ def _apply_reasoning_effect_rules(
                         summary="Structured confirmation is required before progressing.",
                         rule_code=RULE_CONFIRMATION_REQUIRED_BLOCK,
                     )
-                )
+            )
             policy_codes.append("POLICY_CONFIRMATION_REQUIRED")
             rule_codes.append(RULE_CONFIRMATION_REQUIRED_BLOCK)
+        elif effect.effect_type_code == WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION:
+            semantic_key = f"blocker:authority:restriction:{effect.source_projection_identity_key}"
+            blocker_changes.append(
+                BlockerPlanChange(
+                    semantic_issue_key=semantic_key,
+                    blocker_type="deterministic_restriction",
+                    blocked_subject_type=_blocked_subject_type_for_reasoning_purpose(effect.reasoning_purpose),
+                    blocked_subject_reference=f"reasoning_projection:{effect.source_projection_identity_key}",
+                    origin_entity_type="reasoning_projection",
+                    origin_entity_reference=f"reasoning_projection:{effect.source_projection_identity_key}",
+                    severity=SEVERITY_HIGH,
+                    resolution_condition_text="Current governed policy does not support the requested commitment as stated.",
+                    rule_code=RULE_DETERMINISTIC_RESTRICTION,
+                    evidence_reference_keys=(effect.source_projection_identity_key,),
+                )
+            )
+            policy_codes.append("POLICY_CURRENT_GOVERNED_RESTRICTION")
+            rule_codes.append(RULE_DETERMINISTIC_RESTRICTION)
         elif effect.effect_type_code == WORKFLOW_REASONING_EFFECT_REQUIREMENT_CANDIDATE:
             mapping = _map_requirement_candidate(effect)
             if mapping is None:

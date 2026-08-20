@@ -33,6 +33,7 @@ WORKFLOW_REASONING_EFFECT_DEGRADED_WARNING = "degraded_warning"
 WORKFLOW_REASONING_EFFECT_CONFLICT_PRESENT = "conflict_present"
 WORKFLOW_REASONING_EFFECT_CONTAMINATION_WARNING = "contamination_warning"
 WORKFLOW_REASONING_EFFECT_REQUIREMENT_CANDIDATE = "requirement_candidate"
+WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION = "deterministic_restriction"
 
 WORKFLOW_REASONING_EFFECT_CODES = frozenset(
     {
@@ -46,6 +47,23 @@ WORKFLOW_REASONING_EFFECT_CODES = frozenset(
         WORKFLOW_REASONING_EFFECT_CONFLICT_PRESENT,
         WORKFLOW_REASONING_EFFECT_CONTAMINATION_WARNING,
         WORKFLOW_REASONING_EFFECT_REQUIREMENT_CANDIDATE,
+        WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
+    }
+)
+
+WORKFLOW_SEMANTIC_STATE_KNOWN_YES = "known_yes"
+WORKFLOW_SEMANTIC_STATE_KNOWN_NO = "known_no"
+WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL = "known_conditional"
+WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL = "unknown_internal"
+WORKFLOW_SEMANTIC_STATE_MISSING_CLIENT_FACT = "missing_client_fact"
+
+WORKFLOW_SEMANTIC_STATE_CODES = frozenset(
+    {
+        WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+        WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+        WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+        WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+        WORKFLOW_SEMANTIC_STATE_MISSING_CLIENT_FACT,
     }
 )
 
@@ -217,3 +235,21 @@ class Phase7ConsumptionResult:
                     error_category="missing_value",
                     safe_message="successful consumption results require projection and posture.",
                 )
+
+
+def projection_semantic_state_code(projection: WorkflowReasoningProjection) -> str:
+    semantic_state = projection.degraded_retrieval_summary.get("semantic_state_code")
+    if semantic_state in WORKFLOW_SEMANTIC_STATE_CODES:
+        return semantic_state
+
+    if projection.reasoning_state_code == "requires_confirmation":
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+    if projection.reasoning_state_code in {
+        "insufficient_information",
+        "no_applicable_rule",
+        "manual_review_required",
+        "current_status_unknown",
+        "insufficient_current_authority",
+    }:
+        return WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL
+    return WORKFLOW_SEMANTIC_STATE_KNOWN_YES

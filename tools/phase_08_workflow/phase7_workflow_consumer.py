@@ -66,9 +66,15 @@ from .phase7_consumption_types import (
     WORKFLOW_REASONING_EFFECT_CURRENT_GUIDANCE_AVAILABLE,
     WORKFLOW_REASONING_EFFECT_CURRENT_TRUTH_AVAILABLE,
     WORKFLOW_REASONING_EFFECT_DEGRADED_WARNING,
+    WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
     WORKFLOW_REASONING_EFFECT_HISTORICAL_CONTEXT_AVAILABLE,
     WORKFLOW_REASONING_EFFECT_REQUIREMENT_CANDIDATE,
     WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+    WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+    projection_semantic_state_code,
 )
 from .validation import Phase8ContractError, ensure_non_negative_int, ensure_positive_int
 
@@ -132,6 +138,7 @@ def consume_phase7_context(
 
     reasoning_state_code = _derive_reasoning_state_code(context_package)
     posture = _derive_workflow_posture(context_package, authority_outcome, reasoning_state_code)
+    semantic_state_code = _derive_semantic_state_code(context_package)
     identity_key = _projection_identity_key(
         rental_case_id=rental_case_id,
         source_case_revision=expected_case_revision,
@@ -164,7 +171,10 @@ def consume_phase7_context(
         phase_8_workflow_contract_version=PHASE_8_PHASE7_WORKFLOW_CONSUMPTION_CONTRACT_VERSION,
         source_case_revision=expected_case_revision,
         authority_outcome_classification=authority_outcome,
-        degraded_retrieval_summary=_degraded_summary(context_package.degraded_retrieval_state),
+        degraded_retrieval_summary=_degraded_summary(
+            context_package.degraded_retrieval_state,
+            semantic_state_code=semantic_state_code,
+        ),
         created_at=current_timestamp(),
         projection_identity_key=identity_key,
         reasoning_state_code=reasoning_state_code,
@@ -287,6 +297,126 @@ def _derive_reasoning_state_code(context_package: ContextPackage) -> str:
     if not recognized_candidates:
         return PHASE_7_REASONING_STATE_MANUAL_REVIEW_REQUIRED
     return max(recognized_candidates, key=lambda code: _REASONING_PRIORITY[code])
+
+
+def _derive_semantic_state_code(context_package: ContextPackage) -> str:
+    candidates = [
+        semantic_state
+        for item in _authoritative_items(context_package)
+        if (semantic_state := _semantic_state_from_item(item)) is not None
+    ]
+    if candidates:
+        return _dominant_semantic_state(candidates)
+
+    unresolved = context_package.authority_resolution.unresolved_authority_records
+    if any(
+        record.reasoning_state == PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION
+        for record in unresolved
+    ):
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+    if unresolved or context_package.authority_resolution.overall_outcome_classification == AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY:
+        return WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL
+    if context_package.authority_resolution.overall_outcome_classification == AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION:
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+    return WORKFLOW_SEMANTIC_STATE_KNOWN_YES
+
+
+def _authoritative_items(context_package: ContextPackage) -> tuple[Any, ...]:
+    items_by_id = {
+        item.item_id: item
+        for item in (
+            context_package.phase_4_context
+            + context_package.phase_5_context
+            + context_package.phase_6_context
+        )
+    }
+    ordered_ids = (
+        context_package.authority_resolution.resolved_current_truth_item_ids
+        + context_package.authority_resolution.current_guidance_item_ids
+    )
+    return tuple(
+        item
+        for item_id in ordered_ids
+        if (item := items_by_id.get(item_id)) is not None
+    )
+
+
+def _semantic_state_from_item(item: Any) -> str | None:
+    reasoning_state = getattr(item, "reasoning_state", None)
+    if reasoning_state in {
+        PHASE_7_REASONING_STATE_INSUFFICIENT_CURRENT_AUTHORITY,
+        PHASE_7_REASONING_STATE_CURRENT_STATUS_UNKNOWN,
+        PHASE_7_REASONING_STATE_NO_APPLICABLE_RULE,
+        PHASE_7_REASONING_STATE_INSUFFICIENT_INFORMATION,
+        PHASE_7_REASONING_STATE_MANUAL_REVIEW_REQUIRED,
+    }:
+        return WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL
+    if reasoning_state == PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION:
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+
+    payload = getattr(item, "layer_payload", {}) or {}
+    status_values = {
+        value
+        for key, value in payload.items()
+        if key.endswith("_status") and isinstance(value, str)
+    }
+    if "support_status" in payload and isinstance(payload["support_status"], str):
+        status_values.add(payload["support_status"])
+    if "outcome" in payload and isinstance(payload["outcome"], str):
+        status_values.add(payload["outcome"])
+
+    if status_values.intersection(
+        {
+            "external_supplier_required",
+            "not_available",
+            "restricted",
+            "exceeds_capacity",
+            "not_event_capacity_space",
+            "insufficient_quantity",
+        }
+    ):
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_NO
+    if status_values.intersection({"requires_confirmation", "conditional"}):
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+    if status_values.intersection(
+        {
+            "supported",
+            "standard",
+            "available_on_request",
+            "within_capacity",
+            "allowed",
+            "available",
+            "included",
+            "shared",
+        }
+    ):
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_YES
+
+    if any(
+        bool(payload.get(flag))
+        for flag in (
+            "requires_confirmation",
+            "requires_availability_confirmation",
+            "requires_scope_confirmation",
+            "requires_technical_confirmation",
+        )
+    ):
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+    if bool(payload.get("manual_review_required")):
+        return WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL
+    if reasoning_state == PHASE_7_REASONING_STATE_RESOLVED:
+        return WORKFLOW_SEMANTIC_STATE_KNOWN_YES
+    return None
+
+
+def _dominant_semantic_state(candidates: list[str]) -> str:
+    priority = {
+        WORKFLOW_SEMANTIC_STATE_KNOWN_NO: 4,
+        WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL: 3,
+        WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL: 2,
+        WORKFLOW_SEMANTIC_STATE_KNOWN_YES: 1,
+    }
+    return max(candidates, key=lambda item: priority.get(item, 0))
 
 
 def _derive_workflow_posture(
@@ -472,6 +602,7 @@ def _derive_workflow_effects(projection: WorkflowReasoningProjection) -> tuple[W
     effects: list[WorkflowReasoningEffect] = []
     domain_scope_code = _projection_domain_scope_code(projection)
     posture = _posture_from_projection(projection)
+    semantic_state_code = projection_semantic_state_code(projection)
 
     if projection.relevant_current_truth_item_ids:
         effects.append(
@@ -502,6 +633,16 @@ def _derive_workflow_effects(projection: WorkflowReasoningProjection) -> tuple[W
                 domain_scope_code=domain_scope_code,
                 related_item_ids=projection.relevant_historical_item_ids,
                 detail_payload={"historical_context_only": True},
+            )
+        )
+    if semantic_state_code == WORKFLOW_SEMANTIC_STATE_KNOWN_NO:
+        effects.append(
+            _make_effect(
+                projection=projection,
+                effect_type_code=WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
+                blocking_relevance=True,
+                domain_scope_code=domain_scope_code,
+                detail_payload={"semantic_state_code": semantic_state_code},
             )
         )
     if posture.confirmation_required:
@@ -628,8 +769,12 @@ def _unresolved_code(record: UnresolvedAuthorityRecord) -> str:
     return f"{record.topic_or_domain}|{record.reasoning_state}"
 
 
-def _degraded_summary(state: DegradedRetrievalState) -> dict[str, Any]:
-    return {
+def _degraded_summary(
+    state: DegradedRetrievalState,
+    *,
+    semantic_state_code: str | None = None,
+) -> dict[str, Any]:
+    summary = {
         "any_degradation": state.any_degradation,
         "materially_affects_answer_completeness": state.materially_affects_answer_completeness,
         "affected_layers": list(state.affected_layers),
@@ -637,3 +782,6 @@ def _degraded_summary(state: DegradedRetrievalState) -> dict[str, Any]:
         "fallback_reasons": dict(state.fallback_reasons),
         "generator_warnings": list(state.generator_warnings),
     }
+    if semantic_state_code is not None:
+        summary["semantic_state_code"] = semantic_state_code
+    return summary

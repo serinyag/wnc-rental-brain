@@ -13,6 +13,8 @@ from typing import Any, Callable
 
 from tools.phase_05_chunking.generate_pilot import find_local_db_container, run_supabase_query
 from tools.phase_07_reasoning.contracts import (
+    AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+    AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
     AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION,
     PHASE_7_CONTEXT_CONTRACT_VERSION,
 )
@@ -31,8 +33,11 @@ from .contracts import (
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     APPROVAL_REQUEST_STATUS_OPEN,
     OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
+    PHASE_7_REASONING_STATE_INSUFFICIENT_INFORMATION,
     PHASE_7_REASONING_STATE_MANUAL_REVIEW_REQUIRED,
+    PHASE_7_REASONING_STATE_NO_APPLICABLE_RULE,
     PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+    PHASE_7_REASONING_STATE_RESOLVED,
     PHASE_8_PHASE7_WORKFLOW_CONSUMPTION_CONTRACT_VERSION,
     REASONING_PURPOSE_FEASIBILITY_REVIEW,
     OPEN_QUESTION_STATUS_OPEN,
@@ -142,6 +147,12 @@ from .phase7_consumption_repository import (
     InMemoryPhase7ConsumptionRepository,
     SupabasePhase7ConsumptionRepository,
 )
+from .phase7_consumption_types import (
+    WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+    WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+)
 from .provider_safety import guard_asana_execution_adapter, guard_outlook_execution_adapter
 from .supabase_observation_repository import SupabaseObservationRepository
 from .test_console_projection import (
@@ -203,6 +214,8 @@ class TestConsoleReadError(TestConsoleError):
 class SyntheticAuthorityIssue:
     domain_code: str
     issue_code: str
+    semantic_state_code: str
+    authority_outcome_classification: str
     reasoning_state_code: str
     source_label: str
     source_value: Any
@@ -1440,7 +1453,7 @@ limit 1;
                     phase_7_context_contract_version=PHASE_7_CONTEXT_CONTRACT_VERSION,
                     phase_8_workflow_contract_version=PHASE_8_PHASE7_WORKFLOW_CONSUMPTION_CONTRACT_VERSION,
                     source_case_revision=snapshot.rental_case.case_revision,
-                    authority_outcome_classification=AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION,
+                    authority_outcome_classification=issue.authority_outcome_classification,
                     degraded_retrieval_summary={
                         "any_degradation": False,
                         "materially_affects_answer_completeness": False,
@@ -1448,6 +1461,7 @@ limit 1;
                         "per_layer_execution_states": {},
                         "fallback_reasons": {},
                         "generator_warnings": [],
+                        "semantic_state_code": issue.semantic_state_code,
                     },
                     created_at=created_at,
                     projection_identity_key=self._synthetic_projection_identity_key(snapshot, issue),
@@ -1525,19 +1539,14 @@ from api.evaluate_capacity(
 limit 1;
 """.strip()
             )
-            if row is None or row.get("capacity_evaluation_status") == "within_capacity":
-                return None
-            return SyntheticAuthorityIssue(
-                domain_code="capacity",
-                issue_code="capacity_entire_venue_confirmation",
-                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+            return self._capacity_issue_from_row(
+                issue_code_prefix="capacity_entire_venue",
+                status_row=row,
                 source_label="entire_venue_capacity",
                 source_value=guest_count,
                 source_snapshot={
                     "rental_type_code": rental_type_code,
                     "guest_count": guest_count,
-                    "capacity_evaluation_status": row.get("capacity_evaluation_status"),
-                    "applicability_status": row.get("applicability_status"),
                 },
             )
         if rental_type_code == "one_to_one_room":
@@ -1554,25 +1563,19 @@ from api.evaluate_capacity(
 limit 1;
 """.strip()
             )
-            if row is None or row.get("capacity_evaluation_status") == "within_capacity":
-                return None
-            return SyntheticAuthorityIssue(
-                domain_code="capacity",
-                issue_code="capacity_one_to_one_confirmation",
-                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+            return self._capacity_issue_from_row(
+                issue_code_prefix="capacity_one_to_one",
+                status_row=row,
                 source_label="one_to_one_capacity",
                 source_value=guest_count,
                 source_snapshot={
                     "rental_type_code": rental_type_code,
                     "guest_count": guest_count,
-                    "capacity_evaluation_status": row.get("capacity_evaluation_status"),
-                    "applicability_status": row.get("applicability_status"),
                 },
             )
         configuration_type = self._layout_configuration_type(snapshot, observed_by_field=observed_by_field)
-        if configuration_type:
-            row = self._first_row(
-                f"""
+        row = self._first_row(
+            f"""
 select applicability_status, capacity_evaluation_status, within_capacity
 from api.evaluate_capacity(
   'studio_space',
@@ -1583,23 +1586,7 @@ from api.evaluate_capacity(
 )
 limit 1;
 """.strip()
-            )
-            if row is None or row.get("capacity_evaluation_status") == "within_capacity":
-                return None
-            return SyntheticAuthorityIssue(
-                domain_code="capacity",
-                issue_code="capacity_studio_configuration_confirmation",
-                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
-                source_label="studio_capacity_configuration",
-                source_value=guest_count,
-                source_snapshot={
-                    "rental_type_code": rental_type_code,
-                    "guest_count": guest_count,
-                    "configuration_type": configuration_type,
-                    "capacity_evaluation_status": row.get("capacity_evaluation_status"),
-                    "applicability_status": row.get("applicability_status"),
-                },
-            )
+        )
         max_capacity_row = self._first_row(
             """
 select max(max_guests) as max_guests
@@ -1609,11 +1596,17 @@ where scope_code = 'studio_space'
 """.strip()
         )
         max_capacity = max_capacity_row.get("max_guests") if max_capacity_row is not None else None
-        if isinstance(max_capacity, int) and guest_count > max_capacity:
-            return SyntheticAuthorityIssue(
+        if (
+            configuration_type is None
+            and isinstance(max_capacity, int)
+            and guest_count > max_capacity
+        ):
+            return self._make_synthetic_authority_issue(
                 domain_code="capacity",
                 issue_code="capacity_studio_over_published_max",
-                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+                authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
                 source_label="studio_capacity_upper_bound",
                 source_value=guest_count,
                 source_snapshot={
@@ -1621,9 +1614,22 @@ where scope_code = 'studio_space'
                     "guest_count": guest_count,
                     "published_max_guests": max_capacity,
                     "configuration_type": None,
+                    "capacity_evaluation_status": None if row is None else row.get("capacity_evaluation_status"),
+                    "applicability_status": None if row is None else row.get("applicability_status"),
                 },
             )
-        return None
+        return self._capacity_issue_from_row(
+            issue_code_prefix="capacity_studio",
+            status_row=row,
+            source_label="studio_capacity_configuration" if configuration_type else "studio_capacity",
+            source_value=guest_count,
+            source_snapshot={
+                "rental_type_code": rental_type_code,
+                "guest_count": guest_count,
+                "configuration_type": configuration_type,
+                "published_max_guests": max_capacity,
+            },
+        )
 
     def _technical_authority_issue(
         self,
@@ -1635,73 +1641,31 @@ where scope_code = 'studio_space'
             return None
         as_of_date = self.now()[:10]
         triggered: list[dict[str, Any]] = []
+        strongest_issue: SyntheticAuthorityIssue | None = None
         for value in candidate.value_payload:
-            if value == "microphones":
-                row = self._first_row(
-                    f"""
-select support_status, requires_confirmation
-from api.get_technical_capability(
-  'capability_availability',
-  'microphones',
-  null,
-  'audio',
-  {sql_text(as_of_date)}::date
-)
-limit 1;
-""".strip()
-                )
-            elif value == "dj_sound_booth":
-                row = self._first_row(
-                    f"""
-select support_status, requires_confirmation
-from api.evaluate_technical_requirement(
-  'amplified_event_sound',
-  {sql_text(as_of_date)}::date
-)
-limit 1;
-""".strip()
-                )
-            elif value == "power_requirements":
-                row = self._first_row(
-                    f"""
-select support_status, requires_confirmation
-from api.evaluate_technical_requirement(
-  'high_load_power',
-  {sql_text(as_of_date)}::date
-)
-limit 1;
-""".strip()
-                )
-            elif value == "other_technical":
-                row = self._first_row(
-                    f"""
-select support_status, requires_confirmation
-from api.evaluate_technical_requirement(
-  'custom_technical_setup',
-  {sql_text(as_of_date)}::date
-)
-limit 1;
-""".strip()
-                )
-            else:
-                row = None
-            if row is None:
+            issue = self._technical_issue_for_requirement(
+                observed_requirement=str(value),
+                as_of_date=as_of_date,
+            )
+            if issue is None:
                 continue
-            support_status = row.get("support_status")
-            if support_status in {"external_supplier_required", "requires_confirmation"} or bool(row.get("requires_confirmation")):
-                triggered.append(
-                    {
-                        "observed_requirement": value,
-                        "support_status": support_status,
-                        "requires_confirmation": bool(row.get("requires_confirmation")),
-                    }
-                )
-        if not triggered:
+            triggered.append(
+                {
+                    "observed_requirement": value,
+                    "issue_code": issue.issue_code,
+                    "semantic_state_code": issue.semantic_state_code,
+                    "authority_outcome_classification": issue.authority_outcome_classification,
+                    "reasoning_state_code": issue.reasoning_state_code,
+                    "source_snapshot": issue.source_snapshot,
+                }
+            )
+            if strongest_issue is None or self._synthetic_issue_priority(issue) > self._synthetic_issue_priority(strongest_issue):
+                strongest_issue = issue
+        if strongest_issue is None:
             return None
-        return SyntheticAuthorityIssue(
-            domain_code="technical",
-            issue_code="technical_requirements_confirmation",
-            reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+        return replace(
+            strongest_issue,
+            issue_code="technical_requirements_summary",
             source_label="technical_requirements",
             source_value=list(candidate.value_payload),
             source_snapshot={"triggered_requirements": triggered},
@@ -1720,6 +1684,7 @@ limit 1;
         row = self._first_row(
             f"""
 select arrangement_status, requires_confirmation, requires_availability_confirmation,
+       requires_scope_confirmation, requires_technical_confirmation,
        client_commitment_requires_facilitator_confirmation, manual_review_required
 from api.get_facilitator_requirements(
   {sql_text(candidate.value_payload)},
@@ -1739,9 +1704,19 @@ limit 1;
         )
         if not manual_review and not confirmation_required:
             return None
-        return SyntheticAuthorityIssue(
+        return self._make_synthetic_authority_issue(
             domain_code="facilitator",
             issue_code=f"facilitator_{candidate.value_payload}_confirmation",
+            semantic_state_code=(
+                WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL
+                if manual_review
+                else WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL
+            ),
+            authority_outcome_classification=(
+                AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY
+                if manual_review
+                else AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION
+            ),
             reasoning_state_code=(
                 PHASE_7_REASONING_STATE_MANUAL_REVIEW_REQUIRED
                 if manual_review
@@ -1753,9 +1728,213 @@ limit 1;
                 "arrangement_status": row.get("arrangement_status"),
                 "requires_confirmation": bool(row.get("requires_confirmation")),
                 "requires_availability_confirmation": bool(row.get("requires_availability_confirmation")),
+                "requires_scope_confirmation": bool(row.get("requires_scope_confirmation")),
+                "requires_technical_confirmation": bool(row.get("requires_technical_confirmation")),
                 "manual_review_required": manual_review,
             },
         )
+
+    def _capacity_issue_from_row(
+        self,
+        *,
+        issue_code_prefix: str,
+        status_row: dict[str, Any] | None,
+        source_label: str,
+        source_value: Any,
+        source_snapshot: dict[str, Any],
+    ) -> SyntheticAuthorityIssue | None:
+        if status_row is None:
+            return None
+        status = status_row.get("capacity_evaluation_status")
+        snapshot = {
+            **source_snapshot,
+            "capacity_evaluation_status": status,
+            "applicability_status": status_row.get("applicability_status"),
+            "within_capacity": status_row.get("within_capacity"),
+        }
+        if status == "within_capacity":
+            return None
+        if status in {"exceeds_capacity", "not_event_capacity_space"}:
+            return self._make_synthetic_authority_issue(
+                domain_code="capacity",
+                issue_code=f"{issue_code_prefix}_restriction",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+                authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
+                source_label=source_label,
+                source_value=source_value,
+                source_snapshot=snapshot,
+            )
+        if status == "requires_confirmation":
+            return self._make_synthetic_authority_issue(
+                domain_code="capacity",
+                issue_code=f"{issue_code_prefix}_confirmation",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                source_label=source_label,
+                source_value=source_value,
+                source_snapshot=snapshot,
+            )
+        if status == "insufficient_information":
+            return self._make_synthetic_authority_issue(
+                domain_code="capacity",
+                issue_code=f"{issue_code_prefix}_insufficient_information",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                reasoning_state_code=PHASE_7_REASONING_STATE_INSUFFICIENT_INFORMATION,
+                source_label=source_label,
+                source_value=source_value,
+                source_snapshot=snapshot,
+            )
+        if status == "no_applicable_rule":
+            return self._make_synthetic_authority_issue(
+                domain_code="capacity",
+                issue_code=f"{issue_code_prefix}_no_applicable_rule",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                reasoning_state_code=PHASE_7_REASONING_STATE_NO_APPLICABLE_RULE,
+                source_label=source_label,
+                source_value=source_value,
+                source_snapshot=snapshot,
+            )
+        return None
+
+    def _technical_issue_for_requirement(
+        self,
+        *,
+        observed_requirement: str,
+        as_of_date: str,
+    ) -> SyntheticAuthorityIssue | None:
+        requirement_code = {
+            "projection_display": "basic_projection",
+            "audio_playback": "ordinary_audio_playback",
+            "microphones": "microphone_use",
+            "dj_sound_booth": "dj_audio_setup",
+            "enhanced_sound_system": "amplified_event_sound",
+            "lighting": "standard_venue_lighting",
+            "photo_video_production": "filming",
+            "livestream_recording": "dedicated_livestreaming",
+            "internet_connectivity": "standard_wifi",
+            "power_requirements": "high_load_power",
+            "other_technical": "custom_technical_setup",
+        }.get(observed_requirement)
+        if requirement_code is None:
+            return self._make_synthetic_authority_issue(
+                domain_code="technical",
+                issue_code=f"technical_{observed_requirement}_no_applicable_rule",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                reasoning_state_code=PHASE_7_REASONING_STATE_NO_APPLICABLE_RULE,
+                source_label="technical_requirement",
+                source_value=observed_requirement,
+                source_snapshot={
+                    "observed_requirement": observed_requirement,
+                    "requirement_code": None,
+                    "applicability_status": "no_applicable_rule",
+                },
+            )
+        row = self._first_row(
+            f"""
+select applicability_status, support_status, requires_confirmation
+from api.evaluate_technical_requirement(
+  {sql_text(requirement_code)},
+  {sql_text(as_of_date)}::date
+)
+limit 1;
+""".strip()
+        )
+        snapshot = {
+            "observed_requirement": observed_requirement,
+            "requirement_code": requirement_code,
+        }
+        if row is None:
+            return self._make_synthetic_authority_issue(
+                domain_code="technical",
+                issue_code=f"technical_{observed_requirement}_no_result",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                reasoning_state_code=PHASE_7_REASONING_STATE_NO_APPLICABLE_RULE,
+                source_label="technical_requirement",
+                source_value=observed_requirement,
+                source_snapshot=snapshot,
+            )
+        snapshot.update(
+            {
+                "applicability_status": row.get("applicability_status"),
+                "support_status": row.get("support_status"),
+                "requires_confirmation": bool(row.get("requires_confirmation")),
+            }
+        )
+        support_status = row.get("support_status")
+        applicability_status = row.get("applicability_status")
+        if support_status in {"supported", "standard", "available_on_request"}:
+            return None
+        if support_status in {"external_supplier_required", "not_available"}:
+            return self._make_synthetic_authority_issue(
+                domain_code="technical",
+                issue_code=f"technical_{observed_requirement}_restriction",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+                authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
+                source_label="technical_requirement",
+                source_value=observed_requirement,
+                source_snapshot=snapshot,
+            )
+        if support_status == "requires_confirmation" or bool(row.get("requires_confirmation")):
+            return self._make_synthetic_authority_issue(
+                domain_code="technical",
+                issue_code=f"technical_{observed_requirement}_confirmation",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION,
+                reasoning_state_code=PHASE_7_REASONING_STATE_REQUIRES_CONFIRMATION,
+                source_label="technical_requirement",
+                source_value=observed_requirement,
+                source_snapshot=snapshot,
+            )
+        if applicability_status == "no_applicable_rule" or support_status is None:
+            return self._make_synthetic_authority_issue(
+                domain_code="technical",
+                issue_code=f"technical_{observed_requirement}_no_applicable_rule",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+                authority_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                reasoning_state_code=PHASE_7_REASONING_STATE_NO_APPLICABLE_RULE,
+                source_label="technical_requirement",
+                source_value=observed_requirement,
+                source_snapshot=snapshot,
+            )
+        return None
+
+    def _make_synthetic_authority_issue(
+        self,
+        *,
+        domain_code: str,
+        issue_code: str,
+        semantic_state_code: str,
+        authority_outcome_classification: str,
+        reasoning_state_code: str,
+        source_label: str,
+        source_value: Any,
+        source_snapshot: dict[str, Any],
+    ) -> SyntheticAuthorityIssue:
+        return SyntheticAuthorityIssue(
+            domain_code=domain_code,
+            issue_code=issue_code,
+            semantic_state_code=semantic_state_code,
+            authority_outcome_classification=authority_outcome_classification,
+            reasoning_state_code=reasoning_state_code,
+            source_label=source_label,
+            source_value=source_value,
+            source_snapshot=source_snapshot,
+        )
+
+    def _synthetic_issue_priority(self, issue: SyntheticAuthorityIssue) -> int:
+        return {
+            WORKFLOW_SEMANTIC_STATE_KNOWN_NO: 4,
+            WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL: 3,
+            WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL: 2,
+            WORKFLOW_SEMANTIC_STATE_KNOWN_YES: 1,
+        }.get(issue.semantic_state_code, 0)
 
     def _synthetic_projection_identity_key(
         self,
@@ -1768,6 +1947,8 @@ limit 1;
             "reasoning_purpose": REASONING_PURPOSE_FEASIBILITY_REVIEW,
             "domain_code": issue.domain_code,
             "issue_code": issue.issue_code,
+            "semantic_state_code": issue.semantic_state_code,
+            "authority_outcome_classification": issue.authority_outcome_classification,
             "reasoning_state_code": issue.reasoning_state_code,
             "source_label": issue.source_label,
             "source_value": issue.source_value,

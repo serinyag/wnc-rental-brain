@@ -41,7 +41,12 @@ from tools.phase_08_workflow.phase7_consumption_types import (
     WORKFLOW_REASONING_EFFECT_CONFIRMATION_REQUIRED,
     WORKFLOW_REASONING_EFFECT_CURRENT_AUTHORITY_MISSING,
     WORKFLOW_REASONING_EFFECT_CURRENT_TRUTH_AVAILABLE,
+    WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
     WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+    WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+    projection_semantic_state_code,
 )
 from tools.phase_08_workflow.phase7_workflow_consumer import consume_phase7_context
 
@@ -158,6 +163,7 @@ class Phase7WorkflowConsumerTests(unittest.TestCase):
             primary_code="GUIDE-CONFIRM",
             primary_id=3,
             summary_text="Confirmation is required before committing.",
+            layer_payload={"support_status": "requires_confirmation", "requires_confirmation": True},
         )
         package = make_package(
             query_text="Can we confirm this now?",
@@ -199,9 +205,53 @@ class Phase7WorkflowConsumerTests(unittest.TestCase):
         self.assertEqual(result.status, PHASE7_CONSUMPTION_STATUS_CONSUMED)
         self.assertEqual(result.posture.posture_code, WORKFLOW_REASONING_POSTURE_REVIEW_REQUIRED)
         self.assertTrue(result.posture.confirmation_required)
+        self.assertEqual(
+            projection_semantic_state_code(result.projection),
+            WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+        )
         effect_codes = {effect.effect_type_code for effect in result.workflow_effects}
         self.assertIn(WORKFLOW_REASONING_EFFECT_CONFIRMATION_REQUIRED, effect_codes)
         self.assertIn(WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED, effect_codes)
+
+    def test_deterministic_restriction_semantic_state_surfaces_known_no(self) -> None:
+        repository = make_repository(case_revision=2)
+        restricted_item = make_item(
+            item_id="guidance:restriction",
+            source_layer_role=SOURCE_LAYER_ROLE_CURRENT_GOVERNED_KNOWLEDGE,
+            primary_code="TECH-EXTERNAL",
+            primary_id=33,
+            summary_text="The requested setup requires an external supplier.",
+            layer_payload={"support_status": "external_supplier_required"},
+        )
+        package = make_package(
+            query_text="Can WNC provide the requested setup?",
+            query_class=QUERY_CLASS_CURRENT_GUIDANCE,
+            phase5_items=(restricted_item,),
+            phase5_requested=True,
+            phase5_state="success",
+            authority_resolution=AuthorityResolution(
+                overall_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                current_guidance_item_ids=("guidance:restriction",),
+            ),
+        )
+
+        result = consume_phase7_context(
+            rental_case_id=1,
+            expected_case_revision=2,
+            reasoning_purpose="feasibility_review",
+            context_package=package,
+            repository=repository,
+        )
+
+        self.assertEqual(result.status, PHASE7_CONSUMPTION_STATUS_CONSUMED)
+        self.assertEqual(
+            projection_semantic_state_code(result.projection),
+            WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+        )
+        self.assertIn(
+            WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
+            {effect.effect_type_code for effect in result.workflow_effects},
+        )
 
     def test_insufficient_current_authority_blocks_current_decision(self) -> None:
         repository = make_repository(case_revision=4)
@@ -230,6 +280,10 @@ class Phase7WorkflowConsumerTests(unittest.TestCase):
 
         self.assertEqual(result.status, PHASE7_CONSUMPTION_STATUS_CONSUMED)
         self.assertEqual(result.posture.posture_code, WORKFLOW_REASONING_POSTURE_BLOCKED_FOR_CURRENT_DECISION)
+        self.assertEqual(
+            projection_semantic_state_code(result.projection),
+            WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+        )
         effect_codes = {effect.effect_type_code for effect in result.workflow_effects}
         self.assertIn(WORKFLOW_REASONING_EFFECT_CURRENT_AUTHORITY_MISSING, effect_codes)
         self.assertIn(WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED, effect_codes)
