@@ -18,6 +18,10 @@ from tools.phase_08_workflow.operator_harness import (  # noqa: E402
     OperatorHarnessClient,
     OperatorHarnessConfig,
 )
+from tools.phase_08_workflow.contracts import (  # noqa: E402
+    ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
+    ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+)
 
 
 DEFAULT_AUTH_FILE = REPO_ROOT / "Staging Authentications.txt"
@@ -128,6 +132,7 @@ class ScenarioExpectations:
     expected_feasibility_as_requested: str | None = None
     expected_material_blocker: bool = False
     expected_human_confirmation_required: bool = False
+    expected_next_action: str | None = None
     forbidden_draft_fragments: tuple[str, ...] = ()
     must_not_activate_exception: bool = False
     must_not_create_reschedule_for_same_schedule: bool = False
@@ -1419,12 +1424,43 @@ def _score_concision(actual: ActualSnapshot) -> float:
     return 2.0
 
 
-def _correct_next_action(expected: ScenarioExpectations, actual: ActualSnapshot) -> bool:
-    if expected.expected_draft:
-        return actual.draft is not None
+def _expected_next_action(expected: ScenarioExpectations) -> str:
+    if expected.expected_next_action is not None:
+        return expected.expected_next_action
     if expected.expected_open_question_types:
-        return actual.open_blocker_count > 0 or "REQUEST_CLIENT_INFORMATION" in actual.active_workflow_action_types
-    return actual.open_blocker_count == 0 and "REQUEST_CLIENT_INFORMATION" not in actual.active_workflow_action_types
+        return "ask_client"
+    if expected.expected_material_blocker:
+        return (
+            "internal_confirmation"
+            if expected.expected_confirmation_required == "Yes"
+            else "restriction_or_external_solution_only"
+        )
+    return "none"
+
+
+def _correct_next_action(expected: ScenarioExpectations, actual: ActualSnapshot) -> bool:
+    action = _expected_next_action(expected)
+    blocker_types = set(actual.open_blocker_types)
+    action_types = set(actual.active_workflow_action_types)
+    has_internal_review = ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM in action_types
+    has_client_request = ACTION_TYPE_REQUEST_CLIENT_INFORMATION in action_types
+    has_authority_gap = bool({"current_authority_missing", "confirmation_required"} & blocker_types)
+
+    if action == "none":
+        return not blocker_types and not has_internal_review and not has_client_request
+    if action == "ask_client":
+        return bool(actual.active_open_question_types) and has_client_request and not has_authority_gap
+    if action in {"internal_confirmation", "internal_confirmation_without_client_question"}:
+        return has_authority_gap and has_internal_review and not has_client_request and not actual.active_open_question_types
+    if action in {"restriction_or_external_solution_only", "restriction_or_alternative_needed"}:
+        return "deterministic_restriction" in blocker_types and not has_authority_gap and not has_internal_review
+    if action == "approval_gated_only":
+        return (
+            any(status in {"proposed", "pending_approval"} for status in actual.case_decision_statuses)
+            and "case_decision_approval_required" in blocker_types
+            and not has_authority_gap
+        )
+    raise ValueError(f"Unsupported expected_next_action: {action}")
 
 
 def classify_edit_burden(*, scores: dict[str, float], critical_failures: list[str]) -> str:

@@ -45,6 +45,7 @@ from tools.phase_08_workflow.phase7_consumption_types import (
     WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED,
     WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
     WORKFLOW_SEMANTIC_STATE_KNOWN_NO,
+    WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
     WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
     projection_semantic_state_code,
 )
@@ -252,6 +253,92 @@ class Phase7WorkflowConsumerTests(unittest.TestCase):
             WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION,
             {effect.effect_type_code for effect in result.workflow_effects},
         )
+
+    def test_authoritative_yes_is_not_erased_by_unrelated_unknown(self) -> None:
+        repository = make_repository(case_revision=2)
+        supported_item = make_item(
+            item_id="guidance:supported",
+            source_layer_role=SOURCE_LAYER_ROLE_CURRENT_GOVERNED_KNOWLEDGE,
+            primary_code="TECH-SUPPORTED",
+            primary_id=34,
+            summary_text="The standard technical capability is supported.",
+            layer_payload={"support_status": "supported"},
+        )
+        unrelated_unknown = make_item(
+            item_id="guidance:unrelated-unknown",
+            source_layer_role=SOURCE_LAYER_ROLE_CURRENT_GOVERNED_KNOWLEDGE,
+            primary_code="FACILITATOR-UNKNOWN",
+            primary_id=35,
+            summary_text="An unrelated facilitator question lacks current authority.",
+            reasoning_state="no_applicable_rule",
+        )
+        package = make_package(
+            query_text="Can WNC provide standard audio?",
+            query_class=QUERY_CLASS_CURRENT_GUIDANCE,
+            phase5_items=(supported_item, unrelated_unknown),
+            phase5_requested=True,
+            phase5_state="success",
+            authority_resolution=AuthorityResolution(
+                overall_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                current_guidance_item_ids=("guidance:supported", "guidance:unrelated-unknown"),
+            ),
+        )
+
+        result = consume_phase7_context(
+            rental_case_id=1,
+            expected_case_revision=2,
+            reasoning_purpose="feasibility_review",
+            context_package=package,
+            repository=repository,
+        )
+
+        self.assertEqual(projection_semantic_state_code(result.projection), WORKFLOW_SEMANTIC_STATE_KNOWN_YES)
+        effect_codes = {effect.effect_type_code for effect in result.workflow_effects}
+        self.assertNotIn(WORKFLOW_REASONING_EFFECT_CURRENT_AUTHORITY_MISSING, effect_codes)
+        self.assertNotIn(WORKFLOW_REASONING_EFFECT_REVIEW_REQUIRED, effect_codes)
+
+    def test_authoritative_no_is_not_weakened_by_unrelated_unknown(self) -> None:
+        repository = make_repository(case_revision=2)
+        restricted_item = make_item(
+            item_id="guidance:restricted",
+            source_layer_role=SOURCE_LAYER_ROLE_CURRENT_GOVERNED_KNOWLEDGE,
+            primary_code="TECH-RESTRICTED",
+            primary_id=36,
+            summary_text="The requested technical capability is not available.",
+            layer_payload={"support_status": "not_available"},
+        )
+        unrelated_unknown = make_item(
+            item_id="guidance:unrelated-unknown",
+            source_layer_role=SOURCE_LAYER_ROLE_CURRENT_GOVERNED_KNOWLEDGE,
+            primary_code="FACILITATOR-UNKNOWN",
+            primary_id=37,
+            summary_text="An unrelated facilitator question lacks current authority.",
+            reasoning_state="no_applicable_rule",
+        )
+        package = make_package(
+            query_text="Can WNC provide a dedicated streaming system?",
+            query_class=QUERY_CLASS_CURRENT_GUIDANCE,
+            phase5_items=(restricted_item, unrelated_unknown),
+            phase5_requested=True,
+            phase5_state="success",
+            authority_resolution=AuthorityResolution(
+                overall_outcome_classification=AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY,
+                current_guidance_item_ids=("guidance:restricted", "guidance:unrelated-unknown"),
+            ),
+        )
+
+        result = consume_phase7_context(
+            rental_case_id=1,
+            expected_case_revision=2,
+            reasoning_purpose="feasibility_review",
+            context_package=package,
+            repository=repository,
+        )
+
+        self.assertEqual(projection_semantic_state_code(result.projection), WORKFLOW_SEMANTIC_STATE_KNOWN_NO)
+        effect_codes = {effect.effect_type_code for effect in result.workflow_effects}
+        self.assertIn(WORKFLOW_REASONING_EFFECT_DETERMINISTIC_RESTRICTION, effect_codes)
+        self.assertNotIn(WORKFLOW_REASONING_EFFECT_CURRENT_AUTHORITY_MISSING, effect_codes)
 
     def test_insufficient_current_authority_blocks_current_decision(self) -> None:
         repository = make_repository(case_revision=4)

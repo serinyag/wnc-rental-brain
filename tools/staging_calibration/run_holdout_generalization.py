@@ -99,6 +99,7 @@ def _expectations_from_payload(payload: dict[str, Any]) -> ScenarioExpectations:
         expected_feasibility_as_requested=system.get("expected_feasibility_as_requested"),
         expected_material_blocker=bool(system.get("expected_material_blocker", False)),
         expected_human_confirmation_required=bool(system.get("expected_material_blocker", False)),
+        expected_next_action=payload.get("expected_next_action"),
         forbidden_draft_fragments=tuple(payload.get("statements_that_must_not_appear", ())),
         must_not_activate_exception=bool(system.get("must_not_activate_exception", False)),
         must_not_create_reschedule_for_same_schedule=bool(system.get("must_not_create_reschedule_for_same_schedule", False)),

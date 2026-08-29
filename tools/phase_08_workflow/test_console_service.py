@@ -43,6 +43,7 @@ from .contracts import (
     OPEN_QUESTION_STATUS_OPEN,
     WORKFLOW_CONFIDENTIALITY_LEVEL_INTERNAL,
     WORKFLOW_REASONING_POSTURE_REVIEW_REQUIRED,
+    WORKFLOW_REASONING_POSTURE_SAFE_FOR_DETERMINISTIC_USE,
     ApprovalRequest,
     WorkflowReasoningProjection,
     WorkflowAction,
@@ -1466,9 +1467,19 @@ limit 1;
                     created_at=created_at,
                     projection_identity_key=self._synthetic_projection_identity_key(snapshot, issue),
                     reasoning_state_code=issue.reasoning_state_code,
-                    workflow_posture=WORKFLOW_REASONING_POSTURE_REVIEW_REQUIRED,
+                    workflow_posture=(
+                        WORKFLOW_REASONING_POSTURE_SAFE_FOR_DETERMINISTIC_USE
+                        if issue.semantic_state_code
+                        in {WORKFLOW_SEMANTIC_STATE_KNOWN_YES, WORKFLOW_SEMANTIC_STATE_KNOWN_NO}
+                        else WORKFLOW_REASONING_POSTURE_REVIEW_REQUIRED
+                    ),
                     effective_confidentiality_level=WORKFLOW_CONFIDENTIALITY_LEVEL_INTERNAL,
-                    unresolved_authority_codes=(f"{issue.domain_code}|{issue.reasoning_state_code}",),
+                    unresolved_authority_codes=(
+                        ()
+                        if issue.semantic_state_code
+                        in {WORKFLOW_SEMANTIC_STATE_KNOWN_YES, WORKFLOW_SEMANTIC_STATE_KNOWN_NO}
+                        else (f"{issue.domain_code}|{issue.reasoning_state_code}",)
+                    ),
                     grounding_reference_keys=(f"test_console:{issue.issue_code}",),
                 )
             )
@@ -1587,15 +1598,16 @@ from api.evaluate_capacity(
 limit 1;
 """.strip()
         )
-        max_capacity_row = self._first_row(
+        capacity_bounds_row = self._first_row(
             """
-select max(max_guests) as max_guests
+select min(max_guests) as min_guests, max(max_guests) as max_guests
 from public.current_capacity_rules
 where scope_code = 'studio_space'
   and max_guests is not null;
 """.strip()
         )
-        max_capacity = max_capacity_row.get("max_guests") if max_capacity_row is not None else None
+        max_capacity = capacity_bounds_row.get("max_guests") if capacity_bounds_row is not None else None
+        min_capacity = capacity_bounds_row.get("min_guests") if capacity_bounds_row is not None else None
         if (
             configuration_type is None
             and isinstance(max_capacity, int)
@@ -1612,6 +1624,25 @@ where scope_code = 'studio_space'
                 source_snapshot={
                     "rental_type_code": rental_type_code,
                     "guest_count": guest_count,
+                    "published_max_guests": max_capacity,
+                    "configuration_type": None,
+                    "capacity_evaluation_status": None if row is None else row.get("capacity_evaluation_status"),
+                    "applicability_status": None if row is None else row.get("applicability_status"),
+                },
+            )
+        if configuration_type is None and isinstance(min_capacity, int) and guest_count <= min_capacity:
+            return self._make_synthetic_authority_issue(
+                domain_code="capacity",
+                issue_code="capacity_studio_within_all_published_limits",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+                authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
+                source_label="studio_capacity_lower_bound",
+                source_value=guest_count,
+                source_snapshot={
+                    "rental_type_code": rental_type_code,
+                    "guest_count": guest_count,
+                    "published_min_guests": min_capacity,
                     "published_max_guests": max_capacity,
                     "configuration_type": None,
                     "capacity_evaluation_status": None if row is None else row.get("capacity_evaluation_status"),
@@ -1753,7 +1784,16 @@ limit 1;
             "within_capacity": status_row.get("within_capacity"),
         }
         if status == "within_capacity":
-            return None
+            return self._make_synthetic_authority_issue(
+                domain_code="capacity",
+                issue_code=f"{issue_code_prefix}_within_capacity",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+                authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
+                source_label=source_label,
+                source_value=source_value,
+                source_snapshot=snapshot,
+            )
         if status in {"exceeds_capacity", "not_event_capacity_space"}:
             return self._make_synthetic_authority_issue(
                 domain_code="capacity",
@@ -1869,7 +1909,16 @@ limit 1;
         support_status = row.get("support_status")
         applicability_status = row.get("applicability_status")
         if support_status in {"supported", "standard", "available_on_request"}:
-            return None
+            return self._make_synthetic_authority_issue(
+                domain_code="technical",
+                issue_code=f"technical_{observed_requirement}_supported",
+                semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+                authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
+                source_label="technical_requirement",
+                source_value=observed_requirement,
+                source_snapshot=snapshot,
+            )
         if support_status in {"external_supplier_required", "not_available"}:
             return self._make_synthetic_authority_issue(
                 domain_code="technical",

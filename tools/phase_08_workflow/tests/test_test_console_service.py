@@ -509,7 +509,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             ),
             config=TestConsoleConfig(),
             now=lambda: "2026-08-20T10:00:00Z",
-            query_runner=lambda sql, *, expect_json: {"rows": [{"max_guests": 40}]} if "max(max_guests)" in sql else {"rows": []},
+            query_runner=lambda sql, *, expect_json: {"rows": [{"min_guests": 20, "max_guests": 40}]} if "max(max_guests)" in sql else {"rows": []},
         )
 
         report = service.run_reconciliation(rental_case_id=1)

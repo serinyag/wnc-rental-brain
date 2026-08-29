@@ -410,11 +410,13 @@ def _semantic_state_from_item(item: Any) -> str | None:
 
 
 def _dominant_semantic_state(candidates: list[str]) -> str:
+    # `unknown_internal` is a proposition-local fallback.  It must not erase
+    # decisive current support or prohibition carried by another authoritative item.
     priority = {
         WORKFLOW_SEMANTIC_STATE_KNOWN_NO: 4,
-        WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL: 3,
-        WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL: 2,
-        WORKFLOW_SEMANTIC_STATE_KNOWN_YES: 1,
+        WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL: 3,
+        WORKFLOW_SEMANTIC_STATE_KNOWN_YES: 2,
+        WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL: 1,
     }
     return max(candidates, key=lambda item: priority.get(item, 0))
 
@@ -645,7 +647,7 @@ def _derive_workflow_effects(projection: WorkflowReasoningProjection) -> tuple[W
                 detail_payload={"semantic_state_code": semantic_state_code},
             )
         )
-    if posture.confirmation_required:
+    if semantic_state_code == WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL and posture.confirmation_required:
         effects.append(
             _make_effect(
                 projection=projection,
@@ -654,7 +656,10 @@ def _derive_workflow_effects(projection: WorkflowReasoningProjection) -> tuple[W
                 domain_scope_code=domain_scope_code,
             )
         )
-    if projection.authority_outcome_classification == AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY:
+    if (
+        semantic_state_code == WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL
+        and projection.authority_outcome_classification == AUTHORITY_OUTCOME_INSUFFICIENT_CURRENT_AUTHORITY
+    ):
         effects.append(
             _make_effect(
                 projection=projection,
@@ -663,7 +668,12 @@ def _derive_workflow_effects(projection: WorkflowReasoningProjection) -> tuple[W
                 domain_scope_code=domain_scope_code,
             )
         )
-    if posture.review_required or posture.blocked_for_current_decision:
+    if semantic_state_code in {
+        WORKFLOW_SEMANTIC_STATE_KNOWN_CONDITIONAL,
+        WORKFLOW_SEMANTIC_STATE_UNKNOWN_INTERNAL,
+    } and (
+        posture.review_required or posture.blocked_for_current_decision
+    ):
         effects.append(
             _make_effect(
                 projection=projection,
