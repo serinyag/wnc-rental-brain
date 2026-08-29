@@ -321,6 +321,7 @@ def _build_report(
     scored_results: list[ScoredCase],
     summary: dict[str, Any],
     semantic_rows: list[dict[str, Any]],
+    proposition_rows: dict[str, list[dict[str, Any]]],
     extra_failures: dict[str, list[str]],
     generated_at: str,
 ) -> str:
@@ -370,6 +371,7 @@ def _build_report(
                 f"- feasibility: `{result.actual['feasibility_snapshot']}`",
                 f"- open questions: `{list(result.actual['active_open_question_types'])}`",
                 f"- actions: `{list(result.actual['active_workflow_action_types'])}`",
+                f"- material proposition results: `{proposition_rows[result.scenario_id]}`",
                 "",
             ]
         )
@@ -418,7 +420,8 @@ def main() -> int:
     if health.get("status") != "ok":
         raise SystemExit("Hosted staging /healthz is not healthy enough for holdout validation.")
 
-    run_slug = "holdout-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime())
+    artifact_prefix = args.holdout_file.stem.removesuffix("_scenarios")
+    run_slug = artifact_prefix + "-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime())
     scored_results: list[ScoredCase] = []
     semantic_rows: list[dict[str, Any]] = []
     proposition_rows: dict[str, list[dict[str, Any]]] = {}
@@ -446,10 +449,10 @@ def main() -> int:
 
     output_dir: Path = args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
-    results_path = output_dir / f"holdout_results_{run_slug}.json"
-    latest_results_path = output_dir / "holdout_results_latest.json"
-    report_path = output_dir / f"holdout_report_{run_slug}.md"
-    latest_report_path = output_dir / "holdout_report_latest.md"
+    results_path = output_dir / f"{artifact_prefix}_results_{run_slug}.json"
+    latest_results_path = output_dir / f"{artifact_prefix}_results_latest.json"
+    report_path = output_dir / f"{artifact_prefix}_report_{run_slug}.md"
+    latest_report_path = output_dir / f"{artifact_prefix}_report_latest.md"
 
     generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     results_payload = {
@@ -490,6 +493,7 @@ def main() -> int:
         scored_results=scored_results,
         summary=summary,
         semantic_rows=semantic_rows,
+        proposition_rows=proposition_rows,
         extra_failures=extra_failures,
         generated_at=generated_at,
     )
