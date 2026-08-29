@@ -4,6 +4,7 @@ import argparse
 import json
 import time
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -91,6 +92,7 @@ def _expectations_from_payload(payload: dict[str, Any]) -> ScenarioExpectations:
         expected_reschedule_request_count=system.get("expected_reschedule_request_count"),
         expected_booking_fee_baseline=system.get("expected_booking_fee_baseline"),
         expected_effective_booking_fee=system.get("expected_effective_booking_fee"),
+        expected_effective_booking_fee_absent=bool(system.get("expected_effective_booking_fee_absent", False)),
         expected_effective_fee_matches_baseline=bool(system.get("expected_effective_fee_matches_baseline", False)),
         expected_case_decision_status=system.get("expected_case_decision_status"),
         expected_draft=bool(system.get("expected_draft", False)),
@@ -215,11 +217,12 @@ def _build_report(
     summary: dict[str, Any],
     semantic_rows: list[dict[str, Any]],
     extra_failures: dict[str, list[str]],
+    generated_at: str,
 ) -> str:
     lines = [
         "# Holdout Generalization Validation",
         "",
-        f"- date: 2026-08-20",
+        f"- date: {generated_at[:10]}",
         f"- run slug: `{run_slug}`",
         f"- methodology: hosted staging operator API using the same real deployed intake/reconcile/waiting/draft path as calibration",
         f"- holdout version: `{holdout_definition['version']}`",
@@ -319,8 +322,9 @@ def main() -> int:
     report_path = output_dir / f"holdout_report_{run_slug}.md"
     latest_report_path = output_dir / "holdout_report_latest.md"
 
+    generated_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     results_payload = {
-        "generated_at": "2026-08-20",
+        "generated_at": generated_at,
         "run_slug": run_slug,
         "holdout_version": holdout_definition["version"],
         "summary": summary,
@@ -357,6 +361,7 @@ def main() -> int:
         summary=summary,
         semantic_rows=semantic_rows,
         extra_failures=extra_failures,
+        generated_at=generated_at,
     )
     report_path.write_text(report_text, encoding="utf-8")
     latest_report_path.write_text(report_text, encoding="utf-8")

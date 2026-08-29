@@ -973,7 +973,7 @@ def _effective_booking_fee_line(
             detail="A case-specific approved exception is active for this RentalCase.",
             source=_decision_source(active_decision),
         )
-    if booking_fee_context is not None:
+    if booking_fee_context is not None and booking_fee_context.source_state == DISPLAY_STATE_CURRENT:
         return _item(
             "Effective booking fee",
             f"{_format_money(booking_fee_context.fee_ex_vat, booking_fee_context.currency_code)} excl. VAT",

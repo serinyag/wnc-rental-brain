@@ -1514,7 +1514,11 @@ limit 1;
     ) -> tuple[SyntheticAuthorityIssue, ...]:
         observed_by_field = {candidate.field_code: candidate for candidate in observed_field_candidates}
         issues: list[SyntheticAuthorityIssue] = []
-        capacity_issue = self._capacity_authority_issue(snapshot, observed_by_field=observed_by_field)
+        # A proposed commercial exception is independently approval-gated. A generic
+        # capacity inference must not change that commercial decision's posture.
+        capacity_issue = None
+        if not self._has_pending_commercial_case_decision(snapshot):
+            capacity_issue = self._capacity_authority_issue(snapshot, observed_by_field=observed_by_field)
         if capacity_issue is not None:
             issues.append(capacity_issue)
         technical_issue = self._technical_authority_issue(observed_by_field=observed_by_field)
@@ -1524,6 +1528,13 @@ limit 1;
         if facilitator_issue is not None:
             issues.append(facilitator_issue)
         return tuple(issues)
+
+    def _has_pending_commercial_case_decision(self, snapshot: WorkflowOrchestrationCaseSnapshot) -> bool:
+        return any(
+            decision.status in {"proposed", "pending_approval"}
+            and ("commercial" in decision.domain_code or "fee" in decision.domain_code)
+            for decision in snapshot.case_decisions
+        )
 
     def _capacity_authority_issue(
         self,
@@ -3598,8 +3609,7 @@ returning
         )
         if duration_input is None or not rental_type_code:
             return None
-        duration_minutes, source_state, source_detail = duration_input
-        as_of_date = self.now()[:10]
+        duration_minutes, source_state, source_detail, as_of_date = duration_input
         sql = f"""
 select
   rule_code,
@@ -3653,7 +3663,7 @@ limit 1;
         snapshot: WorkflowOrchestrationCaseSnapshot,
         *,
         observed_field_candidates: tuple[ObservedFieldCandidate, ...],
-    ) -> tuple[int, str, str] | None:
+    ) -> tuple[int, str, str, str] | None:
         current_duration = self._duration_minutes(
             snapshot.rental_case.active_event_start,
             snapshot.rental_case.active_event_end,
@@ -3663,6 +3673,7 @@ limit 1;
                 current_duration,
                 "current",
                 "Derived from the current active event window.",
+                self._as_of_date_for_window(snapshot.rental_case.active_event_start),
             )
 
         active_reschedule = next(
@@ -3683,6 +3694,7 @@ limit 1;
                     duration,
                     "proposed",
                     f"Derived from reschedule request {active_reschedule.reschedule_request_id}.",
+                    self._as_of_date_for_window(active_reschedule.requested_date_payload.get("active_event_start")),
                 )
 
         active_window_candidate = next(
@@ -3705,7 +3717,16 @@ limit 1;
             duration,
             "proposed",
             "Derived from an observed requested event window that is not yet governed current truth.",
+            self._as_of_date_for_window(active_window_candidate.value_payload.get("active_event_start")),
         )
+
+    def _as_of_date_for_window(self, start: Any) -> str:
+        if isinstance(start, str):
+            try:
+                return datetime.fromisoformat(start.replace("Z", "+00:00")).date().isoformat()
+            except ValueError:
+                pass
+        return self.now()[:10]
 
     def _duration_minutes(self, start: str | None, end: str | None) -> int | None:
         if not start or not end:

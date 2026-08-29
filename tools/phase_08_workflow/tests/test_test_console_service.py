@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from tools.runtime_environment import AppEnvironment, AppRuntimeConfig
@@ -146,6 +147,20 @@ def make_action(*, target_adapter_code: str = "email") -> WorkflowAction:
 
 
 class TestConsoleServiceSafetyTests(unittest.TestCase):
+    def test_pending_commercial_decision_does_not_trigger_generic_capacity_inference(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+        )
+        snapshot = SimpleNamespace(
+            case_decisions=(
+                SimpleNamespace(status="proposed", domain_code="commercial"),
+            )
+        )
+
+        self.assertTrue(service._has_pending_commercial_case_decision(snapshot))
+
     def test_config_defaults_to_local_only_and_fake_providers(self) -> None:
         config = TestConsoleConfig()
         self.assertEqual(config.host, "127.0.0.1")

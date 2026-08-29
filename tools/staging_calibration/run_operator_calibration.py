@@ -124,6 +124,7 @@ class ScenarioExpectations:
     expected_reschedule_request_count: int | None = None
     expected_booking_fee_baseline: str | None = None
     expected_effective_booking_fee: str | None = None
+    expected_effective_booking_fee_absent: bool = False
     expected_effective_fee_matches_baseline: bool = False
     expected_case_decision_status: str | None = None
     expected_draft: bool = False
@@ -1270,6 +1271,11 @@ def evaluate_case(scenario: CalibrationScenario, actual: ActualSnapshot) -> Scor
         actual_effective = actual.commercial_snapshot.get("Effective booking fee")
         if actual_effective != expected.expected_effective_booking_fee:
             failures.append("effective_booking_fee_mismatch")
+            factual_correction_count += 1
+            critical_failures.append("unsupported_commercial_commitment")
+    elif expected.expected_effective_booking_fee_absent:
+        if "Effective booking fee" in actual.commercial_snapshot:
+            failures.append("effective_booking_fee_unexpectedly_committed")
             factual_correction_count += 1
             critical_failures.append("unsupported_commercial_commitment")
     elif expected.expected_effective_fee_matches_baseline:

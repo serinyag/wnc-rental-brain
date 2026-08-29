@@ -447,6 +447,16 @@ class WorkingProposalProjectionTests(unittest.TestCase):
 
         self.assertEqual(find_item(projection.commercial_snapshot, "Effective booking fee").value, "EUR 50 excl. VAT")
 
+    def test_proposed_schedule_keeps_fee_as_reference_without_effective_commitment(self) -> None:
+        projection = build_working_proposal_projection(
+            WorkflowOrchestrationCaseSnapshot(rental_case=make_case()),
+            metadata=TestConsoleCaseMetadata(label="Proposed schedule"),
+            booking_fee_context=make_booking_fee_context(source_state=DISPLAY_STATE_PROPOSED),
+        )
+
+        self.assertEqual(find_item(projection.commercial_snapshot, "Booking fee baseline").state, DISPLAY_STATE_REFERENCE)
+        self.assertFalse(any(item.label == "Effective booking fee" for item in projection.commercial_snapshot))
+
     def test_current_working_scope_surfaces_observed_operational_candidates(self) -> None:
         projection = build_working_proposal_projection(
             WorkflowOrchestrationCaseSnapshot(rental_case=make_case()),
