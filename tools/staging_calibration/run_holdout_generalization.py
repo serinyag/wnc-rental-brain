@@ -6,6 +6,7 @@ import time
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from tools.staging_calibration.run_operator_calibration import (
@@ -27,11 +28,15 @@ from tools.staging_calibration.run_operator_calibration import (
     ScenarioExpectations,
     ScoredCase,
     StageSpec,
+    SUPPORTED_NEXT_ACTIONS,
+    SUPPORTED_SEMANTIC_STATES,
+    _correct_next_action,
     build_client,
     evaluate_case,
     extract_actual_snapshot,
     run_scenario,
     summarize_results,
+    validate_next_action_label,
 )
 
 
@@ -55,6 +60,69 @@ CLAIM_KIND_MAP = {
     "exception_request": CLAIM_EXCEPTION,
     "requirement_evidence": CLAIM_REQUIREMENT,
 }
+
+SUPPORTED_SYSTEM_ASSERTION_KEYS = frozenset(
+    {
+        "expected_open_question_types",
+        "forbidden_open_question_types",
+        "expected_proposed_change_count",
+        "expected_reschedule_request_count",
+        "expected_booking_fee_baseline",
+        "expected_effective_booking_fee",
+        "expected_effective_booking_fee_absent",
+        "expected_effective_fee_matches_baseline",
+        "expected_case_decision_status",
+        "expected_draft",
+        "expected_draft_question_types",
+        "expected_confirmation_required",
+        "expected_feasibility_as_requested",
+        "expected_material_blocker",
+        "must_not_activate_exception",
+        "must_not_create_reschedule_for_same_schedule",
+    }
+)
+
+
+def validate_holdout_schema(holdout_definition: dict[str, Any]) -> list[str]:
+    """Validate frozen holdout vocabulary without constructing a client or hitting staging."""
+    errors: list[str] = []
+    scenarios = holdout_definition.get("scenarios")
+    if not isinstance(scenarios, list):
+        return ["scenarios must be a list"]
+    if holdout_definition.get("scenario_count") != len(scenarios):
+        errors.append("scenario_count does not match scenarios length")
+
+    for payload in scenarios:
+        scenario_id = str(payload.get("scenario_id", "<unknown>"))
+        state = payload.get("expected_state")
+        if state not in SUPPORTED_SEMANTIC_STATES:
+            errors.append(f"{scenario_id}.expected_state unsupported: {state!r}")
+        action = payload.get("expected_next_action")
+        if not isinstance(action, str):
+            errors.append(f"{scenario_id}.expected_next_action must be a string")
+        else:
+            try:
+                validate_next_action_label(action)
+            except ValueError as exc:
+                errors.append(f"{scenario_id}.expected_next_action: {exc}")
+        system = payload.get("expected_system_assertions")
+        if not isinstance(system, dict):
+            errors.append(f"{scenario_id}.expected_system_assertions must be an object")
+        else:
+            for key in system:
+                if key not in SUPPORTED_SYSTEM_ASSERTION_KEYS:
+                    errors.append(f"{scenario_id}.expected_system_assertions.{key} unsupported")
+        for index, proposition in enumerate(payload.get("material_propositions", ())):
+            prefix = f"{scenario_id}.material_propositions[{index}]"
+            if not isinstance(proposition, dict):
+                errors.append(f"{prefix} must be an object")
+                continue
+            if proposition.get("expected_state") not in SUPPORTED_SEMANTIC_STATES:
+                errors.append(f"{prefix}.expected_state unsupported: {proposition.get('expected_state')!r}")
+            proposition_action = proposition.get("expected_action")
+            if proposition_action is not None and proposition_action not in SUPPORTED_NEXT_ACTIONS:
+                errors.append(f"{prefix}.expected_action unsupported: {proposition_action!r}")
+    return errors
 
 
 def _load_holdout_definition(path: Path) -> dict[str, Any]:
@@ -102,6 +170,7 @@ def _expectations_from_payload(payload: dict[str, Any]) -> ScenarioExpectations:
         expected_material_blocker=bool(system.get("expected_material_blocker", False)),
         expected_human_confirmation_required=bool(system.get("expected_material_blocker", False)),
         expected_next_action=payload.get("expected_next_action"),
+        expected_semantic_state=payload["expected_state"],
         forbidden_draft_fragments=tuple(payload.get("statements_that_must_not_appear", ())),
         must_not_activate_exception=bool(system.get("must_not_activate_exception", False)),
         must_not_create_reschedule_for_same_schedule=bool(system.get("must_not_create_reschedule_for_same_schedule", False)),
@@ -166,6 +235,42 @@ def _is_exception_approval_only_path(actual: dict[str, Any]) -> bool:
 
 def _semantic_match(expected_state: str, system_state: str) -> bool:
     return expected_state == system_state
+
+
+def _evaluate_material_propositions(payload: dict[str, Any], result: ScoredCase, system_state: str) -> list[dict[str, Any]]:
+    """Grade compound propositions with structured case evidence exposed by the operator API."""
+    actual = result.actual
+    available_states = set(actual.get("reasoning_projection_semantic_states", ()))
+    rows: list[dict[str, Any]] = []
+    for proposition in payload.get("material_propositions", ()):
+        expected_state = proposition["expected_state"]
+        expected_action = proposition.get("expected_action")
+        is_primary = proposition.get("proposition") == "primary governed evaluation"
+        semantic_match = (
+            _semantic_match(expected_state, system_state)
+            if is_primary
+            else expected_state in available_states
+        )
+        action_match = None
+        if expected_action is not None:
+            action_match = _correct_next_action(
+                ScenarioExpectations(
+                    expected_next_action=expected_action,
+                    expected_semantic_state=expected_state,
+                ),
+                SimpleNamespace(**actual),
+            )
+        rows.append(
+            {
+                "proposition": proposition["proposition"],
+                "expected_state": expected_state,
+                "semantic_match": semantic_match,
+                "expected_action": expected_action,
+                "action_match": action_match,
+                "evidence_scope": "primary_case_outcome" if is_primary else "reasoning_projection_semantic_states",
+            }
+        )
+    return rows
 
 
 def _holdout_critical_failures(payload: dict[str, Any], result: ScoredCase, system_state: str) -> list[str]:
@@ -278,12 +383,34 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--holdout-file", type=Path, default=DEFAULT_HOLDOUT_FILE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--timeout-seconds", type=float, default=45.0)
+    parser.add_argument(
+        "--static-preflight",
+        action="store_true",
+        help="Validate the frozen holdout schema without constructing a hosted client or executing scenarios.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     holdout_definition = _load_holdout_definition(args.holdout_file)
+    schema_errors = validate_holdout_schema(holdout_definition)
+    if args.static_preflight:
+        print(
+            json.dumps(
+                {
+                    "holdout_file": str(args.holdout_file),
+                    "scenario_count": len(holdout_definition.get("scenarios", ())),
+                    "schema_compatible": not schema_errors,
+                    "errors": schema_errors,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0 if not schema_errors else 1
+    if schema_errors:
+        raise SystemExit("Holdout schema preflight failed: " + "; ".join(schema_errors))
     frozen_scenarios = tuple(_scenario_from_payload(payload) for payload in holdout_definition["scenarios"])
 
     client: OperatorHarnessClient = build_client(args.auth_file, timeout_seconds=args.timeout_seconds)
@@ -294,6 +421,7 @@ def main() -> int:
     run_slug = "holdout-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime())
     scored_results: list[ScoredCase] = []
     semantic_rows: list[dict[str, Any]] = []
+    proposition_rows: dict[str, list[dict[str, Any]]] = {}
     execution_logs: dict[str, list[dict[str, Any]]] = {}
     extra_failures: dict[str, list[str]] = {}
 
@@ -311,6 +439,7 @@ def main() -> int:
                 "match": _semantic_match(payload["expected_state"], system_state),
             }
         )
+        proposition_rows[scenario.scenario_id] = _evaluate_material_propositions(payload, scored, system_state)
         extra_failures[scenario.scenario_id] = _holdout_critical_failures(payload, scored, system_state)
 
     summary = summarize_results(scored_results)
@@ -336,6 +465,7 @@ def main() -> int:
                 "expected_state": next(item["expected_state"] for item in holdout_definition["scenarios"] if item["scenario_id"] == result.scenario_id),
                 "system_state": next(item["system_state"] for item in semantic_rows if item["scenario_id"] == result.scenario_id),
                 "state_match": next(item["match"] for item in semantic_rows if item["scenario_id"] == result.scenario_id),
+                "material_propositions": proposition_rows[result.scenario_id],
                 "scores": result.scores,
                 "edit_burden": result.edit_burden,
                 "critical_failures": list(result.critical_failures),

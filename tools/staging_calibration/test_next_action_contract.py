@@ -46,3 +46,55 @@ class StateToActionContractTests(unittest.TestCase):
                 actual,
             )
         )
+
+    def test_frozen_holdout_action_labels_have_strict_observable_semantics(self) -> None:
+        cases = (
+            (
+                "known yes deterministic response",
+                ScenarioExpectations(expected_next_action="deterministic_response", expected_semantic_state="known_yes"),
+                _actual(),
+                True,
+            ),
+            (
+                "known no deterministic response",
+                ScenarioExpectations(expected_next_action="deterministic_response", expected_semantic_state="known_no"),
+                _actual(blockers=("deterministic_restriction",)),
+                True,
+            ),
+            (
+                "known no cannot degrade to internal confirmation",
+                ScenarioExpectations(expected_next_action="deterministic_response", expected_semantic_state="known_no"),
+                _actual(blockers=("confirmation_required",), actions=("CREATE_INTERNAL_TASK_ITEM",)),
+                False,
+            ),
+            (
+                "proposition client information request",
+                ScenarioExpectations(expected_next_action="request_client_information"),
+                _actual(actions=("REQUEST_CLIENT_INFORMATION",), questions=("requested_event_timing",)),
+                True,
+            ),
+        )
+        for label, expected, actual, wanted in cases:
+            with self.subTest(label=label):
+                self.assertEqual(_correct_next_action(expected, actual), wanted)
+
+    def test_conditional_action_requires_conditional_projection(self) -> None:
+        actual = _actual(blockers=("confirmation_required",), actions=("CREATE_INTERNAL_TASK_ITEM",))
+        actual.reasoning_projection_semantic_states = ("known_conditional",)
+        self.assertTrue(
+            _correct_next_action(
+                ScenarioExpectations(expected_next_action="state_condition_or_confirm"),
+                actual,
+            )
+        )
+        actual.reasoning_projection_semantic_states = ("known_yes",)
+        self.assertFalse(
+            _correct_next_action(
+                ScenarioExpectations(expected_next_action="state_condition_or_confirm"),
+                actual,
+            )
+        )
+
+    def test_unknown_action_label_remains_invalid(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Unsupported expected_next_action"):
+            _correct_next_action(ScenarioExpectations(expected_next_action="anything_goes"), _actual())

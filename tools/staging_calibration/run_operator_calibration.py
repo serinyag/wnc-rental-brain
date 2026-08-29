@@ -27,6 +27,31 @@ from tools.phase_08_workflow.contracts import (  # noqa: E402
 DEFAULT_AUTH_FILE = REPO_ROOT / "Staging Authentications.txt"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "docs" / "staging" / "calibration"
 
+SUPPORTED_SEMANTIC_STATES = frozenset(
+    {
+        "known_yes",
+        "known_no",
+        "known_conditional",
+        "unknown_internal",
+        "missing_client_fact",
+    }
+)
+
+SUPPORTED_NEXT_ACTIONS = frozenset(
+    {
+        "none",
+        "ask_client",
+        "request_client_information",
+        "internal_confirmation",
+        "internal_confirmation_without_client_question",
+        "state_condition_or_confirm",
+        "deterministic_response",
+        "restriction_or_external_solution_only",
+        "restriction_or_alternative_needed",
+        "approval_gated_only",
+    }
+)
+
 OBS_FACT = "fact_candidate"
 OBS_REQUEST = "request_candidate"
 OBS_CHANGE = "change_candidate"
@@ -134,6 +159,7 @@ class ScenarioExpectations:
     expected_material_blocker: bool = False
     expected_human_confirmation_required: bool = False
     expected_next_action: str | None = None
+    expected_semantic_state: str | None = None
     forbidden_draft_fragments: tuple[str, ...] = ()
     must_not_activate_exception: bool = False
     must_not_create_reschedule_for_same_schedule: bool = False
@@ -1444,20 +1470,43 @@ def _expected_next_action(expected: ScenarioExpectations) -> str:
     return "none"
 
 
+def validate_next_action_label(action: str) -> None:
+    if action not in SUPPORTED_NEXT_ACTIONS:
+        raise ValueError(f"Unsupported expected_next_action: {action}")
+
+
 def _correct_next_action(expected: ScenarioExpectations, actual: ActualSnapshot) -> bool:
     action = _expected_next_action(expected)
+    validate_next_action_label(action)
     blocker_types = set(actual.open_blocker_types)
     action_types = set(actual.active_workflow_action_types)
     has_internal_review = ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM in action_types
     has_client_request = ACTION_TYPE_REQUEST_CLIENT_INFORMATION in action_types
     has_authority_gap = bool({"current_authority_missing", "confirmation_required"} & blocker_types)
 
+    if action == "deterministic_response":
+        # Deterministic outcomes are represented by governed state/blockers, not a synthetic workflow action.
+        if expected.expected_semantic_state == "known_yes":
+            return not blocker_types and not has_internal_review and not has_client_request
+        if expected.expected_semantic_state == "known_no":
+            return (
+                "deterministic_restriction" in blocker_types
+                and not has_authority_gap
+                and not has_internal_review
+                and not has_client_request
+            )
+        return not has_authority_gap and not has_internal_review and not has_client_request
     if action == "none":
         return not blocker_types and not has_internal_review and not has_client_request
-    if action == "ask_client":
+    if action in {"ask_client", "request_client_information"}:
         return bool(actual.active_open_question_types) and has_client_request and not has_authority_gap
     if action in {"internal_confirmation", "internal_confirmation_without_client_question"}:
         return has_authority_gap and has_internal_review and not has_client_request and not actual.active_open_question_types
+    if action == "state_condition_or_confirm":
+        states = set(actual.reasoning_projection_semantic_states)
+        if "known_conditional" not in states or has_client_request:
+            return False
+        return (has_authority_gap and has_internal_review) or (not has_authority_gap and not has_internal_review)
     if action in {"restriction_or_external_solution_only", "restriction_or_alternative_needed"}:
         return "deterministic_restriction" in blocker_types and not has_authority_gap and not has_internal_review
     if action == "approval_gated_only":

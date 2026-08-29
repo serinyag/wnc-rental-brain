@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import unittest
+import json
+from pathlib import Path
 
-from tools.staging_calibration.run_holdout_generalization import _classify_system_state
+from tools.staging_calibration.run_holdout_generalization import _classify_system_state, validate_holdout_schema
 from tools.staging_calibration.run_operator_calibration import ScoredCase
 
 
@@ -87,6 +89,26 @@ class HoldoutGeneralizationClassificationTests(unittest.TestCase):
         )
 
         self.assertEqual(_classify_system_state(result), "known_conditional")
+
+    def test_frozen_holdout2_schema_is_compatible_without_hosted_execution(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        payload = json.loads((root / "docs/staging/calibration/holdout2_scenarios.json").read_text(encoding="utf-8"))
+        self.assertEqual(validate_holdout_schema(payload), [])
+
+    def test_unknown_frozen_action_label_fails_schema_validation(self) -> None:
+        payload = {
+            "scenario_count": 1,
+            "scenarios": [
+                {
+                    "scenario_id": "HOLD2-X",
+                    "expected_state": "known_yes",
+                    "expected_next_action": "anything_goes",
+                    "expected_system_assertions": {},
+                    "material_propositions": [],
+                }
+            ],
+        }
+        self.assertIn("unsupported", " ".join(validate_holdout_schema(payload)).lower())
 
 
 if __name__ == "__main__":
