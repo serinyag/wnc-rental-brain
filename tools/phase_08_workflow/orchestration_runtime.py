@@ -174,6 +174,14 @@ def build_workflow_orchestration_context(
         for projection in snapshot.reasoning_projections
         if projection.source_case_revision == snapshot.rental_case.case_revision
     )
+    if _has_pending_commercial_case_decision(snapshot):
+        # A pending commercial exception is governed by its own approval path. Do
+        # not let an earlier test-console capacity inference override that posture.
+        current_projection_set = tuple(
+            projection
+            for projection in current_projection_set
+            if not _is_test_console_capacity_projection(projection)
+        )
     reasoning_effects = tuple(
         effect
         for projection in current_projection_set
@@ -197,6 +205,21 @@ def build_workflow_orchestration_context(
         artifacts=snapshot.artifacts,
         reasoning_projections=current_projection_set,
         reasoning_effects=reasoning_effects,
+    )
+
+
+def _has_pending_commercial_case_decision(snapshot: WorkflowOrchestrationCaseSnapshot) -> bool:
+    return any(
+        decision.status in {CASE_DECISION_STATUS_PROPOSED, CASE_DECISION_STATUS_PENDING_APPROVAL}
+        and ("commercial" in decision.domain_code or "fee" in decision.domain_code)
+        for decision in snapshot.case_decisions
+    )
+
+
+def _is_test_console_capacity_projection(projection: Any) -> bool:
+    return any(
+        grounding_reference_key.startswith("test_console:capacity_")
+        for grounding_reference_key in projection.grounding_reference_keys
     )
 
 

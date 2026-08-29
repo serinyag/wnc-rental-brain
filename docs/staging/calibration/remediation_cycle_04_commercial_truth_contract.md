@@ -7,10 +7,11 @@ report and JSON metadata incorrectly contained the hard-coded date 2026-08-20.
 The historical artifact is preserved. Future artifacts use their runtime UTC
 timestamp.
 
-HOLD-002 first became incorrect in the Phase 8 projection lookup. The lookup
-used the service clock date rather than the active event date, selecting the
-EUR 50 rule instead of the current rule applicable to the requested 2027 event.
-Its technical `unknown_internal` state was otherwise correct.
+HOLD-002 has a three-hour Studio window. The governed Phase 4 rule for one to
+three hours is EUR 50, so the deployed result was correct and the frozen EUR 75
+expectation was not. Its technical `unknown_internal` state was also correct.
+The lookup now still uses the event date, rather than the service clock, so a
+future-dated rule revision will be evaluated against the requested event.
 
 HOLD-008 did not have enough governed schedule scope to resolve a duration.
 The projection correctly returned `Not established` and no effective fee. The

@@ -186,6 +186,7 @@ def make_projection(
     relevant_current_truth_item_ids=(),
     relevant_guidance_item_ids=(),
     unresolved_authority_codes=(),
+    grounding_reference_keys=("grounding:1",),
 ) -> WorkflowReasoningProjection:
     return WorkflowReasoningProjection(
         reasoning_projection_id=projection_id,
@@ -205,7 +206,7 @@ def make_projection(
         relevant_guidance_item_ids=relevant_guidance_item_ids,
         unresolved_authority_codes=unresolved_authority_codes,
         warning_codes=(),
-        grounding_reference_keys=("grounding:1",),
+        grounding_reference_keys=grounding_reference_keys,
     )
 
 
@@ -251,6 +252,46 @@ def make_action_approval(approval_request_id: int, *, action_id: int) -> Approva
 
 
 class OrchestrationRuntimeTests(unittest.TestCase):
+    def test_pending_commercial_decision_excludes_stale_console_capacity_projection(self) -> None:
+        repo = make_repo(
+            make_case(),
+            decisions=(make_decision(1),),
+            projections=(
+                make_projection(
+                    projection_id=1,
+                    reasoning_purpose="feasibility_review",
+                    authority_outcome="INSUFFICIENT_CURRENT_AUTHORITY",
+                    reasoning_state_code="insufficient_current_authority",
+                    workflow_posture=WORKFLOW_REASONING_POSTURE_BLOCKED_FOR_CURRENT_DECISION,
+                    unresolved_authority_codes=("capacity|insufficient_current_authority",),
+                    grounding_reference_keys=("test_console:capacity_studio_unknown",),
+                ),
+            ),
+        )
+
+        context = build_workflow_orchestration_context(repo.load_case_snapshot(1))
+        plan = evaluate_workflow_orchestration(context, now="2026-08-13T10:00:00Z")
+
+        self.assertEqual(context.reasoning_projections, ())
+        self.assertEqual(len(plan.proposed_approval_creations), 1)
+        self.assertFalse(any(change.blocker_type == "current_authority_missing" for change in plan.proposed_blocker_creations))
+
+    def test_pending_commercial_decision_keeps_non_capacity_projection(self) -> None:
+        projection = make_projection(
+            projection_id=1,
+            reasoning_purpose="feasibility_review",
+            authority_outcome="INSUFFICIENT_CURRENT_AUTHORITY",
+            reasoning_state_code="insufficient_current_authority",
+            workflow_posture=WORKFLOW_REASONING_POSTURE_BLOCKED_FOR_CURRENT_DECISION,
+            unresolved_authority_codes=("technical|insufficient_current_authority",),
+            grounding_reference_keys=("test_console:technical_requirement_unknown",),
+        )
+        repo = make_repo(make_case(), decisions=(make_decision(1),), projections=(projection,))
+
+        context = build_workflow_orchestration_context(repo.load_case_snapshot(1))
+
+        self.assertEqual(context.reasoning_projections, (projection,))
+
     def test_missing_client_information_is_idempotent(self) -> None:
         repo = make_repo(make_case(), questions=(make_question(1),))
         context = build_workflow_orchestration_context(repo.load_case_snapshot(1))
