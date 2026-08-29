@@ -238,6 +238,9 @@ class ActualSnapshot:
     reschedule_request_count: int
     case_decision_statuses: tuple[str, ...]
     reasoning_projection_semantic_states: tuple[str, ...]
+    reasoning_projection_references_by_state: dict[str, tuple[str, ...]]
+    blocker_references_by_type: dict[str, tuple[str, ...]]
+    action_references_by_type: dict[str, tuple[str, ...]]
     commercial_snapshot: dict[str, str]
     feasibility_snapshot: dict[str, str]
     missing_client_information: tuple[str, ...]
@@ -1167,6 +1170,28 @@ def extract_actual_snapshot(case_payload: dict[str, Any]) -> ActualSnapshot:
     commercial = _projection_map(case["working_proposal"].get("commercial_snapshot", []))
     feasibility = _projection_map(case["working_proposal"].get("feasibility_snapshot", []))
 
+    projection_references_by_state: dict[str, list[str]] = {}
+    for projection in reasoning_projections:
+        summary = projection.get("degraded_retrieval_summary")
+        state = summary.get("semantic_state_code") if isinstance(summary, dict) else None
+        identity = projection.get("projection_identity_key")
+        if state and identity:
+            projection_references_by_state.setdefault(str(state), []).append(f"reasoning_projection:{identity}")
+
+    blocker_references_by_type: dict[str, list[str]] = {}
+    for blocker in open_blockers:
+        blocker_type = blocker.get("blocker_type")
+        reference = blocker.get("origin_entity_reference")
+        if blocker_type and reference:
+            blocker_references_by_type.setdefault(str(blocker_type), []).append(str(reference))
+
+    action_references_by_type: dict[str, list[str]] = {}
+    for workflow_action in active_actions:
+        action_type = workflow_action.get("action_type")
+        reference = workflow_action.get("reason_entity_reference")
+        if action_type and reference:
+            action_references_by_type.setdefault(str(action_type), []).append(str(reference))
+
     draft: DraftSummary | None = None
     for thread in case.get("simulated_outlook_threads", []):
         current = thread.get("current_revision")
@@ -1219,6 +1244,18 @@ def extract_actual_snapshot(case_payload: dict[str, Any]) -> ActualSnapshot:
             if isinstance((summary := projection.get("degraded_retrieval_summary")), dict)
             and summary.get("semantic_state_code")
         ),
+        reasoning_projection_references_by_state={
+            state: tuple(references)
+            for state, references in projection_references_by_state.items()
+        },
+        blocker_references_by_type={
+            blocker_type: tuple(references)
+            for blocker_type, references in blocker_references_by_type.items()
+        },
+        action_references_by_type={
+            action_type: tuple(references)
+            for action_type, references in action_references_by_type.items()
+        },
         commercial_snapshot=commercial,
         feasibility_snapshot=feasibility,
         missing_client_information=tuple(
@@ -1475,6 +1512,11 @@ def validate_next_action_label(action: str) -> None:
         raise ValueError(f"Unsupported expected_next_action: {action}")
 
 
+def _references_for(actual: ActualSnapshot, attribute: str, key: str) -> set[str]:
+    mapping = getattr(actual, attribute, {})
+    return set(mapping.get(key, ())) if isinstance(mapping, dict) else set()
+
+
 def _correct_next_action(expected: ScenarioExpectations, actual: ActualSnapshot) -> bool:
     action = _expected_next_action(expected)
     validate_next_action_label(action)
@@ -1483,12 +1525,28 @@ def _correct_next_action(expected: ScenarioExpectations, actual: ActualSnapshot)
     has_internal_review = ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM in action_types
     has_client_request = ACTION_TYPE_REQUEST_CLIENT_INFORMATION in action_types
     has_authority_gap = bool({"current_authority_missing", "confirmation_required"} & blocker_types)
+    internal_action_references = _references_for(actual, "action_references_by_type", ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM)
+    client_action_references = _references_for(actual, "action_references_by_type", ACTION_TYPE_REQUEST_CLIENT_INFORMATION)
 
     if action == "deterministic_response":
         # Deterministic outcomes are represented by governed state/blockers, not a synthetic workflow action.
         if expected.expected_semantic_state == "known_yes":
+            proposition_references = _references_for(actual, "reasoning_projection_references_by_state", "known_yes")
+            if proposition_references:
+                return not (
+                    proposition_references & internal_action_references
+                    or proposition_references & client_action_references
+                    or proposition_references & _references_for(actual, "blocker_references_by_type", "confirmation_required")
+                    or proposition_references & _references_for(actual, "blocker_references_by_type", "current_authority_missing")
+                )
             return not blocker_types and not has_internal_review and not has_client_request
         if expected.expected_semantic_state == "known_no":
+            restriction_references = _references_for(actual, "blocker_references_by_type", "deterministic_restriction")
+            if restriction_references:
+                return not (
+                    restriction_references & internal_action_references
+                    or restriction_references & client_action_references
+                )
             return (
                 "deterministic_restriction" in blocker_types
                 and not has_authority_gap
@@ -1499,9 +1557,9 @@ def _correct_next_action(expected: ScenarioExpectations, actual: ActualSnapshot)
     if action == "none":
         return not blocker_types and not has_internal_review and not has_client_request
     if action in {"ask_client", "request_client_information"}:
-        return bool(actual.active_open_question_types) and has_client_request and not has_authority_gap
+        return bool(actual.active_open_question_types) and has_client_request
     if action in {"internal_confirmation", "internal_confirmation_without_client_question"}:
-        return has_authority_gap and has_internal_review and not has_client_request and not actual.active_open_question_types
+        return has_authority_gap and has_internal_review
     if action == "state_condition_or_confirm":
         states = set(actual.reasoning_projection_semantic_states)
         if "known_conditional" not in states or has_client_request:

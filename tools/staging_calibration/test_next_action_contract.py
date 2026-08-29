@@ -9,12 +9,15 @@ from tools.staging_calibration.run_operator_calibration import (
 )
 
 
-def _actual(*, blockers: tuple[str, ...] = (), actions: tuple[str, ...] = (), questions: tuple[str, ...] = (), decisions: tuple[str, ...] = ()) -> SimpleNamespace:
+def _actual(*, blockers: tuple[str, ...] = (), actions: tuple[str, ...] = (), questions: tuple[str, ...] = (), decisions: tuple[str, ...] = (), blocker_references: dict[str, tuple[str, ...]] | None = None, action_references: dict[str, tuple[str, ...]] | None = None, projection_references: dict[str, tuple[str, ...]] | None = None) -> SimpleNamespace:
     return SimpleNamespace(
         open_blocker_types=blockers,
         active_workflow_action_types=actions,
         active_open_question_types=questions,
         case_decision_statuses=decisions,
+        blocker_references_by_type=blocker_references or {},
+        action_references_by_type=action_references or {},
+        reasoning_projection_references_by_state=projection_references or {},
     )
 
 
@@ -98,3 +101,35 @@ class StateToActionContractTests(unittest.TestCase):
     def test_unknown_action_label_remains_invalid(self) -> None:
         with self.assertRaisesRegex(ValueError, "Unsupported expected_next_action"):
             _correct_next_action(ScenarioExpectations(expected_next_action="anything_goes"), _actual())
+
+    def test_known_no_ignores_internal_task_for_a_separate_proposition(self) -> None:
+        actual = _actual(
+            blockers=("deterministic_restriction", "confirmation_required"),
+            actions=("CREATE_INTERNAL_TASK_ITEM",),
+            blocker_references={
+                "deterministic_restriction": ("reasoning_projection:capacity",),
+                "confirmation_required": ("reasoning_projection:technical",),
+            },
+            action_references={"CREATE_INTERNAL_TASK_ITEM": ("reasoning_projection:technical",)},
+        )
+        self.assertTrue(
+            _correct_next_action(
+                ScenarioExpectations(expected_next_action="deterministic_response", expected_semantic_state="known_no"),
+                actual,
+            )
+        )
+
+    def test_known_yes_ignores_unrelated_conditional_review(self) -> None:
+        actual = _actual(
+            blockers=("confirmation_required",),
+            actions=("CREATE_INTERNAL_TASK_ITEM",),
+            blocker_references={"confirmation_required": ("reasoning_projection:conditional",)},
+            action_references={"CREATE_INTERNAL_TASK_ITEM": ("reasoning_projection:conditional",)},
+            projection_references={"known_yes": ("reasoning_projection:yes",)},
+        )
+        self.assertTrue(
+            _correct_next_action(
+                ScenarioExpectations(expected_next_action="deterministic_response", expected_semantic_state="known_yes"),
+                actual,
+            )
+        )

@@ -82,6 +82,13 @@ SUPPORTED_SYSTEM_ASSERTION_KEYS = frozenset(
     }
 )
 
+SUPPORTED_PROPOSITION_EVIDENCE_STRATEGIES = frozenset(
+    {
+        "reasoning_projection_semantic_states",
+        "isolated_case_outcome",
+    }
+)
+
 
 def validate_holdout_schema(holdout_definition: dict[str, Any]) -> list[str]:
     """Validate frozen holdout vocabulary without constructing a client or hitting staging."""
@@ -105,6 +112,9 @@ def validate_holdout_schema(holdout_definition: dict[str, Any]) -> list[str]:
                 validate_next_action_label(action)
             except ValueError as exc:
                 errors.append(f"{scenario_id}.expected_next_action: {exc}")
+        requires_waiting_action = action in {"ask_client", "request_client_information"}
+        if requires_waiting_action and not any(stage.get("run_waiting") for stage in payload.get("stages", ()) if isinstance(stage, dict)):
+            errors.append(f"{scenario_id}.expected_next_action requires a run_waiting stage")
         system = payload.get("expected_system_assertions")
         if not isinstance(system, dict):
             errors.append(f"{scenario_id}.expected_system_assertions must be an object")
@@ -122,6 +132,9 @@ def validate_holdout_schema(holdout_definition: dict[str, Any]) -> list[str]:
             proposition_action = proposition.get("expected_action")
             if proposition_action is not None and proposition_action not in SUPPORTED_NEXT_ACTIONS:
                 errors.append(f"{prefix}.expected_action unsupported: {proposition_action!r}")
+            evidence_strategy = proposition.get("evaluation_evidence", "reasoning_projection_semantic_states")
+            if evidence_strategy not in SUPPORTED_PROPOSITION_EVIDENCE_STRATEGIES:
+                errors.append(f"{prefix}.evaluation_evidence unsupported: {evidence_strategy!r}")
     return errors
 
 
@@ -246,9 +259,10 @@ def _evaluate_material_propositions(payload: dict[str, Any], result: ScoredCase,
         expected_state = proposition["expected_state"]
         expected_action = proposition.get("expected_action")
         is_primary = proposition.get("proposition") == "primary governed evaluation"
+        evidence_strategy = proposition.get("evaluation_evidence", "reasoning_projection_semantic_states")
         semantic_match = (
             _semantic_match(expected_state, system_state)
-            if is_primary
+            if is_primary or evidence_strategy == "isolated_case_outcome"
             else expected_state in available_states
         )
         action_match = None
@@ -267,7 +281,7 @@ def _evaluate_material_propositions(payload: dict[str, Any], result: ScoredCase,
                 "semantic_match": semantic_match,
                 "expected_action": expected_action,
                 "action_match": action_match,
-                "evidence_scope": "primary_case_outcome" if is_primary else "reasoning_projection_semantic_states",
+                "evidence_scope": "primary_case_outcome" if is_primary else evidence_strategy,
             }
         )
     return rows

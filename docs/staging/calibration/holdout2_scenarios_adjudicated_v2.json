@@ -1,0 +1,1266 @@
+{
+  "version": "second-unseen-holdout-adjudicated-v2",
+  "creation_timestamp": "2026-08-29T00:00:00Z",
+  "scenario_count": 12,
+  "scenarios": [
+    {
+      "scenario_id": "HOLD2-001",
+      "coverage_label": "second_unseen_known_yes",
+      "expected_state": "known_conditional",
+      "title": "Projection-ready board briefing",
+      "description": "Three-hour Studio briefing with projection and ordinary audio.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-03T09:00:00Z",
+          "active_event_end": "2027-03-03T12:00:00Z"
+        },
+        "guest_count": 12,
+        "requested_rental_scope": "studio_space",
+        "event_type": "projection-ready board briefing"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_conditional",
+          "expected_action": "internal_confirmation"
+        },
+        {
+          "proposition": "technical:projection_display",
+          "expected_state": "known_conditional"
+        },
+        {
+          "proposition": "technical:audio_playback",
+          "expected_state": "known_yes"
+        }
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-03T09:00:00Z",
+                "active_event_end": "2027-03-03T12:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 12,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "projection-ready board briefing",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "projection_display",
+                "audio_playback"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-002",
+      "coverage_label": "second_unseen_known_yes",
+      "expected_state": "known_yes",
+      "title": "Quiet planning circle",
+      "description": "Small Studio circle with a governed within-published-limits capacity result and unrelated catering detail.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-05T10:00:00Z",
+          "active_event_end": "2027-03-05T13:00:00Z"
+        },
+        "guest_count": 8,
+        "requested_rental_scope": "studio_space",
+        "event_type": "quiet planning circle"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_yes",
+          "expected_action": "deterministic_response"
+        },
+        {
+          "proposition": "catering:external_caterer",
+          "expected_state": "known_yes",
+          "evaluation_evidence": "isolated_case_outcome"
+        }
+      ],
+      "expected_next_action": "deterministic_response",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "No",
+        "expected_material_blocker": false,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-05T10:00:00Z",
+                "active_event_end": "2027-03-05T13:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 8,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "quiet planning circle",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "client_external_caterer",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "catering_arrangement",
+              "value": "client_external_caterer",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-003",
+      "coverage_label": "second_unseen_known_no",
+      "expected_state": "known_no",
+      "title": "DJ-led anniversary reception",
+      "description": "Four-hour Studio event requesting a DJ sound booth, which must not be confirmed as a standard capability.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-10T18:00:00Z",
+          "active_event_end": "2027-03-10T22:00:00Z"
+        },
+        "guest_count": 22,
+        "requested_rental_scope": "studio_space",
+        "event_type": "dj-led anniversary reception"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_no",
+          "expected_action": "deterministic_response"
+        },
+        {
+          "proposition": "technical:dj_sound_booth",
+          "expected_state": "known_no"
+        }
+      ],
+      "expected_next_action": "deterministic_response",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "No",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+        "expected_effective_booking_fee": "EUR 75 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-10T18:00:00Z",
+                "active_event_end": "2027-03-10T22:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 22,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "dj-led anniversary reception",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "dj_sound_booth"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-004",
+      "coverage_label": "second_unseen_known_no",
+      "expected_state": "known_no",
+      "title": "Oversized studio awards huddle",
+      "description": "Studio request above the published capacity limit with an unrelated facilitator request.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-12T17:00:00Z",
+          "active_event_end": "2027-03-12T20:00:00Z"
+        },
+        "guest_count": 58,
+        "requested_rental_scope": "studio_space",
+        "event_type": "oversized studio awards huddle"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_no",
+          "expected_action": "deterministic_response"
+        },
+        {
+          "proposition": "facilitator:wnc_provided",
+          "expected_state": "known_conditional"
+        }
+      ],
+      "expected_next_action": "deterministic_response",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "No",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-12T17:00:00Z",
+                "active_event_end": "2027-03-12T20:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 58,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "oversized studio awards huddle",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "wnc_provided",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-005",
+      "coverage_label": "second_unseen_known_conditional",
+      "expected_state": "known_no",
+      "title": "Amplified product reveal",
+      "description": "Studio reveal requiring enhanced sound, where the governed technical condition must be preserved.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-16T16:00:00Z",
+          "active_event_end": "2027-03-16T20:00:00Z"
+        },
+        "guest_count": 20,
+        "requested_rental_scope": "studio_space",
+        "event_type": "amplified product reveal"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_no",
+          "expected_action": "deterministic_response"
+        },
+        {
+          "proposition": "technical:enhanced_sound_system",
+          "expected_state": "known_no"
+        }
+      ],
+      "expected_next_action": "deterministic_response",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "No",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+        "expected_effective_booking_fee": "EUR 75 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-16T16:00:00Z",
+                "active_event_end": "2027-03-16T20:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 20,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "amplified product reveal",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "enhanced_sound_system"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-006",
+      "coverage_label": "second_unseen_known_conditional",
+      "expected_state": "known_conditional",
+      "title": "Facilitated strategy offsite",
+      "description": "Studio offsite seeking WNC-provided facilitation, governed as conditional rather than confirmed availability.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-18T09:00:00Z",
+          "active_event_end": "2027-03-18T12:00:00Z"
+        },
+        "guest_count": 16,
+        "requested_rental_scope": "studio_space",
+        "event_type": "facilitated strategy offsite"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_conditional",
+          "expected_action": "state_condition_or_confirm"
+        },
+        {
+          "proposition": "facilitator:wnc_provided",
+          "expected_state": "known_conditional"
+        }
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-18T09:00:00Z",
+                "active_event_end": "2027-03-18T12:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 16,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "facilitated strategy offsite",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "wnc_provided",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-007",
+      "coverage_label": "second_unseen_unknown_internal",
+      "expected_state": "known_conditional",
+      "title": "Custom immersive lab",
+      "description": "Complete Studio inquiry for custom technical setup with no governed current answer.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-20T13:00:00Z",
+          "active_event_end": "2027-03-20T16:00:00Z"
+        },
+        "guest_count": 18,
+        "requested_rental_scope": "studio_space",
+        "event_type": "custom immersive lab"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_conditional",
+          "expected_action": "internal_confirmation"
+        },
+        {
+          "proposition": "technical:other_technical",
+          "expected_state": "known_conditional"
+        }
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-20T13:00:00Z",
+                "active_event_end": "2027-03-20T16:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 18,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "custom immersive lab",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "other_technical"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-008",
+      "coverage_label": "second_unseen_unknown_internal",
+      "expected_state": "unknown_internal",
+      "title": "Bespoke experience consultation",
+      "description": "Complete Studio inquiry for custom experience design requiring internal review.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-23T14:00:00Z",
+          "active_event_end": "2027-03-23T17:00:00Z"
+        },
+        "guest_count": 14,
+        "requested_rental_scope": "studio_space",
+        "event_type": "bespoke experience consultation"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "unknown_internal",
+          "expected_action": "internal_confirmation"
+        },
+        {
+          "proposition": "facilitator:custom_experience_design",
+          "expected_state": "unknown_internal"
+        }
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-23T14:00:00Z",
+                "active_event_end": "2027-03-23T17:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 14,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "bespoke experience consultation",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "custom_experience_design",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-009",
+      "coverage_label": "second_unseen_missing_client_fact",
+      "expected_state": "missing_client_fact",
+      "title": "Timed lunch briefing",
+      "description": "Known Studio fee context lacks the requested event window, so the client must supply timing.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "guest_count": 24,
+        "requested_rental_scope": "studio_space",
+        "event_type": "timed lunch briefing"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "missing_client_fact",
+          "expected_action": "request_client_information"
+        },
+        {
+          "proposition": "technical:projection_display",
+          "expected_state": "known_conditional"
+        }
+      ],
+      "expected_next_action": "ask_client",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [
+          "requested_event_timing"
+        ],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "Not established",
+        "expected_effective_booking_fee_absent": true
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": true,
+          "observations": [
+            {
+              "field_code": "guest_count",
+              "value": 24,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "timed lunch briefing",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "projection_display"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-010",
+      "coverage_label": "second_unseen_missing_client_fact",
+      "expected_state": "missing_client_fact",
+      "title": "Scope-unspecified member salon",
+      "description": "Client supplies timing and guest count but omits rental scope; the system must ask rather than assume.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-25T18:00:00Z",
+          "active_event_end": "2027-03-25T21:00:00Z"
+        },
+        "guest_count": 26,
+        "event_type": "scope-unspecified member salon"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "missing_client_fact",
+          "expected_action": "request_client_information"
+        },
+        {
+          "proposition": "technical:audio_playback",
+          "expected_state": "known_yes"
+        }
+      ],
+      "expected_next_action": "ask_client",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [
+          "requested_rental_scope"
+        ],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "Not established",
+        "expected_effective_booking_fee_absent": true
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": true,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-25T18:00:00Z",
+                "active_event_end": "2027-03-25T21:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 26,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "scope-unspecified member salon",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "audio_playback"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-011",
+      "coverage_label": "second_unseen_missing_client_fact",
+      "expected_state": "missing_client_fact",
+      "title": "Hybrid curator dinner",
+      "description": "Compound case: supported projection, unknown custom technical request, external catering, and missing timing.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "guest_count": 28,
+        "requested_rental_scope": "studio_space",
+        "event_type": "hybrid curator dinner"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "missing_client_fact",
+          "expected_action": "request_client_information"
+        },
+        {
+          "proposition": "technical:projection_display",
+          "expected_state": "known_conditional"
+        },
+        {
+          "proposition": "technical:other_technical",
+          "expected_state": "unknown_internal"
+        },
+        {
+          "proposition": "facilitator:client_external_caterer",
+          "expected_state": "known_conditional"
+        }
+      ],
+      "expected_next_action": "ask_client",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "Yes",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [
+          "requested_event_timing"
+        ],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "Not established",
+        "expected_effective_booking_fee_absent": true
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": true,
+          "observations": [
+            {
+              "field_code": "guest_count",
+              "value": 28,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "hybrid curator dinner",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "projection_display",
+                "other_technical"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "client_external_caterer",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "catering_arrangement",
+              "value": "client_external_caterer",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD2-012",
+      "coverage_label": "second_unseen_known_no",
+      "expected_state": "known_no",
+      "title": "Capacity-limited sound salon",
+      "description": "Compound case: published Studio capacity restriction plus unknown custom technical setup; deterministic capacity restriction remains controlling.",
+      "relevant_rules": [
+        "current Phase 4 booking-fee duration rule where timing is present",
+        "current capacity, technical, and facilitator authority surfaces"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_start": "2027-03-28T18:00:00Z",
+          "active_event_end": "2027-03-28T21:00:00Z"
+        },
+        "guest_count": 62,
+        "requested_rental_scope": "studio_space",
+        "event_type": "capacity-limited sound salon"
+      },
+      "material_propositions": [
+        {
+          "proposition": "primary governed evaluation",
+          "expected_state": "known_no",
+          "expected_action": "deterministic_response"
+        },
+        {
+          "proposition": "technical:other_technical",
+          "expected_state": "known_conditional"
+        }
+      ],
+      "expected_next_action": "deterministic_response",
+      "expected_system_assertions": {
+        "expected_confirmation_required": "No",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT"
+      },
+      "statements_that_must_not_appear": [
+        "confirmed availability without governed authority",
+        "historical fee is the current fee"
+      ],
+      "phase6_relevant": false,
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-03-28T18:00:00Z",
+                "active_event_end": "2027-03-28T21:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "guest_count",
+              "value": 62,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "event_type",
+              "value": "capacity-limited sound salon",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "other_technical"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information",
+              "source_excerpt": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation_contract": {
+    "original_version": "second-unseen-holdout-v1",
+    "original_sha256": "a2f99889c36d8853fc2feb5c370e08b4e2171510898dd7a0c0323a72ac2034c8",
+    "adjudication_date": "2026-08-29",
+    "purpose": "Same Holdout 2 scenarios with adjudicated gold, proposition-local action grading, and required waiting-stage execution.",
+    "changes": [
+      {
+        "cases": [
+          "HOLD2-001"
+        ],
+        "classification": "GOLD_DEFECT",
+        "rule": "TECH_REQ_BASIC_PROJECTION_CONFIRM",
+        "reason": "Basic projection is confirmation-sensitive."
+      },
+      {
+        "cases": [
+          "HOLD2-005"
+        ],
+        "classification": "GOLD_DEFECT",
+        "rule": "TECH_REQ_AMPLIFIED_SOUND_EXTERNAL",
+        "reason": "Amplified event sound is externally supplied."
+      },
+      {
+        "cases": [
+          "HOLD2-007",
+          "HOLD2-012"
+        ],
+        "classification": "GOLD_DEFECT",
+        "rule": "TECH_REQ_CUSTOM_TECH_CONFIRM",
+        "reason": "Custom technical setup has an explicit confirmation path."
+      },
+      {
+        "cases": [
+          "HOLD2-002"
+        ],
+        "classification": "GOLD_DEFECT",
+        "rule": "CATER_EXTERNAL_CATERER_ALLOWED",
+        "reason": "External catering is allowed when storage and power needs are not in scope."
+      },
+      {
+        "cases": [
+          "HOLD2-009",
+          "HOLD2-010",
+          "HOLD2-011"
+        ],
+        "classification": "SCENARIO_EXECUTION_DEFECT",
+        "rule": "inquiry_waiting",
+        "reason": "Client-information actions are formed by the waiting/follow-up path."
+      },
+      {
+        "cases": [
+          "HOLD2-003",
+          "HOLD2-004",
+          "HOLD2-012"
+        ],
+        "classification": "HARNESS_DEFECT",
+        "rule": "proposition_local_action_attribution",
+        "reason": "Unrelated internal tasks must not fail a deterministic restriction."
+      }
+    ]
+  }
+}

@@ -1,0 +1,1024 @@
+{
+  "generated_at": "2026-08-20T16:15:00Z",
+  "scenario_count": 10,
+  "version": "holdout-generalization-v1",
+  "notes": "Frozen holdout set created after the calibrated 32-case remediation pass and before execution. These scenarios are semantically novel relative to the original benchmark and are not to be edited after outputs are observed.",
+  "scenarios": [
+    {
+      "scenario_id": "HOLD-001",
+      "coverage_label": "known_supported_technical_capability",
+      "expected_state": "known_yes",
+      "title": "Supported Wi-Fi And Audio For A Client Briefing",
+      "description": "Client asks for ordinary venue Wi-Fi and normal background audio during a short studio briefing. This is an over-caution control for clearly supported technical capability.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "TECH_REQ_STANDARD_WIFI_SUPPORTED",
+        "TECH_REQ_ORDINARY_AUDIO_SUPPORTED",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-01-13T11:30:00Z",
+          "active_event_start": "2027-01-13T09:00:00Z"
+        },
+        "event_type": "strategy briefing",
+        "guest_count": 14,
+        "requested_rental_scope": "studio_space",
+        "technical_requirements": [
+          "audio_playback",
+          "internet_connectivity"
+        ]
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [],
+      "expected_next_action": "none",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+        "expected_effective_booking_fee": "EUR 50 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "No",
+        "expected_feasibility_as_requested": null,
+        "expected_material_blocker": false,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "requires confirmation",
+        "we would need to check whether Wi-Fi exists",
+        "ordinary audio is unavailable"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-01-13T11:30:00Z",
+                "active_event_start": "2027-01-13T09:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 14
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "strategy briefing"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "technical_requirements",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client asks for stable Wi-Fi and ordinary background audio for a presentation session.",
+              "value": [
+                "audio_playback",
+                "internet_connectivity"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+    "scenario_id": "HOLD-002",
+      "coverage_label": "unknown_technical_capability",
+      "expected_state": "unknown_internal",
+      "title": "Acoustic Treatment Request For A Podcast Salon",
+      "description": "Client asks whether WNC can support a quiet acoustic-treatment setup for a podcast-style salon. Current governed technical rules do not explicitly establish this normalized ask as supported or unsupported.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "Approved Phase 5 technical capability surface from OPS-002",
+        "api.evaluate_technical_requirement nonexistent requirement returns no_applicable_rule",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-01-20T20:00:00Z",
+          "active_event_start": "2027-01-20T17:00:00Z"
+        },
+        "event_type": "podcast salon",
+        "guest_count": 18,
+        "requested_rental_scope": "studio_space",
+        "technical_requirements": [
+          "acoustic_noise"
+        ]
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [
+        "Current governed capability rules do not explicitly establish whether WNC can provide an acoustic-treatment solution for this request."
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+    "expected_booking_fee_baseline": "EUR 50 excl. VAT",
+    "expected_effective_booking_fee": "EUR 50 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "Yes",
+        "expected_feasibility_as_requested": "Requires confirmation",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "WNC can provide acoustic treatment as standard",
+        "No need to confirm acoustics internally"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-01-20T20:00:00Z",
+                "active_event_start": "2027-01-20T17:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 18
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "podcast salon"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "technical_requirements",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client asks whether WNC can handle acoustic control so the room feels podcast-ready without echo.",
+              "value": [
+                "acoustic_noise"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD-003",
+      "coverage_label": "deterministically_unsupported_capability",
+      "expected_state": "known_no",
+      "title": "Dedicated Livestream Control Setup Requested",
+      "description": "Client asks whether WNC itself can provide a dedicated livestream system for a hybrid event. Governed technical rules explicitly say WNC does not own a dedicated livestream system or guaranteed dedicated streaming capacity.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "TECH_LIVESTREAM_SYSTEM_NOT_AVAILABLE",
+        "TECH_REQ_LIVESTREAM_EXTERNAL",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-01-22T17:00:00Z",
+          "active_event_start": "2027-01-22T13:00:00Z"
+        },
+        "event_type": "hybrid investor update",
+        "guest_count": 24,
+        "requested_rental_scope": "entire_venue",
+        "technical_requirements": [
+          "livestream_recording"
+        ]
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [],
+      "expected_next_action": "restriction_or_external_solution_only",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 250 excl. VAT",
+        "expected_effective_booking_fee": "EUR 250 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "No",
+        "expected_feasibility_as_requested": null,
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "WNC can provide a dedicated livestream setup",
+        "we just need to confirm the livestream internally"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-01-22T17:00:00Z",
+                "active_event_start": "2027-01-22T13:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 24
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "entire_venue"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "hybrid investor update"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "technical_requirements",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client asks if WNC can supply a dedicated livestream control setup and streaming system in-house.",
+              "value": [
+                "livestream_recording"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+    "scenario_id": "HOLD-004",
+      "coverage_label": "ambiguous_capacity_applicability",
+      "expected_state": "unknown_internal",
+      "title": "Studio Circle Session Without Layout Clarified",
+      "description": "Client gives complete core inquiry facts for a studio event, but the capacity applicability cannot be safely concluded because the layout/configuration is not governed as current truth in the request.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "api.evaluate_capacity studio_space with missing configuration returns insufficient_information",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-01-27T19:00:00Z",
+          "active_event_start": "2027-01-27T15:00:00Z"
+        },
+        "event_type": "guided circle session",
+        "guest_count": 34,
+        "requested_rental_scope": "studio_space"
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [
+        "Applicable studio layout capacity cannot be concluded from governed current truth without a confirmed configuration."
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+    "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+    "expected_effective_booking_fee": "EUR 75 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "Yes",
+        "expected_feasibility_as_requested": "Requires confirmation",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "34 guests definitely fit the studio",
+        "studio capacity is confirmed without layout review"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-01-27T19:00:00Z",
+                "active_event_start": "2027-01-27T15:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 34
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "guided circle session"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD-005",
+      "coverage_label": "deterministic_over_capacity",
+      "expected_state": "known_no",
+      "title": "Movement Workshop Above Governed Studio Limit",
+      "description": "Client requests a movement-format studio workshop at 21 guests. The governed movement limit is 20, so this should be treated as an over-capacity restriction rather than a confirmation path.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "Studio movement capacity is within at 20 and exceeded at 21",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-01-29T13:00:00Z",
+          "active_event_start": "2027-01-29T09:00:00Z"
+        },
+        "event_type": "movement workshop",
+        "guest_count": 21,
+        "requested_rental_scope": "studio_space",
+        "layout_requirements": {
+          "configuration_type": "movement",
+          "notes": "Client wants everyone moving at the same time."
+        }
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [],
+      "expected_next_action": "restriction_or_alternative_needed",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+        "expected_effective_booking_fee": "EUR 75 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "No",
+        "expected_feasibility_as_requested": null,
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "movement workshop capacity is confirmed",
+        "21 guests are within the movement layout limit"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-01-29T13:00:00Z",
+                "active_event_start": "2027-01-29T09:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 21
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "movement workshop"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "layout_requirements",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client wants an open movement layout with everyone moving at once.",
+              "value": {
+                "configuration_type": "movement",
+                "notes": "Client wants everyone moving at the same time."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD-006",
+      "coverage_label": "facilitator_service_ambiguity",
+      "expected_state": "unknown_internal",
+      "title": "WNC-Led Reflection Segment With Coordinated Catering",
+      "description": "Client clearly wants a WNC-led reflection segment plus WNC-coordinated refreshments. The request is clear, but facilitator availability/commitment is not currently safe to promise from governed knowledge.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "WNC-provided facilitator arrangements are conditional and require availability confirmation",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-02-03T18:00:00Z",
+          "active_event_start": "2027-02-03T12:00:00Z"
+        },
+        "event_type": "leadership retreat afternoon",
+        "guest_count": 26,
+        "requested_rental_scope": "studio_space",
+        "catering_arrangement": "wnc_coordinated",
+        "facilitator_arrangement": "wnc_provided"
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [
+        "Facilitator availability and commitment must be confirmed before WNC provision can be promised."
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+        "expected_effective_booking_fee": "EUR 75 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "Yes",
+        "expected_feasibility_as_requested": "Requires confirmation",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "WNC can definitely provide the facilitator",
+        "facilitator pricing or commitment is already confirmed"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-02-03T18:00:00Z",
+                "active_event_start": "2027-02-03T12:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 26
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "leadership retreat afternoon"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "catering_arrangement",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client wants WNC-coordinated refreshments after the session.",
+              "value": "wnc_coordinated"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "facilitator_arrangement",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client asks whether WNC can provide the facilitator for the reflection segment.",
+              "value": "wnc_provided"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD-007",
+      "coverage_label": "insufficient_internal_wnc_knowledge",
+      "expected_state": "unknown_internal",
+      "title": "Branding Installation Feasibility Without Enough Governed Detail",
+      "description": "Client supplies a complete request including timing, scope, guest count, and event type, but the governed surface does not currently establish whether this branding-installation ask can be confirmed safely.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "Approved Phase 5 technical capability surface from OPS-002",
+        "Unknown or unmapped technical asks must not be guessed",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-02-05T21:00:00Z",
+          "active_event_start": "2027-02-05T16:00:00Z"
+        },
+        "event_type": "brand storytelling evening",
+        "guest_count": 32,
+        "requested_rental_scope": "entire_venue",
+        "technical_requirements": [
+          "branding_signage"
+        ]
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [
+        "Current governed surface does not safely confirm this normalized branding-installation request."
+      ],
+      "expected_next_action": "internal_confirmation",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 250 excl. VAT",
+        "expected_effective_booking_fee": "EUR 250 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "Yes",
+        "expected_feasibility_as_requested": "Requires confirmation",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "branding installation is confirmed as supported",
+        "no internal review is needed for signage installation"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-02-05T21:00:00Z",
+                "active_event_start": "2027-02-05T16:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 32
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "entire_venue"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "brand storytelling evening"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "technical_requirements",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client wants branded hanging elements and signage integrated throughout the event space.",
+              "value": [
+                "branding_signage"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+  "scenario_id": "HOLD-008",
+      "coverage_label": "missing_client_information",
+      "expected_state": "missing_client_fact",
+      "title": "Supplier-Led Dinner Inquiry Without Timing",
+      "description": "Current WNC policy is sufficiently known for the supplier/catering context, but the client omitted the actual timing window needed to progress the inquiry.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "Phase 8 inquiry-intake core field governance",
+        "Supplier responsibility and external-caterer handling are governed separately from core timing facts",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "event_type": "chef-hosted dinner",
+        "guest_count": 30,
+        "requested_rental_scope": "studio_space",
+        "catering_arrangement": "client_external_caterer",
+        "supplier_details": {
+          "supplier_name": "Synthetic Supper Club",
+          "access_needs": "load-in with cooling boxes"
+        }
+      },
+      "missing_client_facts": [
+        "active_event_window"
+      ],
+      "missing_internal_knowledge": [],
+      "expected_next_action": "ask_client",
+      "expected_system_assertions": {
+    "expected_booking_fee_baseline": "Not established",
+    "expected_effective_booking_fee_absent": true,
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "Yes",
+        "expected_feasibility_as_requested": null,
+        "expected_material_blocker": true,
+        "expected_open_question_types": [
+          "requested_event_timing"
+        ],
+        "expected_draft": true,
+        "expected_draft_question_types": [
+          "requested_event_timing"
+        ]
+      },
+      "statements_that_must_not_appear": [
+        "internal confirmation is the main missing step",
+        "the client already provided the timing"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": true,
+          "run_waiting": true,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 30
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "chef-hosted dinner"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "catering_arrangement",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client wants to bring an outside supper-club caterer.",
+              "value": "client_external_caterer"
+            },
+            {
+              "claim_kind": "requirement_evidence",
+              "field_code": "supplier_details",
+              "observation_type": "requirement_evidence_candidate",
+              "source_excerpt": "Supplier would need load-in with cooling boxes and a prep table.",
+              "value": {
+                "access_needs": "load-in with cooling boxes",
+                "supplier_name": "Synthetic Supper Club"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD-009",
+      "coverage_label": "authority_conflict",
+      "expected_state": "known_no",
+      "title": "Legacy Discount Story Should Not Set Current Fee",
+      "description": "An internal note says a similar community evening once got a half-price studio booking fee. Current governed commercial truth should still win unless an approval-gated decision is accepted.",
+      "phase6_relevant": true,
+      "historical_conflict_relevant": true,
+      "relevant_rules": [
+        "Current Phase 4 studio booking-fee baseline",
+        "Approval-gated case-decision activation",
+        "Current authority outranks historical precedent cues"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-02-10T21:00:00Z",
+          "active_event_start": "2027-02-10T17:00:00Z"
+        },
+        "event_type": "community salon",
+        "guest_count": 24,
+        "requested_rental_scope": "studio_space"
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [],
+      "expected_next_action": "approval_gated_only",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+        "expected_effective_booking_fee": "EUR 75 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "No",
+        "expected_feasibility_as_requested": null,
+        "expected_material_blocker": false,
+        "expected_open_question_types": [],
+        "expected_draft": false,
+        "expected_case_decision_status": "proposed",
+        "must_not_activate_exception": true
+      },
+      "statements_that_must_not_appear": [
+        "the old discount is current policy",
+        "the reduced fee is already effective"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "establish_current",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-02-10T21:00:00Z",
+                "active_event_start": "2027-02-10T17:00:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 24
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "community salon"
+            }
+          ]
+        },
+        {
+          "name": "legacy_discount_note",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "exception_request",
+              "field_code": "booking_fee_override",
+              "observation_type": "case_decision_candidate",
+              "source_excerpt": "Operator note: a similar community evening once received a 50% studio-fee discount, but this is not current authority.",
+              "value": {
+                "booking_fee": 37.5,
+                "currency": "EUR",
+                "reason": "Legacy community discount reference"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "HOLD-010",
+      "coverage_label": "compound_unusual_inquiry",
+      "expected_state": "unknown_internal",
+      "title": "Immersive Sound Dinner With Mixed Known And Unknown Elements",
+      "description": "Client asks for a studio immersive dinner with ordinary audio playback, an outside caterer, facilitator recommendations, and a special acoustic setup. The system should preserve the known supported parts, route the unknown internal capability to confirmation, and avoid blanket uncertainty.",
+      "phase6_relevant": false,
+      "historical_conflict_relevant": false,
+      "relevant_rules": [
+        "TECH_REQ_ORDINARY_AUDIO_SUPPORTED",
+        "Client external catering remains a governed client-managed path",
+        "recommendation_requested should not invent WNC facilitator commitment",
+        "Unknown acoustic-treatment support is not established as current governed truth",
+        "Phase 4 booking-fee projection"
+      ],
+      "known_facts": {
+        "active_event_window": {
+          "active_event_end": "2027-02-13T21:30:00Z",
+          "active_event_start": "2027-02-13T16:30:00Z"
+        },
+        "event_type": "immersive sound dinner",
+        "guest_count": 26,
+        "requested_rental_scope": "studio_space",
+        "catering_arrangement": "client_external_caterer",
+        "facilitator_arrangement": "recommendation_requested",
+        "technical_requirements": [
+          "audio_playback",
+          "acoustic_noise"
+        ]
+      },
+      "missing_client_facts": [],
+      "missing_internal_knowledge": [
+        "Current governed surface does not safely confirm the requested acoustic-treatment element."
+      ],
+      "expected_next_action": "internal_confirmation_without_client_question",
+      "expected_system_assertions": {
+        "expected_booking_fee_baseline": "EUR 75 excl. VAT",
+        "expected_effective_booking_fee": "EUR 75 excl. VAT",
+        "expected_effective_fee_matches_baseline": false,
+        "expected_confirmation_required": "Yes",
+        "expected_feasibility_as_requested": "Requires confirmation",
+        "expected_material_blocker": true,
+        "expected_open_question_types": [],
+        "expected_draft": false
+      },
+      "statements_that_must_not_appear": [
+        "all aspects are confirmed",
+        "ordinary audio is unsupported",
+        "client must answer a missing core fact that was already supplied"
+      ],
+      "stages": [
+        {
+          "name": "bootstrap_open_questions",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": []
+        },
+        {
+          "name": "client_answers",
+          "generate_draft": false,
+          "run_waiting": false,
+          "observations": [
+            {
+              "claim_kind": "new_information",
+              "field_code": "active_event_window",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": {
+                "active_event_end": "2027-02-13T21:30:00Z",
+                "active_event_start": "2027-02-13T16:30:00Z"
+              }
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "guest_count",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": 26
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "requested_rental_scope",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "studio_space"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "event_type",
+              "observation_type": "fact_candidate",
+              "source_excerpt": null,
+              "value": "immersive sound dinner"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "catering_arrangement",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client plans to bring an outside chef team.",
+              "value": "client_external_caterer"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "facilitator_arrangement",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client would like WNC to recommend a facilitator if possible.",
+              "value": "recommendation_requested"
+            },
+            {
+              "claim_kind": "new_information",
+              "field_code": "technical_requirements",
+              "observation_type": "fact_candidate",
+              "source_excerpt": "Client wants ordinary playback for a soundscape dinner and asks whether WNC can manage extra acoustic dampening.",
+              "value": [
+                "audio_playback",
+                "acoustic_noise"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

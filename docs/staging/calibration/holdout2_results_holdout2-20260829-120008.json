@@ -1,0 +1,3301 @@
+{
+  "generated_at": "2026-08-29T12:02:35.813055Z",
+  "holdout_version": "second-unseen-holdout-v1",
+  "results": [
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-03T12:00:00Z",
+          "active_event_start": "2027-03-03T09:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120008820",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "projection-ready board briefing",
+          "guest_count": 12
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Structured confirmation or review must be completed before commitment.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 1,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes",
+          "known_conditional"
+        ],
+        "rental_case_id": 296,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_yes",
+      "critical_failures": [],
+      "diagnosed_layer": "phase8_workflow_consumption",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 296,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 314.5"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1242",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1243",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1244",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1245",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1246",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 293.4"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 1",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_yes",
+      "failures": [
+        "confirmation_requirement_mismatch"
+      ],
+      "holdout_extra_failures": [
+        "over_cautious_blocker_on_known_yes"
+      ],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "deterministic_response",
+          "expected_state": "known_yes",
+          "proposition": "primary governed evaluation",
+          "semantic_match": false
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_yes",
+          "proposition": "technical:projection_display",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_yes",
+          "proposition": "technical:audio_playback",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "workflow consumption failure",
+      "scenario_id": "HOLD2-001",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": false,
+      "system_state": "known_conditional"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-05T13:00:00Z",
+          "active_event_start": "2027-03-05T10:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [],
+        "active_workflow_action_types": [],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120023100",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "quiet planning circle",
+          "guest_count": 8
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "No",
+          "Feasibility as requested": "Not yet evaluated",
+          "Hard constraint": "None",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Needs attention"
+        ],
+        "open_blocker_count": 0,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes"
+        ],
+        "rental_case_id": 297,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_yes",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "A",
+      "execution_log": [
+        {
+          "case_id": 297,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 311.6"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1247",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1248",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1249",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1250",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "facilitator_arrangement",
+          "ok": false,
+          "report": {
+            "failure_codes": [
+              "invalid_value_type"
+            ],
+            "lines": [
+              "Observation id: 1251",
+              "Disposition: reject_quarantine",
+              "Status: quarantined"
+            ],
+            "success": false,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "catering_arrangement",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1252",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 271.4"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 0",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_yes",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": true,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "deterministic_response",
+          "expected_state": "known_yes",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_conditional",
+          "proposition": "facilitator:client_external_caterer",
+          "semantic_match": false
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-002",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 4.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 4.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "known_yes"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-10T22:00:00Z",
+          "active_event_start": "2027-03-10T18:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120035883",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 75 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 75 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "dj-led anniversary reception",
+          "guest_count": 22
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Current authority must be resolved before consequential workflow commitment.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Current authority is missing for the requested workflow scope."
+        ],
+        "open_blocker_count": 2,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "current_authority_missing",
+          "deterministic_restriction"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "unknown_internal",
+          "known_no"
+        ],
+        "rental_case_id": 298,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_no",
+      "critical_failures": [],
+      "diagnosed_layer": "phase8_workflow_consumption",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 298,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 236.5"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1253",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1254",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1255",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1256",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1257",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 319.8"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 2",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_no",
+      "failures": [
+        "confirmation_requirement_mismatch"
+      ],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "deterministic_response",
+          "expected_state": "known_no",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_no",
+          "proposition": "technical:dj_sound_booth",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "workflow consumption failure",
+      "scenario_id": "HOLD2-003",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "known_no"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-12T20:00:00Z",
+          "active_event_start": "2027-03-12T17:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120048707",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "oversized studio awards huddle",
+          "guest_count": 58
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Current governed policy does not support the requested commitment as stated.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 2,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "deterministic_restriction",
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_no",
+          "known_conditional"
+        ],
+        "rental_case_id": 299,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_no",
+      "critical_failures": [],
+      "diagnosed_layer": "phase8_workflow_consumption",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 299,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 308.3"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1258",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1259",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1260",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1261",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "facilitator_arrangement",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1262",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 235.8"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 2",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_no",
+      "failures": [
+        "confirmation_requirement_mismatch"
+      ],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "deterministic_response",
+          "expected_state": "known_no",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_conditional",
+          "proposition": "facilitator:wnc_provided",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "workflow consumption failure",
+      "scenario_id": "HOLD2-004",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "known_no"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-16T20:00:00Z",
+          "active_event_start": "2027-03-16T16:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [],
+        "active_workflow_action_types": [],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120101182",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 75 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 75 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "amplified product reveal",
+          "guest_count": 20
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "No",
+          "Feasibility as requested": "Not yet evaluated",
+          "Hard constraint": "Current governed policy does not support the requested commitment as stated.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Needs attention"
+        ],
+        "open_blocker_count": 1,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "deterministic_restriction"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes",
+          "known_no"
+        ],
+        "rental_case_id": 300,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_conditional",
+      "critical_failures": [],
+      "diagnosed_layer": "phase8_workflow_consumption",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 300,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 242.2"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1263",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1264",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1265",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1266",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1267",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 333.1"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 1",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_conditional",
+      "failures": [
+        "confirmation_requirement_mismatch"
+      ],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "state_condition_or_confirm",
+          "expected_state": "known_conditional",
+          "proposition": "primary governed evaluation",
+          "semantic_match": false
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_conditional",
+          "proposition": "technical:enhanced_sound_system",
+          "semantic_match": false
+        }
+      ],
+      "root_cause": "workflow consumption failure",
+      "scenario_id": "HOLD2-005",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": false,
+      "system_state": "known_no"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-18T12:00:00Z",
+          "active_event_start": "2027-03-18T09:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120112889",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "facilitated strategy offsite",
+          "guest_count": 16
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Structured confirmation or review must be completed before commitment.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 1,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes",
+          "known_conditional"
+        ],
+        "rental_case_id": 301,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_conditional",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "A",
+      "execution_log": [
+        {
+          "case_id": 301,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 241.3"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1268",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1269",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1270",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1271",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "facilitator_arrangement",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1272",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 336.1"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 1",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_conditional",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": true,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "state_condition_or_confirm",
+          "expected_state": "known_conditional",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_conditional",
+          "proposition": "facilitator:wnc_provided",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-006",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 4.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "known_conditional"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-20T16:00:00Z",
+          "active_event_start": "2027-03-20T13:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120124387",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "custom immersive lab",
+          "guest_count": 18
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Structured confirmation or review must be completed before commitment.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 1,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes",
+          "known_conditional"
+        ],
+        "rental_case_id": 302,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_unknown_internal",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "A",
+      "execution_log": [
+        {
+          "case_id": 302,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 235.8"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1273",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1274",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1275",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1276",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1277",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 344.5"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 1",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "unknown_internal",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": true,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "internal_confirmation",
+          "expected_state": "unknown_internal",
+          "proposition": "primary governed evaluation",
+          "semantic_match": false
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "unknown_internal",
+          "proposition": "technical:other_technical",
+          "semantic_match": false
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-007",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 4.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": false,
+      "system_state": "known_conditional"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-23T17:00:00Z",
+          "active_event_start": "2027-03-23T14:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120136370",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "bespoke experience consultation",
+          "guest_count": 14
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Current authority must be resolved before consequential workflow commitment.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Current authority is missing for the requested workflow scope."
+        ],
+        "open_blocker_count": 1,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "current_authority_missing"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes",
+          "unknown_internal"
+        ],
+        "rental_case_id": 303,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_unknown_internal",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "A",
+      "execution_log": [
+        {
+          "case_id": 303,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 307.6"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1278",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1279",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1280",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1281",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "facilitator_arrangement",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1282",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 301.0"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 1",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "unknown_internal",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": true,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "internal_confirmation",
+          "expected_state": "unknown_internal",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "unknown_internal",
+          "proposition": "facilitator:custom_experience_design",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-008",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 4.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "unknown_internal"
+    },
+    {
+      "actual": {
+        "active_event_window": null,
+        "active_open_question_texts": [
+          "What date and time is the client requesting for the event?"
+        ],
+        "active_open_question_types": [
+          "requested_event_timing"
+        ],
+        "active_workflow_action_statuses": [
+          "ready_to_execute",
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM",
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120149371",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "Not established",
+          "Case-specific exceptions": "None",
+          "Unresolved commercial items": "0",
+          "VAT": "Not established"
+        },
+        "current_facts": {
+          "event_type": "timed lunch briefing",
+          "guest_count": 24
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Open question 1152 must be resolved.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "What date and time is the client requesting for the event?"
+        ],
+        "next_action_labels": [
+          "Current authority is missing for the requested workflow scope.",
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 3,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "missing_client_information",
+          "current_authority_missing",
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "unknown_internal",
+          "known_conditional"
+        ],
+        "rental_case_id": 304,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_missing_client_fact",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 304,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 358.8"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1283",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1284",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1285",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1286",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 3",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 6",
+              "Runtime ms: 322.5"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 2",
+              "Created approvals: 0",
+              "Created blockers: 2",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "missing_client_fact",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "request_client_information",
+          "expected_state": "missing_client_fact",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_yes",
+          "proposition": "technical:projection_display",
+          "semantic_match": false
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-009",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "missing_client_fact"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-25T21:00:00Z",
+          "active_event_start": "2027-03-25T18:00:00Z"
+        },
+        "active_open_question_texts": [
+          "Which space or rental scope is the client requesting?"
+        ],
+        "active_open_question_types": [
+          "requested_rental_scope"
+        ],
+        "active_workflow_action_statuses": [],
+        "active_workflow_action_types": [],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120200795",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "Not established",
+          "Case-specific exceptions": "None",
+          "Unresolved commercial items": "0",
+          "VAT": "Not established"
+        },
+        "current_facts": {
+          "event_type": "scope-unspecified member salon",
+          "guest_count": 26
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Not yet evaluated",
+          "Hard constraint": "Open question 1158 must be resolved.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Which space or rental scope is the client requesting?"
+        ],
+        "next_action_labels": [
+          "Needs attention"
+        ],
+        "open_blocker_count": 1,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "missing_client_information"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_yes"
+        ],
+        "rental_case_id": 305,
+        "rental_type_code": "custom_scope",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_missing_client_fact",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 305,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 316.0"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1287",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1288",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1289",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1290",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 3",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 6",
+              "Runtime ms: 310.2"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 0",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "missing_client_fact",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "request_client_information",
+          "expected_state": "missing_client_fact",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_yes",
+          "proposition": "technical:audio_playback",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-010",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "missing_client_fact"
+    },
+    {
+      "actual": {
+        "active_event_window": null,
+        "active_open_question_texts": [
+          "What date and time is the client requesting for the event?"
+        ],
+        "active_open_question_types": [
+          "requested_event_timing"
+        ],
+        "active_workflow_action_statuses": [
+          "ready_to_execute",
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM",
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120212061",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "Not established",
+          "Case-specific exceptions": "None",
+          "Unresolved commercial items": "0",
+          "VAT": "Not established"
+        },
+        "current_facts": {
+          "event_type": "hybrid curator dinner",
+          "guest_count": 28
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Open question 1160 must be resolved.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "What date and time is the client requesting for the event?"
+        ],
+        "next_action_labels": [
+          "Current authority is missing for the requested workflow scope.",
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 3,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "missing_client_information",
+          "current_authority_missing",
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "unknown_internal",
+          "known_conditional"
+        ],
+        "rental_case_id": 306,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_missing_client_fact",
+      "critical_failures": [],
+      "diagnosed_layer": "none",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 306,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 329.5"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1291",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1292",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1293",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1294",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "facilitator_arrangement",
+          "ok": false,
+          "report": {
+            "failure_codes": [
+              "invalid_value_type"
+            ],
+            "lines": [
+              "Observation id: 1295",
+              "Disposition: reject_quarantine",
+              "Status: quarantined"
+            ],
+            "success": false,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "catering_arrangement",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1296",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 3",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 6",
+              "Runtime ms: 367.8"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 2",
+              "Created approvals: 0",
+              "Created blockers: 2",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "missing_client_fact",
+      "failures": [],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "request_client_information",
+          "expected_state": "missing_client_fact",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_yes",
+          "proposition": "technical:projection_display",
+          "semantic_match": false
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "unknown_internal",
+          "proposition": "technical:other_technical",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "known_conditional",
+          "proposition": "facilitator:client_external_caterer",
+          "semantic_match": true
+        }
+      ],
+      "root_cause": "no substantive failure observed",
+      "scenario_id": "HOLD2-011",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "missing_client_fact"
+    },
+    {
+      "actual": {
+        "active_event_window": {
+          "active_event_end": "2027-03-28T21:00:00Z",
+          "active_event_start": "2027-03-28T18:00:00Z"
+        },
+        "active_open_question_texts": [],
+        "active_open_question_types": [],
+        "active_workflow_action_statuses": [
+          "ready_to_execute"
+        ],
+        "active_workflow_action_types": [
+          "CREATE_INTERNAL_TASK_ITEM"
+        ],
+        "case_decision_statuses": [],
+        "case_reference_code": "RC-20260829120224681",
+        "case_revision": 2,
+        "commercial_snapshot": {
+          "Booking fee baseline": "EUR 50 excl. VAT",
+          "Case-specific exceptions": "None",
+          "Effective booking fee": "EUR 50 excl. VAT",
+          "Unresolved commercial items": "0",
+          "VAT": "21%"
+        },
+        "current_facts": {
+          "event_type": "capacity-limited sound salon",
+          "guest_count": 62
+        },
+        "draft": null,
+        "feasibility_snapshot": {
+          "Confirmation still required": "Yes",
+          "Feasibility as requested": "Requires confirmation",
+          "Hard constraint": "Current governed policy does not support the requested commitment as stated.",
+          "Supported alternative": "Not established"
+        },
+        "missing_client_information": [
+          "Outstanding client information"
+        ],
+        "next_action_labels": [
+          "Structured confirmation is required before progressing."
+        ],
+        "open_blocker_count": 2,
+        "open_blocker_rule_codes": [],
+        "open_blocker_types": [
+          "deterministic_restriction",
+          "confirmation_required"
+        ],
+        "proposed_change_count": 0,
+        "reasoning_projection_semantic_states": [
+          "known_no",
+          "known_conditional"
+        ],
+        "rental_case_id": 307,
+        "rental_type_code": "studio_space",
+        "reschedule_request_count": 0
+      },
+      "coverage_label": "second_unseen_known_no",
+      "critical_failures": [],
+      "diagnosed_layer": "phase8_workflow_consumption",
+      "edit_burden": "B",
+      "execution_log": [
+        {
+          "case_id": 307,
+          "step": "create_case"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 0",
+              "Case revision after: 1",
+              "Promoted current fields: 0",
+              "Open questions created: 4",
+              "Open questions resolved: 0",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 4",
+              "Runtime ms: 249.3"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 1",
+              "Created actions: 0",
+              "Created approvals: 0",
+              "Created blockers: 4",
+              "Evaluated case revision: 1"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "bootstrap_open_questions",
+          "step": "run_reconciliation"
+        },
+        {
+          "field_code": "active_event_window",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1297",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "guest_count",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1298",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "requested_rental_scope",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1299",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "event_type",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1300",
+              "Disposition: open_question_answer_candidate",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "field_code": "technical_requirements",
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Observation id: 1301",
+              "Disposition: no_workflow_effect",
+              "Status: validated"
+            ],
+            "success": true,
+            "title": "Structured Test Observation Injected"
+          },
+          "stage": "client_answers",
+          "step": "inject_structured_observation"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 1",
+              "Case revision after: 2",
+              "Promoted current fields: Requested Schedule, Guest Count, Requested Space, Event Type",
+              "Open questions created: 0",
+              "Open questions resolved: 4",
+              "Proposed changes created: 0",
+              "Reschedule requests created: 0",
+              "Planned semantic effects: 8",
+              "Runtime ms: 264.7"
+            ],
+            "success": true,
+            "title": "Inquiry Intake Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_inquiry_intake"
+        },
+        {
+          "ok": true,
+          "report": {
+            "failure_codes": [],
+            "lines": [
+              "Case revision before: 2",
+              "Case revision after: 2",
+              "Created actions: 1",
+              "Created approvals: 0",
+              "Created blockers: 2",
+              "Evaluated case revision: 2"
+            ],
+            "success": true,
+            "title": "Workflow Reconciliation Evaluated"
+          },
+          "stage": "client_answers",
+          "step": "run_reconciliation"
+        }
+      ],
+      "expected_state": "known_no",
+      "failures": [
+        "confirmation_requirement_mismatch"
+      ],
+      "holdout_extra_failures": [],
+      "material_propositions": [
+        {
+          "action_match": false,
+          "evidence_scope": "primary_case_outcome",
+          "expected_action": "deterministic_response",
+          "expected_state": "known_no",
+          "proposition": "primary governed evaluation",
+          "semantic_match": true
+        },
+        {
+          "action_match": null,
+          "evidence_scope": "reasoning_projection_semantic_states",
+          "expected_action": null,
+          "expected_state": "unknown_internal",
+          "proposition": "technical:other_technical",
+          "semantic_match": false
+        }
+      ],
+      "root_cause": "workflow consumption failure",
+      "scenario_id": "HOLD2-012",
+      "scores": {
+        "appropriate_restraint": 4.0,
+        "authority_handling": 4.0,
+        "communication_quality": 3.0,
+        "completeness": 4.0,
+        "concision": 3.0,
+        "correct_next_action": 0.0,
+        "factual_correctness": 4.0,
+        "missing_information_detection": 4.0,
+        "operational_usefulness": 2.0,
+        "unsupported_assertion_avoidance": 4.0
+      },
+      "state_match": true,
+      "system_state": "known_no"
+    }
+  ],
+  "run_slug": "holdout2-20260829-120008",
+  "semantic_matrix": [
+    {
+      "expected_state": "known_yes",
+      "match": false,
+      "scenario_id": "HOLD2-001",
+      "system_state": "known_conditional"
+    },
+    {
+      "expected_state": "known_yes",
+      "match": true,
+      "scenario_id": "HOLD2-002",
+      "system_state": "known_yes"
+    },
+    {
+      "expected_state": "known_no",
+      "match": true,
+      "scenario_id": "HOLD2-003",
+      "system_state": "known_no"
+    },
+    {
+      "expected_state": "known_no",
+      "match": true,
+      "scenario_id": "HOLD2-004",
+      "system_state": "known_no"
+    },
+    {
+      "expected_state": "known_conditional",
+      "match": false,
+      "scenario_id": "HOLD2-005",
+      "system_state": "known_no"
+    },
+    {
+      "expected_state": "known_conditional",
+      "match": true,
+      "scenario_id": "HOLD2-006",
+      "system_state": "known_conditional"
+    },
+    {
+      "expected_state": "unknown_internal",
+      "match": false,
+      "scenario_id": "HOLD2-007",
+      "system_state": "known_conditional"
+    },
+    {
+      "expected_state": "unknown_internal",
+      "match": true,
+      "scenario_id": "HOLD2-008",
+      "system_state": "unknown_internal"
+    },
+    {
+      "expected_state": "missing_client_fact",
+      "match": true,
+      "scenario_id": "HOLD2-009",
+      "system_state": "missing_client_fact"
+    },
+    {
+      "expected_state": "missing_client_fact",
+      "match": true,
+      "scenario_id": "HOLD2-010",
+      "system_state": "missing_client_fact"
+    },
+    {
+      "expected_state": "missing_client_fact",
+      "match": true,
+      "scenario_id": "HOLD2-011",
+      "system_state": "missing_client_fact"
+    },
+    {
+      "expected_state": "known_no",
+      "match": true,
+      "scenario_id": "HOLD2-012",
+      "system_state": "known_no"
+    }
+  ],
+  "summary": {
+    "A_plus_B_percentage": 100.0,
+    "authority_conflict_success_rate": 1.0,
+    "category_breakdown": {},
+    "confidentiality_safety_rate": 1.0,
+    "correct_next_action_rate": 0.3333,
+    "critical_failure_count": 0,
+    "edit_burden_counts": {
+      "A": 4,
+      "B": 8,
+      "C": 0,
+      "D": 0
+    },
+    "edit_burden_percentages": {
+      "A": 33.3,
+      "B": 66.7,
+      "C": 0.0,
+      "D": 0.0
+    },
+    "factual_correction_count": 0,
+    "mean_scores": {
+      "appropriate_restraint": 4.0,
+      "authority_handling": 4.0,
+      "communication_quality": 3.0,
+      "completeness": 4.0,
+      "concision": 3.0,
+      "correct_next_action": 1.33,
+      "factual_correctness": 4.0,
+      "missing_information_detection": 4.0,
+      "operational_usefulness": 2.17,
+      "unsupported_assertion_avoidance": 4.0
+    },
+    "median_scores": {
+      "appropriate_restraint": 4.0,
+      "authority_handling": 4.0,
+      "communication_quality": 3.0,
+      "completeness": 4.0,
+      "concision": 3.0,
+      "correct_next_action": 0.0,
+      "factual_correctness": 4.0,
+      "missing_information_detection": 4.0,
+      "operational_usefulness": 2.0,
+      "unsupported_assertion_avoidance": 4.0
+    },
+    "missing_information_detection_rate": 1.0,
+    "total_scenarios": 12,
+    "unsupported_claim_count": 0
+  }
+}
