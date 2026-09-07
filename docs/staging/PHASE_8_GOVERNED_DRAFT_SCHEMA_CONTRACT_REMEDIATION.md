@@ -43,7 +43,25 @@ ordinary inquiry-follow-up drafting remains strict by default.
 
 ## Current Status
 
-The migration must be applied to the staging Supabase project before another
-controlled synthetic draft attempt. The prior OpenAI provider call was not a
-successful end-to-end verification, so no general-drafting success marker is
-claimed by this remediation alone.
+Staging Supabase applied both pending migrations on 2026-09-07:
+
+- `20260829000100_phase_08_general_governed_client_response_drafting.sql`
+- `20260907000100_phase_08_governed_client_response_action_type.sql`
+
+The final controlled synthetic staging verification then succeeded for
+RentalCase `369` at case revision `1`:
+
+- generated draft revision `87`
+- approval request `117`, bound to workflow action `360` and the exact draft
+  revision
+- response intent `COMPLETE_INQUIRY_RESPONSE`
+- provider `openai`, status `completed`, with no validation failures
+- grounded assertions limited to the product workshop, 20 guests, and the
+  governed `EUR 75` booking fee excluding 21% VAT
+- no availability or booking confirmation, no workflow execution attempts, no
+  Outlook/Graph send, and no Asana execution
+
+`GENERAL_GOVERNED_CLIENT_DRAFTING_INTEGRATION_FIXED`
+
+This marker applies only to supervised synthetic staging drafting. It does not
+claim Outlook readiness, autonomous operation, or production readiness.
