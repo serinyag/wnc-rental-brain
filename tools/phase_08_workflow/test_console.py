@@ -113,6 +113,7 @@ class TestConsoleApp:
                 self._render_error(
                     str(error),
                     failure_code=error.failure_code,
+                    diagnostics=error.diagnostics,
                     current_path=self._normalize_render_path(path),
                 ),
                 status=error.status,
@@ -1293,12 +1294,19 @@ class TestConsoleApp:
         message: str,
         *,
         failure_code: str | None = None,
+        diagnostics: dict[str, Any] | None = None,
         current_path: str = "/",
     ) -> str:
         code_html = f"<p><strong>Failure Code:</strong> {h(failure_code)}</p>" if failure_code else ""
+        diagnostics_html = ""
+        if diagnostics:
+            diagnostics_html = f"<h3>Safe Diagnostics</h3><pre>{h(json.dumps(diagnostics, sort_keys=True))}</pre>"
         return self._render_layout(
             title="Rental Workflow Test Console Error",
-            body=f"<section class='report failure'><h1>Error</h1>{code_html}<pre>{h(message)}</pre></section>",
+            body=(
+                f"<section class='report failure'><h1>Error</h1>{code_html}"
+                f"<pre>{h(message)}</pre>{diagnostics_html}</section>"
+            ),
             current_path=current_path,
         )
 

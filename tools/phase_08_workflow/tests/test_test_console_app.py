@@ -627,6 +627,18 @@ class TestConsoleAppTests(unittest.TestCase):
         self.assertEqual(payload["error"]["diagnostics"]["sqlstate"], "42703")
         self.assertNotIn("message", payload["error"]["diagnostics"])
 
+    def test_html_governed_draft_error_renders_safe_database_diagnostics(self) -> None:
+        app = TestConsoleApp(_DatabaseReadErrorService())
+
+        status, body = call_app(app, "POST", "/cases/1/mailbox", b"")
+
+        self.assertEqual(status, "503 Service Unavailable")
+        self.assertIn("Safe Diagnostics", body)
+        self.assertIn("ab12cd34ef56ab78", body)
+        self.assertIn("UndefinedColumn", body)
+        self.assertIn("42703", body)
+        self.assertNotIn("Direct PostgreSQL query failed.", body)
+
     def test_operator_api_runs_provider_free_revalidation_read(self) -> None:
         app = TestConsoleApp(_DatabaseReadErrorService())
 
