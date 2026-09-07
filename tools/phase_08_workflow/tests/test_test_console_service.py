@@ -63,6 +63,26 @@ class _MetadataService(TestConsoleService):
         )
 
 
+class _PostProviderReadRepository:
+    def __init__(self, snapshot: WorkflowOrchestrationCaseSnapshot, calls: list[str]) -> None:
+        self.snapshot = snapshot
+        self.calls = calls
+
+    def load_case_snapshot(self, rental_case_id: int) -> WorkflowOrchestrationCaseSnapshot:
+        self.calls.append(f"snapshot:{rental_case_id}")
+        return self.snapshot
+
+
+class _PostProviderReadService(_MetadataService):
+    def __init__(self, *, calls: list[str], **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.calls = calls
+
+    def _load_test_case_metadata(self, rental_case_id: int) -> TestConsoleCaseMetadata:
+        self.calls.append(f"metadata:{rental_case_id}")
+        return super()._load_test_case_metadata(rental_case_id)
+
+
 class _BatchedOrchestrationRepository:
     def __init__(self, snapshot: WorkflowOrchestrationCaseSnapshot, events):
         self.snapshot = snapshot
@@ -1161,6 +1181,37 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(len(diagnostics["query_fingerprint"]), 16)
         self.assertIn("public.workflow_events", diagnostics["tables"])
         self.assertNotIn("Direct PostgreSQL query failed.", diagnostics.values())
+
+    def test_post_provider_reread_inspection_uses_only_metadata_then_snapshot(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=3,
+            rental_type_code="studio_space",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+        )
+        calls: list[str] = []
+        service = _PostProviderReadService(
+            calls=calls,
+            orchestration_repository=_PostProviderReadRepository(
+                WorkflowOrchestrationCaseSnapshot(rental_case=rental_case),
+                calls,
+            ),
+            observation_repository=_DummyRepository(),
+            client_response_provider=object(),
+            config=TestConsoleConfig(),
+        )
+
+        report = service.inspect_governed_client_response_reread(rental_case_id=1)
+
+        self.assertTrue(report.success)
+        self.assertEqual(calls, ["metadata:1", "snapshot:1"])
+        self.assertIn("Read mode: provider-free", report.lines)
+        self.assertIn("Case revision: 3", report.lines)
 
     def test_page_load_does_not_build_real_provider_adapters(self) -> None:
         rental_case = RentalCase(

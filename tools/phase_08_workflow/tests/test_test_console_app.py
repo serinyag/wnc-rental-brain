@@ -261,6 +261,14 @@ class _DatabaseReadErrorService(_FakeService):
             },
         )
 
+    def inspect_governed_client_response_reread(self, **kwargs) -> OperationReport:
+        del kwargs
+        return OperationReport(
+            title="Governed Client Response Re-read Verified",
+            success=True,
+            lines=("Read mode: provider-free", "Case revision: 0"),
+        )
+
 
 def call_app(
     app: TestConsoleApp,
@@ -602,6 +610,21 @@ class TestConsoleAppTests(unittest.TestCase):
         self.assertEqual(payload["error"]["failure_code"], "DATABASE_READ_FAILED")
         self.assertEqual(payload["error"]["diagnostics"]["sqlstate"], "42703")
         self.assertNotIn("message", payload["error"]["diagnostics"])
+
+    def test_operator_api_runs_provider_free_revalidation_read(self) -> None:
+        app = TestConsoleApp(_DatabaseReadErrorService())
+
+        status, headers, body = call_app_response(
+            app,
+            "GET",
+            "/api/operator/cases/1/mailbox/revalidation-read",
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["lines"], ["Read mode: provider-free", "Case revision: 0"])
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(

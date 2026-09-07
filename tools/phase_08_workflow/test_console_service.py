@@ -2407,6 +2407,20 @@ limit 1;
             ),
         )
 
+    def inspect_governed_client_response_reread(self, *, rental_case_id: int) -> OperationReport:
+        """Run the post-provider re-read boundary without provider or persistence work."""
+        snapshot = self._require_case_snapshot(rental_case_id)
+        return OperationReport(
+            title="Governed Client Response Re-read Verified",
+            success=True,
+            lines=(
+                "Read mode: provider-free",
+                "Registered-case metadata: found",
+                f"Case revision: {snapshot.rental_case.case_revision}",
+                f"Workflow events: {len(snapshot.workflow_events)}",
+            ),
+        )
+
     def edit_inquiry_response_draft(
         self,
         *,
