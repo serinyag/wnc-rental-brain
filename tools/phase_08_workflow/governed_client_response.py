@@ -21,6 +21,18 @@ from tools.phase_07_reasoning.openai_answer_generator import (
     call_openai_responses,
 )
 
+from .context_aware_drafting import (
+    CLIENT_VISIBILITY_EXTERNAL_PENDING_VISIBLE,
+    ContextualGuidance,
+    OperatorAnnotation,
+    RESOLUTION_OWNER_EXTERNAL_PARTY,
+    RESOLUTION_STATUS_CONTACT_REQUIRED,
+    ResolutionItem,
+    STYLE_PROFILE,
+    derive_resolution_items,
+    operator_annotations,
+)
+
 
 RESPONSE_INTENT_COMPLETE_INQUIRY_RESPONSE = "COMPLETE_INQUIRY_RESPONSE"
 RESPONSE_INTENT_REQUEST_CLIENT_INFORMATION = "REQUEST_CLIENT_INFORMATION"
@@ -52,6 +64,9 @@ DRAFT_VALIDATION_UNSUPPORTED_AVAILABILITY_OR_CONFIRMATION = "unsupported_availab
 DRAFT_VALIDATION_PENDING_DECISION_PRESENTED_AS_ACTIVE = "pending_decision_presented_as_active"
 DRAFT_VALIDATION_KNOWN_NO_CONTRADICTION = "known_no_contradiction"
 DRAFT_VALIDATION_COMMERCIAL_ASSERTION_NOT_ALLOWED = "commercial_assertion_not_allowed"
+DRAFT_VALIDATION_EM_DASH_NOT_ALLOWED = "em_dash_not_allowed"
+DRAFT_VALIDATION_DANGLING_SIGNOFF = "dangling_signoff"
+DRAFT_VALIDATION_EXTERNAL_CONTACT_NOT_RECORDED = "external_contact_not_recorded"
 
 
 class ClientResponseProviderError(RuntimeError):
@@ -85,6 +100,10 @@ class DraftContract:
     change_or_reschedule_state: tuple[str, ...]
     forbidden_claims: tuple[str, ...]
     style_guidance: tuple[str, ...]
+    resolution_items: tuple[ResolutionItem, ...] = ()
+    contextual_guidance: tuple[ContextualGuidance, ...] = ()
+    operator_annotations: tuple[OperatorAnnotation, ...] = ()
+    style_profile: tuple[str, ...] = STYLE_PROFILE
 
     def to_provider_payload(self) -> dict[str, Any]:
         return {
@@ -103,6 +122,13 @@ class DraftContract:
             "change_or_reschedule_state": list(self.change_or_reschedule_state),
             "forbidden_claims": list(self.forbidden_claims),
             "style_guidance": list(self.style_guidance),
+            "resolution_items": [
+                item.to_payload()
+                for item in self.resolution_items
+                if item.client_visibility != "INTERNAL_ONLY"
+            ],
+            "contextual_guidance": [item.to_payload() for item in self.contextual_guidance],
+            "style_profile": list(self.style_profile),
         }
 
 
@@ -191,6 +217,8 @@ def build_draft_contract(
     latest_client_message: str | None,
     commercial_snapshot: tuple[tuple[str, str], ...] = (),
     feasibility_snapshot: tuple[tuple[str, str], ...] = (),
+    resolution_items: tuple[ResolutionItem, ...] | None = None,
+    contextual_guidance: tuple[ContextualGuidance, ...] = (),
 ) -> DraftContract:
     intent = ResponseIntentResolver().resolve(snapshot)
     rental_case = snapshot.rental_case
@@ -208,11 +236,11 @@ def build_draft_contract(
         for label, value in feasibility_snapshot
         if value and value not in {"None", "No", "Not established", "Not yet evaluated"}
     )
+    items = derive_resolution_items(snapshot) if resolution_items is None else resolution_items
     pending_internal = tuple(
-        _humanize(getattr(blocker, "blocker_type", "internal confirmation"))
-        for blocker in getattr(snapshot, "blockers", ())
-        if getattr(blocker, "status", None) == "open"
-        and getattr(blocker, "blocker_type", None) != "missing_client_information"
+        item.message
+        for item in items
+        if item.client_visibility == "INTERNAL_ONLY"
     )
     questions = tuple(
         sorted(
@@ -244,6 +272,7 @@ def build_draft_contract(
         "Do not describe a pending internal confirmation as completed.",
         "Do not describe a pending decision or fee adjustment as approved.",
         "Do not use historical precedent as current policy.",
+        "Do not use an em dash in the subject or body.",
     ]
     if intent.code == RESPONSE_INTENT_COMMUNICATE_RESTRICTION:
         forbidden.append("Do not represent a known restriction as supported.")
@@ -257,6 +286,8 @@ def build_draft_contract(
         "questions": questions,
         "decisions": pending_decisions,
         "changes": changes,
+        "resolution_items": [item.to_payload() for item in items],
+        "contextual_guidance": [item.to_payload() for item in contextual_guidance],
     }
     context_hash = hashlib.sha256(json.dumps(context_payload, sort_keys=True, ensure_ascii=True).encode("utf-8")).hexdigest()
     return DraftContract(
@@ -275,10 +306,15 @@ def build_draft_contract(
         change_or_reschedule_state=changes,
         forbidden_claims=tuple(forbidden),
         style_guidance=(
-            "Write one warm, concise, professional email.",
+            "Write one warm, concise, human email that sounds like a helpful WNC rental operator.",
             "Use only supplied assertions and do not mention internal systems or workflow terms.",
             "Ask only the supplied open client questions and make the next step clear.",
+            "Include only relevant supplied contextual guidance and never present it as an unsupported promise.",
+            "Use a complete WNC signoff. Do not use an em dash.",
         ),
+        resolution_items=items,
+        contextual_guidance=contextual_guidance,
+        operator_annotations=operator_annotations(items),
     )
 
 
@@ -295,16 +331,17 @@ class DeterministicFakeClientResponseProvider:
             detail = contract.known_restrictions[0] if contract.known_restrictions else "The requested arrangement is not supported under the current conditions."
             return ClientResponseDraft("Your WNC inquiry", f"{greeting}\n\nThank you for your inquiry. {detail}\n\nWarmly,\nWNC")
         if contract.response_intent.code == RESPONSE_INTENT_PENDING_INTERNAL_CONFIRMATION:
-            detail = contract.pending_internal_confirmations[0] if contract.pending_internal_confirmations else "We are checking the remaining details internally."
-            return ClientResponseDraft("Your WNC inquiry", f"{greeting}\n\nThank you for your inquiry. We are checking {detail} and will come back to you once that review is complete.\n\nWarmly,\nWNC")
+            guidance = contract.contextual_guidance[0].client_safe_guidance if contract.contextual_guidance else "Thanks for sending everything through."
+            return ClientResponseDraft("Your WNC inquiry", f"{greeting}\n\n{guidance}\n\nBest,\nWNC Rentals")
         if contract.response_intent.code == RESPONSE_INTENT_DECISION_PENDING:
             detail = contract.pending_decisions[0] if contract.pending_decisions else "Your request"
             return ClientResponseDraft("Your WNC inquiry", f"{greeting}\n\nThank you for your inquiry. {detail} has been noted and is not yet confirmed.\n\nWarmly,\nWNC")
         if contract.response_intent.code in {RESPONSE_INTENT_CHANGE_ACKNOWLEDGEMENT, RESPONSE_INTENT_RESCHEDULE_ACKNOWLEDGEMENT}:
             detail = contract.change_or_reschedule_state[0] if contract.change_or_reschedule_state else "your updated request"
             return ClientResponseDraft("Your updated WNC inquiry", f"{greeting}\n\nThanks for the update. We have noted {detail} and will review it before confirming any arrangements.\n\nWarmly,\nWNC")
-        assertions = "\n".join(contract.allowed_client_assertions[:2]) or "We have the details needed to review your inquiry."
-        return ClientResponseDraft("Your WNC inquiry", f"{greeting}\n\nThank you for your inquiry. {assertions}\n\nWe will be in touch with the next steps.\n\nWarmly,\nWNC")
+        assertions = "\n".join(contract.allowed_client_assertions[:2]) or "Thanks for sending everything through."
+        guidance = "\n".join(item.client_safe_guidance for item in contract.contextual_guidance[:1])
+        return ClientResponseDraft("Your WNC inquiry", f"{greeting}\n\n{assertions}\n\n{guidance}\n\nBest,\nWNC Rentals")
 
 
 class OpenAIClientResponseProvider:
@@ -376,6 +413,11 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     if tuple(draft.question_ids) != expected_questions:
         failures.append(DRAFT_VALIDATION_OPEN_QUESTION_SET_MISMATCH)
     body = draft.body.lower()
+    combined = f"{draft.subject}\n{draft.body}"
+    if "—" in combined:
+        failures.append(DRAFT_VALIDATION_EM_DASH_NOT_ALLOWED)
+    if re.search(r"\b(?:best regards|kind regards|warm regards|best),\s*$", body):
+        failures.append(DRAFT_VALIDATION_DANGLING_SIGNOFF)
     if re.search(r"\b(?:booking|venue|date).{0,24}\b(?:confirmed|available)\b", body):
         failures.append(DRAFT_VALIDATION_UNSUPPORTED_AVAILABILITY_OR_CONFIRMATION)
     if contract.response_intent.code == RESPONSE_INTENT_DECISION_PENDING and re.search(r"\b(?:waiver|discount|adjustment).{0,20}\b(?:approved|confirmed)\b", body):
@@ -389,6 +431,13 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     asserted_fees = {match.group(0).lower() for match in re.finditer(r"(?:EUR|€)\s?\d+(?:[.,]\d+)?", draft.body, flags=re.IGNORECASE)}
     if not asserted_fees.issubset(allowed_fees):
         failures.append(DRAFT_VALIDATION_COMMERCIAL_ASSERTION_NOT_ALLOWED)
+    external_contact_required = any(
+        item.resolution_owner == RESOLUTION_OWNER_EXTERNAL_PARTY
+        and item.resolution_status == RESOLUTION_STATUS_CONTACT_REQUIRED
+        for item in contract.resolution_items
+    )
+    if external_contact_required and re.search(r"\b(?:we(?:'ve| have) contacted|we(?:'ve| have) reached out|we(?:'re| are) waiting to hear)\b", body):
+        failures.append(DRAFT_VALIDATION_EXTERNAL_CONTACT_NOT_RECORDED)
     return DraftValidationResult(is_valid=not failures, failure_codes=tuple(failures))
 
 
@@ -413,6 +462,8 @@ def _provider_system_prompt() -> str:
     return (
         "You draft client email prose for the WNC Rental Brain. Use only the supplied contract. "
         "Do not retrieve facts, make commitments, expose internal terms, or add assertions. "
+        "Use the supplied current factual guidance only when relevant. Keep internal-only resolution items out of client prose. "
+        "Use a warm human WNC rental voice, a complete signoff, and never use an em dash. "
         "Return JSON only."
     )
 

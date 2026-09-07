@@ -113,6 +113,19 @@ from .governed_client_response import (
     build_draft_contract,
     validate_client_response_draft,
 )
+from .context_aware_drafting import (
+    ContextualGuidanceSearch,
+    Phase5HybridGuidanceSearch,
+    RESOLUTION_OWNER_EXTERNAL_PARTY,
+    RESOLUTION_OWNER_WNC_INTERNAL,
+    RESOLUTION_STATUS_CONTACT_REQUIRED,
+    RESOLUTION_STATUS_REQUIRED,
+    ResolutionItem,
+    derive_resolution_items,
+    detect_guidance_topics,
+    retrieve_contextual_guidance,
+    with_workflow_actions,
+)
 from .inquiry_waiting import InquiryFollowUpPolicy, reconcile_inquiry_waiting
 from .lifecycle_repository import _sql_int, _sql_json, _sql_timestamptz, sql_text
 from .observation_contracts import (
@@ -384,6 +397,7 @@ class SimulatedOutlookThread:
     can_regenerate: bool = False
     can_edit: bool = False
     can_simulate_send: bool = False
+    approval_blocked_by_operator_annotations: bool = False
     status_note: str | None = None
 
 
@@ -556,6 +570,7 @@ class TestConsoleService:
         config: TestConsoleConfig | None = None,
         draft_generator: DeterministicInquiryResponseDraftGenerator | None = None,
         client_response_provider: GovernedClientResponseProvider | None = None,
+        contextual_guidance_search: ContextualGuidanceSearch | None = None,
         now: Callable[[], str] | None = None,
         clock: Clock | None = None,
     ) -> None:
@@ -574,6 +589,7 @@ class TestConsoleService:
         self.observation_repository = observation_repository or SupabaseObservationRepository(query_runner=self.query_runner)
         self.draft_generator = draft_generator or DeterministicInquiryResponseDraftGenerator()
         self.client_response_provider = client_response_provider or build_client_response_provider_from_env()
+        self.contextual_guidance_search = contextual_guidance_search or Phase5HybridGuidanceSearch()
 
     def clock_controls_enabled(self) -> bool:
         return self.config.runtime.allows_mutable_test_clock()
@@ -2256,6 +2272,26 @@ limit 1;
             (bundle.raw_evidence for bundle in detail.evidence_bundles if bundle.raw_evidence is not None),
             None,
         )
+        resolution_items = derive_resolution_items(snapshot)
+        requires_internal_action = any(
+            item.resolution_owner in {RESOLUTION_OWNER_WNC_INTERNAL, RESOLUTION_OWNER_EXTERNAL_PARTY}
+            and item.resolution_status in {RESOLUTION_STATUS_REQUIRED, RESOLUTION_STATUS_CONTACT_REQUIRED}
+            for item in resolution_items
+        )
+        if requires_internal_action:
+            self._ensure_resolution_workflow_actions(snapshot, resolution_items)
+            snapshot = self._require_case_snapshot(rental_case_id)
+        resolution_items = with_workflow_actions(derive_resolution_items(snapshot), snapshot.workflow_actions)
+        guidance_topics = detect_guidance_topics(snapshot, None if latest_evidence is None else latest_evidence.body)
+        try:
+            contextual_guidance = retrieve_contextual_guidance(
+                search=self.contextual_guidance_search,
+                topics=guidance_topics,
+                rental_type_code=snapshot.rental_case.rental_type_code,
+            )
+        except Exception:
+            # Retrieval failure cannot promote uncertainty or block a safe draft.
+            contextual_guidance = ()
         contract = build_draft_contract(
             snapshot=snapshot,
             recipient_label=detail.metadata.client_label,
@@ -2268,6 +2304,8 @@ limit 1;
                 (item.label, item.value)
                 for item in detail.working_proposal.feasibility_snapshot
             ),
+            resolution_items=resolution_items,
+            contextual_guidance=contextual_guidance,
         )
         try:
             generated = self.client_response_provider.generate_client_response(contract)
@@ -2291,6 +2329,8 @@ limit 1;
                 (item.label, item.value)
                 for item in detail.working_proposal.feasibility_snapshot
             ),
+            resolution_items=resolution_items,
+            contextual_guidance=contextual_guidance,
         )
         validation = validate_client_response_draft(
             contract=contract,
@@ -2347,6 +2387,7 @@ limit 1;
             action=action,
             metadata=detail.metadata,
             open_question_ids=tuple(question_id for question_id, _ in contract.open_client_questions),
+            contract=contract,
         )
         content = self._content_from_governed_client_response(
             subject=generated.subject,
@@ -2399,6 +2440,9 @@ limit 1;
                 "provider_response_status": generated.provider_response_status,
                 "provider_incomplete_reason": generated.provider_incomplete_reason,
                 "validation_failure_codes": list(validation.failure_codes),
+                "resolution_items": [item.to_payload() for item in contract.resolution_items],
+                "operator_annotations": [item.to_payload() for item in contract.operator_annotations],
+                "contextual_guidance_topics": [item.topic for item in contract.contextual_guidance],
             },
             actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
@@ -2722,6 +2766,17 @@ limit 1;
                         else ("inquiry_draft_not_current",)
                     ),
                 )
+            if decision == ORCHESTRATION_DECISION_APPROVED and self._has_blocking_operator_annotations(linked_draft):
+                return OperationReport(
+                    title="Approval Blocked",
+                    success=False,
+                    lines=(
+                        f"Approval request id: {approval_request_id}",
+                        f"Draft revision id: {linked_draft.inquiry_response_draft_revision_id}",
+                        "Resolve the blocking operator annotations before approving this client draft.",
+                    ),
+                    failure_codes=("inquiry_draft_blocking_operator_annotation",),
+                )
         result = apply_approval_decision(
             self.orchestration_repository,
             ApprovalDecisionInput(
@@ -2816,6 +2871,7 @@ limit 1;
             question_labels: tuple[str, ...] = ()
             recipient_email = None
             open_approval_request_id = None
+            approval_blocked_by_operator_annotations = False
             if current_revision is not None:
                 display_status = self._draft_display_status(snapshot, current_revision, action=current_action)
                 question_labels = tuple(line.human_question_text for line in current_revision.question_lines)
@@ -2827,6 +2883,7 @@ limit 1;
                 )
                 if approval is not None and approval.status == APPROVAL_REQUEST_STATUS_OPEN:
                     open_approval_request_id = approval.approval_request_id
+                approval_blocked_by_operator_annotations = self._has_blocking_operator_annotations(current_revision)
                 if display_status == INQUIRY_DRAFT_STATUS_STALE:
                     status_note = "Current case revision or unresolved question set changed after this draft was created."
             elif current_action is not None:
@@ -2855,6 +2912,7 @@ limit 1;
                     can_regenerate=current_action is not None and current_revision is not None and display_status != INQUIRY_DRAFT_STATUS_STALE,
                     can_edit=current_action is not None and current_revision is not None and display_status != INQUIRY_DRAFT_STATUS_STALE and current_action.status != WORKFLOW_ACTION_STATUS_EXECUTING,
                     can_simulate_send=current_action is not None and current_revision is not None and display_status == INQUIRY_DRAFT_STATUS_APPROVED and current_action.status == WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
+                    approval_blocked_by_operator_annotations=approval_blocked_by_operator_annotations,
                     status_note=status_note,
                 )
             )
@@ -3228,6 +3286,55 @@ limit 1;
             )
         )
 
+    def _ensure_resolution_workflow_actions(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        resolution_items: tuple[ResolutionItem, ...],
+    ) -> None:
+        """Create idempotent operator work only; no provider is called from drafting."""
+        for item in resolution_items:
+            if item.resolution_owner not in {RESOLUTION_OWNER_WNC_INTERNAL, RESOLUTION_OWNER_EXTERNAL_PARTY}:
+                continue
+            if item.resolution_status not in {RESOLUTION_STATUS_REQUIRED, RESOLUTION_STATUS_CONTACT_REQUIRED}:
+                continue
+            task_kind = (
+                "external_contact_required"
+                if item.resolution_owner == RESOLUTION_OWNER_EXTERNAL_PARTY
+                else "wnc_internal_confirmation"
+            )
+            action_prefix = "Contact" if item.resolution_owner == RESOLUTION_OWNER_EXTERNAL_PARTY else "Confirm"
+            timestamp = self.now()
+            self.orchestration_repository.create_workflow_action(
+                WorkflowAction(
+                    workflow_action_id=1,
+                    workflow_action_uuid="workflow-action",
+                    rental_case_id=snapshot.rental_case.rental_case_id,
+                    action_type=ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
+                    action_category=ACTION_CATEGORY_COORDINATION,
+                    target_adapter_code="task_surface",
+                    reason_entity_type="resolution_item",
+                    reason_entity_reference=item.proposition_key,
+                    approval_posture=APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+                    status=WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
+                    semantic_subject_hash=_json_digest(item.to_payload()),
+                    source_case_revision=snapshot.rental_case.case_revision,
+                    idempotency_key=(
+                        f"context_aware_resolution:{snapshot.rental_case.rental_case_id}:"
+                        f"{item.proposition_key}:{item.resolution_status}"
+                    ),
+                    structured_payload={
+                        "task_kind": task_kind,
+                        "summary": f"{action_prefix}: {item.message}",
+                        "reason": "context_aware_governed_draft_resolution",
+                        "resolution_item_key": item.proposition_key,
+                        "resolution_owner": item.resolution_owner,
+                        "resolution_status": item.resolution_status,
+                    },
+                    created_at=timestamp,
+                    updated_at=timestamp,
+                )
+            )
+
     def _build_governed_client_response_context(
         self,
         snapshot: WorkflowOrchestrationCaseSnapshot,
@@ -3235,6 +3342,7 @@ limit 1;
         action: WorkflowAction,
         metadata: TestConsoleCaseMetadata,
         open_question_ids: tuple[int, ...],
+        contract: Any,
     ) -> InquiryResponseDraftContext:
         return InquiryResponseDraftContext(
             rental_case_id=snapshot.rental_case.rental_case_id,
@@ -3261,6 +3369,8 @@ limit 1;
                 f"Governed response intent: {action.structured_payload['response_intent']}",
                 f"Contract hash: {action.structured_payload['context_hash']}",
             ),
+            operator_annotations=tuple(item.to_payload() for item in contract.operator_annotations),
+            contextual_guidance=tuple(item.to_payload() for item in contract.contextual_guidance),
             workflow_action=action,
         )
 
@@ -3681,6 +3791,11 @@ returning
                 "Only the current approved inquiry-response draft can be sent.",
                 failure_code="INQUIRY_DRAFT_NOT_APPROVED",
             )
+        if self._has_blocking_operator_annotations(current_revision):
+            raise TestConsoleError(
+                "The current inquiry-response draft has unresolved blocking operator annotations and cannot be sent.",
+                failure_code="INQUIRY_DRAFT_BLOCKING_OPERATOR_ANNOTATION",
+            )
         approval = (
             None
             if current_revision.approval_request_id is None
@@ -3691,6 +3806,11 @@ returning
                 "The current inquiry-response draft does not have an approved exact-revision approval record.",
                 failure_code="INQUIRY_DRAFT_APPROVAL_MISSING",
             )
+
+    @staticmethod
+    def _has_blocking_operator_annotations(revision: InquiryResponseDraftRevision) -> bool:
+        annotations = revision.context_payload.get("operator_annotations", [])
+        return any(isinstance(item, dict) and item.get("blocking") is True for item in annotations)
 
     def _draft_display_status(
         self,

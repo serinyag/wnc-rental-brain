@@ -166,6 +166,30 @@ class OperatorHarnessTests(unittest.TestCase):
         self.assertEqual(captured["method"], "POST")
         self.assertIn('"project_gid_override": "project-123"', str(captured["body"]))
 
+    def test_generate_governed_client_response_posts_only_to_draft_endpoint(self) -> None:
+        captured: dict[str, object] = {}
+
+        def opener(request, timeout, context):
+            captured["url"] = request.full_url
+            captured["method"] = request.get_method()
+            captured["body"] = request.data.decode("utf-8") if request.data else None
+            del timeout, context
+            return _FakeResponse(json.dumps({"ok": True}))
+
+        client = OperatorHarnessClient(
+            OperatorHarnessConfig(
+                base_url="https://stage.example.test",
+                username="stage-user",
+                password="stage-pass",
+            ),
+            opener=opener,
+        )
+
+        self.assertEqual(client.generate_governed_client_response_draft(rental_case_id=42), {"ok": True})
+        self.assertEqual(captured["url"], "https://stage.example.test/api/operator/cases/42/mailbox/generate")
+        self.assertEqual(captured["method"], "POST")
+        self.assertEqual(captured["body"], "{}")
+
 
 if __name__ == "__main__":
     unittest.main()

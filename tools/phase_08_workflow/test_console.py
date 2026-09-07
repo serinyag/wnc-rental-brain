@@ -817,11 +817,13 @@ class TestConsoleApp:
                 )
             approval_actions = ""
             if thread.open_approval_request_id is not None:
-                approval_actions = (
-                    f'<form method="post" action="/cases/{rental_case_id}/approvals/{thread.open_approval_request_id}/approve" class="inline">'
-                    f'<button type="submit">Approve Exact Revision</button></form>'
+                reject_form = (
                     f'<form method="post" action="/cases/{rental_case_id}/approvals/{thread.open_approval_request_id}/reject" class="inline">'
                     f'<button type="submit">Reject Draft</button></form>'
+                )
+                approval_actions = reject_form if thread.approval_blocked_by_operator_annotations else (
+                    f'<form method="post" action="/cases/{rental_case_id}/approvals/{thread.open_approval_request_id}/approve" class="inline">'
+                    f'<button type="submit">Approve Exact Revision</button></form>{reject_form}'
                 )
             simulate_send = ""
             if thread.can_simulate_send and thread.workflow_action_id is not None:
@@ -850,6 +852,7 @@ class TestConsoleApp:
   <div><strong>Workflow action:</strong> {thread.current_revision.workflow_action_id}</div>
   <div><strong>Approval request:</strong> {thread.current_revision.approval_request_id or ''}</div>
   <pre>{h(thread.current_revision.body_text)}</pre>
+  {''.join(f"<p class='note'>[WNC INTERNAL: {h(str(item.get('message', '')))}]</p>" for item in thread.current_revision.context_payload.get('operator_annotations', []) if isinstance(item, dict))}
 </div>
 """
                 if thread.can_edit:
