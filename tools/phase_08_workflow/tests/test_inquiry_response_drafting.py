@@ -278,6 +278,33 @@ class _DraftOnlyService(TestConsoleService):
 
 
 class InquiryResponseDraftingContractTests(unittest.TestCase):
+    def test_body_only_governed_response_context_allows_no_client_questions(self) -> None:
+        context = InquiryResponseDraftContext(
+            rental_case_id=1,
+            workflow_action_id=7,
+            conversation_key="governed_client_response:1",
+            source_case_revision=0,
+            contact_label="Acme Events",
+            recipient_email="client@example.test",
+            recipient_label="Acme Events",
+            sender_email="wnc-rentals-simulated@example.test",
+            sender_label="WNC Rentals (Simulated)",
+            open_questions=(),
+            allow_empty_open_questions=True,
+        )
+        content = InquiryResponseDraftContent(
+            subject="Your WNC inquiry",
+            salutation="Hello,",
+            intro_text="Governed client response.",
+            question_lines=(),
+            closing_text="Warm regards,",
+            signoff_text="WNC Rentals",
+            body_text_override="Thank you for your inquiry. We will be in touch with next steps.",
+        )
+
+        self.assertEqual(validate_draft_content(content=content, required_questions=context.open_questions), ())
+        self.assertTrue(context.to_payload()["allow_empty_open_questions"])
+
     def test_generator_covers_exact_open_question_set(self) -> None:
         context = InquiryResponseDraftContext(
             rental_case_id=1,

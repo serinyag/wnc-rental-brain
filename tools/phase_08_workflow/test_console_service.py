@@ -3246,6 +3246,7 @@ limit 1;
             recipient_label=metadata.client_label,
             sender_email="wnc-rentals-simulated@example.test",
             sender_label="WNC Rentals (Simulated)",
+            allow_empty_open_questions=True,
             open_questions=tuple(
                 question
                 for question in self._current_inquiry_questions(snapshot)

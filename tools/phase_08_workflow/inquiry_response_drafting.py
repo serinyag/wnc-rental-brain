@@ -178,6 +178,7 @@ class InquiryResponseDraftContext:
     sender_email: str
     sender_label: str
     open_questions: tuple[OpenQuestion, ...]
+    allow_empty_open_questions: bool = False
     current_facts: tuple[RentalCaseFact, ...] = ()
     guidance_references: tuple[str, ...] = DEFAULT_GUIDANCE_REFERENCES
     workflow_action: WorkflowAction | None = None
@@ -190,9 +191,15 @@ class InquiryResponseDraftContext:
         ensure_non_empty_text("recipient_email", self.recipient_email)
         ensure_non_empty_text("sender_email", self.sender_email)
         ensure_non_empty_text("sender_label", self.sender_label)
+        ensure_bool("allow_empty_open_questions", self.allow_empty_open_questions)
         ensure_tuple_of_non_empty_text("guidance_references", self.guidance_references)
         ensure_tuple_of_non_empty_text("metadata_summary_lines", self.metadata_summary_lines)
-        if not isinstance(self.open_questions, tuple) or not self.open_questions:
+        if not isinstance(self.open_questions, tuple):
+            raise Phase8ContractError(
+                error_category="missing_value",
+                safe_message="open_questions must be a tuple.",
+            )
+        if not self.open_questions and not self.allow_empty_open_questions:
             raise Phase8ContractError(
                 error_category="missing_value",
                 safe_message="open_questions must contain at least one unresolved client question.",
@@ -225,6 +232,7 @@ class InquiryResponseDraftContext:
             "recipient_label": self.recipient_label,
             "sender_email": self.sender_email,
             "sender_label": self.sender_label,
+            "allow_empty_open_questions": self.allow_empty_open_questions,
             "guidance_references": list(self.guidance_references),
             "metadata_summary_lines": list(self.metadata_summary_lines),
             "open_questions": [

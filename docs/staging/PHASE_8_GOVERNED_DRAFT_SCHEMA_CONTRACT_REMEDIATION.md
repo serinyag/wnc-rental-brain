@@ -22,6 +22,12 @@ the closed `workflow_actions_action_type_check` SQL allowlist did not include
 it. The governed client-response path correctly attempted to create an
 approval-required workflow action and the database rejected it.
 
+After the schema repair, the controlled retry persisted the intended
+approval-bound action but failed before draft persistence. The shared
+`InquiryResponseDraftContext` still required at least one client question,
+which conflicts with valid governed replies such as a complete inquiry
+acknowledgement that use a body-only draft.
+
 ## Remediation
 
 `20260907000100_phase_08_governed_client_response_action_type.sql` updates only
@@ -31,6 +37,9 @@ posture, execution eligibility, or authority controls.
 
 `44_phase_08_governed_client_response_action_type.sql` proves an
 approval-bound action with that type can persist.
+
+The governed-response context now explicitly permits an empty question set;
+ordinary inquiry-follow-up drafting remains strict by default.
 
 ## Current Status
 
