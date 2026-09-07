@@ -329,7 +329,7 @@ class OpenAIClientResponseProvider:
         except OpenAIAnswerProviderError as exc:
             raise ClientResponseProviderError(exc.safe_message) from exc
         try:
-            text = str(response["output"][0]["content"][0]["text"])
+            text = _extract_openai_client_draft_text(response)
             parsed = json.loads(text)
             return ClientResponseDraft(
                 subject=str(parsed["subject"]), body=str(parsed["body"]),
@@ -401,6 +401,27 @@ def _provider_system_prompt() -> str:
         "Do not retrieve facts, make commitments, expose internal terms, or add assertions. "
         "Return JSON only."
     )
+
+
+def _extract_openai_client_draft_text(response: dict[str, Any]) -> str:
+    if response.get("status") not in {None, "completed"}:
+        raise ClientResponseProviderError("OpenAI client-draft response did not complete.")
+    output = response.get("output")
+    if not isinstance(output, list):
+        raise ClientResponseProviderError("OpenAI returned malformed structured client-draft output.")
+    for item in output:
+        if not isinstance(item, dict) or item.get("type") not in {None, "message"}:
+            continue
+        content = item.get("content")
+        if not isinstance(content, list):
+            continue
+        for content_item in content:
+            if not isinstance(content_item, dict) or content_item.get("type") not in {None, "output_text"}:
+                continue
+            text = content_item.get("text")
+            if isinstance(text, str):
+                return text
+    raise ClientResponseProviderError("OpenAI response did not contain a structured client draft.")
 
 
 def _provider_schema() -> dict[str, Any]:

@@ -152,6 +152,24 @@ class GovernedClientResponseTests(unittest.TestCase):
         with self.assertRaises(ClientResponseProviderError):
             provider.generate_client_response(contract)
 
+    def test_openai_provider_rejects_empty_response_output(self) -> None:
+        contract = build_draft_contract(snapshot=make_snapshot(), recipient_label="Avery", latest_client_message=None)
+
+        def transport(*_args):
+            return (
+                {
+                    "id": "resp_incomplete",
+                    "status": "incomplete",
+                    "incomplete_details": {"reason": "max_output_tokens"},
+                    "output": [],
+                },
+                {"x-request-id": "req_incomplete"},
+            )
+
+        provider = OpenAIClientResponseProvider(api_key="test-key", model_code="configured-model", transport=transport)
+        with self.assertRaises(ClientResponseProviderError):
+            provider.generate_client_response(contract)
+
 
 if __name__ == "__main__":
     unittest.main()
