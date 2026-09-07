@@ -158,6 +158,14 @@ class _FakeService:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Generated", success=True, lines=("Draft revision id: 9",))
 
+    def generate_governed_client_response_draft(self, **kwargs) -> OperationReport:
+        del kwargs
+        return OperationReport(
+            title="Governed Client Response Draft Generated",
+            success=True,
+            lines=("Draft revision id: 10",),
+        )
+
     def edit_inquiry_response_draft(self, **kwargs) -> OperationReport:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Saved", success=True, lines=("Draft revision id: 10",))
@@ -372,7 +380,15 @@ class TestConsoleAppTests(unittest.TestCase):
 
         self.assertEqual(status, "200 OK")
         self.assertIn("Inquiry Response Draft Generated", body)
-        self.assertIn("Draft revision id: 9", body)
+
+    def test_governed_mailbox_generate_route_renders_report(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, body = call_app(app, "POST", "/cases/1/mailbox", b"")
+
+        self.assertEqual(status, "200 OK")
+        self.assertIn("Governed Client Response Draft Generated", body)
+        self.assertIn("Draft revision id: 10", body)
 
     def test_mailbox_edit_route_renders_report(self) -> None:
         app = TestConsoleApp(_FakeService())

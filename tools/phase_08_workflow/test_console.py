@@ -383,6 +383,9 @@ class TestConsoleApp:
                 external_test_reference=form.get("external_test_reference"),
             )
             return self._respond_html(start_response, self._render_case_detail(rental_case_id, report))
+        if len(parts) == 3 and parts[2] == "mailbox" and method == "POST":
+            report = self.service.generate_governed_client_response_draft(rental_case_id=rental_case_id)
+            return self._respond_html(start_response, self._render_case_detail(rental_case_id, report))
         if len(parts) == 6 and parts[2] == "mailbox" and parts[3] == "actions" and parts[5] == "generate" and method == "POST":
             workflow_action_id = int(parts[4])
             report = self.service.generate_inquiry_response_draft(
@@ -751,6 +754,11 @@ class TestConsoleApp:
     <form method="post" action="/cases/{rental_case_id}/followups/evaluate" class="stack">
       <h3>Follow-Ups</h3>
       <button type="submit">Evaluate Follow-Ups</button>
+    </form>
+    <form method="post" action="/cases/{rental_case_id}/mailbox" class="stack">
+      <h3>Governed Client Response</h3>
+      <p class="note">Calls the configured draft provider once and creates an approval-bound draft only.</p>
+      <button type="submit">Generate Governed Client Response</button>
     </form>
   </div>
   <div class="grid two">
