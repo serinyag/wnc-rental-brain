@@ -265,10 +265,13 @@ class GovernedClientResponseTests(unittest.TestCase):
 
         def transport(payload, _base_url, _headers, _timeout, _ssl_context):
             recorded.append(payload)
-            return ({"id": "resp_1", "output": [{"content": [{"text": json.dumps({"subject": "Hello", "body": "Hi Avery,\n\nThank you.\n\nWNC", "question_ids": []})}]}]}, {"x-request-id": "req_1"})
+            return ({"id": "resp_1", "status": "completed", "output": [{"content": [{"text": json.dumps({"subject": "Hello", "body": "Hi Avery,\n\nThank you.\n\nWNC", "question_ids": []})}]}]}, {"x-request-id": "req_1"})
 
         draft = OpenAIClientResponseProvider(api_key="test-key", model_code="configured-model", transport=transport).generate_client_response(contract)
         self.assertEqual(draft.provider_request_id, "req_1")
+        self.assertEqual(draft.provider_response_id, "resp_1")
+        self.assertEqual(draft.provider_response_status, "completed")
+        self.assertIsNone(draft.provider_incomplete_reason)
         self.assertNotIn("tools", recorded[0])
         self.assertFalse(recorded[0]["store"])
         self.assertTrue(recorded[0]["text"]["format"]["strict"])

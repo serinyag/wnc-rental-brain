@@ -114,6 +114,9 @@ class ClientResponseDraft:
     provider_code: str = "deterministic_fake"
     model_code: str | None = None
     provider_request_id: str | None = None
+    provider_response_id: str | None = None
+    provider_response_status: str | None = None
+    provider_incomplete_reason: str | None = None
 
     def __post_init__(self) -> None:
         if not self.subject.strip() or not self.body.strip():
@@ -341,7 +344,11 @@ class OpenAIClientResponseProvider:
             return ClientResponseDraft(
                 subject=str(parsed["subject"]), body=str(parsed["body"]),
                 question_ids=tuple(int(item) for item in parsed["question_ids"]), provider_code="openai",
-                model_code=self.model_code, provider_request_id=response_headers.get("x-request-id") or response.get("id"),
+                model_code=self.model_code,
+                provider_request_id=_optional_text(response_headers.get("x-request-id")),
+                provider_response_id=_optional_text(response.get("id")),
+                provider_response_status=_optional_text(response.get("status")),
+                provider_incomplete_reason=_incomplete_reason(response),
             )
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             raise ClientResponseProviderError("OpenAI returned malformed structured client-draft output.") from exc
@@ -429,6 +436,17 @@ def _extract_openai_client_draft_text(response: dict[str, Any]) -> str:
             if isinstance(text, str):
                 return text
     raise ClientResponseProviderError("OpenAI response did not contain a structured client draft.")
+
+
+def _optional_text(value: Any) -> str | None:
+    return value.strip() if isinstance(value, str) and value.strip() else None
+
+
+def _incomplete_reason(response: dict[str, Any]) -> str | None:
+    details = response.get("incomplete_details")
+    if not isinstance(details, dict):
+        return None
+    return _optional_text(details.get("reason"))
 
 
 def _provider_schema() -> dict[str, Any]:

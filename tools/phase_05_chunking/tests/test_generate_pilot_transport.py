@@ -17,6 +17,80 @@ SCRATCH_TABLE = "public._portability_query_transport"
 
 
 class SupabaseQueryTransportSelectionTests(unittest.TestCase):
+    def test_direct_transport_closes_each_query_connection_before_the_next_query(self) -> None:
+        events: list[str] = []
+
+        class FakeCursor:
+            def __enter__(self):
+                events.append("cursor_open")
+                return self
+
+            def __exit__(self, *_args):
+                events.append("cursor_closed")
+
+            def execute(self, _statement):
+                events.append("query_executed")
+
+            def fetchone(self):
+                return ("[]",)
+
+            def nextset(self):
+                return False
+
+        class FakeConnection:
+            def __init__(self, connection_number: int) -> None:
+                self.connection_number = connection_number
+
+            def __enter__(self):
+                events.append(f"connection_open:{self.connection_number}")
+                return self
+
+            def __exit__(self, *_args):
+                events.append(f"connection_closed:{self.connection_number}")
+
+            def cursor(self):
+                return FakeCursor()
+
+        class FakePsycopg:
+            calls = 0
+
+            @classmethod
+            def connect(cls, _database_url, **_kwargs):
+                cls.calls += 1
+                return FakeConnection(cls.calls)
+
+        with patch("tools.phase_05_chunking.generate_pilot.importlib.import_module", return_value=FakePsycopg):
+            generate_pilot._run_direct_postgres_query(
+                "select 1 as value;",
+                expect_json=True,
+                database_url=LOCAL_SUPABASE_DATABASE_URL,
+                timeout_seconds=10,
+            )
+            events.append("provider_boundary")
+            generate_pilot._run_direct_postgres_query(
+                "select 2 as value;",
+                expect_json=True,
+                database_url=LOCAL_SUPABASE_DATABASE_URL,
+                timeout_seconds=10,
+            )
+
+        self.assertEqual(
+            events,
+            [
+                "connection_open:1",
+                "cursor_open",
+                "query_executed",
+                "cursor_closed",
+                "connection_closed:1",
+                "provider_boundary",
+                "connection_open:2",
+                "cursor_open",
+                "query_executed",
+                "cursor_closed",
+                "connection_closed:2",
+            ],
+        )
+
     def test_database_url_absent_uses_legacy_docker_transport(self) -> None:
         with (
             patch("tools.phase_05_chunking.generate_pilot.load_env_value", return_value=None),

@@ -25,6 +25,7 @@ from tools.phase_08_workflow.contracts import (
     WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
 )
 from tools.phase_08_workflow.asana_adapter import AsanaAdapterConfig
+from tools.phase_08_workflow.governed_client_response import DeterministicFakeClientResponseProvider
 from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig
 from tools.phase_08_workflow.observation_contracts import InboundObservation, InboundObservationEffect, InboundSourceRecord
 from tools.phase_08_workflow.observation_repository import InMemoryObservationRepository
@@ -81,6 +82,71 @@ class _PostProviderReadService(_MetadataService):
     def _load_test_case_metadata(self, rental_case_id: int) -> TestConsoleCaseMetadata:
         self.calls.append(f"metadata:{rental_case_id}")
         return super()._load_test_case_metadata(rental_case_id)
+
+
+class _LifecycleAwareClientResponseProvider:
+    def __init__(self, calls: list[str]) -> None:
+        self.calls = calls
+        self.fake_provider = DeterministicFakeClientResponseProvider()
+
+    def generate_client_response(self, contract):
+        if self.calls != ["initial_reads_closed"]:
+            raise AssertionError("provider was called before the initial read boundary completed")
+        self.calls.append("provider_called")
+        return self.fake_provider.generate_client_response(contract)
+
+
+class _GovernedClientResponseLifecycleService(_MetadataService):
+    def __init__(self, *, snapshot: WorkflowOrchestrationCaseSnapshot, calls: list[str]) -> None:
+        self.snapshot = snapshot
+        self.calls = calls
+        super().__init__(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            client_response_provider=_LifecycleAwareClientResponseProvider(calls),
+            config=TestConsoleConfig(),
+        )
+
+    def load_case_detail(self, rental_case_id: int):
+        self.calls.append("initial_reads_closed")
+        return SimpleNamespace(
+            metadata=self._load_test_case_metadata(rental_case_id),
+            orchestration_snapshot=self.snapshot,
+            evidence_bundles=(),
+            working_proposal=SimpleNamespace(commercial_snapshot=(), feasibility_snapshot=()),
+        )
+
+    def _require_case_snapshot(self, rental_case_id: int) -> WorkflowOrchestrationCaseSnapshot:
+        del rental_case_id
+        if self.calls != ["initial_reads_closed", "provider_called"]:
+            raise AssertionError("post-provider state was not loaded after generation")
+        self.calls.append("fresh_authoritative_reread")
+        return self.snapshot
+
+    def _ensure_governed_client_response_action(self, _snapshot, *, response_intent: str, context_hash: str):
+        del response_intent, context_hash
+        return make_action()
+
+    def _load_current_draft_revision_for_conversation(self, *_args, **_kwargs):
+        return None
+
+    def _build_governed_client_response_context(self, *_args, **_kwargs):
+        return SimpleNamespace()
+
+    def _create_draft_revision(self, **_kwargs):
+        self.calls.append("draft_persisted")
+        return SimpleNamespace(inquiry_response_draft_revision_id=101)
+
+    def _replace_draft_approval(self, **_kwargs):
+        self.calls.append("approval_created")
+        return SimpleNamespace(approval_request_id=202)
+
+    def _bind_approval_request_to_draft_revision(self, **_kwargs):
+        self.calls.append("draft_bound_to_approval")
+        return SimpleNamespace(inquiry_response_draft_revision_id=101)
+
+    def _create_console_event(self, **_kwargs) -> None:
+        self.calls.append("event_recorded")
 
 
 class _BatchedOrchestrationRepository:
@@ -167,6 +233,42 @@ def make_action(*, target_adapter_code: str = "email") -> WorkflowAction:
 
 
 class TestConsoleServiceSafetyTests(unittest.TestCase):
+    def test_governed_client_response_fake_provider_uses_fresh_post_provider_state_before_persistence(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=3,
+            rental_type_code="studio_space",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+        )
+        calls: list[str] = []
+        service = _GovernedClientResponseLifecycleService(
+            snapshot=WorkflowOrchestrationCaseSnapshot(rental_case=rental_case),
+            calls=calls,
+        )
+
+        report = service.generate_governed_client_response_draft(rental_case_id=1)
+
+        self.assertTrue(report.success)
+        self.assertEqual(
+            calls,
+            [
+                "initial_reads_closed",
+                "provider_called",
+                "fresh_authoritative_reread",
+                "draft_persisted",
+                "approval_created",
+                "draft_bound_to_approval",
+                "event_recorded",
+            ],
+        )
+        self.assertIn("Draft revision id: 101", report.lines)
+        self.assertIn("Approval request id: 202", report.lines)
+
     def test_pending_commercial_decision_does_not_trigger_generic_capacity_inference(self) -> None:
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
