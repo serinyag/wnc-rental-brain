@@ -16,6 +16,7 @@ from .contracts import (
     ACTION_TYPE_ESCALATE_COMPLIANCE_REVIEW,
     ACTION_TYPE_MARK_ARTIFACT_REFRESH_REQUIRED,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+    ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     ACTION_TYPE_SCHEDULE_FOLLOW_UP_REVIEW,
     APPROVAL_POSTURE_APPROVAL_REQUIRED,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
@@ -1722,6 +1723,7 @@ def _parse_id_reference(reference: str | None) -> int | None:
 def _validate_action_payload(action_type: str, payload: dict[str, Any]) -> None:
     required_keys = {
         ACTION_TYPE_REQUEST_CLIENT_INFORMATION: {"open_question_ids", "required_field_codes", "intended_recipient_role", "purpose", "reason"},
+        ACTION_TYPE_SEND_INQUIRY_RESPONSE: {"response_intent", "context_hash", "purpose", "reason"},
         ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM: {"task_kind", "summary", "reason"},
         ACTION_TYPE_ESCALATE_COMPLIANCE_REVIEW: {"task_kind", "reason"},
         ACTION_TYPE_MARK_ARTIFACT_REFRESH_REQUIRED: {"artifact_reference_ids", "reason"},

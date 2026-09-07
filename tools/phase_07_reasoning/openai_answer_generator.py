@@ -173,12 +173,13 @@ class OpenAIAnswerGenerator:
         self.last_request_json = json.dumps(payload, sort_keys=True, ensure_ascii=True)
 
         start = time.perf_counter()
-        response_json, response_headers = self.transport(
+        response_json, response_headers = call_openai_responses(
             payload,
             self.config.api_base_url,
             headers,
             self.config.timeout_seconds,
-            self.ssl_context,
+            transport=self.transport,
+            ssl_context=self.ssl_context,
         )
         latency_ms = max(1, int((time.perf_counter() - start) * 1000))
 
@@ -192,6 +193,21 @@ class OpenAIAnswerGenerator:
         ).to_dict()
 
         return _extract_structured_output(response_json)
+
+
+def call_openai_responses(
+    payload: dict[str, Any],
+    api_base_url: str,
+    headers: dict[str, str],
+    timeout_seconds: int,
+    *,
+    transport: OpenAITransport | None = None,
+    ssl_context: ssl.SSLContext | None = None,
+) -> TransportResult:
+    """Call the existing Responses transport without coupling callers to its client type."""
+    actual_transport = transport or _default_openai_transport
+    actual_ssl_context = ssl_context or ssl.create_default_context(cafile=certifi.where())
+    return actual_transport(payload, api_base_url, headers, timeout_seconds, actual_ssl_context)
 
 
 def _default_openai_transport(

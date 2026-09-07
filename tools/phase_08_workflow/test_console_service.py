@@ -27,10 +27,13 @@ from tools.runtime_environment import (
 from .asana_adapter import AsanaAdapterConfig, build_asana_execution_adapter_from_env
 from .clock import CallableClock, Clock, MutableTestClock, SystemClock
 from .contracts import (
+    ACTION_CATEGORY_COMMUNICATION,
     ACTION_CATEGORY_COORDINATION,
     ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+    ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+    APPROVAL_POSTURE_APPROVAL_REQUIRED,
     APPROVAL_REQUEST_STATUS_OPEN,
     OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     PHASE_7_REASONING_STATE_INSUFFICIENT_INFORMATION,
@@ -101,6 +104,13 @@ from .inquiry_response_drafting import (
 from .inquiry_intake import (
     INQUIRY_INTAKE_OUTCOME_PROMOTED,
     apply_inquiry_intake,
+)
+from .governed_client_response import (
+    ClientResponseProviderError,
+    GovernedClientResponseProvider,
+    build_client_response_provider_from_env,
+    build_draft_contract,
+    validate_client_response_draft,
 )
 from .inquiry_waiting import InquiryFollowUpPolicy, reconcile_inquiry_waiting
 from .lifecycle_repository import _sql_int, _sql_json, _sql_timestamptz, sql_text
@@ -508,6 +518,7 @@ class TestConsoleService:
         query_runner: Callable[..., Any] | None = None,
         config: TestConsoleConfig | None = None,
         draft_generator: DeterministicInquiryResponseDraftGenerator | None = None,
+        client_response_provider: GovernedClientResponseProvider | None = None,
         now: Callable[[], str] | None = None,
         clock: Clock | None = None,
     ) -> None:
@@ -525,6 +536,7 @@ class TestConsoleService:
         self.orchestration_repository = orchestration_repository or SupabaseWorkflowOrchestrationRepository(query_runner=self.query_runner)
         self.observation_repository = observation_repository or SupabaseObservationRepository(query_runner=self.query_runner)
         self.draft_generator = draft_generator or DeterministicInquiryResponseDraftGenerator()
+        self.client_response_provider = client_response_provider or build_client_response_provider_from_env()
 
     def clock_controls_enabled(self) -> bool:
         return self.config.runtime.allows_mutable_test_clock()
@@ -2100,6 +2112,7 @@ limit 1;
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             now=self.now,
         )
+        self._invalidate_stale_drafts(self._require_case_snapshot(rental_case_id))
         promoted_fields = [
             humanize_code(evaluation.inquiry_field_code)
             for evaluation in result.plan.field_evaluations
@@ -2194,6 +2207,139 @@ limit 1;
             lines=(
                 f"Draft revision id: {revision.inquiry_response_draft_revision_id}",
                 f"Workflow action id: {target_action.workflow_action_id}",
+                f"Approval request id: {approval.approval_request_id}",
+            ),
+        )
+
+    def generate_governed_client_response_draft(self, *, rental_case_id: int) -> OperationReport:
+        """Generate one validated client reply without changing governed case truth."""
+        detail = self.load_case_detail(rental_case_id)
+        snapshot = detail.orchestration_snapshot
+        latest_evidence = next(
+            (bundle.raw_evidence for bundle in detail.evidence_bundles if bundle.raw_evidence is not None),
+            None,
+        )
+        contract = build_draft_contract(
+            snapshot=snapshot,
+            recipient_label=detail.metadata.client_label,
+            latest_client_message=None if latest_evidence is None else latest_evidence.body,
+            commercial_snapshot=tuple(
+                (item.label, item.value)
+                for item in detail.working_proposal.commercial_snapshot
+            ),
+            feasibility_snapshot=tuple(
+                (item.label, item.value)
+                for item in detail.working_proposal.feasibility_snapshot
+            ),
+        )
+        try:
+            generated = self.client_response_provider.generate_client_response(contract)
+        except (ClientResponseProviderError, TimeoutError) as exc:
+            raise TestConsoleError(
+                "Client response generation did not complete; no draft was created.",
+                failure_code="CLIENT_RESPONSE_PROVIDER_FAILURE",
+                status=HTTPStatus.SERVICE_UNAVAILABLE,
+            ) from exc
+
+        current_snapshot = self._require_case_snapshot(rental_case_id)
+        current_contract = build_draft_contract(
+            snapshot=current_snapshot,
+            recipient_label=detail.metadata.client_label,
+            latest_client_message=None if latest_evidence is None else latest_evidence.body,
+            commercial_snapshot=tuple(
+                (item.label, item.value)
+                for item in detail.working_proposal.commercial_snapshot
+            ),
+            feasibility_snapshot=tuple(
+                (item.label, item.value)
+                for item in detail.working_proposal.feasibility_snapshot
+            ),
+        )
+        validation = validate_client_response_draft(
+            contract=contract,
+            draft=generated,
+            current_case_revision=current_snapshot.rental_case.case_revision,
+            current_context_hash=current_contract.context_hash,
+        )
+        if not validation.is_valid:
+            raise TestConsoleError(
+                "Generated client response did not pass governed validation; no draft was created.",
+                failure_code="CLIENT_RESPONSE_DRAFT_INVALID",
+            )
+
+        action = self._ensure_governed_client_response_action(
+            current_snapshot,
+            response_intent=contract.response_intent.code,
+            context_hash=contract.context_hash,
+        )
+        latest_revision = self._load_current_draft_revision_for_conversation(
+            rental_case_id,
+            conversation_key=self._draft_conversation_key(action),
+        )
+        context = self._build_governed_client_response_context(
+            current_snapshot,
+            action=action,
+            metadata=detail.metadata,
+            open_question_ids=tuple(question_id for question_id, _ in contract.open_client_questions),
+        )
+        content = self._content_from_governed_client_response(
+            subject=generated.subject,
+            body=generated.body,
+            open_questions=contract.open_client_questions,
+        )
+        revision = self._create_draft_revision(
+            context=context,
+            content=content,
+            draft_source=(
+                INQUIRY_DRAFT_SOURCE_GENERATED
+                if latest_revision is None
+                else INQUIRY_DRAFT_SOURCE_REGENERATED
+            ),
+            created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            supersedes_draft_revision_id=(
+                None
+                if latest_revision is None
+                else latest_revision.inquiry_response_draft_revision_id
+            ),
+        )
+        approval = self._replace_draft_approval(
+            rental_case_id=rental_case_id,
+            workflow_action=action,
+            revision=revision,
+            superseded_revision=latest_revision,
+        )
+        revision = self._bind_approval_request_to_draft_revision(
+            rental_case_id=rental_case_id,
+            draft_revision_id=revision.inquiry_response_draft_revision_id,
+            approval_request_id=approval.approval_request_id,
+            draft_status=INQUIRY_DRAFT_STATUS_NEEDS_APPROVAL,
+            updated_at=self.now(),
+        )
+        self._create_console_event(
+            rental_case_id=rental_case_id,
+            event_type_code="governed_client_response_draft_generated",
+            source_reference=f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}",
+            occurred_at=self.now(),
+            structured_payload={
+                "workflow_action_id": action.workflow_action_id,
+                "draft_revision_id": revision.inquiry_response_draft_revision_id,
+                "approval_request_id": approval.approval_request_id,
+                "response_intent": contract.response_intent.code,
+                "context_hash": contract.context_hash,
+                "provider": generated.provider_code,
+                "model": generated.model_code,
+                "validation_failure_codes": list(validation.failure_codes),
+            },
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+        )
+        return OperationReport(
+            title="Governed Client Response Draft Generated",
+            success=True,
+            lines=(
+                f"Response intent: {contract.response_intent.code}",
+                f"Draft revision id: {revision.inquiry_response_draft_revision_id}",
+                f"Workflow action id: {action.workflow_action_id}",
                 f"Approval request id: {approval.approval_request_id}",
             ),
         )
@@ -2314,6 +2460,8 @@ limit 1;
         return self._decide_approval(rental_case_id=rental_case_id, approval_request_id=approval_request_id, decision=ORCHESTRATION_DECISION_REJECTED)
 
     def execute_action(self, *, rental_case_id: int, workflow_action_id: int, execution_mode: str) -> OperationReport:
+        snapshot = self._require_case_snapshot(rental_case_id)
+        self._invalidate_stale_drafts(snapshot)
         snapshot = self._require_case_snapshot(rental_case_id)
         action = snapshot.find_workflow_action(workflow_action_id)
         if action is None:
@@ -2444,6 +2592,8 @@ limit 1;
 
     def _decide_approval(self, *, rental_case_id: int, approval_request_id: int, decision: str) -> OperationReport:
         snapshot = self._require_case_snapshot(rental_case_id)
+        self._invalidate_stale_drafts(snapshot)
+        snapshot = self._require_case_snapshot(rental_case_id)
         linked_draft = self._load_draft_revision_by_approval_request_id(rental_case_id, approval_request_id)
         linked_action = None
         if linked_draft is not None:
@@ -2554,7 +2704,10 @@ limit 1;
             revisions_by_conversation.setdefault(revision.conversation_key, []).append(revision)
         actions_by_conversation: dict[str, list[WorkflowAction]] = {}
         for action in snapshot.workflow_actions:
-            if action.action_type != ACTION_TYPE_REQUEST_CLIENT_INFORMATION:
+            if action.action_type not in {
+                ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+                ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            }:
                 continue
             actions_by_conversation.setdefault(self._draft_conversation_key(action), []).append(action)
         threads: list[SimulatedOutlookThread] = []
@@ -2937,6 +3090,120 @@ limit 1;
             workflow_action=action,
         )
 
+    def _ensure_governed_client_response_action(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        response_intent: str,
+        context_hash: str,
+    ) -> WorkflowAction:
+        conversation_key = f"governed_client_response:{snapshot.rental_case.rental_case_id}"
+        existing = next(
+            (
+                action
+                for action in snapshot.workflow_actions
+                if action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE
+                and self._draft_conversation_key(action) == conversation_key
+                and action.source_case_revision == snapshot.rental_case.case_revision
+                and action.structured_payload.get("context_hash") == context_hash
+                and action.status not in {
+                    WORKFLOW_ACTION_STATUS_CANCELLED,
+                    WORKFLOW_ACTION_STATUS_FAILED,
+                    WORKFLOW_ACTION_STATUS_SUPERSEDED,
+                    WORKFLOW_ACTION_STATUS_SUCCEEDED,
+                }
+            ),
+            None,
+        )
+        if existing is not None:
+            return existing
+        timestamp = self.now()
+        return self.orchestration_repository.create_workflow_action(
+            WorkflowAction(
+                workflow_action_id=1,
+                workflow_action_uuid="workflow-action",
+                rental_case_id=snapshot.rental_case.rental_case_id,
+                action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+                action_category=ACTION_CATEGORY_COMMUNICATION,
+                target_adapter_code="outlook",
+                reason_entity_type="rental_case",
+                reason_entity_reference=f"governed_client_response:{snapshot.rental_case.rental_case_id}",
+                approval_posture=APPROVAL_POSTURE_APPROVAL_REQUIRED,
+                status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
+                semantic_subject_hash=context_hash,
+                source_case_revision=snapshot.rental_case.case_revision,
+                idempotency_key=f"{conversation_key}:successor:{context_hash[:16]}",
+                structured_payload={
+                    "response_intent": response_intent,
+                    "context_hash": context_hash,
+                    "purpose": "governed_client_response_draft",
+                    "reason": "operator_requested_governed_client_response",
+                },
+                created_at=timestamp,
+                updated_at=timestamp,
+            )
+        )
+
+    def _build_governed_client_response_context(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        action: WorkflowAction,
+        metadata: TestConsoleCaseMetadata,
+        open_question_ids: tuple[int, ...],
+    ) -> InquiryResponseDraftContext:
+        return InquiryResponseDraftContext(
+            rental_case_id=snapshot.rental_case.rental_case_id,
+            workflow_action_id=action.workflow_action_id,
+            conversation_key=self._draft_conversation_key(action),
+            source_case_revision=snapshot.rental_case.case_revision,
+            contact_label=metadata.client_label,
+            recipient_email=self._simulated_recipient_email(snapshot.rental_case.rental_case_id, metadata),
+            recipient_label=metadata.client_label,
+            sender_email="wnc-rentals-simulated@example.test",
+            sender_label="WNC Rentals (Simulated)",
+            open_questions=tuple(
+                question
+                for question in self._current_inquiry_questions(snapshot)
+                if question.open_question_id in set(open_question_ids)
+            ),
+            current_facts=tuple(
+                fact
+                for fact in snapshot.rental_case_facts
+                if fact.established_case_revision <= snapshot.rental_case.case_revision
+            ),
+            metadata_summary_lines=(
+                f"Governed response intent: {action.structured_payload['response_intent']}",
+                f"Contract hash: {action.structured_payload['context_hash']}",
+            ),
+            workflow_action=action,
+        )
+
+    def _content_from_governed_client_response(
+        self,
+        *,
+        subject: str,
+        body: str,
+        open_questions: tuple[tuple[int, str], ...],
+    ) -> InquiryResponseDraftContent:
+        return InquiryResponseDraftContent(
+            subject=subject,
+            salutation="Hello,",
+            intro_text="Governed client response.",
+            question_lines=tuple(
+                InquiryResponseQuestionLine(
+                    open_question_id=question_id,
+                    question_type="governed_client_question",
+                    human_question_text=question,
+                    prompt_text=question,
+                )
+                for question_id, question in open_questions
+            ),
+            closing_text="Warm regards,",
+            signoff_text="WNC Rentals",
+            body_text_override=body,
+        )
+
     def _create_draft_revision(
         self,
         *,
@@ -3251,7 +3518,10 @@ returning
         workflow_action: WorkflowAction,
         execution_result,
     ) -> None:
-        if workflow_action.action_type != ACTION_TYPE_REQUEST_CLIENT_INFORMATION:
+        if workflow_action.action_type not in {
+            ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+            ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+        }:
             return
         if execution_result.execution_attempt_id is None:
             return
@@ -3296,7 +3566,10 @@ returning
         *,
         action: WorkflowAction,
     ) -> None:
-        if action.action_type != ACTION_TYPE_REQUEST_CLIENT_INFORMATION:
+        if action.action_type not in {
+            ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+            ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+        }:
             return
         current_revision = self._load_current_draft_revision_for_conversation(
             snapshot.rental_case.rental_case_id,
@@ -3351,6 +3624,56 @@ returning
             current_open_question_ids=current_open_question_ids,
             action_status=None if action is None else action.status,
         )
+
+    def _invalidate_stale_drafts(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+    ) -> None:
+        """Retire unsent revisions whose immutable source no longer matches case truth."""
+        rental_case_id = snapshot.rental_case.rental_case_id
+        sent_statuses = {
+            INQUIRY_DRAFT_STATUS_SIMULATED_SENT,
+            INQUIRY_DRAFT_STATUS_SEND_FAILED,
+            INQUIRY_DRAFT_STATUS_SEND_OUTCOME_UNCERTAIN,
+        }
+        for revision in self._list_draft_revisions(rental_case_id):
+            if not revision.is_current or revision.draft_status in sent_statuses:
+                continue
+            action = snapshot.find_workflow_action(revision.workflow_action_id)
+            if self._draft_display_status(snapshot, revision, action=action) != INQUIRY_DRAFT_STATUS_STALE:
+                continue
+            sql = f"""
+update public.inquiry_response_draft_revisions
+set is_current = false,
+    updated_at = {_sql_timestamptz(self.now())}
+where rental_case_id = {rental_case_id}
+  and id = {revision.inquiry_response_draft_revision_id}
+  and is_current = true;
+""".strip()
+            self.query_runner(sql, expect_json=False)
+            if revision.approval_request_id is not None:
+                approval = snapshot.find_approval_request(revision.approval_request_id)
+                if approval is not None and approval.status == APPROVAL_REQUEST_STATUS_OPEN:
+                    self.orchestration_repository.cancel_approval_request(
+                        rental_case_id=rental_case_id,
+                        approval_request_id=approval.approval_request_id,
+                        decided_at=self.now(),
+                        decision_notes="Draft source context became stale.",
+                    )
+            self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code="inquiry_response_draft_invalidated_stale",
+                source_reference=f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}",
+                occurred_at=self.now(),
+                structured_payload={
+                    "draft_revision_id": revision.inquiry_response_draft_revision_id,
+                    "workflow_action_id": revision.workflow_action_id,
+                    "source_case_revision": revision.source_case_revision,
+                    "current_case_revision": snapshot.rental_case.case_revision,
+                },
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            )
 
     def _current_inquiry_questions(
         self,

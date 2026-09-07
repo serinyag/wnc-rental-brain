@@ -80,15 +80,21 @@ class InquiryResponseDraftContent:
     question_lines: tuple[InquiryResponseQuestionLine, ...]
     closing_text: str
     signoff_text: str
+    body_text_override: str | None = None
 
     def __post_init__(self) -> None:
         ensure_non_empty_text("subject", self.subject)
         ensure_non_empty_text("salutation", self.salutation)
         ensure_non_empty_text("intro_text", self.intro_text)
-        if not isinstance(self.question_lines, tuple) or not self.question_lines:
+        if not isinstance(self.question_lines, tuple):
+            raise Phase8ContractError(
+                error_category="invalid_value",
+                safe_message="question_lines must be a tuple.",
+            )
+        if not self.question_lines and not self.body_text_override:
             raise Phase8ContractError(
                 error_category="missing_value",
-                safe_message="question_lines must contain at least one inquiry question.",
+                safe_message="question_lines or body_text_override is required.",
             )
         for index, line in enumerate(self.question_lines):
             if not isinstance(line, InquiryResponseQuestionLine):
@@ -98,6 +104,7 @@ class InquiryResponseDraftContent:
                 )
         ensure_non_empty_text("closing_text", self.closing_text)
         ensure_non_empty_text("signoff_text", self.signoff_text)
+        ensure_optional_non_empty_text("body_text_override", self.body_text_override)
 
     @property
     def covered_question_ids(self) -> tuple[int, ...]:
@@ -119,6 +126,7 @@ class InquiryResponseDraftContent:
             ],
             "closing_text": self.closing_text,
             "signoff_text": self.signoff_text,
+            "body_text_override": self.body_text_override,
         }
 
     @classmethod
@@ -150,6 +158,11 @@ class InquiryResponseDraftContent:
             ),
             closing_text=str(payload.get("closing_text") or ""),
             signoff_text=str(payload.get("signoff_text") or ""),
+            body_text_override=(
+                str(payload["body_text_override"])
+                if payload.get("body_text_override") is not None
+                else None
+            ),
         )
 
 
@@ -282,10 +295,10 @@ class InquiryResponseDraftRevision:
         ensure_non_empty_text("subject", self.subject)
         ensure_non_empty_text("salutation", self.salutation)
         ensure_non_empty_text("intro_text", self.intro_text)
-        if not isinstance(self.question_lines, tuple) or not self.question_lines:
+        if not isinstance(self.question_lines, tuple):
             raise Phase8ContractError(
-                error_category="missing_value",
-                safe_message="question_lines must contain at least one inquiry question.",
+                error_category="invalid_value",
+                safe_message="question_lines must be a tuple.",
             )
         ensure_non_empty_text("closing_text", self.closing_text)
         ensure_non_empty_text("signoff_text", self.signoff_text)
@@ -322,6 +335,7 @@ class InquiryResponseDraftRevision:
             question_lines=self.question_lines,
             closing_text=self.closing_text,
             signoff_text=self.signoff_text,
+            body_text_override=self.body_text,
         )
 
     @classmethod
@@ -406,6 +420,8 @@ class DeterministicInquiryResponseDraftGenerator:
 
 
 def render_draft_body(content: InquiryResponseDraftContent) -> str:
+    if content.body_text_override is not None:
+        return content.body_text_override.strip()
     lines = [content.salutation, "", content.intro_text, ""]
     for line in content.question_lines:
         lines.append(f"- {line.prompt_text}")
@@ -419,7 +435,8 @@ def validate_draft_content(
     required_questions: tuple[OpenQuestion, ...],
 ) -> tuple[int, ...]:
     required_question_ids = tuple(question.open_question_id for question in required_questions)
-    ensure_tuple_of_positive_ints("required_question_ids", required_question_ids)
+    if required_question_ids:
+        ensure_tuple_of_positive_ints("required_question_ids", required_question_ids)
     if content.covered_question_ids != required_question_ids:
         raise Phase8ContractError(
             error_category="invalid_value",

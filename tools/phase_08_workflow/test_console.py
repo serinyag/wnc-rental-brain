@@ -262,6 +262,11 @@ class TestConsoleApp:
                 external_test_reference=payload.get("external_test_reference"),
             )
             return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 6 and parts[4] == "mailbox" and parts[5] == "generate" and method == "POST":
+            report = self.service.generate_governed_client_response_draft(
+                rental_case_id=rental_case_id,
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "actions" and parts[7] == "generate" and method == "POST":
             workflow_action_id = int(parts[6])
             report = self.service.generate_inquiry_response_draft(
