@@ -105,6 +105,7 @@ class TestConsoleApp:
                     status=error.status,
                     message=str(error),
                     failure_code=error.failure_code,
+                    validation_codes=error.validation_codes,
                 )
             return self._respond_html(
                 start_response,
@@ -1562,6 +1563,7 @@ class TestConsoleApp:
         message: str,
         failure_code: str,
         www_authenticate: bool = False,
+        validation_codes: tuple[str, ...] = (),
     ) -> list[bytes]:
         payload = {
             "ok": False,
@@ -1571,6 +1573,8 @@ class TestConsoleApp:
                 "status": status.value,
             },
         }
+        if validation_codes:
+            payload["error"]["validation_codes"] = list(validation_codes)
         encoded = json.dumps(payload, sort_keys=True, ensure_ascii=True).encode("utf-8")
         headers = [
             ("Content-Type", "application/json; charset=utf-8"),

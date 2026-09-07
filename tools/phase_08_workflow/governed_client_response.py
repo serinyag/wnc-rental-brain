@@ -46,6 +46,13 @@ CLIENT_DRAFT_PROVIDER_ENV = "CLIENT_DRAFT_PROVIDER"
 CLIENT_DRAFT_MODEL_ENV = "CLIENT_DRAFT_MODEL"
 CLIENT_DRAFT_TIMEOUT_SECONDS_ENV = "CLIENT_DRAFT_TIMEOUT_SECONDS"
 
+DRAFT_VALIDATION_STALE_DRAFT_CONTRACT = "stale_draft_contract"
+DRAFT_VALIDATION_OPEN_QUESTION_SET_MISMATCH = "open_question_set_mismatch"
+DRAFT_VALIDATION_UNSUPPORTED_AVAILABILITY_OR_CONFIRMATION = "unsupported_availability_or_confirmation"
+DRAFT_VALIDATION_PENDING_DECISION_PRESENTED_AS_ACTIVE = "pending_decision_presented_as_active"
+DRAFT_VALIDATION_KNOWN_NO_CONTRADICTION = "known_no_contradiction"
+DRAFT_VALIDATION_COMMERCIAL_ASSERTION_NOT_ALLOWED = "commercial_assertion_not_allowed"
+
 
 class ClientResponseProviderError(RuntimeError):
     """A safe provider failure that never changes case truth."""
@@ -357,24 +364,24 @@ def build_client_response_provider_from_env() -> GovernedClientResponseProvider:
 def validate_client_response_draft(*, contract: DraftContract, draft: ClientResponseDraft, current_case_revision: int, current_context_hash: str) -> DraftValidationResult:
     failures: list[str] = []
     if current_case_revision != contract.source_case_revision or current_context_hash != contract.context_hash:
-        failures.append("stale_draft_contract")
+        failures.append(DRAFT_VALIDATION_STALE_DRAFT_CONTRACT)
     expected_questions = tuple(question_id for question_id, _ in contract.open_client_questions)
     if tuple(draft.question_ids) != expected_questions:
-        failures.append("open_question_set_mismatch")
+        failures.append(DRAFT_VALIDATION_OPEN_QUESTION_SET_MISMATCH)
     body = draft.body.lower()
     if re.search(r"\b(?:booking|venue|date).{0,24}\b(?:confirmed|available)\b", body):
-        failures.append("unsupported_availability_or_confirmation")
+        failures.append(DRAFT_VALIDATION_UNSUPPORTED_AVAILABILITY_OR_CONFIRMATION)
     if contract.response_intent.code == RESPONSE_INTENT_DECISION_PENDING and re.search(r"\b(?:waiver|discount|adjustment).{0,20}\b(?:approved|confirmed)\b", body):
-        failures.append("pending_decision_presented_as_active")
+        failures.append(DRAFT_VALIDATION_PENDING_DECISION_PRESENTED_AS_ACTIVE)
     if contract.response_intent.code == RESPONSE_INTENT_COMMUNICATE_RESTRICTION and re.search(
         r"(?<!not )\b(?:supported|available|can provide)\b",
         body,
     ):
-        failures.append("known_no_contradiction")
+        failures.append(DRAFT_VALIDATION_KNOWN_NO_CONTRADICTION)
     allowed_fees = {match.group(0).lower() for assertion in contract.allowed_client_assertions for match in re.finditer(r"(?:EUR|€)\s?\d+(?:[.,]\d+)?", assertion, flags=re.IGNORECASE)}
     asserted_fees = {match.group(0).lower() for match in re.finditer(r"(?:EUR|€)\s?\d+(?:[.,]\d+)?", draft.body, flags=re.IGNORECASE)}
     if not asserted_fees.issubset(allowed_fees):
-        failures.append("commercial_assertion_not_allowed")
+        failures.append(DRAFT_VALIDATION_COMMERCIAL_ASSERTION_NOT_ALLOWED)
     return DraftValidationResult(is_valid=not failures, failure_codes=tuple(failures))
 
 

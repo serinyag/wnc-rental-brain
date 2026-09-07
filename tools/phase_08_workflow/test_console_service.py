@@ -210,10 +210,12 @@ class TestConsoleError(RuntimeError):
         *,
         failure_code: str = "TEST_CONSOLE_ERROR",
         status: HTTPStatus = HTTPStatus.BAD_REQUEST,
+        validation_codes: tuple[str, ...] = (),
     ) -> None:
         super().__init__(message)
         self.failure_code = failure_code
         self.status = status
+        self.validation_codes = validation_codes
 
 
 class TestConsoleReadError(TestConsoleError):
@@ -2262,9 +2264,35 @@ limit 1;
             current_context_hash=current_contract.context_hash,
         )
         if not validation.is_valid:
+            self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code="governed_client_response_draft_rejected",
+                source_reference=f"governed_client_response_rejected:{contract.context_hash}",
+                occurred_at=self.now(),
+                structured_payload={
+                    "provider": generated.provider_code,
+                    "model": generated.model_code,
+                    "provider_request_id": generated.provider_request_id,
+                    "response_intent": contract.response_intent.code,
+                    "source_case_revision": contract.source_case_revision,
+                    "context_hash": contract.context_hash,
+                    "validation_result": "rejected",
+                    "validation_codes": list(validation.failure_codes),
+                    "content_hash": _json_digest(
+                        {
+                            "subject": generated.subject,
+                            "body": generated.body,
+                            "question_ids": list(generated.question_ids),
+                        }
+                    ),
+                },
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            )
             raise TestConsoleError(
                 "Generated client response did not pass governed validation; no draft was created.",
                 failure_code="CLIENT_RESPONSE_DRAFT_INVALID",
+                validation_codes=validation.failure_codes,
             )
 
         action = self._ensure_governed_client_response_action(

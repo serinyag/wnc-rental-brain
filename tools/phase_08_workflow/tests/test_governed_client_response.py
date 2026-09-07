@@ -111,6 +111,137 @@ class GovernedClientResponseTests(unittest.TestCase):
         self.assertIn("unsupported_availability_or_confirmation", result.failure_codes)
         self.assertIn("commercial_assertion_not_allowed", result.failure_codes)
 
+    def test_validator_emits_each_enforced_validation_code(self) -> None:
+        clean_contract = build_draft_contract(
+            snapshot=make_snapshot(),
+            recipient_label="Avery",
+            latest_client_message=None,
+        )
+        question_contract = build_draft_contract(
+            snapshot=make_snapshot(open_questions=(client_question(),)),
+            recipient_label="Avery",
+            latest_client_message=None,
+        )
+        pending_decision_contract = build_draft_contract(
+            snapshot=make_snapshot(case_decisions=(SimpleNamespace(status="pending_approval"),)),
+            recipient_label="Avery",
+            latest_client_message=None,
+        )
+        restriction_contract = build_draft_contract(
+            snapshot=make_snapshot(
+                reasoning_projections=(
+                    SimpleNamespace(degraded_retrieval_summary={"semantic_state_code": "known_no"}),
+                ),
+            ),
+            recipient_label="Avery",
+            latest_client_message=None,
+        )
+        commercial_contract = build_draft_contract(
+            snapshot=make_snapshot(),
+            recipient_label="Avery",
+            latest_client_message=None,
+            commercial_snapshot=(("Booking fee", "EUR 75 excl. VAT"),),
+        )
+        cases = (
+            (
+                "stale contract",
+                clean_contract,
+                ClientResponseDraft(subject="Hello", body="Thank you."),
+                5,
+                clean_contract.context_hash,
+                "stale_draft_contract",
+            ),
+            (
+                "open questions",
+                question_contract,
+                ClientResponseDraft(subject="Hello", body="Thank you.", question_ids=()),
+                4,
+                question_contract.context_hash,
+                "open_question_set_mismatch",
+            ),
+            (
+                "availability assertion",
+                clean_contract,
+                ClientResponseDraft(subject="Hello", body="The venue is available."),
+                4,
+                clean_contract.context_hash,
+                "unsupported_availability_or_confirmation",
+            ),
+            (
+                "pending decision",
+                pending_decision_contract,
+                ClientResponseDraft(subject="Hello", body="The discount is approved."),
+                4,
+                pending_decision_contract.context_hash,
+                "pending_decision_presented_as_active",
+            ),
+            (
+                "known no contradiction",
+                restriction_contract,
+                ClientResponseDraft(subject="Hello", body="That arrangement is supported."),
+                4,
+                restriction_contract.context_hash,
+                "known_no_contradiction",
+            ),
+            (
+                "commercial assertion",
+                commercial_contract,
+                ClientResponseDraft(subject="Hello", body="The fee is EUR 25."),
+                4,
+                commercial_contract.context_hash,
+                "commercial_assertion_not_allowed",
+            ),
+        )
+
+        for name, contract, draft, revision, context_hash, expected_code in cases:
+            with self.subTest(name=name):
+                result = validate_client_response_draft(
+                    contract=contract,
+                    draft=draft,
+                    current_case_revision=revision,
+                    current_context_hash=context_hash,
+                )
+                self.assertEqual(result.failure_codes, (expected_code,))
+
+    def test_validator_allows_safe_complete_inquiry_phrasing(self) -> None:
+        contract = build_draft_contract(
+            snapshot=make_snapshot(),
+            recipient_label="Avery",
+            latest_client_message=None,
+        )
+        draft = ClientResponseDraft(
+            subject="Your inquiry",
+            body="This looks suitable, and we can move this forward. The Studio can accommodate 20 guests.",
+        )
+
+        result = validate_client_response_draft(
+            contract=contract,
+            draft=draft,
+            current_case_revision=4,
+            current_context_hash=contract.context_hash,
+        )
+
+        self.assertTrue(result.is_valid)
+        self.assertEqual(result.failure_codes, ())
+
+    def test_validator_treats_currency_tokens_as_literal_values(self) -> None:
+        contract = build_draft_contract(
+            snapshot=make_snapshot(),
+            recipient_label="Avery",
+            latest_client_message=None,
+            commercial_snapshot=(("Booking fee", "EUR 75 excl. VAT"),),
+        )
+        draft = ClientResponseDraft(subject="Fee", body="The fee is €75 excluding VAT.")
+
+        result = validate_client_response_draft(
+            contract=contract,
+            draft=draft,
+            current_case_revision=4,
+            current_context_hash=contract.context_hash,
+        )
+
+        self.assertEqual(result.failure_codes, ("commercial_assertion_not_allowed",))
+
     def test_known_no_draft_may_state_that_an_arrangement_is_not_supported(self) -> None:
         contract = build_draft_contract(
             snapshot=make_snapshot(reasoning_projections=(SimpleNamespace(degraded_retrieval_summary={"semantic_state_code": "known_no"}),)),

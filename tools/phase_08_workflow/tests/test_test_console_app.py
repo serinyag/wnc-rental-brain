@@ -235,6 +235,16 @@ class _ErrorService(_FakeService):
         )
 
 
+class _ValidationErrorService(_FakeService):
+    def generate_governed_client_response_draft(self, **kwargs) -> OperationReport:
+        del kwargs
+        raise TestConsoleError(
+            "Generated client response did not pass governed validation; no draft was created.",
+            failure_code="CLIENT_RESPONSE_DRAFT_INVALID",
+            validation_codes=("commercial_assertion_not_allowed",),
+        )
+
+
 def call_app(
     app: TestConsoleApp,
     method: str,
@@ -542,6 +552,22 @@ class TestConsoleAppTests(unittest.TestCase):
         self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
         payload = json.loads(body)
         self.assertEqual(payload["error"]["failure_code"], "INVALID_JSON_REQUEST")
+
+    def test_operator_api_returns_governed_draft_validation_codes(self) -> None:
+        app = TestConsoleApp(_ValidationErrorService())
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/1/mailbox/generate",
+            body=b"{}",
+        )
+
+        self.assertEqual(status, "400 Bad Request")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertEqual(payload["error"]["failure_code"], "CLIENT_RESPONSE_DRAFT_INVALID")
+        self.assertEqual(payload["error"]["validation_codes"], ["commercial_assertion_not_allowed"])
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(
