@@ -245,6 +245,23 @@ class _ValidationErrorService(_FakeService):
         )
 
 
+class _DatabaseReadErrorService(_FakeService):
+    def generate_governed_client_response_draft(self, **kwargs) -> OperationReport:
+        del kwargs
+        raise TestConsoleError(
+            "Console read failed.\n\nReason:\nDATABASE_READ_FAILED",
+            failure_code="DATABASE_READ_FAILED",
+            status=HTTPStatus.SERVICE_UNAVAILABLE,
+            diagnostics={
+                "operation": "test_console_database_query",
+                "query_fingerprint": "ab12cd34ef56ab78",
+                "tables": ["public.workflow_events"],
+                "error_class": "UndefinedColumn",
+                "sqlstate": "42703",
+            },
+        )
+
+
 def call_app(
     app: TestConsoleApp,
     method: str,
@@ -568,6 +585,23 @@ class TestConsoleAppTests(unittest.TestCase):
         payload = json.loads(body)
         self.assertEqual(payload["error"]["failure_code"], "CLIENT_RESPONSE_DRAFT_INVALID")
         self.assertEqual(payload["error"]["validation_codes"], ["commercial_assertion_not_allowed"])
+
+    def test_operator_api_returns_safe_database_read_diagnostics(self) -> None:
+        app = TestConsoleApp(_DatabaseReadErrorService())
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/1/mailbox/generate",
+            body=b"{}",
+        )
+
+        self.assertEqual(status, "503 Service Unavailable")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertEqual(payload["error"]["failure_code"], "DATABASE_READ_FAILED")
+        self.assertEqual(payload["error"]["diagnostics"]["sqlstate"], "42703")
+        self.assertNotIn("message", payload["error"]["diagnostics"])
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(

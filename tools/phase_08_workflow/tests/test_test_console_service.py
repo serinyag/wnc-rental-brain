@@ -1131,6 +1131,36 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 service.list_test_cases()
 
         self.assertEqual(captured.exception.failure_code, "DATABASE_READ_TIMEOUT")
+        self.assertEqual(captured.exception.diagnostics["operation"], "test_console_database_query")
+        self.assertEqual(captured.exception.diagnostics["error_class"], "TimeoutExpired")
+
+    def test_default_query_runner_preserves_safe_database_failure_diagnostics(self) -> None:
+        class _DatabaseError(Exception):
+            sqlstate = "42703"
+
+        failure = subprocess.CalledProcessError(
+            returncode=1,
+            cmd=["direct_postgres", "execute"],
+            stderr="Direct PostgreSQL query failed.",
+        )
+        failure.__cause__ = _DatabaseError("column does not exist")
+        with patch("tools.phase_08_workflow.test_console_service.run_supabase_query", side_effect=failure):
+            service = TestConsoleService(
+                orchestration_repository=_DummyRepository(),
+                observation_repository=_DummyRepository(),
+                config=TestConsoleConfig(),
+            )
+
+            with self.assertRaises(TestConsoleReadError) as captured:
+                service.list_test_cases()
+
+        diagnostics = captured.exception.diagnostics
+        self.assertEqual(diagnostics["operation"], "test_console_database_query")
+        self.assertEqual(diagnostics["error_class"], "_DatabaseError")
+        self.assertEqual(diagnostics["sqlstate"], "42703")
+        self.assertEqual(len(diagnostics["query_fingerprint"]), 16)
+        self.assertIn("public.workflow_events", diagnostics["tables"])
+        self.assertNotIn("Direct PostgreSQL query failed.", diagnostics.values())
 
     def test_page_load_does_not_build_real_provider_adapters(self) -> None:
         rental_case = RentalCase(

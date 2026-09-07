@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import subprocess
 import time
 from dataclasses import dataclass, field, replace
@@ -211,16 +212,23 @@ class TestConsoleError(RuntimeError):
         failure_code: str = "TEST_CONSOLE_ERROR",
         status: HTTPStatus = HTTPStatus.BAD_REQUEST,
         validation_codes: tuple[str, ...] = (),
+        diagnostics: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message)
         self.failure_code = failure_code
         self.status = status
         self.validation_codes = validation_codes
+        self.diagnostics = diagnostics or {}
 
 
 class TestConsoleReadError(TestConsoleError):
-    def __init__(self, message: str, *, failure_code: str) -> None:
-        super().__init__(message, failure_code=failure_code, status=HTTPStatus.SERVICE_UNAVAILABLE)
+    def __init__(self, message: str, *, failure_code: str, diagnostics: dict[str, Any] | None = None) -> None:
+        super().__init__(
+            message,
+            failure_code=failure_code,
+            status=HTTPStatus.SERVICE_UNAVAILABLE,
+            diagnostics=diagnostics,
+        )
 
 
 @dataclass(frozen=True)
@@ -484,6 +492,7 @@ def _build_test_console_query_runner(timeout_seconds: float) -> Callable[..., An
             raise TestConsoleReadError(
                 "Console read failed.\n\nReason:\nDATABASE_READ_TIMEOUT",
                 failure_code="DATABASE_READ_TIMEOUT",
+                diagnostics=_safe_database_read_diagnostics(sql, exc),
             ) from exc
         except subprocess.CalledProcessError as exc:
             stderr = exc.stderr or ""
@@ -492,9 +501,35 @@ def _build_test_console_query_runner(timeout_seconds: float) -> Callable[..., An
             raise TestConsoleReadError(
                 "Console read failed.\n\nReason:\nDATABASE_READ_FAILED",
                 failure_code="DATABASE_READ_FAILED",
+                diagnostics=_safe_database_read_diagnostics(sql, exc),
             ) from exc
 
     return runner
+
+
+def _safe_database_read_diagnostics(sql: str, exc: BaseException) -> dict[str, Any]:
+    """Expose stable query identity without leaking SQL, row data, or connection details."""
+    normalized_sql = " ".join(sql.split())
+    tables = sorted(
+        set(
+            re.findall(
+                r"\b(?:from|join|update|into)\s+(public\.[a-z_][a-z0-9_]*)",
+                normalized_sql,
+                flags=re.IGNORECASE,
+            )
+        )
+    )
+    database_error = exc.__cause__ or exc
+    diagnostics: dict[str, Any] = {
+        "operation": "test_console_database_query",
+        "query_fingerprint": hashlib.sha256(normalized_sql.encode("utf-8")).hexdigest()[:16],
+        "tables": tables,
+        "error_class": type(database_error).__name__,
+    }
+    sqlstate = getattr(database_error, "sqlstate", None)
+    if isinstance(sqlstate, str) and re.fullmatch(r"[0-9A-Z]{5}", sqlstate):
+        diagnostics["sqlstate"] = sqlstate
+    return diagnostics
 
 
 def _format_stage_timings(stage_timings: dict[str, float]) -> str:
