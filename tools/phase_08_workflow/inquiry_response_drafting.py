@@ -183,6 +183,7 @@ class InquiryResponseDraftContext:
     guidance_references: tuple[str, ...] = DEFAULT_GUIDANCE_REFERENCES
     workflow_action: WorkflowAction | None = None
     metadata_summary_lines: tuple[str, ...] = ()
+    resolution_items: tuple[dict[str, Any], ...] = ()
     operator_annotations: tuple[dict[str, Any], ...] = ()
     contextual_guidance: tuple[dict[str, Any], ...] = ()
 
@@ -196,6 +197,11 @@ class InquiryResponseDraftContext:
         ensure_bool("allow_empty_open_questions", self.allow_empty_open_questions)
         ensure_tuple_of_non_empty_text("guidance_references", self.guidance_references)
         ensure_tuple_of_non_empty_text("metadata_summary_lines", self.metadata_summary_lines)
+        if not isinstance(self.resolution_items, tuple) or not all(isinstance(item, dict) for item in self.resolution_items):
+            raise Phase8ContractError(
+                error_category="invalid_value",
+                safe_message="resolution_items must be a tuple of structured payloads.",
+            )
         if not isinstance(self.operator_annotations, tuple) or not all(isinstance(item, dict) for item in self.operator_annotations):
             raise Phase8ContractError(
                 error_category="invalid_value",
@@ -247,6 +253,7 @@ class InquiryResponseDraftContext:
             "allow_empty_open_questions": self.allow_empty_open_questions,
             "guidance_references": list(self.guidance_references),
             "metadata_summary_lines": list(self.metadata_summary_lines),
+            "resolution_items": list(self.resolution_items),
             "operator_annotations": list(self.operator_annotations),
             "contextual_guidance": list(self.contextual_guidance),
             "open_questions": [

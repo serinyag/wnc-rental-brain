@@ -291,6 +291,13 @@ class InquiryResponseDraftingContractTests(unittest.TestCase):
             sender_label="WNC Rentals (Simulated)",
             open_questions=(),
             allow_empty_open_questions=True,
+            resolution_items=(
+                {
+                    "proposition_key": "blocker:1",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                },
+            ),
         )
         content = InquiryResponseDraftContent(
             subject="Your WNC inquiry",
@@ -304,6 +311,7 @@ class InquiryResponseDraftingContractTests(unittest.TestCase):
 
         self.assertEqual(validate_draft_content(content=content, required_questions=context.open_questions), ())
         self.assertTrue(context.to_payload()["allow_empty_open_questions"])
+        self.assertEqual(context.to_payload()["resolution_items"][0]["resolution_owner"], "WNC_INTERNAL")
 
     def test_generator_covers_exact_open_question_set(self) -> None:
         context = InquiryResponseDraftContext(

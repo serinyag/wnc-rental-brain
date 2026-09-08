@@ -311,11 +311,13 @@ def _humanize(value: Any) -> str:
 
 def _topic_query(topic: str) -> str:
     return {
-        "catering_kitchen": "current client-safe catering kitchen guidance external caterer buffet",
-        "external_supplier_setup": "current client-safe external supplier delivery setup access guidance",
-        "technical_capabilities": "current client-safe technical equipment projection audio custom setup guidance",
-        "facilitator_process": "current client-safe facilitator process availability guidance",
-        "capacity": "current client-safe venue capacity and whole venue guidance",
+        # Phase 5 FTS uses its own lexical index. Broad topic terms preserve
+        # recall here; authority and document filters below remain the safety gate.
+        "catering_kitchen": "catering",
+        "external_supplier_setup": "supplier",
+        "technical_capabilities": "technical",
+        "facilitator_process": "facilitator",
+        "capacity": "venue",
     }[topic]
 
 

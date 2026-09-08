@@ -3369,6 +3369,7 @@ limit 1;
                 f"Governed response intent: {action.structured_payload['response_intent']}",
                 f"Contract hash: {action.structured_payload['context_hash']}",
             ),
+            resolution_items=tuple(item.to_payload() for item in contract.resolution_items),
             operator_annotations=tuple(item.to_payload() for item in contract.operator_annotations),
             contextual_guidance=tuple(item.to_payload() for item in contract.contextual_guidance),
             workflow_action=action,

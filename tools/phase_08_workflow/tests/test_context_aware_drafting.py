@@ -16,6 +16,7 @@ from tools.phase_08_workflow.context_aware_drafting import (
     operator_annotations,
     retrieve_contextual_guidance,
     with_workflow_actions,
+    _topic_query,
 )
 from tools.phase_08_workflow.governed_client_response import (
     ClientResponseDraft,
@@ -115,6 +116,8 @@ class ContextAwareDraftingTests(unittest.TestCase):
             rental_type_code="studio_space",
         )
         self.assertEqual([(item.topic, item.client_safe_guidance) for item in guidance], [("catering_kitchen", "Kitchen guidance.")])
+        self.assertEqual(_topic_query("catering_kitchen"), "catering")
+        self.assertEqual(_topic_query("external_supplier_setup"), "supplier")
 
     def test_irrelevant_topics_are_not_requested(self) -> None:
         self.assertEqual(detect_guidance_topics(snapshot(), "A simple team workshop."), ())
