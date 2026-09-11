@@ -17,6 +17,7 @@ from tools.phase_08_workflow.test_console_service import (
     TestCaseSummary,
     TestConsoleClockStatus,
     TestConsoleError,
+    TestConsoleReadError,
     TestConsoleHealthReport,
     TestConsoleConfig,
 )
@@ -743,6 +744,43 @@ class TestConsoleAppTests(unittest.TestCase):
         payload = json.loads(body)
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["report"]["title"], "Outlook Human Edit Reconciled")
+
+    def test_operator_api_logs_and_returns_safe_reconciliation_diagnostics(self) -> None:
+        service = _FakeService()
+        service.reconcile_human_edited_outlook_draft = lambda **_kwargs: (_ for _ in ()).throw(
+            TestConsoleReadError(
+                "Outlook reconciliation prepare database operation failed.",
+                failure_code="RECONCILIATION_PREPARE_DB_FAILED",
+                diagnostics={
+                    "reconciliation_phase": "prepare",
+                    "reconciliation_operation": "reconcile.prepare.load_originating_draft",
+                    "query_fingerprint": "safe-fingerprint",
+                    "tables": ["public.inquiry_response_draft_revisions"],
+                    "error_class": "OperationalError",
+                    "sqlstate": "08006",
+                    "rental_case_id": 1,
+                },
+            )
+        )
+        app = TestConsoleApp(service)
+
+        with self.assertLogs("tools.phase_08_workflow.test_console", level="WARNING") as logs:
+            status, _headers, body = call_app_response(
+                app,
+                "POST",
+                "/api/operator/cases/1/mailbox/drafts/10/outlook-human-edit-reconcile",
+                body=b"{}",
+            )
+
+        payload = json.loads(body)
+        self.assertEqual(status, "503 Service Unavailable")
+        self.assertEqual(payload["error"]["failure_code"], "RECONCILIATION_PREPARE_DB_FAILED")
+        self.assertEqual(
+            payload["error"]["diagnostics"]["reconciliation_operation"],
+            "reconcile.prepare.load_originating_draft",
+        )
+        self.assertIn("test_console_safe_diagnostics", logs.output[0])
+        self.assertNotIn("DATABASE_URL", logs.output[0])
 
     def test_operator_api_runs_provider_free_human_edit_preflight(self) -> None:
         app = TestConsoleApp(_FakeService())

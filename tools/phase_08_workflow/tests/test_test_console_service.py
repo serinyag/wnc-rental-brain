@@ -48,6 +48,7 @@ from tools.phase_08_workflow.test_console_service import (
     TestConsoleError,
     TestConsoleReadError,
     TestConsoleService,
+    _OutlookHumanEditGraphRead,
     _assess_outlook_draft_identity,
     _ProjectedWorkflowActionExecutionAdapter,
 )
@@ -509,7 +510,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         create_event.assert_not_called()
         create_revision.assert_not_called()
 
-    def test_pre_graph_read_failure_includes_repository_operation_without_sensitive_sql(self) -> None:
+    def test_pre_graph_read_failure_includes_reconciliation_operation_without_sensitive_sql(self) -> None:
         failure = TestConsoleReadError(
             "Console read failed.\n\nReason:\nDATABASE_READ_FAILED",
             failure_code="DATABASE_READ_FAILED",
@@ -526,18 +527,20 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             observation_repository=_DummyRepository(),
             query_runner=lambda _sql, *, expect_json: (_ for _ in ()).throw(failure),
         )
-        runner = service._pre_graph_query_runner(operation="outlook_human_edit.draft_revision", reads=[])
+        runner = service._pre_graph_query_runner(operation="reconcile.prepare.load_originating_draft", reads=[])
 
         with self.assertRaises(TestConsoleReadError) as error:
             runner("select * from public.rental_cases where id = 41", expect_json=True)
 
         self.assertEqual(error.exception.failure_code, "DATABASE_READ_FAILED")
-        self.assertEqual(error.exception.diagnostics["repository_operation"], "outlook_human_edit.draft_revision")
+        self.assertEqual(error.exception.diagnostics["repository_operation"], "reconcile.prepare.load_originating_draft")
+        self.assertEqual(error.exception.diagnostics["reconciliation_phase"], "prepare")
+        self.assertEqual(error.exception.diagnostics["reconciliation_operation"], "reconcile.prepare.load_originating_draft")
         self.assertEqual(error.exception.diagnostics["sqlstate"], "08006")
         self.assertEqual(error.exception.diagnostics["tables"], ["public.rental_cases"])
         self.assertNotIn("sql", error.exception.diagnostics)
 
-    def test_human_edit_reconciliation_creates_only_a_new_approval_bound_revision(self) -> None:
+    def test_provider_free_apply_reconciliation_creates_only_a_new_approval_bound_revision(self) -> None:
         runtime = AppRuntimeConfig(
             app_env=AppEnvironment.STAGING,
             app_env_explicit=True,
@@ -587,10 +590,8 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             rental_case=SimpleNamespace(case_revision=7),
             find_workflow_action=lambda action_id: target_action if action_id == 62 else None,
         )
-        adapter = SimpleNamespace(
-            config=SimpleNamespace(sender_mailbox="approved@example.com"),
-            read_availability_failure_code=lambda: None,
-            read_draft_snapshot=lambda **_kwargs: OutlookDraftSnapshot(
+        graph_read = _OutlookHumanEditGraphRead(
+            snapshot=OutlookDraftSnapshot(
                 outcome="found",
                 message_id="immutable-draft-id",
                 subject="Edited subject",
@@ -599,6 +600,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 to_recipients=("approved@example.com",),
                 is_draft=True,
             ),
+            configured_mailbox="approved@example.com",
         )
         contract = SimpleNamespace(
             response_intent=SimpleNamespace(code="REQUEST_CLIENT_INFORMATION"),
@@ -614,10 +616,8 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         new_approval = SimpleNamespace(approval_request_id=52)
 
         with patch.object(service, "_load_draft_revision_by_id", return_value=prior_revision), patch.object(
-            service, "_require_case_snapshot", side_effect=(initial_snapshot, current_snapshot)
-        ), patch(
-            "tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env", return_value=adapter
-        ) as build_adapter, patch.object(
+            service, "_require_case_snapshot", return_value=initial_snapshot
+        ) as require_case_snapshot, patch.object(
             service, "_build_current_governed_draft_contract", return_value=(detail, current_snapshot, contract)
         ), patch(
             "tools.phase_08_workflow.test_console_service.validate_client_response_draft",
@@ -629,12 +629,14 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         ) as create_revision, patch.object(service, "_replace_draft_approval", return_value=new_approval), patch.object(
             service, "_bind_approval_request_to_draft_revision", return_value=created_revision
         ), patch.object(service, "_create_console_event") as create_event:
-            report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
+            prepared = service.prepare_outlook_reconciliation(rental_case_id=1, draft_revision_id=41)
+            self.assertNotIsInstance(prepared, OperationReport)
+            report = service.apply_outlook_reconciliation(prepared, graph_read)
 
         self.assertTrue(report.success)
+        require_case_snapshot.assert_called_once()
         self.assertIn("Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_PASS", report.lines)
         self.assertIn("Prior approval authorizes new revision: no", report.lines)
-        build_adapter.assert_called_once_with(send_enabled=False)
         create_revision.assert_called_once_with(
             context=ANY,
             content=ANY,
@@ -647,6 +649,62 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(identity_evidence["unavailable_fields"], ["from", "sender"])
         self.assertTrue(identity_evidence["identity_field_unavailable"])
         self.assertEqual(identity_evidence["graph_mailbox_target"], "approved@example.com")
+
+    def test_prepare_failure_preserves_exact_database_operation(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+        )
+        failure = TestConsoleReadError(
+            "Console read failed.",
+            failure_code="DATABASE_READ_FAILED",
+            diagnostics={
+                "query_fingerprint": "safe-fingerprint",
+                "tables": ["public.inquiry_response_draft_revisions"],
+                "error_class": "OperationalError",
+                "sqlstate": "08006",
+                "reconciliation_phase": "prepare",
+                "reconciliation_operation": "reconcile.prepare.load_originating_draft",
+            },
+        )
+
+        with patch.object(service, "_prepare_outlook_reconciliation", side_effect=failure), self.assertRaises(
+            TestConsoleReadError
+        ) as error:
+            service.prepare_outlook_reconciliation(rental_case_id=424, draft_revision_id=143)
+
+        self.assertEqual(error.exception.failure_code, "RECONCILIATION_PREPARE_DB_FAILED")
+        self.assertEqual(error.exception.diagnostics["reconciliation_phase"], "prepare")
+        self.assertEqual(error.exception.diagnostics["reconciliation_operation"], "reconcile.prepare.load_originating_draft")
+        self.assertEqual(error.exception.diagnostics["database_failure_code"], "DATABASE_READ_FAILED")
+        self.assertEqual(error.exception.diagnostics["rental_case_id"], 424)
+
+    def test_reconciliation_event_persistence_failure_has_stable_operation(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+        )
+        failure = TestConsoleReadError(
+            "Console write failed.",
+            failure_code="DATABASE_READ_FAILED",
+            diagnostics={"query_fingerprint": "safe-fingerprint", "tables": ["public.workflow_events"]},
+        )
+
+        with patch.object(service, "_create_console_event", side_effect=failure), self.assertRaises(
+            TestConsoleReadError
+        ) as error:
+            service._append_reconciliation_event(
+                operation="reconcile.persist.append_detected_event",
+                rental_case_id=424,
+                event_type_code="outlook_human_edit_detected",
+                source_reference="outlook:message:synthetic",
+                occurred_at="2026-09-11T10:00:00Z",
+                structured_payload={},
+            )
+
+        self.assertEqual(error.exception.failure_code, "RECONCILIATION_PERSISTENCE_FAILED")
+        self.assertEqual(error.exception.diagnostics["reconciliation_phase"], "apply")
+        self.assertEqual(error.exception.diagnostics["reconciliation_operation"], "reconcile.persist.append_detected_event")
 
     def test_outlook_draft_identity_allows_matching_fields_with_canonical_smtp(self) -> None:
         identity = _assess_outlook_draft_identity(
@@ -809,7 +867,8 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
 
         self.assertFalse(report.success)
-        self.assertEqual(report.failure_codes, ("outlook_human_edit_graph_draft_not_found",))
+        self.assertEqual(report.failure_codes, ("RECONCILIATION_GRAPH_READ_FAILED",))
+        self.assertIn("Provider failure code: outlook_human_edit_graph_draft_not_found", report.lines)
         create_revision.assert_not_called()
 
     def test_staging_outlook_draft_read_reports_exact_graph_match_without_persistence(self) -> None:

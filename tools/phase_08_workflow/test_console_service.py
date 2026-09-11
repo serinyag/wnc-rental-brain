@@ -459,13 +459,20 @@ class _PreGraphReadRecord:
 
 
 @dataclass(frozen=True)
-class _OutlookHumanEditPreflight:
+class _OutlookHumanEditReconciliationPlan:
+    rental_case_id: int
     prior_revision: InquiryResponseDraftRevision
     snapshot: WorkflowOrchestrationCaseSnapshot
     action: WorkflowAction
     approval: ApprovalRequest
     graph_message_id: str
     reads: tuple[_PreGraphReadRecord, ...]
+
+
+@dataclass(frozen=True)
+class _OutlookHumanEditGraphRead:
+    snapshot: OutlookDraftSnapshot
+    configured_mailbox: str | None
 
 
 @dataclass(frozen=True)
@@ -2860,7 +2867,7 @@ limit 1;
         draft_revision_id: int,
     ) -> OperationReport:
         """Run the complete reconciliation read boundary without constructing a provider adapter."""
-        prepared = self._prepare_outlook_human_edit_reconciliation(
+        prepared = self.prepare_outlook_reconciliation(
             rental_case_id=rental_case_id,
             draft_revision_id=draft_revision_id,
         )
@@ -2890,16 +2897,22 @@ limit 1;
         draft_revision_id: int,
     ) -> OperationReport:
         """Accept one human Outlook edit only after a read-only governed revalidation."""
-        prepared = self._prepare_outlook_human_edit_reconciliation(
+        prepared = self.prepare_outlook_reconciliation(
             rental_case_id=rental_case_id,
             draft_revision_id=draft_revision_id,
         )
         if isinstance(prepared, OperationReport):
             return prepared
-        runtime = self.config.runtime
-        prior_revision = prepared.prior_revision
-        action = prepared.action
-        graph_message_id = prepared.graph_message_id
+        graph_read = self.read_outlook_draft(prepared)
+        if isinstance(graph_read, OperationReport):
+            return graph_read
+        return self.apply_outlook_reconciliation(prepared, graph_read)
+
+    def read_outlook_draft(
+        self,
+        plan: _OutlookHumanEditReconciliationPlan,
+    ) -> _OutlookHumanEditGraphRead | OperationReport:
+        """Perform the one trusted Graph GET; the plan supplies the only mailbox binding."""
         adapter = build_outlook_execution_adapter_from_env(send_enabled=False)
         availability_failure = adapter.read_availability_failure_code()
         if availability_failure is not None:
@@ -2909,14 +2922,54 @@ limit 1;
             )
 
         # This is the sole Graph operation in the reconciliation path.
-        graph_draft = adapter.read_draft_snapshot(message_id=graph_message_id)
+        graph_draft = adapter.read_draft_snapshot(message_id=plan.graph_message_id)
         if graph_draft.outcome != "found" or not graph_draft.is_draft:
-            return self._outlook_human_edit_safety_blocked(
-                "The originating Graph message could not be read as an existing draft.",
-                failure_code=graph_draft.failure_code or "outlook_human_edit_graph_draft_not_found",
+            return OperationReport(
+                title="Outlook Reconciliation Graph Read Failed",
+                success=False,
+                lines=(
+                    "Outcome: RECONCILIATION_GRAPH_READ_FAILED",
+                    "The originating Graph message could not be read as an existing draft.",
+                    f"Provider failure code: {graph_draft.failure_code or 'outlook_human_edit_graph_draft_not_found'}",
+                    "Graph mutations: 0",
+                ),
+                failure_codes=("RECONCILIATION_GRAPH_READ_FAILED",),
             )
-        identity = _assess_outlook_draft_identity(
+        return _OutlookHumanEditGraphRead(
+            snapshot=graph_draft,
             configured_mailbox=adapter.config.sender_mailbox,
+        )
+
+    def apply_outlook_reconciliation(
+        self,
+        plan: _OutlookHumanEditReconciliationPlan,
+        graph_read: _OutlookHumanEditGraphRead,
+    ) -> OperationReport:
+        """Apply a trusted Graph snapshot and retain a typed, safe database failure stage."""
+        try:
+            return self._apply_outlook_reconciliation(plan, graph_read)
+        except TestConsoleReadError as exc:
+            raise self._reconciliation_database_error(
+                exc,
+                phase="apply",
+                operation="reconcile.apply",
+                rental_case_id=plan.rental_case_id,
+            ) from exc
+
+    def _apply_outlook_reconciliation(
+        self,
+        plan: _OutlookHumanEditReconciliationPlan,
+        graph_read: _OutlookHumanEditGraphRead,
+    ) -> OperationReport:
+        """Apply one already-read draft against current truth; this stage never calls Graph."""
+        runtime = self.config.runtime
+        prior_revision = plan.prior_revision
+        rental_case_id = plan.rental_case_id
+        action = plan.action
+        graph_message_id = plan.graph_message_id
+        graph_draft = graph_read.snapshot
+        identity = _assess_outlook_draft_identity(
+            configured_mailbox=graph_read.configured_mailbox,
             graph_from_mailbox=graph_draft.from_mailbox,
             graph_from_display_name=graph_draft.from_display_name,
             graph_sender_mailbox=graph_draft.sender_mailbox,
@@ -2927,7 +2980,8 @@ limit 1;
 
         diff = _outlook_human_edit_diff(prior_revision=prior_revision, graph_draft=graph_draft)
         if not diff.meaningful_change:
-            self._create_console_event(
+            self._append_reconciliation_event(
+                operation="reconcile.persist.append_not_detected_event",
                 rental_case_id=rental_case_id,
                 event_type_code="outlook_human_edit_not_detected",
                 source_reference=f"outlook:message:{graph_message_id}",
@@ -2941,8 +2995,6 @@ limit 1;
                     "mailbox_identity": identity.to_payload(),
                     "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
                 },
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
-                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
             return OperationReport(
                 title="Outlook Human Edit Not Detected",
@@ -2956,7 +3008,8 @@ limit 1;
                 failure_codes=("OUTLOOK_HUMAN_EDIT_NOT_DETECTED",),
             )
 
-        self._create_console_event(
+        self._append_reconciliation_event(
+            operation="reconcile.persist.append_detected_event",
             rental_case_id=rental_case_id,
             event_type_code="outlook_human_edit_detected",
             source_reference=f"outlook:message:{graph_message_id}",
@@ -2971,15 +3024,18 @@ limit 1;
                 "mailbox_identity": identity.to_payload(),
                 "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
-            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         recipient_failure_codes = _outlook_recipient_validation_codes(
             graph_draft=graph_draft,
             originating_recipient=prior_revision.recipient_email,
             recipient_allowed=runtime.is_email_recipient_allowed,
         )
-        detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
+        detail, current_snapshot, contract = self._reconciliation_operation(
+            phase="apply",
+            operation="reconcile.apply.load_current_governed_contract",
+            rental_case_id=rental_case_id,
+            callback=lambda: self._build_current_governed_draft_contract(rental_case_id),
+        )
         current_draft = ClientResponseDraft(
             subject=graph_draft.subject or "",
             body=graph_draft.body or "",
@@ -2994,7 +3050,8 @@ limit 1;
         )
         validation_codes = (*recipient_failure_codes, *validation.failure_codes)
         if validation_codes:
-            self._create_console_event(
+            self._append_reconciliation_event(
+                operation="reconcile.persist.append_validation_failed_event",
                 rental_case_id=rental_case_id,
                 event_type_code="outlook_human_edit_validation_failed",
                 source_reference=f"outlook:message:{graph_message_id}",
@@ -3012,8 +3069,6 @@ limit 1;
                     "mailbox_identity": identity.to_payload(),
                     "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
                 },
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
-                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
             return OperationReport(
                 title="Outlook Human Edit Validation Failed",
@@ -3030,13 +3085,16 @@ limit 1;
                 failure_codes=tuple(validation_codes),
             )
 
-        target_action = self._ensure_governed_client_response_action(
-            current_snapshot,
-            response_intent=contract.response_intent.code,
-            context_hash=contract.context_hash,
+        target_action = self._reconciliation_operation(
+            phase="apply",
+            operation="reconcile.persist.ensure_successor_action",
+            rental_case_id=rental_case_id,
+            callback=lambda: self._ensure_governed_client_response_action(
+                current_snapshot,
+                response_intent=contract.response_intent.code,
+                context_hash=contract.context_hash,
+            ),
         )
-        current_snapshot = self._require_case_snapshot(rental_case_id)
-        target_action = current_snapshot.find_workflow_action(target_action.workflow_action_id) or target_action
         context = self._build_governed_client_response_context(
             current_snapshot,
             action=target_action,
@@ -3049,27 +3107,43 @@ limit 1;
             body=current_draft.body,
             open_questions=contract.open_client_questions,
         )
-        revision = self._create_draft_revision(
-            context=context,
-            content=content,
-            draft_source=INQUIRY_DRAFT_SOURCE_HUMAN_EDITED,
-            created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
-            supersedes_draft_revision_id=prior_revision.inquiry_response_draft_revision_id,
-        )
-        new_approval = self._replace_draft_approval(
+        revision = self._reconciliation_operation(
+            phase="apply",
+            operation="reconcile.persist.successor_revision",
             rental_case_id=rental_case_id,
-            workflow_action=target_action,
-            revision=revision,
-            superseded_revision=prior_revision,
+            callback=lambda: self._create_draft_revision(
+                context=context,
+                content=content,
+                draft_source=INQUIRY_DRAFT_SOURCE_HUMAN_EDITED,
+                created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                supersedes_draft_revision_id=prior_revision.inquiry_response_draft_revision_id,
+            ),
         )
-        revision = self._bind_approval_request_to_draft_revision(
+        new_approval = self._reconciliation_operation(
+            phase="apply",
+            operation="reconcile.persist.create_approval_requirement",
             rental_case_id=rental_case_id,
-            draft_revision_id=revision.inquiry_response_draft_revision_id,
-            approval_request_id=new_approval.approval_request_id,
-            draft_status=INQUIRY_DRAFT_STATUS_NEEDS_APPROVAL,
-            updated_at=self.now(),
+            callback=lambda: self._replace_draft_approval(
+                rental_case_id=rental_case_id,
+                workflow_action=target_action,
+                revision=revision,
+                superseded_revision=prior_revision,
+            ),
         )
-        self._create_console_event(
+        revision = self._reconciliation_operation(
+            phase="apply",
+            operation="reconcile.persist.bind_approval_to_successor",
+            rental_case_id=rental_case_id,
+            callback=lambda: self._bind_approval_request_to_draft_revision(
+                rental_case_id=rental_case_id,
+                draft_revision_id=revision.inquiry_response_draft_revision_id,
+                approval_request_id=new_approval.approval_request_id,
+                draft_status=INQUIRY_DRAFT_STATUS_NEEDS_APPROVAL,
+                updated_at=self.now(),
+            ),
+        )
+        self._append_reconciliation_event(
+            operation="reconcile.persist.append_revision_created_event",
             rental_case_id=rental_case_id,
             event_type_code="outlook_human_edit_revision_created",
             source_reference=f"outlook:message:{graph_message_id}",
@@ -3090,8 +3164,6 @@ limit 1;
                 "mailbox_identity": identity.to_payload(),
                 "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
-            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
             title="Outlook Human Edit Reconciled",
@@ -3136,12 +3208,32 @@ limit 1;
             failure_codes=(failure_code,),
         )
 
-    def _prepare_outlook_human_edit_reconciliation(
+    def prepare_outlook_reconciliation(
         self,
         *,
         rental_case_id: int,
         draft_revision_id: int,
-    ) -> _OutlookHumanEditPreflight | OperationReport:
+    ) -> _OutlookHumanEditReconciliationPlan | OperationReport:
+        """Prepare the immutable, provider-free reconciliation plan used by every entry point."""
+        try:
+            return self._prepare_outlook_reconciliation(
+                rental_case_id=rental_case_id,
+                draft_revision_id=draft_revision_id,
+            )
+        except TestConsoleReadError as exc:
+            raise self._reconciliation_database_error(
+                exc,
+                phase="prepare",
+                operation="reconcile.prepare",
+                rental_case_id=rental_case_id,
+            ) from exc
+
+    def _prepare_outlook_reconciliation(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> _OutlookHumanEditReconciliationPlan | OperationReport:
         """Load and verify every governed fact required before the sole Graph read."""
         runtime = self.config.runtime
         if (
@@ -3159,7 +3251,7 @@ limit 1;
             rental_case_id,
             draft_revision_id,
             query_runner=self._pre_graph_query_runner(
-                operation="outlook_human_edit.draft_revision",
+                operation="reconcile.prepare.load_originating_draft",
                 reads=reads,
             ),
         )
@@ -3173,11 +3265,11 @@ limit 1;
             )
 
         metadata_runner = self._pre_graph_query_runner(
-            operation="outlook_human_edit.test_case_metadata",
+            operation="reconcile.prepare.load_case_registration",
             reads=reads,
         )
         snapshot_runner = self._pre_graph_query_runner(
-            operation="outlook_human_edit.canonical_case_snapshot",
+            operation="reconcile.prepare.load_case_snapshot_pre_graph",
             reads=reads,
         )
         repository = self.orchestration_repository
@@ -3216,7 +3308,8 @@ limit 1;
             return self._outlook_human_edit_safety_blocked(
                 "The originating Graph draft binding is missing or ambiguous."
             )
-        return _OutlookHumanEditPreflight(
+        return _OutlookHumanEditReconciliationPlan(
+            rental_case_id=rental_case_id,
             prior_revision=prior_revision,
             snapshot=snapshot,
             action=action,
@@ -3242,6 +3335,8 @@ limit 1;
                     **identity,
                     **exc.diagnostics,
                     "repository_operation": operation,
+                    "reconciliation_phase": "prepare",
+                    "reconciliation_operation": operation,
                     "elapsed_ms": round((time.perf_counter() - started) * 1000, 1),
                 }
                 raise TestConsoleReadError(
@@ -3260,6 +3355,79 @@ limit 1;
             return result
 
         return runner
+
+    def _append_reconciliation_event(
+        self,
+        *,
+        operation: str,
+        rental_case_id: int,
+        event_type_code: str,
+        source_reference: str,
+        occurred_at: str,
+        structured_payload: dict[str, Any],
+    ) -> None:
+        """Persist append-only reconciliation evidence under a stable operation name."""
+        self._reconciliation_operation(
+            phase="apply",
+            operation=operation,
+            rental_case_id=rental_case_id,
+            callback=lambda: self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code=event_type_code,
+                source_reference=source_reference,
+                occurred_at=occurred_at,
+                structured_payload=structured_payload,
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            ),
+        )
+
+    def _reconciliation_operation(
+        self,
+        *,
+        phase: str,
+        operation: str,
+        rental_case_id: int,
+        callback: Callable[[], Any],
+    ) -> Any:
+        """Attach one stable reconciliation operation code to a database boundary."""
+        try:
+            return callback()
+        except TestConsoleReadError as exc:
+            raise self._reconciliation_database_error(
+                exc,
+                phase=phase,
+                operation=operation,
+                rental_case_id=rental_case_id,
+            ) from exc
+
+    @staticmethod
+    def _reconciliation_database_error(
+        exc: TestConsoleReadError,
+        *,
+        phase: str,
+        operation: str,
+        rental_case_id: int,
+    ) -> TestConsoleReadError:
+        diagnostics = {
+            **exc.diagnostics,
+            "reconciliation_phase": exc.diagnostics.get("reconciliation_phase", phase),
+            "reconciliation_operation": exc.diagnostics.get("reconciliation_operation", operation),
+            "rental_case_id": rental_case_id,
+        }
+        failure_code = (
+            "RECONCILIATION_PREPARE_DB_FAILED"
+            if diagnostics["reconciliation_phase"] == "prepare"
+            else "RECONCILIATION_POST_GRAPH_DB_FAILED"
+        )
+        if str(diagnostics["reconciliation_operation"]).startswith("reconcile.persist"):
+            failure_code = "RECONCILIATION_PERSISTENCE_FAILED"
+        diagnostics["database_failure_code"] = exc.failure_code
+        return TestConsoleReadError(
+            f"Outlook reconciliation {diagnostics['reconciliation_phase']} database operation failed.",
+            failure_code=failure_code,
+            diagnostics=diagnostics,
+        )
 
     def _outlook_human_edit_identity_blocked(
         self,

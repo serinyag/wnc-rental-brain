@@ -99,6 +99,14 @@ class TestConsoleApp:
         except TestConsoleError as error:
             status = error.status
             failure_code = error.failure_code
+            if error.diagnostics:
+                LOGGER.warning(
+                    "test_console_safe_diagnostics method=%s path=%s failure_code=%s diagnostics=%s",
+                    method,
+                    path,
+                    error.failure_code,
+                    json.dumps(error.diagnostics, sort_keys=True, ensure_ascii=True),
+                )
             if api_request:
                 return self._respond_json_error(
                     start_response,

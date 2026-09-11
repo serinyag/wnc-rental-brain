@@ -21,7 +21,12 @@ DEFAULT_PASSWORD_ENV = "STAGING_BASIC_AUTH_PASSWORD"
 
 
 class OperatorHarnessError(RuntimeError):
-    pass
+    """HTTP failure retaining only the API's already-sanitized error payload."""
+
+    def __init__(self, message: str, *, status_code: int | None = None, error_payload: dict[str, Any] | None = None) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.error_payload = error_payload or {}
 
 
 @dataclass(frozen=True)
@@ -279,7 +284,11 @@ class OperatorHarnessClient:
                 response_body = response.read().decode("utf-8")
         except HTTPError as exc:
             response_body = exc.read().decode("utf-8", errors="replace")
-            raise OperatorHarnessError(self._format_http_error(exc.code, response_body)) from exc
+            raise OperatorHarnessError(
+                self._format_http_error(exc.code, response_body),
+                status_code=exc.code,
+                error_payload=self._safe_error_payload(response_body),
+            ) from exc
         except (TimeoutError, socket.timeout) as exc:
             raise OperatorHarnessError(
                 f"Operator request timed out after {self.config.timeout_seconds:g} seconds."
@@ -319,6 +328,15 @@ class OperatorHarnessClient:
                 message = error.get("message", "Operator request failed.")
                 return f"Operator request failed with HTTP {status_code}: {failure_code}: {message}"
         return f"Operator request failed with HTTP {status_code}."
+
+    @staticmethod
+    def _safe_error_payload(response_body: str) -> dict[str, Any]:
+        try:
+            payload = json.loads(response_body)
+        except json.JSONDecodeError:
+            return {}
+        error = payload.get("error") if isinstance(payload, dict) else None
+        return error if isinstance(error, dict) else {}
 
 
 def build_parser() -> argparse.ArgumentParser:

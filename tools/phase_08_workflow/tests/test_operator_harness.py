@@ -110,8 +110,56 @@ class OperatorHarnessTests(unittest.TestCase):
             opener=opener,
         )
 
-        with self.assertRaisesRegex(OperatorHarnessError, "AUTHENTICATION_REQUIRED"):
+        with self.assertRaisesRegex(OperatorHarnessError, "AUTHENTICATION_REQUIRED") as error:
             client.list_cases()
+
+        self.assertEqual(error.exception.status_code, 401)
+        self.assertEqual(error.exception.error_payload["failure_code"], "AUTHENTICATION_REQUIRED")
+
+    def test_request_retains_sanitized_reconciliation_diagnostics(self) -> None:
+        def opener(request, timeout, context):
+            del request, timeout, context
+            raise HTTPError(
+                url="https://stage.example.test/api/operator/cases/424/mailbox/drafts/143/outlook-human-edit-reconcile",
+                code=503,
+                msg="Service Unavailable",
+                hdrs=None,
+                fp=io.BytesIO(
+                    json.dumps(
+                        {
+                            "ok": False,
+                            "error": {
+                                "failure_code": "RECONCILIATION_PREPARE_DB_FAILED",
+                                "message": "Outlook reconciliation prepare database operation failed.",
+                                "diagnostics": {
+                                    "reconciliation_phase": "prepare",
+                                    "reconciliation_operation": "reconcile.prepare.load_originating_draft",
+                                    "query_fingerprint": "safe-fingerprint",
+                                    "tables": ["public.inquiry_response_draft_revisions"],
+                                },
+                            },
+                        }
+                    ).encode("utf-8")
+                ),
+            )
+
+        client = OperatorHarnessClient(
+            OperatorHarnessConfig(
+                base_url="https://stage.example.test",
+                username="stage-user",
+                password="stage-pass",
+            ),
+            opener=opener,
+        )
+
+        with self.assertRaises(OperatorHarnessError) as error:
+            client.reconcile_human_edited_outlook_draft(rental_case_id=424, draft_revision_id=143)
+
+        self.assertEqual(error.exception.status_code, 503)
+        self.assertEqual(
+            error.exception.error_payload["diagnostics"]["reconciliation_operation"],
+            "reconcile.prepare.load_originating_draft",
+        )
 
     def test_request_raises_clean_timeout_error(self) -> None:
         def opener(request, timeout, context):
