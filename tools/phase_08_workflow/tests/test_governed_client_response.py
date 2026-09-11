@@ -4,6 +4,7 @@ import json
 import unittest
 from types import SimpleNamespace
 
+from tools.phase_07_reasoning.openai_answer_generator import OpenAIAnswerProviderError
 from tools.phase_08_workflow.governed_client_response import (
     ClientResponseDraft,
     ClientResponseProviderError,
@@ -303,6 +304,29 @@ class GovernedClientResponseTests(unittest.TestCase):
         provider = OpenAIClientResponseProvider(api_key="test-key", model_code="configured-model", transport=transport)
         with self.assertRaises(ClientResponseProviderError):
             provider.generate_client_response(contract)
+
+    def test_openai_provider_surfaces_safe_http_diagnostics(self) -> None:
+        contract = build_draft_contract(snapshot=make_snapshot(), recipient_label="Avery", latest_client_message=None)
+
+        def transport(*_args):
+            raise OpenAIAnswerProviderError(
+                "HTTP 400: OpenAI answer generation request failed.",
+                http_status=400,
+                provider_error_code="invalid_json_schema",
+                provider_error_type="invalid_request_error",
+                provider_request_id="req_400",
+            )
+
+        provider = OpenAIClientResponseProvider(api_key="test-key", model_code="configured-model", transport=transport)
+        with self.assertRaises(ClientResponseProviderError) as error:
+            provider.generate_client_response(contract)
+
+        self.assertEqual(error.exception.failure_category, "CLIENT_RESPONSE_REQUEST_SCHEMA_REGRESSION")
+        self.assertEqual(error.exception.diagnostics["http_status"], 400)
+        self.assertEqual(error.exception.diagnostics["provider_error_code"], "invalid_json_schema")
+        self.assertEqual(error.exception.diagnostics["provider_request_id"], "req_400")
+        self.assertEqual(error.exception.diagnostics["provider_endpoint"], "/v1/responses")
+        self.assertNotIn("test-key", json.dumps(error.exception.diagnostics))
 
 
 if __name__ == "__main__":

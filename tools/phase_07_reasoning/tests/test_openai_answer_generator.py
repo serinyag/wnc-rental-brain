@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import json
+import urllib.error
 import unittest
 from unittest import mock
 
@@ -29,6 +31,7 @@ from tools.phase_07_reasoning.openai_answer_generator import (
     OpenAIAnswerGeneratorConfig,
     OpenAIAnswerModelUnavailableError,
     OpenAIAnswerProviderError,
+    _default_openai_transport,
 )
 from tools.phase_07_reasoning.tests.test_context_safety import (
     make_item,
@@ -105,6 +108,33 @@ def make_success_provider_response(request, *, answer_text: str = "Bounded answe
 
 
 class OpenAIAnswerGeneratorTests(unittest.TestCase):
+    def test_transport_retains_only_safe_http_error_diagnostics(self) -> None:
+        provider_body = json.dumps(
+            {
+                "error": {
+                    "message": "Sensitive provider prose must not be surfaced.",
+                    "type": "invalid_request_error",
+                    "code": "invalid_json_schema",
+                }
+            }
+        ).encode("utf-8")
+        error = urllib.error.HTTPError(
+            "https://api.openai.com/v1/responses",
+            400,
+            "Bad Request",
+            {"x-request-id": "req_safe_123"},
+            io.BytesIO(provider_body),
+        )
+
+        with mock.patch("urllib.request.urlopen", side_effect=error), self.assertRaises(OpenAIAnswerProviderError) as raised:
+            _default_openai_transport({}, "https://api.openai.com/v1", {}, 10, mock.Mock())
+
+        self.assertEqual(raised.exception.http_status, 400)
+        self.assertEqual(raised.exception.provider_error_code, "invalid_json_schema")
+        self.assertEqual(raised.exception.provider_error_type, "invalid_request_error")
+        self.assertEqual(raised.exception.provider_request_id, "req_safe_123")
+        self.assertNotIn("Sensitive provider prose", json.dumps(raised.exception.safe_diagnostics()))
+
     def test_missing_api_key_raises_system_exit(self) -> None:
         with mock.patch(
             "tools.phase_07_reasoning.openai_answer_generator.load_env_value",

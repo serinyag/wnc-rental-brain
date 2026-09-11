@@ -2335,11 +2335,19 @@ limit 1;
         )
         try:
             generated = self.client_response_provider.generate_client_response(contract)
-        except (ClientResponseProviderError, TimeoutError) as exc:
+        except ClientResponseProviderError as exc:
             raise TestConsoleError(
                 "Client response generation did not complete; no draft was created.",
                 failure_code="CLIENT_RESPONSE_PROVIDER_FAILURE",
                 status=HTTPStatus.SERVICE_UNAVAILABLE,
+                diagnostics={"failure_category": exc.failure_category, **exc.diagnostics},
+            ) from exc
+        except TimeoutError as exc:
+            raise TestConsoleError(
+                "Client response generation did not complete; no draft was created.",
+                failure_code="CLIENT_RESPONSE_PROVIDER_FAILURE",
+                status=HTTPStatus.SERVICE_UNAVAILABLE,
+                diagnostics={"failure_category": "OPENAI_TIMEOUT"},
             ) from exc
 
         current_snapshot = self._require_case_snapshot(rental_case_id)

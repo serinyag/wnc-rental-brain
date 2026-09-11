@@ -27,7 +27,7 @@ from tools.phase_08_workflow.contracts import (
     WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
 )
 from tools.phase_08_workflow.asana_adapter import AsanaAdapterConfig
-from tools.phase_08_workflow.governed_client_response import DeterministicFakeClientResponseProvider
+from tools.phase_08_workflow.governed_client_response import ClientResponseProviderError, DeterministicFakeClientResponseProvider
 from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig
 from tools.phase_08_workflow.observation_contracts import InboundObservation, InboundObservationEffect, InboundSourceRecord
 from tools.phase_08_workflow.observation_repository import InMemoryObservationRepository
@@ -96,6 +96,15 @@ class _LifecycleAwareClientResponseProvider:
             raise AssertionError("provider was called before the initial read boundary completed")
         self.calls.append("provider_called")
         return self.fake_provider.generate_client_response(contract)
+
+
+class _FailingClientResponseProvider:
+    def generate_client_response(self, _contract):
+        raise ClientResponseProviderError(
+            "OpenAI request failed.",
+            failure_category="OPENAI_REQUEST_REJECTED",
+            diagnostics={"http_status": 400, "provider_error_code": "invalid_request_error"},
+        )
 
 
 class _GovernedClientResponseLifecycleService(_MetadataService):
@@ -270,6 +279,41 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         )
         self.assertIn("Draft revision id: 101", report.lines)
         self.assertIn("Approval request id: 202", report.lines)
+
+    def test_governed_client_response_provider_failure_exposes_safe_diagnostics(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=3,
+            rental_type_code="studio_space",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            client_response_provider=_FailingClientResponseProvider(),
+            config=TestConsoleConfig(),
+        )
+        detail = SimpleNamespace(
+            metadata=_MetadataService(
+                orchestration_repository=_DummyRepository(),
+                observation_repository=_DummyRepository(),
+            )._load_test_case_metadata(1),
+            orchestration_snapshot=WorkflowOrchestrationCaseSnapshot(rental_case=rental_case),
+            evidence_bundles=(),
+            working_proposal=SimpleNamespace(commercial_snapshot=(), feasibility_snapshot=()),
+        )
+
+        with patch.object(service, "load_case_detail", return_value=detail), self.assertRaises(TestConsoleError) as error:
+            service.generate_governed_client_response_draft(rental_case_id=1)
+
+        self.assertEqual(error.exception.failure_code, "CLIENT_RESPONSE_PROVIDER_FAILURE")
+        self.assertEqual(error.exception.diagnostics["failure_category"], "OPENAI_REQUEST_REJECTED")
+        self.assertEqual(error.exception.diagnostics["http_status"], 400)
 
     def test_pending_commercial_decision_does_not_trigger_generic_capacity_inference(self) -> None:
         service = TestConsoleService(

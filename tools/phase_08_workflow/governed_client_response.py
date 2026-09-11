@@ -17,6 +17,7 @@ from typing import Any, Protocol
 from tools.phase_07_reasoning.openai_answer_generator import (
     DEFAULT_OPENAI_API_BASE_URL,
     OpenAIAnswerProviderError,
+    OpenAIAnswerModelUnavailableError,
     OpenAITransport,
     call_openai_responses,
 )
@@ -71,6 +72,18 @@ DRAFT_VALIDATION_EXTERNAL_CONTACT_NOT_RECORDED = "external_contact_not_recorded"
 
 class ClientResponseProviderError(RuntimeError):
     """A safe provider failure that never changes case truth."""
+
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        failure_category: str = "PROVIDER_FAILURE_UNKNOWN",
+        diagnostics: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(safe_message)
+        self.safe_message = safe_message
+        self.failure_category = failure_category
+        self.diagnostics = diagnostics or {}
 
 
 @dataclass(frozen=True)
@@ -369,12 +382,21 @@ class OpenAIClientResponseProvider:
             "metadata": {"phase": "8", "contract": "governed_client_response_v1", "client_request_id": request_id},
         }
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json", "X-Client-Request-Id": request_id}
+        request_diagnostics = _provider_request_diagnostics(payload, request_id=request_id)
         try:
             response, response_headers = call_openai_responses(payload, DEFAULT_OPENAI_API_BASE_URL, headers, self.timeout_seconds, transport=self.transport)
-        except TimeoutError:
-            raise
+        except TimeoutError as exc:
+            raise ClientResponseProviderError(
+                "OpenAI client-draft generation timed out.",
+                failure_category="OPENAI_TIMEOUT",
+                diagnostics=request_diagnostics,
+            ) from exc
         except OpenAIAnswerProviderError as exc:
-            raise ClientResponseProviderError(exc.safe_message) from exc
+            raise ClientResponseProviderError(
+                exc.safe_message,
+                failure_category=_openai_failure_category(exc),
+                diagnostics={**request_diagnostics, **exc.safe_diagnostics()},
+            ) from exc
         try:
             text = _extract_openai_client_draft_text(response)
             parsed = json.loads(text)
@@ -387,8 +409,18 @@ class OpenAIClientResponseProvider:
                 provider_response_status=_optional_text(response.get("status")),
                 provider_incomplete_reason=_incomplete_reason(response),
             )
+        except ClientResponseProviderError:
+            raise
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
-            raise ClientResponseProviderError("OpenAI returned malformed structured client-draft output.") from exc
+            raise ClientResponseProviderError(
+                "OpenAI returned malformed structured client-draft output.",
+                failure_category="OPENAI_RESPONSE_PARSING",
+                diagnostics={
+                    **request_diagnostics,
+                    "provider_response_id": _optional_text(response.get("id")),
+                    "provider_response_status": _optional_text(response.get("status")),
+                },
+            ) from exc
 
 
 def build_client_response_provider_from_env() -> GovernedClientResponseProvider:
@@ -469,8 +501,17 @@ def _provider_system_prompt() -> str:
 
 
 def _extract_openai_client_draft_text(response: dict[str, Any]) -> str:
-    if response.get("status") not in {None, "completed"}:
-        raise ClientResponseProviderError("OpenAI client-draft response did not complete.")
+    status = response.get("status")
+    if status not in {None, "completed"}:
+        raise ClientResponseProviderError(
+            "OpenAI client-draft response did not complete.",
+            failure_category="OPENAI_INCOMPLETE_OR_EMPTY_RESPONSE",
+            diagnostics={
+                "provider_response_id": _optional_text(response.get("id")),
+                "provider_response_status": _optional_text(status),
+                "provider_incomplete_reason": _incomplete_reason(response),
+            },
+        )
     output = response.get("output")
     if not isinstance(output, list):
         raise ClientResponseProviderError("OpenAI returned malformed structured client-draft output.")
@@ -481,12 +522,29 @@ def _extract_openai_client_draft_text(response: dict[str, Any]) -> str:
         if not isinstance(content, list):
             continue
         for content_item in content:
+            if isinstance(content_item, dict) and content_item.get("type") == "refusal":
+                raise ClientResponseProviderError(
+                    "OpenAI refused the client-draft response.",
+                    failure_category="OPENAI_REFUSAL",
+                    diagnostics={
+                        "provider_response_id": _optional_text(response.get("id")),
+                        "provider_response_status": _optional_text(status),
+                    },
+                )
             if not isinstance(content_item, dict) or content_item.get("type") not in {None, "output_text"}:
                 continue
             text = content_item.get("text")
             if isinstance(text, str):
                 return text
-    raise ClientResponseProviderError("OpenAI response did not contain a structured client draft.")
+    raise ClientResponseProviderError(
+        "OpenAI response did not contain a structured client draft.",
+        failure_category="OPENAI_INCOMPLETE_OR_EMPTY_RESPONSE",
+        diagnostics={
+            "provider_response_id": _optional_text(response.get("id")),
+            "provider_response_status": _optional_text(status),
+            "provider_incomplete_reason": _incomplete_reason(response),
+        },
+    )
 
 
 def _optional_text(value: Any) -> str | None:
@@ -498,6 +556,43 @@ def _incomplete_reason(response: dict[str, Any]) -> str | None:
     if not isinstance(details, dict):
         return None
     return _optional_text(details.get("reason"))
+
+
+def _provider_request_diagnostics(payload: dict[str, Any], *, request_id: str) -> dict[str, Any]:
+    encoded = json.dumps(payload, sort_keys=True, ensure_ascii=True).encode("utf-8")
+    return {
+        "provider_request_started": True,
+        "provider_endpoint": "/v1/responses",
+        "client_request_id": request_id,
+        "model": payload["model"],
+        "request_bytes": len(encoded),
+        "input_item_count": len(payload["input"]),
+        "max_output_tokens": payload["max_output_tokens"],
+        "store": payload["store"],
+        "structured_output_name": payload["text"]["format"]["name"],
+        "structured_output_strict": payload["text"]["format"]["strict"],
+        "structured_output_schema_sha256": hashlib.sha256(
+            json.dumps(payload["text"]["format"]["schema"], sort_keys=True, ensure_ascii=True).encode("utf-8")
+        ).hexdigest(),
+    }
+
+
+def _openai_failure_category(error: OpenAIAnswerProviderError) -> str:
+    if error.http_status in {401, 403} or isinstance(error, OpenAIAnswerModelUnavailableError):
+        return "OPENAI_AUTH_OR_MODEL_ACCESS"
+    if error.http_status == 429:
+        return "OPENAI_RATE_LIMIT"
+    if error.http_status is not None and error.http_status >= 500:
+        return "OPENAI_PROVIDER_5XX"
+    if error.http_status in {400, 404} and error.provider_error_code in {
+        "invalid_json_schema",
+        "invalid_schema",
+        "schema_validation_error",
+    }:
+        return "CLIENT_RESPONSE_REQUEST_SCHEMA_REGRESSION"
+    if error.http_status is not None:
+        return "OPENAI_REQUEST_REJECTED"
+    return "PROVIDER_FAILURE_UNKNOWN"
 
 
 def _provider_schema() -> dict[str, Any]:

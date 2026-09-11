@@ -51,9 +51,33 @@ class OpenAIAnswerGeneratorConfig:
 
 
 class OpenAIAnswerProviderError(RuntimeError):
-    def __init__(self, safe_message: str) -> None:
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        http_status: int | None = None,
+        provider_error_code: str | None = None,
+        provider_error_type: str | None = None,
+        provider_request_id: str | None = None,
+    ) -> None:
         self.safe_message = safe_message
+        self.http_status = http_status
+        self.provider_error_code = provider_error_code
+        self.provider_error_type = provider_error_type
+        self.provider_request_id = provider_request_id
         super().__init__(safe_message)
+
+    def safe_diagnostics(self) -> dict[str, Any]:
+        return {
+            key: value
+            for key, value in {
+                "http_status": self.http_status,
+                "provider_error_code": self.provider_error_code,
+                "provider_error_type": self.provider_error_type,
+                "provider_request_id": self.provider_request_id,
+            }.items()
+            if value is not None
+        }
 
 
 class OpenAIAnswerModelUnavailableError(OpenAIAnswerProviderError):
@@ -239,23 +263,37 @@ def _default_openai_transport(
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         lowered_body = body.lower()
+        error_details = _safe_provider_error_details(body)
+        provider_request_id = _optional_header_value(exc.headers, "x-request-id")
         if exc.code == 401:
             raise OpenAIAnswerProviderError(
-                "HTTP 401: OpenAI rejected the supplied API key for answer generation."
+                "HTTP 401: OpenAI rejected the supplied API key for answer generation.",
+                http_status=exc.code,
+                provider_request_id=provider_request_id,
+                **error_details,
             ) from exc
         if exc.code in {400, 404} and (
             "model" in lowered_body
             and ("not found" in lowered_body or "does not exist" in lowered_body or "unavailable" in lowered_body)
         ):
             raise OpenAIAnswerModelUnavailableError(
-                "Configured OpenAI answer model is unavailable."
+                "Configured OpenAI answer model is unavailable.",
+                http_status=exc.code,
+                provider_request_id=provider_request_id,
+                **error_details,
             ) from exc
         if exc.code == 429 and "credit_balance_exhausted" in lowered_body:
             raise OpenAIAnswerProviderError(
-                "HTTP 429: OpenAI reported insufficient quota for answer generation."
+                "HTTP 429: OpenAI reported insufficient quota for answer generation.",
+                http_status=exc.code,
+                provider_request_id=provider_request_id,
+                **error_details,
             ) from exc
         raise OpenAIAnswerProviderError(
-            f"HTTP {exc.code}: OpenAI answer generation request failed."
+            f"HTTP {exc.code}: OpenAI answer generation request failed.",
+            http_status=exc.code,
+            provider_request_id=provider_request_id,
+            **error_details,
         ) from exc
     except socket.timeout as exc:
         raise TimeoutError("OpenAI answer generation timed out.") from exc
@@ -269,6 +307,32 @@ def _default_openai_transport(
         raise OpenAIAnswerProviderError(
             f"OpenAI answer generation transport failed: {exc.reason}"
         ) from exc
+
+
+def _safe_provider_error_details(body: str) -> dict[str, str]:
+    """Extract machine-readable provider diagnostics without retaining error prose."""
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError:
+        return {}
+    error = payload.get("error") if isinstance(payload, dict) else None
+    if not isinstance(error, dict):
+        return {}
+    details: dict[str, str] = {}
+    for source_key, output_key in (("code", "provider_error_code"), ("type", "provider_error_type")):
+        value = error.get(source_key)
+        if isinstance(value, str) and value.strip():
+            details[output_key] = value.strip()
+    return details
+
+
+def _optional_header_value(headers: Mapping[str, str] | None, name: str) -> str | None:
+    if headers is None:
+        return None
+    for key, value in headers.items():
+        if key.lower() == name.lower() and isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
 
 
 def _system_prompt(request: BoundedAnswerGeneratorRequest) -> str:
