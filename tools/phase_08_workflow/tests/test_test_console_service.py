@@ -449,6 +449,94 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(report.failure_codes, ("OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED",))
         self.assertIn("Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED", report.lines)
 
+    def test_human_edit_preflight_reads_governed_state_without_constructing_provider_or_mutating(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_basic_auth_username="stage-user",
+            staging_basic_auth_password="stage-pass",
+            staging_allowed_email_recipients=("approved@example.com",),
+            staging_allow_real_outlook=True,
+            staging_allow_real_outlook_send=False,
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
+        )
+        prior_revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            approval_request_id=51,
+            workflow_action_id=61,
+            recipient_email="approved@example.com",
+            is_current=True,
+        )
+        action = SimpleNamespace(workflow_action_id=61, target_adapter_code="outlook")
+        approval = SimpleNamespace(
+            approval_request_id=51,
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference="workflow_action:61:draft_revision:41",
+        )
+        event = SimpleNamespace(
+            event_type_code="outlook_draft_reconciled_after_adapter_code_mismatch",
+            structured_payload={
+                "workflow_action_id": 61,
+                "draft_revision_id": 41,
+                "external_reference": "outlook:message:immutable-draft-id",
+            },
+        )
+        snapshot = SimpleNamespace(
+            workflow_events=(event,),
+            find_workflow_action=lambda _action_id: action,
+            find_approval_request=lambda _approval_id: approval,
+        )
+
+        with patch.object(service, "_load_draft_revision_by_id", return_value=prior_revision), patch.object(
+            service, "_require_case_snapshot", return_value=snapshot
+        ), patch("tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env") as build_adapter, patch.object(
+            service, "_create_console_event"
+        ) as create_event, patch.object(service, "_create_draft_revision") as create_revision:
+            reports = [
+                service.inspect_human_edited_outlook_preflight(rental_case_id=1, draft_revision_id=41)
+                for _ in range(3)
+            ]
+
+        self.assertTrue(all(report.success for report in reports))
+        self.assertTrue(all("Outcome: OUTLOOK_HUMAN_EDIT_PREFLIGHT_PASS" in report.lines for report in reports))
+        self.assertTrue(all("Graph operations: 0" in report.lines for report in reports))
+        build_adapter.assert_not_called()
+        create_event.assert_not_called()
+        create_revision.assert_not_called()
+
+    def test_pre_graph_read_failure_includes_repository_operation_without_sensitive_sql(self) -> None:
+        failure = TestConsoleReadError(
+            "Console read failed.\n\nReason:\nDATABASE_READ_FAILED",
+            failure_code="DATABASE_READ_FAILED",
+            diagnostics={
+                "operation": "test_console_database_query",
+                "query_fingerprint": "safe-fingerprint",
+                "tables": ["public.rental_cases"],
+                "error_class": "OperationalError",
+                "sqlstate": "08006",
+            },
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            query_runner=lambda _sql, *, expect_json: (_ for _ in ()).throw(failure),
+        )
+        runner = service._pre_graph_query_runner(operation="outlook_human_edit.draft_revision", reads=[])
+
+        with self.assertRaises(TestConsoleReadError) as error:
+            runner("select * from public.rental_cases where id = 41", expect_json=True)
+
+        self.assertEqual(error.exception.failure_code, "DATABASE_READ_FAILED")
+        self.assertEqual(error.exception.diagnostics["repository_operation"], "outlook_human_edit.draft_revision")
+        self.assertEqual(error.exception.diagnostics["sqlstate"], "08006")
+        self.assertEqual(error.exception.diagnostics["tables"], ["public.rental_cases"])
+        self.assertNotIn("sql", error.exception.diagnostics)
+
     def test_human_edit_reconciliation_creates_only_a_new_approval_bound_revision(self) -> None:
         runtime = AppRuntimeConfig(
             app_env=AppEnvironment.STAGING,

@@ -444,6 +444,31 @@ class OperationReport:
 
 
 @dataclass(frozen=True)
+class _PreGraphReadRecord:
+    operation: str
+    query_fingerprint: str
+    tables: tuple[str, ...]
+    elapsed_ms: float
+
+    def report_line(self) -> str:
+        table_names = ", ".join(self.tables) or "(none detected)"
+        return (
+            f"Read: {self.operation}; query: {self.query_fingerprint}; tables: {table_names}; "
+            f"fresh connection: yes; elapsed_ms: {self.elapsed_ms:.1f}"
+        )
+
+
+@dataclass(frozen=True)
+class _OutlookHumanEditPreflight:
+    prior_revision: InquiryResponseDraftRevision
+    snapshot: WorkflowOrchestrationCaseSnapshot
+    action: WorkflowAction
+    approval: ApprovalRequest
+    graph_message_id: str
+    reads: tuple[_PreGraphReadRecord, ...]
+
+
+@dataclass(frozen=True)
 class _OutlookDraftIdentityAssessment:
     configured_mailbox: str | None
     graph_from_mailbox: str | None
@@ -643,6 +668,17 @@ def _build_test_console_query_runner(timeout_seconds: float) -> Callable[..., An
 
 def _safe_database_read_diagnostics(sql: str, exc: BaseException) -> dict[str, Any]:
     """Expose stable query identity without leaking SQL, row data, or connection details."""
+    diagnostics = _safe_database_read_identity(sql)
+    database_error = exc.__cause__ or exc
+    diagnostics["error_class"] = type(database_error).__name__
+    sqlstate = getattr(database_error, "sqlstate", None)
+    if isinstance(sqlstate, str) and re.fullmatch(r"[0-9A-Z]{5}", sqlstate):
+        diagnostics["sqlstate"] = sqlstate
+    return diagnostics
+
+
+def _safe_database_read_identity(sql: str) -> dict[str, Any]:
+    """Return the non-sensitive identity of a read query for operator diagnostics."""
     normalized_sql = " ".join(sql.split())
     tables = sorted(
         set(
@@ -653,17 +689,11 @@ def _safe_database_read_diagnostics(sql: str, exc: BaseException) -> dict[str, A
             )
         )
     )
-    database_error = exc.__cause__ or exc
-    diagnostics: dict[str, Any] = {
+    return {
         "operation": "test_console_database_query",
         "query_fingerprint": hashlib.sha256(normalized_sql.encode("utf-8")).hexdigest()[:16],
         "tables": tables,
-        "error_class": type(database_error).__name__,
     }
-    sqlstate = getattr(database_error, "sqlstate", None)
-    if isinstance(sqlstate, str) and re.fullmatch(r"[0-9A-Z]{5}", sqlstate):
-        diagnostics["sqlstate"] = sqlstate
-    return diagnostics
 
 
 def _format_stage_timings(stage_timings: dict[str, float]) -> str:
@@ -2823,6 +2853,36 @@ limit 1;
             ),
         )
 
+    def inspect_human_edited_outlook_preflight(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> OperationReport:
+        """Run the complete reconciliation read boundary without constructing a provider adapter."""
+        prepared = self._prepare_outlook_human_edit_reconciliation(
+            rental_case_id=rental_case_id,
+            draft_revision_id=draft_revision_id,
+        )
+        if isinstance(prepared, OperationReport):
+            return prepared
+        return OperationReport(
+            title="Outlook Human Edit Preflight Verified",
+            success=True,
+            lines=(
+                "Outcome: OUTLOOK_HUMAN_EDIT_PREFLIGHT_PASS",
+                "Read mode: provider-free",
+                "Graph operations: 0",
+                "Outlook adapter constructed: no",
+                "Database reads: 3",
+                *(read.report_line() for read in prepared.reads),
+                f"Originating DraftRevision: {prepared.prior_revision.inquiry_response_draft_revision_id}",
+                f"WorkflowAction: {prepared.action.workflow_action_id}",
+                f"ApprovalRequest: {prepared.approval.approval_request_id}",
+                "Graph binding: exactly one",
+            ),
+        )
+
     def reconcile_human_edited_outlook_draft(
         self,
         *,
@@ -2830,55 +2890,16 @@ limit 1;
         draft_revision_id: int,
     ) -> OperationReport:
         """Accept one human Outlook edit only after a read-only governed revalidation."""
+        prepared = self._prepare_outlook_human_edit_reconciliation(
+            rental_case_id=rental_case_id,
+            draft_revision_id=draft_revision_id,
+        )
+        if isinstance(prepared, OperationReport):
+            return prepared
         runtime = self.config.runtime
-        if (
-            not runtime.is_staging
-            or not self.config.allow_real_providers
-            or not runtime.staging_allow_real_outlook
-            or runtime.staging_allow_real_outlook_send
-        ):
-            return self._outlook_human_edit_safety_blocked(
-                "Staging requires Outlook draft-only authorization with sending disabled."
-            )
-        prior_revision = self._load_draft_revision_by_id(rental_case_id, draft_revision_id)
-        if prior_revision is None or not prior_revision.is_current or prior_revision.approval_request_id is None:
-            return self._outlook_human_edit_safety_blocked(
-                "The originating revision is not the current approval-bound draft."
-            )
-        if not runtime.is_email_recipient_allowed(prior_revision.recipient_email):
-            return self._outlook_human_edit_safety_blocked(
-                "The originating draft recipient is not allowlisted for staging."
-            )
-        snapshot = self._require_case_snapshot(rental_case_id)
-        action = snapshot.find_workflow_action(prior_revision.workflow_action_id)
-        approval = snapshot.find_approval_request(prior_revision.approval_request_id)
-        if (
-            action is None
-            or action.target_adapter_code != "outlook"
-            or approval is None
-            or approval.status != APPROVAL_REQUEST_STATUS_APPROVED
-            or approval.target_entity_reference
-            != f"workflow_action:{action.workflow_action_id}:draft_revision:{prior_revision.inquiry_response_draft_revision_id}"
-        ):
-            return self._outlook_human_edit_safety_blocked(
-                "The originating Outlook action or exact-revision approval binding is invalid."
-            )
-        graph_message_ids = {
-            _outlook_message_id_from_external_reference(str(event.structured_payload.get("external_reference") or ""))
-            for event in snapshot.workflow_events
-            if (
-                event.event_type_code == "outlook_draft_reconciled_after_adapter_code_mismatch"
-                and event.structured_payload.get("workflow_action_id") == action.workflow_action_id
-                and event.structured_payload.get("draft_revision_id")
-                == prior_revision.inquiry_response_draft_revision_id
-            )
-        }
-        graph_message_ids.discard(None)
-        if len(graph_message_ids) != 1:
-            return self._outlook_human_edit_safety_blocked(
-                "The originating Graph draft binding is missing or ambiguous."
-            )
-        graph_message_id = next(iter(graph_message_ids))
+        prior_revision = prepared.prior_revision
+        action = prepared.action
+        graph_message_id = prepared.graph_message_id
         adapter = build_outlook_execution_adapter_from_env(send_enabled=False)
         availability_failure = adapter.read_availability_failure_code()
         if availability_failure is not None:
@@ -3114,6 +3135,131 @@ limit 1;
             ),
             failure_codes=(failure_code,),
         )
+
+    def _prepare_outlook_human_edit_reconciliation(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> _OutlookHumanEditPreflight | OperationReport:
+        """Load and verify every governed fact required before the sole Graph read."""
+        runtime = self.config.runtime
+        if (
+            not runtime.is_staging
+            or not self.config.allow_real_providers
+            or not runtime.staging_allow_real_outlook
+            or runtime.staging_allow_real_outlook_send
+        ):
+            return self._outlook_human_edit_safety_blocked(
+                "Staging requires Outlook draft-only authorization with sending disabled."
+            )
+
+        reads: list[_PreGraphReadRecord] = []
+        prior_revision = self._load_draft_revision_by_id(
+            rental_case_id,
+            draft_revision_id,
+            query_runner=self._pre_graph_query_runner(
+                operation="outlook_human_edit.draft_revision",
+                reads=reads,
+            ),
+        )
+        if prior_revision is None or not prior_revision.is_current or prior_revision.approval_request_id is None:
+            return self._outlook_human_edit_safety_blocked(
+                "The originating revision is not the current approval-bound draft."
+            )
+        if not runtime.is_email_recipient_allowed(prior_revision.recipient_email):
+            return self._outlook_human_edit_safety_blocked(
+                "The originating draft recipient is not allowlisted for staging."
+            )
+
+        metadata_runner = self._pre_graph_query_runner(
+            operation="outlook_human_edit.test_case_metadata",
+            reads=reads,
+        )
+        snapshot_runner = self._pre_graph_query_runner(
+            operation="outlook_human_edit.canonical_case_snapshot",
+            reads=reads,
+        )
+        repository = self.orchestration_repository
+        if isinstance(repository, SupabaseWorkflowOrchestrationRepository):
+            repository = replace(repository, query_runner=snapshot_runner)
+        snapshot = self._require_case_snapshot(
+            rental_case_id,
+            metadata_query_runner=metadata_runner,
+            orchestration_repository=repository,
+        )
+        action = snapshot.find_workflow_action(prior_revision.workflow_action_id)
+        approval = snapshot.find_approval_request(prior_revision.approval_request_id)
+        if (
+            action is None
+            or action.target_adapter_code != "outlook"
+            or approval is None
+            or approval.status != APPROVAL_REQUEST_STATUS_APPROVED
+            or approval.target_entity_reference
+            != f"workflow_action:{action.workflow_action_id}:draft_revision:{prior_revision.inquiry_response_draft_revision_id}"
+        ):
+            return self._outlook_human_edit_safety_blocked(
+                "The originating Outlook action or exact-revision approval binding is invalid."
+            )
+        graph_message_ids = {
+            _outlook_message_id_from_external_reference(str(event.structured_payload.get("external_reference") or ""))
+            for event in snapshot.workflow_events
+            if (
+                event.event_type_code == "outlook_draft_reconciled_after_adapter_code_mismatch"
+                and event.structured_payload.get("workflow_action_id") == action.workflow_action_id
+                and event.structured_payload.get("draft_revision_id")
+                == prior_revision.inquiry_response_draft_revision_id
+            )
+        }
+        graph_message_ids.discard(None)
+        if len(graph_message_ids) != 1:
+            return self._outlook_human_edit_safety_blocked(
+                "The originating Graph draft binding is missing or ambiguous."
+            )
+        return _OutlookHumanEditPreflight(
+            prior_revision=prior_revision,
+            snapshot=snapshot,
+            action=action,
+            approval=approval,
+            graph_message_id=next(iter(graph_message_ids)),
+            reads=tuple(reads),
+        )
+
+    def _pre_graph_query_runner(
+        self,
+        *,
+        operation: str,
+        reads: list[_PreGraphReadRecord],
+    ) -> Callable[..., Any]:
+        """Label one idempotent SQL read without changing its connection or retry behavior."""
+        def runner(sql: str, *, expect_json: bool) -> Any:
+            identity = _safe_database_read_identity(sql)
+            started = time.perf_counter()
+            try:
+                result = self.query_runner(sql, expect_json=expect_json)
+            except TestConsoleReadError as exc:
+                diagnostics = {
+                    **identity,
+                    **exc.diagnostics,
+                    "repository_operation": operation,
+                    "elapsed_ms": round((time.perf_counter() - started) * 1000, 1),
+                }
+                raise TestConsoleReadError(
+                    str(exc),
+                    failure_code=exc.failure_code,
+                    diagnostics=diagnostics,
+                ) from exc
+            reads.append(
+                _PreGraphReadRecord(
+                    operation=operation,
+                    query_fingerprint=str(identity["query_fingerprint"]),
+                    tables=tuple(str(table) for table in identity["tables"]),
+                    elapsed_ms=(time.perf_counter() - started) * 1000,
+                )
+            )
+            return result
+
+        return runner
 
     def _outlook_human_edit_identity_blocked(
         self,
@@ -3751,6 +3897,8 @@ limit 1;
         self,
         rental_case_id: int,
         draft_revision_id: int,
+        *,
+        query_runner: Callable[..., Any] | None = None,
     ) -> InquiryResponseDraftRevision | None:
         sql = f"""
 select
@@ -3793,7 +3941,8 @@ where rental_case_id = {rental_case_id}
   and id = {draft_revision_id}
 limit 1;
 """.strip()
-        rows = self.query_runner(sql, expect_json=True)["rows"]
+        runner = query_runner or self.query_runner
+        rows = runner(sql, expect_json=True)["rows"]
         if not rows:
             return None
         return InquiryResponseDraftRevision.from_row(rows[0])
@@ -5057,7 +5206,12 @@ limit 1;
                 return f"{prefix}:{linked_id}"
         return None
 
-    def _load_test_case_metadata(self, rental_case_id: int) -> TestConsoleCaseMetadata:
+    def _load_test_case_metadata(
+        self,
+        rental_case_id: int,
+        *,
+        query_runner: Callable[..., Any] | None = None,
+    ) -> TestConsoleCaseMetadata:
         sql = f"""
 select
   structured_payload,
@@ -5070,7 +5224,8 @@ where rental_case_id = {rental_case_id}
 order by id asc
 limit 1;
 """.strip()
-        rows = self.query_runner(sql, expect_json=True)["rows"]
+        runner = query_runner or self.query_runner
+        rows = runner(sql, expect_json=True)["rows"]
         if not rows:
             raise TestConsoleError(
                 f"RentalCase {rental_case_id} is not marked as a test-console case. Test-only controls are blocked.",
@@ -5190,9 +5345,19 @@ on conflict (rental_case_id, event_identity_key) do nothing;
 """.strip()
         self.query_runner(sql, expect_json=False)
 
-    def _require_case_snapshot(self, rental_case_id: int) -> WorkflowOrchestrationCaseSnapshot:
-        self._load_test_case_metadata(rental_case_id)
-        snapshot = self.orchestration_repository.load_case_snapshot(rental_case_id)
+    def _require_case_snapshot(
+        self,
+        rental_case_id: int,
+        *,
+        metadata_query_runner: Callable[..., Any] | None = None,
+        orchestration_repository: Any | None = None,
+    ) -> WorkflowOrchestrationCaseSnapshot:
+        if metadata_query_runner is None:
+            self._load_test_case_metadata(rental_case_id)
+        else:
+            self._load_test_case_metadata(rental_case_id, query_runner=metadata_query_runner)
+        repository = orchestration_repository or self.orchestration_repository
+        snapshot = repository.load_case_snapshot(rental_case_id)
         if snapshot is None:
             raise TestConsoleError(f"RentalCase {rental_case_id} was not found.")
         return snapshot

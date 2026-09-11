@@ -213,6 +213,36 @@ class OperatorHarnessTests(unittest.TestCase):
         )
         self.assertEqual(captured["body"], '{"draft_provider": "deterministic_fixture"}')
 
+    def test_human_edit_preflight_uses_get_only(self) -> None:
+        captured: dict[str, object] = {}
+
+        def opener(request, timeout, context):
+            captured["url"] = request.full_url
+            captured["method"] = request.get_method()
+            captured["body"] = request.data
+            del timeout, context
+            return _FakeResponse(json.dumps({"ok": True}))
+
+        client = OperatorHarnessClient(
+            OperatorHarnessConfig(
+                base_url="https://stage.example.test",
+                username="stage-user",
+                password="stage-pass",
+            ),
+            opener=opener,
+        )
+
+        self.assertEqual(
+            client.inspect_human_edited_outlook_preflight(rental_case_id=42, draft_revision_id=143),
+            {"ok": True},
+        )
+        self.assertEqual(
+            captured["url"],
+            "https://stage.example.test/api/operator/cases/42/mailbox/drafts/143/outlook-human-edit-preflight",
+        )
+        self.assertEqual(captured["method"], "GET")
+        self.assertIsNone(captured["body"])
+
 
 if __name__ == "__main__":
     unittest.main()

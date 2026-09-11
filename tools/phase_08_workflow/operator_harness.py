@@ -216,6 +216,18 @@ class OperatorHarnessClient:
             {},
         )
 
+    def inspect_human_edited_outlook_preflight(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> dict[str, Any]:
+        """Verify all governed database reads before a separately authorized Graph GET."""
+        return self.request(
+            "GET",
+            f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-human-edit-preflight",
+        )
+
     def edit_draft(
         self,
         *,
