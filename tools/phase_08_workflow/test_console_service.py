@@ -452,21 +452,26 @@ class _OutlookDraftIdentityAssessment:
     graph_sender_display_name: str | None
     classification: str
     authorized: bool
+    unavailable_fields: tuple[str, ...]
 
-    def to_payload(self) -> dict[str, str | bool | None]:
+    def to_payload(self) -> dict[str, Any]:
         return {
             "configured_mailbox": self.configured_mailbox,
+            "graph_mailbox_target": self.configured_mailbox,
             "graph_from_mailbox": self.graph_from_mailbox,
             "graph_from_display_name": self.graph_from_display_name,
             "graph_sender_mailbox": self.graph_sender_mailbox,
             "graph_sender_display_name": self.graph_sender_display_name,
             "classification": self.classification,
             "authorized": self.authorized,
+            "identity_field_unavailable": bool(self.unavailable_fields),
+            "unavailable_fields": list(self.unavailable_fields),
         }
 
     def report_lines(self) -> tuple[str, ...]:
         return (
             f"Configured mailbox: {self.configured_mailbox or '(not configured)'}",
+            f"Graph mailbox target: {self.configured_mailbox or '(not configured)'}",
             f"Graph from: {_outlook_identity_line(self.graph_from_mailbox, self.graph_from_display_name)}",
             f"Graph sender: {_outlook_identity_line(self.graph_sender_mailbox, self.graph_sender_display_name)}",
             f"Mailbox identity decision: {'authorized' if self.authorized else 'blocked'}",
@@ -3114,7 +3119,7 @@ limit 1;
             lines=(
                 "Outcome: OUTLOOK_DRAFT_IDENTITY_MISMATCH_CONFIRMED",
                 *identity.report_lines(),
-                "The Graph from mailbox does not exactly match the configured staging mailbox.",
+                "A Graph-provided mailbox identity conflicts with the configured staging mailbox.",
                 "Graph mutations: 0",
             ),
             failure_codes=("OUTLOOK_DRAFT_IDENTITY_MISMATCH_CONFIRMED",),
@@ -5254,33 +5259,32 @@ def _assess_outlook_draft_identity(
     graph_sender_mailbox: str | None,
     graph_sender_display_name: str | None,
 ) -> _OutlookDraftIdentityAssessment:
-    """Require exact configured mailbox ownership without treating delegation as ownership."""
+    """Assess only Graph-provided identities; the caller enforces path and ID binding."""
     configured = _canonical_outlook_mailbox_address(configured_mailbox)
     graph_from = _canonical_outlook_mailbox_address(graph_from_mailbox)
     graph_sender = _canonical_outlook_mailbox_address(graph_sender_mailbox)
-    if configured is None or graph_from is None:
-        classification = "FROM_OR_SENDER_MISSING_ON_DRAFT"
+    unavailable_fields = tuple(
+        field_name
+        for field_name, mailbox in (("from", graph_from), ("sender", graph_sender))
+        if mailbox is None
+    )
+    conflicting_fields = tuple(
+        field_name
+        for field_name, mailbox in (("from", graph_from), ("sender", graph_sender))
+        if mailbox is not None and mailbox != configured
+    )
+    if configured is None:
+        classification = "MAILBOX_IDENTITY_CONFLICT"
         authorized = False
-    elif graph_from == configured:
-        if graph_from_mailbox != configured_mailbox:
-            classification = "CASE_ONLY_ADDRESS_DIFFERENCE"
-        elif graph_sender is None:
-            classification = "FROM_MATCHES_SENDER_MISSING"
-        elif graph_sender == graph_from:
-            classification = "IDENTITY_MATCH"
-        else:
-            # Graph uses sender for the generating/delegated account; from owns the draft.
-            classification = "FROM_MATCHES_SENDER_DIFFERS"
+    elif conflicting_fields:
+        classification = "MAILBOX_IDENTITY_CONFLICT"
+        authorized = False
+    elif unavailable_fields:
+        classification = "MAILBOX_IDENTITY_FIELDS_ABSENT"
         authorized = True
-    elif graph_sender == configured:
-        classification = "SENDER_MATCHES_FROM_DIFFERS"
-        authorized = False
-    elif graph_sender is None:
-        classification = "UNEXPECTED_DIFFERENT_MAILBOX"
-        authorized = False
     else:
-        classification = "IDENTITY_MISMATCH_OTHER"
-        authorized = False
+        classification = "MAILBOX_IDENTITY_MATCH"
+        authorized = True
     return _OutlookDraftIdentityAssessment(
         configured_mailbox=configured,
         graph_from_mailbox=graph_from,
@@ -5289,6 +5293,7 @@ def _assess_outlook_draft_identity(
         graph_sender_display_name=graph_sender_display_name,
         classification=classification,
         authorized=authorized,
+        unavailable_fields=unavailable_fields,
     )
 
 

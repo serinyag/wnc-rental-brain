@@ -341,6 +341,7 @@ class OutlookAdapterTests(unittest.TestCase):
         self.assertEqual(result.sender_mailbox, "delegate@wnc.example")
         self.assertEqual(result.sender_display_name, "Delegated App")
         self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
+        self.assertIn("/users/sales%40wnc.example/messages/", str(transport.requests[1]["url"]))
         self.assertIn("/messages/immutable-draft-id?", str(transport.requests[1]["url"]))
         self.assertNotIn("/send", str(transport.requests[1]["url"]))
 

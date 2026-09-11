@@ -510,8 +510,6 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 body_content_type="text",
                 to_recipients=("approved@example.com",),
                 is_draft=True,
-                from_mailbox="approved@example.com",
-                sender_mailbox="approved@example.com",
             ),
         )
         contract = SimpleNamespace(
@@ -542,7 +540,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             service, "_create_draft_revision", return_value=created_revision
         ) as create_revision, patch.object(service, "_replace_draft_approval", return_value=new_approval), patch.object(
             service, "_bind_approval_request_to_draft_revision", return_value=created_revision
-        ), patch.object(service, "_create_console_event"):
+        ), patch.object(service, "_create_console_event") as create_event:
             report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
 
         self.assertTrue(report.success)
@@ -556,60 +554,64 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             created_by_reference="test_console:operator",
             supersedes_draft_revision_id=41,
         )
+        identity_evidence = create_event.call_args_list[0].kwargs["structured_payload"]["mailbox_identity"]
+        self.assertEqual(identity_evidence["classification"], "MAILBOX_IDENTITY_FIELDS_ABSENT")
+        self.assertEqual(identity_evidence["unavailable_fields"], ["from", "sender"])
+        self.assertTrue(identity_evidence["identity_field_unavailable"])
+        self.assertEqual(identity_evidence["graph_mailbox_target"], "approved@example.com")
 
-    def test_outlook_draft_identity_allows_exact_canonical_from_match(self) -> None:
+    def test_outlook_draft_identity_allows_matching_fields_with_canonical_smtp(self) -> None:
         identity = _assess_outlook_draft_identity(
             configured_mailbox="Serinya@whennaturecalls.nl",
             graph_from_mailbox=" serinya@whennaturecalls.nl ",
             graph_from_display_name="Serinya",
-            graph_sender_mailbox="delegate@whennaturecalls.nl",
-            graph_sender_display_name="Graph Delegate",
+            graph_sender_mailbox="SERINYA@whennaturecalls.nl",
+            graph_sender_display_name="Ignored display name",
         )
 
         self.assertTrue(identity.authorized)
-        self.assertEqual(identity.classification, "CASE_ONLY_ADDRESS_DIFFERENCE")
+        self.assertEqual(identity.classification, "MAILBOX_IDENTITY_MATCH")
         self.assertEqual(identity.configured_mailbox, "serinya@whennaturecalls.nl")
         self.assertEqual(identity.graph_from_mailbox, "serinya@whennaturecalls.nl")
+        self.assertEqual(identity.graph_sender_mailbox, "serinya@whennaturecalls.nl")
 
-    def test_outlook_draft_identity_allows_matching_from_with_different_sender(self) -> None:
-        identity = _assess_outlook_draft_identity(
-            configured_mailbox="serinya@whennaturecalls.nl",
-            graph_from_mailbox="serinya@whennaturecalls.nl",
-            graph_from_display_name=None,
-            graph_sender_mailbox="delegated-app@whennaturecalls.nl",
-            graph_sender_display_name=None,
-        )
-
-        self.assertTrue(identity.authorized)
-        self.assertEqual(identity.classification, "FROM_MATCHES_SENDER_DIFFERS")
-
-    def test_outlook_draft_identity_blocks_different_or_booking_from_mailboxes(self) -> None:
-        for graph_from_mailbox in ("other@whennaturecalls.nl", "booking@whennaturecalls.nl"):
-            with self.subTest(graph_from_mailbox=graph_from_mailbox):
+    def test_outlook_draft_identity_allows_matching_or_absent_optional_fields(self) -> None:
+        for graph_from_mailbox, graph_sender_mailbox, unavailable_fields in (
+            ("serinya@whennaturecalls.nl", None, ("sender",)),
+            (None, "serinya@whennaturecalls.nl", ("from",)),
+            (None, None, ("from", "sender")),
+        ):
+            with self.subTest(graph_from_mailbox=graph_from_mailbox, graph_sender_mailbox=graph_sender_mailbox):
                 identity = _assess_outlook_draft_identity(
                     configured_mailbox="serinya@whennaturecalls.nl",
                     graph_from_mailbox=graph_from_mailbox,
                     graph_from_display_name=None,
-                    graph_sender_mailbox="serinya@whennaturecalls.nl",
+                    graph_sender_mailbox=graph_sender_mailbox,
                     graph_sender_display_name=None,
                 )
 
-                self.assertFalse(identity.authorized)
-                self.assertEqual(identity.classification, "SENDER_MATCHES_FROM_DIFFERS")
+                self.assertTrue(identity.authorized)
+                self.assertEqual(identity.classification, "MAILBOX_IDENTITY_FIELDS_ABSENT")
+                self.assertEqual(identity.unavailable_fields, unavailable_fields)
 
-    def test_outlook_draft_identity_does_not_accept_arbitrary_or_alias_mailboxes(self) -> None:
-        for graph_from_mailbox in ("unrelated@example.net", "serinya-alias@whennaturecalls.nl"):
-            with self.subTest(graph_from_mailbox=graph_from_mailbox):
+    def test_outlook_draft_identity_blocks_conflicting_or_booking_mailboxes(self) -> None:
+        for graph_from_mailbox, graph_sender_mailbox in (
+            ("other@whennaturecalls.nl", "serinya@whennaturecalls.nl"),
+            ("serinya@whennaturecalls.nl", "other@whennaturecalls.nl"),
+            ("booking@whennaturecalls.nl", None),
+            ("serinya-alias@whennaturecalls.nl", None),
+        ):
+            with self.subTest(graph_from_mailbox=graph_from_mailbox, graph_sender_mailbox=graph_sender_mailbox):
                 identity = _assess_outlook_draft_identity(
                     configured_mailbox="serinya@whennaturecalls.nl",
                     graph_from_mailbox=graph_from_mailbox,
                     graph_from_display_name=None,
-                    graph_sender_mailbox=None,
+                    graph_sender_mailbox=graph_sender_mailbox,
                     graph_sender_display_name=None,
                 )
 
                 self.assertFalse(identity.authorized)
-                self.assertEqual(identity.classification, "UNEXPECTED_DIFFERENT_MAILBOX")
+                self.assertEqual(identity.classification, "MAILBOX_IDENTITY_CONFLICT")
 
     def test_human_edit_reconciliation_blocks_action_binding_mismatch_before_graph_read(self) -> None:
         runtime = AppRuntimeConfig(
