@@ -14,6 +14,7 @@ from tools.phase_08_workflow.contracts import (
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
     ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+    EXECUTION_ATTEMPT_STATUS_FAILED,
     EXECUTION_ATTEMPT_STATUS_SUCCEEDED,
     FOLLOW_UP_STATUS_SCHEDULED,
     FOLLOW_UP_URGENCY_MEDIUM,
@@ -27,6 +28,7 @@ from tools.phase_08_workflow.contracts import (
     WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
 )
 from tools.phase_08_workflow.asana_adapter import AsanaAdapterConfig
+from tools.phase_08_workflow.execution_types import NormalizedExecutionResult
 from tools.phase_08_workflow.governed_client_response import ClientResponseProviderError, DeterministicFakeClientResponseProvider
 from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig
 from tools.phase_08_workflow.observation_contracts import InboundObservation, InboundObservationEffect, InboundSourceRecord
@@ -44,6 +46,7 @@ from tools.phase_08_workflow.test_console_service import (
     TestConsoleError,
     TestConsoleReadError,
     TestConsoleService,
+    _ProjectedWorkflowActionExecutionAdapter,
 )
 
 
@@ -452,6 +455,29 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         self.assertIsNotNone(registry.resolve("outlook"))
         build_adapter.assert_called_once_with(send_enabled=False)
+
+    def test_projected_outlook_adapter_preserves_provider_outcome_under_canonical_action_code(self) -> None:
+        provider_result = NormalizedExecutionResult(
+            adapter_code="email",
+            attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
+            response_snapshot={"stage": "draft_created_send_disabled"},
+            external_reference="outlook:message:immutable-id",
+            failure_code="adapter_forbidden",
+        )
+        adapter = _ProjectedWorkflowActionExecutionAdapter(
+            delegate=SimpleNamespace(execute=lambda **_kwargs: provider_result),
+            projected_action=make_action(target_adapter_code="outlook"),
+        )
+
+        result = adapter.execute(
+            action=make_action(target_adapter_code="outlook"),
+            execution_context=SimpleNamespace(),
+            idempotency=SimpleNamespace(),
+        )
+
+        self.assertEqual(result.adapter_code, "outlook")
+        self.assertEqual(result.external_reference, "outlook:message:immutable-id")
+        self.assertEqual(result.response_snapshot["stage"], "draft_created_send_disabled")
 
     def test_governed_outlook_execution_projects_the_current_approved_draft(self) -> None:
         service = TestConsoleService(

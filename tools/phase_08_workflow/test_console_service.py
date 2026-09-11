@@ -257,12 +257,16 @@ class _ProjectedWorkflowActionExecutionAdapter:
         return self.delegate.availability_failure_code(action=self.projected_action)
 
     def execute(self, *, action: WorkflowAction, execution_context: Any, idempotency: Any) -> Any:
-        del action
-        return self.delegate.execute(
+        result = self.delegate.execute(
             action=self.projected_action,
             execution_context=execution_context,
             idempotency=idempotency,
         )
+        # The provider projection may be registered under a canonical action code
+        # (for example, ``outlook``) while the provider uses its legacy ``email`` code.
+        if isinstance(result, NormalizedExecutionResult):
+            return replace(result, adapter_code=action.target_adapter_code)
+        return result
 
 
 @dataclass(frozen=True)
