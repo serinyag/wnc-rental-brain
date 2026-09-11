@@ -727,6 +727,12 @@ class TestConsoleService:
         application = HealthComponentReport(
             status="ok",
             detail="WSGI application responded.",
+            metrics={
+                "outlook_human_edit_identity_policy": (
+                    "trusted_configured_mailbox_and_bound_graph_id; "
+                    "provided_smtp_fields_must_match; absent_identity_fields_allowed"
+                ),
+            },
         )
         provider_statuses = self._provider_health_statuses()
         try:

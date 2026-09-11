@@ -1102,6 +1102,11 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(report.database.status, "ok")
         self.assertEqual(report.phase5.status, "warn")
         self.assertEqual(report.phase6.status, "ok")
+        self.assertEqual(
+            report.application.metrics["outlook_human_edit_identity_policy"],
+            "trusted_configured_mailbox_and_bound_graph_id; "
+            "provided_smtp_fields_must_match; absent_identity_fields_allowed",
+        )
         self.assertEqual(report.providers["outlook"], "disabled")
         self.assertEqual(report.providers["asana"], "disabled")
 
