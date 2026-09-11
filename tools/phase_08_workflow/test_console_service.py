@@ -76,6 +76,7 @@ from .execution_types import (
     EXECUTION_ATTEMPT_STATUS_FAILED,
     EXECUTION_ATTEMPT_STATUS_SUCCEEDED,
     EXECUTION_FAILURE_ADAPTER_OUTCOME_AMBIGUOUS,
+    EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
     FollowUpEvaluationRequest,
     NormalizedExecutionResult,
     WorkflowActionExecutionRequest,
@@ -2634,6 +2635,95 @@ limit 1;
             failure_codes=() if result.outcome != "read_failed" else (result.failure_code or "outlook_draft_read_failed",),
         )
 
+    def reconcile_governed_outlook_draft(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> OperationReport:
+        """Append verified provider evidence without rewriting an immutable attempt."""
+        read_report = self.inspect_governed_outlook_draft(
+            rental_case_id=rental_case_id,
+            draft_revision_id=draft_revision_id,
+        )
+        if not read_report.success:
+            return read_report
+        message_id = _report_line_value(read_report.lines, "Graph message id: ")
+        if _report_line_value(read_report.lines, "Read outcome: ") != "found" or message_id is None:
+            return OperationReport(
+                title="Outlook Draft Reconciliation Not Recorded",
+                success=False,
+                lines=read_report.lines,
+                failure_codes=("outlook_draft_reconciliation_requires_exact_graph_match",),
+            )
+        revision = self._load_draft_revision_by_id(rental_case_id, draft_revision_id)
+        snapshot = self._require_case_snapshot(rental_case_id)
+        if revision is None:
+            raise TestConsoleError(
+                f"Inquiry draft revision {draft_revision_id} was not found for RentalCase {rental_case_id}.",
+                failure_code="INQUIRY_DRAFT_NOT_FOUND",
+                status=HTTPStatus.NOT_FOUND,
+            )
+        action = snapshot.find_workflow_action(revision.workflow_action_id)
+        matching_attempts = tuple(
+            attempt
+            for attempt in snapshot.execution_attempts
+            if (
+                attempt.workflow_action_id == revision.workflow_action_id
+                and attempt.adapter_code == "outlook"
+                and attempt.external_reference is None
+                and attempt.failure_code == EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED
+                and isinstance(attempt.response_snapshot, dict)
+                and attempt.response_snapshot.get("reason") == "adapter_code_mismatch"
+            )
+        )
+        if action is None or action.target_adapter_code != "outlook" or len(matching_attempts) != 1:
+            return OperationReport(
+                title="Outlook Draft Reconciliation Not Recorded",
+                success=False,
+                lines=read_report.lines,
+                failure_codes=("outlook_draft_reconciliation_binding_ambiguous",),
+            )
+        attempt = matching_attempts[0]
+        external_reference = f"outlook:message:{message_id}"
+        self._create_console_event(
+            rental_case_id=rental_case_id,
+            event_type_code="outlook_draft_reconciled_after_adapter_code_mismatch",
+            source_reference=f"execution_attempt:{attempt.execution_attempt_id}",
+            occurred_at=self.now(),
+            structured_payload={
+                "reconciliation_mode": "graph_get_exact_match",
+                "execution_attempt_id": attempt.execution_attempt_id,
+                "workflow_action_id": action.workflow_action_id,
+                "draft_revision_id": revision.inquiry_response_draft_revision_id,
+                "approval_request_id": revision.approval_request_id,
+                "canonical_adapter_code": action.target_adapter_code,
+                "historical_attempt_adapter_code": attempt.adapter_code,
+                "historical_failure_code": attempt.failure_code,
+                "historical_failure_reason": attempt.response_snapshot.get("reason"),
+                "external_reference": external_reference,
+                "provider_outcome": "draft_created_send_disabled",
+                "is_draft": True,
+                "recipient_matches": True,
+                "subject_matches": True,
+                "body_matches": True,
+                "send_enabled": False,
+            },
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+        )
+        return OperationReport(
+            title="Prior Outlook Draft Reconciled",
+            success=True,
+            lines=(
+                *read_report.lines,
+                f"Execution attempt id: {attempt.execution_attempt_id}",
+                f"Workflow action id: {action.workflow_action_id}",
+                f"External reference recorded in audit event: {external_reference}",
+                "Historical execution attempt left immutable: yes",
+            ),
+        )
+
     def edit_inquiry_response_draft(
         self,
         *,
@@ -4704,6 +4794,14 @@ def _normalize_optional_text(value: str | None) -> str | None:
         return None
     trimmed = value.strip()
     return trimmed or None
+
+
+def _report_line_value(lines: tuple[str, ...], prefix: str) -> str | None:
+    for line in lines:
+        if line.startswith(prefix):
+            value = line.removeprefix(prefix).strip()
+            return value or None
+    return None
 
 
 def _normalize_task_surface_context_lines(value: list[str] | None) -> tuple[str, ...]:

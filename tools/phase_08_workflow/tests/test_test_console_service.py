@@ -39,6 +39,7 @@ from tools.phase_08_workflow.test_console_projection import TestConsoleCaseMetad
 from tools.phase_08_workflow.test_console_service import (
     TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV,
     HealthComponentReport,
+    OperationReport,
     TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV,
     TEST_CONSOLE_DEFAULT_WORKFLOW_EVENT_LIMIT,
     TEST_CONSOLE_DEFAULT_RENTAL_TYPE_CODE,
@@ -481,6 +482,55 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertIn("Read mode: Microsoft Graph GET only", report.lines)
         self.assertIn("Graph message id: immutable-draft-id", report.lines)
         self.assertIn("Body matches: yes", report.lines)
+
+    def test_outlook_draft_reconciliation_appends_evidence_without_rewriting_attempt(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            approval_request_id=51,
+            workflow_action_id=61,
+        )
+        action = SimpleNamespace(workflow_action_id=61, target_adapter_code="outlook")
+        attempt = SimpleNamespace(
+            execution_attempt_id=71,
+            workflow_action_id=61,
+            adapter_code="outlook",
+            external_reference=None,
+            failure_code="adapter_result_malformed",
+            response_snapshot={"reason": "adapter_code_mismatch"},
+        )
+        snapshot = SimpleNamespace(
+            execution_attempts=(attempt,),
+            find_workflow_action=lambda _action_id: action,
+        )
+        read_report = OperationReport(
+            title="Outlook Draft Read Completed",
+            success=True,
+            lines=(
+                "Read mode: Microsoft Graph GET only",
+                "Read outcome: found",
+                "Graph message id: immutable-draft-id",
+            ),
+        )
+
+        with patch.object(service, "inspect_governed_outlook_draft", return_value=read_report), patch.object(
+            service, "_load_draft_revision_by_id", return_value=revision
+        ), patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
+            service, "_create_console_event"
+        ) as create_event:
+            report = service.reconcile_governed_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+        self.assertTrue(report.success)
+        self.assertIn("Historical execution attempt left immutable: yes", report.lines)
+        payload = create_event.call_args.kwargs["structured_payload"]
+        self.assertEqual(payload["execution_attempt_id"], 71)
+        self.assertEqual(payload["canonical_adapter_code"], "outlook")
+        self.assertEqual(payload["external_reference"], "outlook:message:immutable-draft-id")
+        self.assertFalse(payload["send_enabled"])
 
     def test_staging_asana_real_mode_requires_provider_authorization(self) -> None:
         service = TestConsoleService(

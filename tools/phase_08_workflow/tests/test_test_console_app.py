@@ -174,6 +174,14 @@ class _FakeService:
             lines=("Read mode: Microsoft Graph GET only", "Read outcome: no_match"),
         )
 
+    def reconcile_governed_outlook_draft(self, **kwargs) -> OperationReport:
+        del kwargs
+        return OperationReport(
+            title="Prior Outlook Draft Reconciled",
+            success=True,
+            lines=("Historical execution attempt left immutable: yes",),
+        )
+
     def edit_inquiry_response_draft(self, **kwargs) -> OperationReport:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Saved", success=True, lines=("Draft revision id: 10",))
@@ -687,6 +695,22 @@ class TestConsoleAppTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["report"]["title"], "Outlook Draft Read Completed")
         self.assertIn("Read mode: Microsoft Graph GET only", payload["report"]["lines"])
+
+    def test_operator_api_records_outlook_reconciliation_evidence(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/1/mailbox/drafts/10/outlook-reconcile",
+            body=b"{}",
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["title"], "Prior Outlook Draft Reconciled")
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(

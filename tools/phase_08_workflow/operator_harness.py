@@ -190,6 +190,19 @@ class OperatorHarnessClient:
             f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-read",
         )
 
+    def reconcile_governed_outlook_draft(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> dict[str, Any]:
+        """Record one verified Graph draft as append-only staging audit evidence."""
+        return self.request(
+            "POST",
+            f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-reconcile",
+            {},
+        )
+
     def edit_draft(
         self,
         *,
