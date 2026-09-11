@@ -316,7 +316,8 @@ class OutlookAdapterTests(unittest.TestCase):
                     {
                         "id": "immutable-draft-id",
                         "isDraft": True,
-                        "from": {"emailAddress": {"address": "sales@wnc.example"}},
+                        "from": {"emailAddress": {"address": "sales@wnc.example", "name": "Sales Mailbox"}},
+                        "sender": {"emailAddress": {"address": "delegate@wnc.example", "name": "Delegated App"}},
                         "toRecipients": [{"emailAddress": {"address": "client@example.com"}}],
                         "ccRecipients": [],
                         "subject": "Need your event details",
@@ -335,7 +336,10 @@ class OutlookAdapterTests(unittest.TestCase):
         self.assertEqual(result.subject, "Need your event details")
         self.assertEqual(result.body, "Please confirm the final guest count.")
         self.assertEqual(result.to_recipients, ("client@example.com",))
-        self.assertEqual(result.sender_mailbox, "sales@wnc.example")
+        self.assertEqual(result.from_mailbox, "sales@wnc.example")
+        self.assertEqual(result.from_display_name, "Sales Mailbox")
+        self.assertEqual(result.sender_mailbox, "delegate@wnc.example")
+        self.assertEqual(result.sender_display_name, "Delegated App")
         self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
         self.assertIn("/messages/immutable-draft-id?", str(transport.requests[1]["url"]))
         self.assertNotIn("/send", str(transport.requests[1]["url"]))

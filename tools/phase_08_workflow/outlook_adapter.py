@@ -217,7 +217,10 @@ class OutlookDraftSnapshot:
     to_recipients: tuple[str, ...] = ()
     cc_recipients: tuple[str, ...] = ()
     is_draft: bool | None = None
+    from_mailbox: str | None = None
+    from_display_name: str | None = None
     sender_mailbox: str | None = None
+    sender_display_name: str | None = None
     last_modified_at: str | None = None
     failure_code: str | None = None
     provider_error_code: str | None = None
@@ -439,6 +442,8 @@ class OutlookExecutionAdapter:
             )
         body_content_type = body.get("contentType")
         last_modified_at = parsed.get("lastModifiedDateTime")
+        from_mailbox, from_display_name = _message_mailbox_identity(parsed, field_name="from")
+        sender_mailbox, sender_display_name = _message_mailbox_identity(parsed, field_name="sender")
         return OutlookDraftSnapshot(
             outcome="found",
             message_id=returned_message_id.strip(),
@@ -448,7 +453,10 @@ class OutlookExecutionAdapter:
             to_recipients=_message_recipient_addresses(parsed),
             cc_recipients=_message_recipient_addresses(parsed, field_name="ccRecipients"),
             is_draft=is_draft,
-            sender_mailbox=_message_sender_address(parsed),
+            from_mailbox=from_mailbox,
+            from_display_name=from_display_name,
+            sender_mailbox=sender_mailbox,
+            sender_display_name=sender_display_name,
             last_modified_at=last_modified_at if isinstance(last_modified_at, str) and last_modified_at.strip() else None,
         )
 
@@ -1072,18 +1080,22 @@ def _message_recipient_addresses(
     return tuple(addresses)
 
 
-def _message_sender_address(message: Mapping[str, Any]) -> str | None:
-    for field_name in ("sender", "from"):
-        sender = message.get(field_name)
-        if not isinstance(sender, Mapping):
-            continue
-        email_address = sender.get("emailAddress")
-        if not isinstance(email_address, Mapping):
-            continue
-        address = email_address.get("address")
-        if isinstance(address, str) and address.strip():
-            return _normalized_email_address(address)
-    return None
+def _message_mailbox_identity(
+    message: Mapping[str, Any],
+    *,
+    field_name: str,
+) -> tuple[str | None, str | None]:
+    mailbox = message.get(field_name)
+    if not isinstance(mailbox, Mapping):
+        return None, None
+    email_address = mailbox.get("emailAddress")
+    if not isinstance(email_address, Mapping):
+        return None, None
+    address = email_address.get("address")
+    display_name = email_address.get("name")
+    normalized_address = _normalized_email_address(address) if isinstance(address, str) and address.strip() else None
+    normalized_display_name = display_name.strip() if isinstance(display_name, str) and display_name.strip() else None
+    return normalized_address, normalized_display_name
 
 
 def _message_body_content(message: Mapping[str, Any]) -> str:

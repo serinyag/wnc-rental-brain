@@ -444,6 +444,37 @@ class OperationReport:
 
 
 @dataclass(frozen=True)
+class _OutlookDraftIdentityAssessment:
+    configured_mailbox: str | None
+    graph_from_mailbox: str | None
+    graph_from_display_name: str | None
+    graph_sender_mailbox: str | None
+    graph_sender_display_name: str | None
+    classification: str
+    authorized: bool
+
+    def to_payload(self) -> dict[str, str | bool | None]:
+        return {
+            "configured_mailbox": self.configured_mailbox,
+            "graph_from_mailbox": self.graph_from_mailbox,
+            "graph_from_display_name": self.graph_from_display_name,
+            "graph_sender_mailbox": self.graph_sender_mailbox,
+            "graph_sender_display_name": self.graph_sender_display_name,
+            "classification": self.classification,
+            "authorized": self.authorized,
+        }
+
+    def report_lines(self) -> tuple[str, ...]:
+        return (
+            f"Configured mailbox: {self.configured_mailbox or '(not configured)'}",
+            f"Graph from: {_outlook_identity_line(self.graph_from_mailbox, self.graph_from_display_name)}",
+            f"Graph sender: {_outlook_identity_line(self.graph_sender_mailbox, self.graph_sender_display_name)}",
+            f"Mailbox identity decision: {'authorized' if self.authorized else 'blocked'}",
+            f"Mailbox identity classification: {self.classification}",
+        )
+
+
+@dataclass(frozen=True)
 class _OutlookHumanEditDiff:
     subject_changed: bool
     body_changed: bool
@@ -2852,13 +2883,15 @@ limit 1;
                 "The originating Graph message could not be read as an existing draft.",
                 failure_code=graph_draft.failure_code or "outlook_human_edit_graph_draft_not_found",
             )
-        if (
-            graph_draft.sender_mailbox is None
-            or graph_draft.sender_mailbox.casefold() != (adapter.config.sender_mailbox or "").casefold()
-        ):
-            return self._outlook_human_edit_safety_blocked(
-                "The Graph draft sender does not match the configured staging mailbox."
-            )
+        identity = _assess_outlook_draft_identity(
+            configured_mailbox=adapter.config.sender_mailbox,
+            graph_from_mailbox=graph_draft.from_mailbox,
+            graph_from_display_name=graph_draft.from_display_name,
+            graph_sender_mailbox=graph_draft.sender_mailbox,
+            graph_sender_display_name=graph_draft.sender_display_name,
+        )
+        if not identity.authorized:
+            return self._outlook_human_edit_identity_blocked(identity)
 
         diff = _outlook_human_edit_diff(prior_revision=prior_revision, graph_draft=graph_draft)
         if not diff.meaningful_change:
@@ -2873,6 +2906,7 @@ limit 1;
                     "graph_message_id": graph_message_id,
                     "original_content_hash": prior_revision.content_hash,
                     "comparison": diff.to_payload(),
+                    "mailbox_identity": identity.to_payload(),
                     "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
                 },
                 actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
@@ -2883,6 +2917,7 @@ limit 1;
                 success=False,
                 lines=(
                     "Outcome: OUTLOOK_HUMAN_EDIT_NOT_DETECTED",
+                    *identity.report_lines(),
                     *diff.report_lines(),
                     "Graph mutations: 0",
                 ),
@@ -2901,6 +2936,7 @@ limit 1;
                 "original_content_hash": prior_revision.content_hash,
                 "candidate_content_hash": _json_digest({"subject": graph_draft.subject, "body": graph_draft.body}),
                 "comparison": diff.to_payload(),
+                "mailbox_identity": identity.to_payload(),
                 "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
             },
             actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
@@ -2941,6 +2977,7 @@ limit 1;
                     "context_hash": contract.context_hash,
                     "validation_codes": list(validation_codes),
                     "comparison": diff.to_payload(),
+                    "mailbox_identity": identity.to_payload(),
                     "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
                 },
                 actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
@@ -2954,6 +2991,7 @@ limit 1;
                     f"Validation codes: {', '.join(validation_codes)}",
                     f"Current case revision: {current_snapshot.rental_case.case_revision}",
                     f"Current context hash: {contract.context_hash}",
+                    *identity.report_lines(),
                     *diff.report_lines(),
                     "Graph mutations: 0",
                 ),
@@ -3017,6 +3055,7 @@ limit 1;
                 "content_hash": revision.content_hash,
                 "validation_result": "passed",
                 "comparison": diff.to_payload(),
+                "mailbox_identity": identity.to_payload(),
                 "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
             },
             actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
@@ -3039,6 +3078,7 @@ limit 1;
                 f"Originating revision status: {prior_revision.draft_status}",
                 f"New revision status: {revision.draft_status}",
                 "Historical execution attempt left immutable: yes",
+                *identity.report_lines(),
                 *diff.report_lines(),
                 "Graph GET calls: 1",
                 "Graph PATCH calls: 0",
@@ -3062,6 +3102,22 @@ limit 1;
                 "Graph mutations: 0",
             ),
             failure_codes=(failure_code,),
+        )
+
+    def _outlook_human_edit_identity_blocked(
+        self,
+        identity: _OutlookDraftIdentityAssessment,
+    ) -> OperationReport:
+        return OperationReport(
+            title="Outlook Draft Identity Mismatch Confirmed",
+            success=False,
+            lines=(
+                "Outcome: OUTLOOK_DRAFT_IDENTITY_MISMATCH_CONFIRMED",
+                *identity.report_lines(),
+                "The Graph from mailbox does not exactly match the configured staging mailbox.",
+                "Graph mutations: 0",
+            ),
+            failure_codes=("OUTLOOK_DRAFT_IDENTITY_MISMATCH_CONFIRMED",),
         )
 
     def _build_current_governed_draft_contract(
@@ -5175,6 +5231,65 @@ def _outlook_message_id_from_external_reference(external_reference: str) -> str 
         return None
     message_id = external_reference[len(prefix) :].strip()
     return message_id or None
+
+
+def _canonical_outlook_mailbox_address(value: str | None) -> str | None:
+    if value is None:
+        return None
+    canonical = value.strip().casefold()
+    return canonical or None
+
+
+def _outlook_identity_line(mailbox: str | None, display_name: str | None) -> str:
+    if mailbox is None:
+        return "(not returned)"
+    return f"{mailbox} ({display_name})" if display_name else mailbox
+
+
+def _assess_outlook_draft_identity(
+    *,
+    configured_mailbox: str | None,
+    graph_from_mailbox: str | None,
+    graph_from_display_name: str | None,
+    graph_sender_mailbox: str | None,
+    graph_sender_display_name: str | None,
+) -> _OutlookDraftIdentityAssessment:
+    """Require exact configured mailbox ownership without treating delegation as ownership."""
+    configured = _canonical_outlook_mailbox_address(configured_mailbox)
+    graph_from = _canonical_outlook_mailbox_address(graph_from_mailbox)
+    graph_sender = _canonical_outlook_mailbox_address(graph_sender_mailbox)
+    if configured is None or graph_from is None:
+        classification = "FROM_OR_SENDER_MISSING_ON_DRAFT"
+        authorized = False
+    elif graph_from == configured:
+        if graph_from_mailbox != configured_mailbox:
+            classification = "CASE_ONLY_ADDRESS_DIFFERENCE"
+        elif graph_sender is None:
+            classification = "FROM_MATCHES_SENDER_MISSING"
+        elif graph_sender == graph_from:
+            classification = "IDENTITY_MATCH"
+        else:
+            # Graph uses sender for the generating/delegated account; from owns the draft.
+            classification = "FROM_MATCHES_SENDER_DIFFERS"
+        authorized = True
+    elif graph_sender == configured:
+        classification = "SENDER_MATCHES_FROM_DIFFERS"
+        authorized = False
+    elif graph_sender is None:
+        classification = "UNEXPECTED_DIFFERENT_MAILBOX"
+        authorized = False
+    else:
+        classification = "IDENTITY_MISMATCH_OTHER"
+        authorized = False
+    return _OutlookDraftIdentityAssessment(
+        configured_mailbox=configured,
+        graph_from_mailbox=graph_from,
+        graph_from_display_name=graph_from_display_name,
+        graph_sender_mailbox=graph_sender,
+        graph_sender_display_name=graph_sender_display_name,
+        classification=classification,
+        authorized=authorized,
+    )
 
 
 def _canonical_outlook_transport_text(value: str) -> str:

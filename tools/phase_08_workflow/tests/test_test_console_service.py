@@ -48,6 +48,7 @@ from tools.phase_08_workflow.test_console_service import (
     TestConsoleError,
     TestConsoleReadError,
     TestConsoleService,
+    _assess_outlook_draft_identity,
     _ProjectedWorkflowActionExecutionAdapter,
 )
 
@@ -509,6 +510,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 body_content_type="text",
                 to_recipients=("approved@example.com",),
                 is_draft=True,
+                from_mailbox="approved@example.com",
                 sender_mailbox="approved@example.com",
             ),
         )
@@ -554,6 +556,171 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             created_by_reference="test_console:operator",
             supersedes_draft_revision_id=41,
         )
+
+    def test_outlook_draft_identity_allows_exact_canonical_from_match(self) -> None:
+        identity = _assess_outlook_draft_identity(
+            configured_mailbox="Serinya@whennaturecalls.nl",
+            graph_from_mailbox=" serinya@whennaturecalls.nl ",
+            graph_from_display_name="Serinya",
+            graph_sender_mailbox="delegate@whennaturecalls.nl",
+            graph_sender_display_name="Graph Delegate",
+        )
+
+        self.assertTrue(identity.authorized)
+        self.assertEqual(identity.classification, "CASE_ONLY_ADDRESS_DIFFERENCE")
+        self.assertEqual(identity.configured_mailbox, "serinya@whennaturecalls.nl")
+        self.assertEqual(identity.graph_from_mailbox, "serinya@whennaturecalls.nl")
+
+    def test_outlook_draft_identity_allows_matching_from_with_different_sender(self) -> None:
+        identity = _assess_outlook_draft_identity(
+            configured_mailbox="serinya@whennaturecalls.nl",
+            graph_from_mailbox="serinya@whennaturecalls.nl",
+            graph_from_display_name=None,
+            graph_sender_mailbox="delegated-app@whennaturecalls.nl",
+            graph_sender_display_name=None,
+        )
+
+        self.assertTrue(identity.authorized)
+        self.assertEqual(identity.classification, "FROM_MATCHES_SENDER_DIFFERS")
+
+    def test_outlook_draft_identity_blocks_different_or_booking_from_mailboxes(self) -> None:
+        for graph_from_mailbox in ("other@whennaturecalls.nl", "booking@whennaturecalls.nl"):
+            with self.subTest(graph_from_mailbox=graph_from_mailbox):
+                identity = _assess_outlook_draft_identity(
+                    configured_mailbox="serinya@whennaturecalls.nl",
+                    graph_from_mailbox=graph_from_mailbox,
+                    graph_from_display_name=None,
+                    graph_sender_mailbox="serinya@whennaturecalls.nl",
+                    graph_sender_display_name=None,
+                )
+
+                self.assertFalse(identity.authorized)
+                self.assertEqual(identity.classification, "SENDER_MATCHES_FROM_DIFFERS")
+
+    def test_outlook_draft_identity_does_not_accept_arbitrary_or_alias_mailboxes(self) -> None:
+        for graph_from_mailbox in ("unrelated@example.net", "serinya-alias@whennaturecalls.nl"):
+            with self.subTest(graph_from_mailbox=graph_from_mailbox):
+                identity = _assess_outlook_draft_identity(
+                    configured_mailbox="serinya@whennaturecalls.nl",
+                    graph_from_mailbox=graph_from_mailbox,
+                    graph_from_display_name=None,
+                    graph_sender_mailbox=None,
+                    graph_sender_display_name=None,
+                )
+
+                self.assertFalse(identity.authorized)
+                self.assertEqual(identity.classification, "UNEXPECTED_DIFFERENT_MAILBOX")
+
+    def test_human_edit_reconciliation_blocks_action_binding_mismatch_before_graph_read(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_basic_auth_username="stage-user",
+            staging_basic_auth_password="stage-pass",
+            staging_allowed_email_recipients=("approved@example.com",),
+            staging_allow_real_outlook=True,
+            staging_allow_real_outlook_send=False,
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
+        )
+        prior_revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            approval_request_id=51,
+            workflow_action_id=61,
+            recipient_email="approved@example.com",
+            is_current=True,
+        )
+        action = SimpleNamespace(workflow_action_id=61, target_adapter_code="outlook")
+        approval = SimpleNamespace(
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference="workflow_action:61:draft_revision:41",
+        )
+        mismatched_event = SimpleNamespace(
+            event_type_code="outlook_draft_reconciled_after_adapter_code_mismatch",
+            structured_payload={
+                "workflow_action_id": 62,
+                "draft_revision_id": 41,
+                "external_reference": "outlook:message:other-draft",
+            },
+        )
+        snapshot = SimpleNamespace(
+            workflow_events=(mismatched_event,),
+            find_workflow_action=lambda _action_id: action,
+            find_approval_request=lambda _approval_id: approval,
+        )
+
+        with patch.object(service, "_load_draft_revision_by_id", return_value=prior_revision), patch.object(
+            service, "_require_case_snapshot", return_value=snapshot
+        ), patch("tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env") as build_adapter:
+            report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+        self.assertFalse(report.success)
+        self.assertEqual(report.failure_codes, ("OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED",))
+        build_adapter.assert_not_called()
+
+    def test_human_edit_reconciliation_blocks_non_draft_before_creating_revision(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_basic_auth_username="stage-user",
+            staging_basic_auth_password="stage-pass",
+            staging_allowed_email_recipients=("approved@example.com",),
+            staging_allow_real_outlook=True,
+            staging_allow_real_outlook_send=False,
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
+        )
+        prior_revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            approval_request_id=51,
+            workflow_action_id=61,
+            recipient_email="approved@example.com",
+            is_current=True,
+        )
+        action = SimpleNamespace(workflow_action_id=61, target_adapter_code="outlook")
+        approval = SimpleNamespace(
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference="workflow_action:61:draft_revision:41",
+        )
+        event = SimpleNamespace(
+            event_type_code="outlook_draft_reconciled_after_adapter_code_mismatch",
+            structured_payload={
+                "workflow_action_id": 61,
+                "draft_revision_id": 41,
+                "external_reference": "outlook:message:immutable-draft-id",
+            },
+        )
+        snapshot = SimpleNamespace(
+            workflow_events=(event,),
+            find_workflow_action=lambda _action_id: action,
+            find_approval_request=lambda _approval_id: approval,
+        )
+        adapter = SimpleNamespace(
+            config=SimpleNamespace(sender_mailbox="approved@example.com"),
+            read_availability_failure_code=lambda: None,
+            read_draft_snapshot=lambda **_kwargs: OutlookDraftSnapshot(
+                outcome="found", message_id="immutable-draft-id", is_draft=False
+            ),
+        )
+
+        with patch.object(service, "_load_draft_revision_by_id", return_value=prior_revision), patch.object(
+            service, "_require_case_snapshot", return_value=snapshot
+        ), patch(
+            "tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env", return_value=adapter
+        ), patch.object(service, "_create_draft_revision") as create_revision:
+            report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+        self.assertFalse(report.success)
+        self.assertEqual(report.failure_codes, ("outlook_human_edit_graph_draft_not_found",))
+        create_revision.assert_not_called()
 
     def test_staging_outlook_draft_read_reports_exact_graph_match_without_persistence(self) -> None:
         service = TestConsoleService(
