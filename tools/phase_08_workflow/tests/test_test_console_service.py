@@ -500,7 +500,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         )
         adapter = SimpleNamespace(
             config=SimpleNamespace(sender_mailbox="approved@example.com"),
-            availability_failure_code=lambda **_kwargs: None,
+            read_availability_failure_code=lambda: None,
             read_draft_snapshot=lambda **_kwargs: OutlookDraftSnapshot(
                 outcome="found",
                 message_id="immutable-draft-id",

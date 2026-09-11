@@ -2838,7 +2838,7 @@ limit 1;
             )
         graph_message_id = next(iter(graph_message_ids))
         adapter = build_outlook_execution_adapter_from_env(send_enabled=False)
-        availability_failure = adapter.availability_failure_code(action=action)
+        availability_failure = adapter.read_availability_failure_code()
         if availability_failure is not None:
             return self._outlook_human_edit_safety_blocked(
                 "Outlook configuration is not valid for a draft-only reconciliation.",

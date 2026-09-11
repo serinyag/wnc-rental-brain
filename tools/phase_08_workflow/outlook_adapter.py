@@ -114,14 +114,21 @@ class OutlookAdapterConfig:
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         if action.action_type not in OUTLOOK_SUPPORTED_ACTION_TYPES:
             return EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID
-        if not self.tenant_id or not self.client_id or not self.client_secret or not self.sender_mailbox:
-            return EXECUTION_FAILURE_ADAPTER_CONFIGURATION_INVALID
-        if not _is_valid_email_address(self.sender_mailbox):
-            return EXECUTION_FAILURE_ADAPTER_CONFIGURATION_INVALID
+        configuration_failure = self.read_availability_failure_code()
+        if configuration_failure is not None:
+            return configuration_failure
         try:
             _parse_outlook_email_payload(action.structured_payload)
         except OutlookActionInputError:
             return EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID
+        return None
+
+    def read_availability_failure_code(self) -> str | None:
+        """Validate only the credentials and mailbox required for a Graph read."""
+        if not self.tenant_id or not self.client_id or not self.client_secret or not self.sender_mailbox:
+            return EXECUTION_FAILURE_ADAPTER_CONFIGURATION_INVALID
+        if not _is_valid_email_address(self.sender_mailbox):
+            return EXECUTION_FAILURE_ADAPTER_CONFIGURATION_INVALID
         return None
 
 
@@ -224,6 +231,9 @@ class OutlookExecutionAdapter:
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         return self.config.availability_failure_code(action=action)
+
+    def read_availability_failure_code(self) -> str | None:
+        return self.config.read_availability_failure_code()
 
     def execute(
         self,
