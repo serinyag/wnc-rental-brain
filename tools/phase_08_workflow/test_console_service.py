@@ -244,6 +244,26 @@ class TestConsoleReadError(TestConsoleError):
         )
 
 
+@dataclass
+class _ProjectedWorkflowActionExecutionAdapter:
+    """Executes a canonical action using a validated, provider-specific projection."""
+
+    delegate: Any
+    projected_action: WorkflowAction
+
+    def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
+        del action
+        return self.delegate.availability_failure_code(action=self.projected_action)
+
+    def execute(self, *, action: WorkflowAction, execution_context: Any, idempotency: Any) -> Any:
+        del action
+        return self.delegate.execute(
+            action=self.projected_action,
+            execution_context=execution_context,
+            idempotency=idempotency,
+        )
+
+
 @dataclass(frozen=True)
 class SyntheticAuthorityIssue:
     domain_code: str
@@ -2601,7 +2621,11 @@ limit 1;
         if action is None:
             raise TestConsoleError(f"WorkflowAction {workflow_action_id} was not found for RentalCase {rental_case_id}.")
         self._guard_inquiry_draft_execution_ready(snapshot, action=action)
-        registry = self._build_execution_registry(action=action, execution_mode=execution_mode)
+        registry = self._build_execution_registry(
+            action=action,
+            execution_mode=execution_mode,
+            provider_action=self._project_governed_outlook_execution_action(snapshot, action=action),
+        )
         result = execute_workflow_action(
             self.orchestration_repository,
             WorkflowActionExecutionRequest(
@@ -2659,7 +2683,13 @@ limit 1;
             failure_codes=result.failure_codes,
         )
 
-    def _build_execution_registry(self, *, action: WorkflowAction, execution_mode: str) -> ExecutionAdapterRegistry:
+    def _build_execution_registry(
+        self,
+        *,
+        action: WorkflowAction,
+        execution_mode: str,
+        provider_action: WorkflowAction | None = None,
+    ) -> ExecutionAdapterRegistry:
         registry = build_default_fake_execution_registry(now=self.now)
         if execution_mode == "retryable_failure":
             registry.register(
@@ -2691,20 +2721,26 @@ limit 1;
                     raise TestConsoleError(
                         "Real Outlook execution is disabled. Set STAGING_ALLOW_REAL_OUTLOOK=true after global approval."
                     )
+                outlook_adapter = guard_outlook_execution_adapter(
+                    build_outlook_execution_adapter_from_env(
+                        send_enabled=(
+                            not self.config.runtime.is_staging
+                            or self.config.runtime.staging_allow_real_outlook_send
+                        ),
+                    ),
+                    runtime=self.config.runtime,
+                    provider_enabled=(
+                        not self.config.runtime.is_staging
+                        or self.config.runtime.staging_allow_real_outlook
+                    ),
+                )
                 registry.register(
                     action.target_adapter_code,
-                    guard_outlook_execution_adapter(
-                        build_outlook_execution_adapter_from_env(
-                            send_enabled=(
-                                not self.config.runtime.is_staging
-                                or self.config.runtime.staging_allow_real_outlook_send
-                            ),
-                        ),
-                        runtime=self.config.runtime,
-                        provider_enabled=(
-                            not self.config.runtime.is_staging
-                            or self.config.runtime.staging_allow_real_outlook
-                        ),
+                    outlook_adapter
+                    if provider_action is None
+                    else _ProjectedWorkflowActionExecutionAdapter(
+                        delegate=outlook_adapter,
+                        projected_action=provider_action,
                     ),
                 )
             elif action.target_adapter_code == "task_surface":
@@ -3835,6 +3871,44 @@ returning
                 failure_code="INQUIRY_DRAFT_APPROVAL_MISSING",
             )
 
+    def _project_governed_outlook_execution_action(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        action: WorkflowAction,
+    ) -> WorkflowAction:
+        """Expose only the exact approved draft fields required by the Outlook adapter."""
+        if (
+            action.action_type != ACTION_TYPE_SEND_INQUIRY_RESPONSE
+            or action.target_adapter_code != "outlook"
+        ):
+            return action
+        revision = self._load_current_draft_revision_for_conversation(
+            snapshot.rental_case.rental_case_id,
+            conversation_key=self._draft_conversation_key(action),
+        )
+        if revision is None or revision.workflow_action_id != action.workflow_action_id:
+            raise TestConsoleError(
+                "The approved inquiry-response draft is no longer bound to this workflow action.",
+                failure_code="INQUIRY_DRAFT_ACTION_MISMATCH",
+            )
+        if revision.source_case_revision != action.source_case_revision:
+            raise TestConsoleError(
+                "The approved inquiry-response draft was created from a different case revision.",
+                failure_code="INQUIRY_DRAFT_STALE",
+            )
+        payload: dict[str, Any] = {
+            "recipient_email": revision.recipient_email,
+            "recipient_reference": f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}",
+            "subject": revision.subject,
+            "body": revision.body_text,
+            "body_type": "text",
+            "message_mode": "new",
+        }
+        if revision.recipient_label:
+            payload["recipient_name"] = revision.recipient_label
+        return replace(action, structured_payload=payload)
+
     @staticmethod
     def _has_blocking_operator_annotations(revision: InquiryResponseDraftRevision) -> bool:
         annotations = revision.context_payload.get("operator_annotations", [])
@@ -4044,7 +4118,13 @@ where rental_case_id = {rental_case_id}
         metadata: TestConsoleCaseMetadata,
     ) -> str:
         contact_email = _normalize_optional_text(metadata.contact_email)
-        if contact_email and _is_safe_test_email(contact_email):
+        if contact_email and (
+            _is_safe_test_email(contact_email)
+            or (
+                self.config.runtime.is_staging
+                and self.config.runtime.is_email_recipient_allowed(contact_email)
+            )
+        ):
             return contact_email
         return f"case-{rental_case_id}@example.test"
 

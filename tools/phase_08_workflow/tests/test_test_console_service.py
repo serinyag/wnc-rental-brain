@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import unittest
+from dataclasses import replace
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -11,6 +12,7 @@ from tools.phase_08_workflow.contracts import (
     ACTION_CATEGORY_COMMUNICATION,
     ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+    ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     EXECUTION_ATTEMPT_STATUS_SUCCEEDED,
     FOLLOW_UP_STATUS_SCHEDULED,
@@ -387,6 +389,70 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         self.assertIsNotNone(registry.resolve("outlook"))
         build_adapter.assert_called_once_with(send_enabled=False)
+
+    def test_governed_outlook_execution_projects_the_current_approved_draft(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+        )
+        action = replace(
+            make_action(target_adapter_code="outlook"),
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            source_case_revision=3,
+            structured_payload={
+                "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+                "context_hash": "context-123",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+            },
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            workflow_action_id=action.workflow_action_id,
+            source_case_revision=3,
+            recipient_email="approved@example.com",
+            recipient_label="Synthetic Client",
+            subject="Synthetic inquiry response",
+            body_text="This is a governed synthetic draft.",
+        )
+        snapshot = SimpleNamespace(rental_case=SimpleNamespace(rental_case_id=1))
+
+        with patch.object(service, "_load_current_draft_revision_for_conversation", return_value=revision):
+            projected = service._project_governed_outlook_execution_action(snapshot, action=action)
+
+        self.assertEqual(action.structured_payload["context_hash"], "context-123")
+        self.assertEqual(projected.structured_payload["recipient_email"], "approved@example.com")
+        self.assertEqual(projected.structured_payload["recipient_name"], "Synthetic Client")
+        self.assertEqual(projected.structured_payload["subject"], "Synthetic inquiry response")
+        self.assertEqual(projected.structured_payload["body"], "This is a governed synthetic draft.")
+        self.assertEqual(projected.structured_payload["message_mode"], "new")
+
+    def test_staging_uses_an_explicitly_allowlisted_synthetic_recipient(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_email_recipients=("approved@example.com",),
+                ),
+            ),
+        )
+        metadata = TestConsoleCaseMetadata(
+            label="Synthetic rental",
+            client_label="Synthetic Client",
+            contact_email="approved@example.com",
+            event_reference="Synthetic event",
+            created_by="test_console:operator",
+            created_at="2026-08-14T09:00:00Z",
+        )
+
+        self.assertEqual(service._simulated_recipient_email(17, metadata), "approved@example.com")
 
     def test_provider_health_reports_draft_only_outlook_and_disabled_asana(self) -> None:
         service = TestConsoleService(

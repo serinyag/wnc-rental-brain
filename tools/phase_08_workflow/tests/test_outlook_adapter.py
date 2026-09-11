@@ -7,6 +7,7 @@ from tools.phase_08_workflow.contracts import (
     ACTION_CATEGORY_COMMUNICATION,
     ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM,
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
+    ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     EXECUTION_ATTEMPT_STATUS_FAILED,
     LIFECYCLE_STATE_PROPOSAL_IN_PROGRESS,
@@ -265,6 +266,19 @@ class OutlookAdapterTests(unittest.TestCase):
         failure = adapter.availability_failure_code(action=action)
 
         self.assertEqual(failure, EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID)
+
+    def test_availability_accepts_governed_client_response_payload(self) -> None:
+        adapter = self.make_adapter(StubOutlookTransport())
+        action = make_email_action(
+            1,
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            structured_payload={
+                "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+                "context_hash": "context-123",
+            },
+        )
+
+        self.assertIsNone(adapter.availability_failure_code(action=action))
 
     def test_execute_successfully_creates_sends_and_verifies_message(self) -> None:
         transport = StubOutlookTransport(
