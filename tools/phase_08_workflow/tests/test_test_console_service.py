@@ -315,6 +315,25 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(error.exception.diagnostics["failure_category"], "OPENAI_REQUEST_REJECTED")
         self.assertEqual(error.exception.diagnostics["http_status"], 400)
 
+    def test_deterministic_client_response_fixture_is_staging_only_and_uses_no_configured_provider(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            client_response_provider=_FailingClientResponseProvider(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(app_env=AppEnvironment.STAGING, app_env_explicit=True),
+            ),
+        )
+
+        provider = service._client_response_provider_for_request(use_deterministic_fixture=True)
+
+        self.assertIsInstance(provider, DeterministicFakeClientResponseProvider)
+
+        service.config = TestConsoleConfig()
+        with self.assertRaises(TestConsoleError) as error:
+            service._client_response_provider_for_request(use_deterministic_fixture=True)
+        self.assertEqual(error.exception.failure_code, "CLIENT_RESPONSE_FIXTURE_STAGING_ONLY")
+
     def test_pending_commercial_decision_does_not_trigger_generic_capacity_inference(self) -> None:
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),

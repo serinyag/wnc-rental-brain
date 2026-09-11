@@ -108,6 +108,7 @@ from .inquiry_intake import (
 )
 from .governed_client_response import (
     ClientResponseProviderError,
+    DeterministicFakeClientResponseProvider,
     GovernedClientResponseProvider,
     build_client_response_provider_from_env,
     build_draft_contract,
@@ -2290,7 +2291,12 @@ limit 1;
             ),
         )
 
-    def generate_governed_client_response_draft(self, *, rental_case_id: int) -> OperationReport:
+    def generate_governed_client_response_draft(
+        self,
+        *,
+        rental_case_id: int,
+        use_deterministic_fixture: bool = False,
+    ) -> OperationReport:
         """Generate one validated client reply without changing governed case truth."""
         detail = self.load_case_detail(rental_case_id)
         snapshot = detail.orchestration_snapshot
@@ -2333,8 +2339,9 @@ limit 1;
             resolution_items=resolution_items,
             contextual_guidance=contextual_guidance,
         )
+        provider = self._client_response_provider_for_request(use_deterministic_fixture=use_deterministic_fixture)
         try:
-            generated = self.client_response_provider.generate_client_response(contract)
+            generated = provider.generate_client_response(contract)
         except ClientResponseProviderError as exc:
             raise TestConsoleError(
                 "Client response generation did not complete; no draft was created.",
@@ -2491,6 +2498,21 @@ limit 1;
                 f"Approval request id: {approval.approval_request_id}",
             ),
         )
+
+    def _client_response_provider_for_request(
+        self,
+        *,
+        use_deterministic_fixture: bool,
+    ) -> GovernedClientResponseProvider:
+        if not use_deterministic_fixture:
+            return self.client_response_provider
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError(
+                "The deterministic client-response fixture is available only when APP_ENV=staging.",
+                failure_code="CLIENT_RESPONSE_FIXTURE_STAGING_ONLY",
+                status=HTTPStatus.FORBIDDEN,
+            )
+        return DeterministicFakeClientResponseProvider()
 
     def inspect_governed_client_response_reread(self, *, rental_case_id: int) -> OperationReport:
         """Run the post-provider re-read boundary without provider or persistence work."""

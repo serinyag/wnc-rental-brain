@@ -190,6 +190,29 @@ class OperatorHarnessTests(unittest.TestCase):
         self.assertEqual(captured["method"], "POST")
         self.assertEqual(captured["body"], "{}")
 
+    def test_generate_governed_client_response_can_select_staging_deterministic_fixture(self) -> None:
+        captured: dict[str, object] = {}
+
+        def opener(request, timeout, context):
+            captured["body"] = request.data.decode("utf-8") if request.data else None
+            del timeout, context
+            return _FakeResponse(json.dumps({"ok": True}))
+
+        client = OperatorHarnessClient(
+            OperatorHarnessConfig(
+                base_url="https://stage.example.test",
+                username="stage-user",
+                password="stage-pass",
+            ),
+            opener=opener,
+        )
+
+        self.assertEqual(
+            client.generate_governed_client_response_draft(rental_case_id=42, use_deterministic_fixture=True),
+            {"ok": True},
+        )
+        self.assertEqual(captured["body"], '{"draft_provider": "deterministic_fixture"}')
+
 
 if __name__ == "__main__":
     unittest.main()

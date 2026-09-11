@@ -165,12 +165,17 @@ class OperatorHarnessClient:
             {},
         )
 
-    def generate_governed_client_response_draft(self, *, rental_case_id: int) -> dict[str, Any]:
+    def generate_governed_client_response_draft(
+        self,
+        *,
+        rental_case_id: int,
+        use_deterministic_fixture: bool = False,
+    ) -> dict[str, Any]:
         """Generate one approval-bound governed client draft without execution."""
         return self.request(
             "POST",
             f"/api/operator/cases/{rental_case_id}/mailbox/generate",
-            {},
+            {"draft_provider": "deterministic_fixture"} if use_deterministic_fixture else {},
         )
 
     def edit_draft(

@@ -266,8 +266,17 @@ class TestConsoleApp:
             )
             return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         if len(parts) == 6 and parts[4] == "mailbox" and parts[5] == "generate" and method == "POST":
+            payload = self._parse_json(environ)
+            draft_provider = payload.get("draft_provider")
+            if draft_provider not in {None, "deterministic_fixture"}:
+                raise TestConsoleError(
+                    "draft_provider must be deterministic_fixture when supplied.",
+                    failure_code="CLIENT_RESPONSE_FIXTURE_INVALID",
+                    status=HTTPStatus.BAD_REQUEST,
+                )
             report = self.service.generate_governed_client_response_draft(
                 rental_case_id=rental_case_id,
+                use_deterministic_fixture=draft_provider == "deterministic_fixture",
             )
             return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         if len(parts) == 6 and parts[4] == "mailbox" and parts[5] == "revalidation-read" and method == "GET":
