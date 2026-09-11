@@ -859,8 +859,12 @@ left join stale_units su on true;
             return "disabled"
         if not self.config.allow_real_providers:
             return "configured_but_disabled"
+        if runtime.is_staging and not runtime.staging_allow_real_outlook:
+            return "configured_but_disabled"
         if runtime.is_staging and not allowlist_configured:
             return "misconfigured"
+        if fully_configured and runtime.is_staging and not runtime.staging_allow_real_outlook_send:
+            return "configured_draft_only"
         return "configured" if fully_configured else "misconfigured"
 
     def _resolve_asana_provider_status(self, config: AsanaAdapterConfig) -> str:
@@ -882,6 +886,8 @@ left join stale_units su on true;
         if not any_configuration:
             return "disabled"
         if not self.config.allow_real_providers:
+            return "configured_but_disabled"
+        if runtime.is_staging and not runtime.staging_allow_real_asana:
             return "configured_but_disabled"
         if runtime.is_staging and not allowlist_configured:
             return "misconfigured"
@@ -2681,19 +2687,40 @@ limit 1;
                     f"Real provider execution is disabled. Set {TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV}=true to enable it."
                 )
             if action.target_adapter_code == "email":
+                if self.config.runtime.is_staging and not self.config.runtime.staging_allow_real_outlook:
+                    raise TestConsoleError(
+                        "Real Outlook execution is disabled. Set STAGING_ALLOW_REAL_OUTLOOK=true after global approval."
+                    )
                 registry.register(
                     "email",
                     guard_outlook_execution_adapter(
-                        build_outlook_execution_adapter_from_env(),
+                        build_outlook_execution_adapter_from_env(
+                            send_enabled=(
+                                not self.config.runtime.is_staging
+                                or self.config.runtime.staging_allow_real_outlook_send
+                            ),
+                        ),
                         runtime=self.config.runtime,
+                        provider_enabled=(
+                            not self.config.runtime.is_staging
+                            or self.config.runtime.staging_allow_real_outlook
+                        ),
                     ),
                 )
             elif action.target_adapter_code == "task_surface":
+                if self.config.runtime.is_staging and not self.config.runtime.staging_allow_real_asana:
+                    raise TestConsoleError(
+                        "Real Asana execution is disabled. Set STAGING_ALLOW_REAL_ASANA=true after global approval."
+                    )
                 registry.register(
                     "task_surface",
                     guard_asana_execution_adapter(
                         build_asana_execution_adapter_from_env(),
                         runtime=self.config.runtime,
+                        provider_enabled=(
+                            not self.config.runtime.is_staging
+                            or self.config.runtime.staging_allow_real_asana
+                        ),
                     ),
                 )
             else:

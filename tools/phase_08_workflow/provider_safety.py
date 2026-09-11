@@ -45,11 +45,12 @@ def guard_outlook_execution_adapter(
     adapter: OutlookExecutionAdapter,
     *,
     runtime: AppRuntimeConfig,
+    provider_enabled: bool = True,
 ) -> EnvironmentGuardedExecutionAdapter:
     return EnvironmentGuardedExecutionAdapter(
         delegate=adapter,
         runtime=runtime,
-        guard=lambda action: _is_outlook_action_allowed(action, runtime=runtime),
+        guard=lambda action: _is_outlook_action_allowed(action, runtime=runtime, provider_enabled=provider_enabled),
     )
 
 
@@ -57,17 +58,30 @@ def guard_asana_execution_adapter(
     adapter: AsanaExecutionAdapter,
     *,
     runtime: AppRuntimeConfig,
+    provider_enabled: bool = True,
 ) -> EnvironmentGuardedExecutionAdapter:
     return EnvironmentGuardedExecutionAdapter(
         delegate=adapter,
         runtime=runtime,
-        guard=lambda action: _is_asana_action_allowed(action, runtime=runtime, default_project_gid=adapter.config.default_project_gid),
+        guard=lambda action: _is_asana_action_allowed(
+            action,
+            runtime=runtime,
+            default_project_gid=adapter.config.default_project_gid,
+            provider_enabled=provider_enabled,
+        ),
     )
 
 
-def _is_outlook_action_allowed(action: WorkflowAction, *, runtime: AppRuntimeConfig) -> bool:
+def _is_outlook_action_allowed(
+    action: WorkflowAction,
+    *,
+    runtime: AppRuntimeConfig,
+    provider_enabled: bool,
+) -> bool:
     if not runtime.is_staging:
         return True
+    if not provider_enabled:
+        return False
     try:
         payload = _parse_outlook_email_payload(action.structured_payload)
     except OutlookActionInputError:
@@ -80,9 +94,12 @@ def _is_asana_action_allowed(
     *,
     runtime: AppRuntimeConfig,
     default_project_gid: str | None,
+    provider_enabled: bool,
 ) -> bool:
     if not runtime.is_staging:
         return True
+    if not provider_enabled:
+        return False
     try:
         project_gid = _resolve_project_gid(action, default_project_gid=default_project_gid)
     except AsanaActionInputError:

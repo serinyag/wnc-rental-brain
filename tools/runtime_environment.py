@@ -13,6 +13,9 @@ STAGING_BASIC_AUTH_PASSWORD_ENV = "STAGING_BASIC_AUTH_PASSWORD"
 STAGING_ALLOWED_EMAIL_RECIPIENTS_ENV = "STAGING_ALLOWED_EMAIL_RECIPIENTS"
 STAGING_ALLOWED_EMAIL_DOMAINS_ENV = "STAGING_ALLOWED_EMAIL_DOMAINS"
 STAGING_ALLOWED_ASANA_PROJECT_GIDS_ENV = "STAGING_ALLOWED_ASANA_PROJECT_GIDS"
+STAGING_ALLOW_REAL_OUTLOOK_ENV = "STAGING_ALLOW_REAL_OUTLOOK"
+STAGING_ALLOW_REAL_OUTLOOK_SEND_ENV = "STAGING_ALLOW_REAL_OUTLOOK_SEND"
+STAGING_ALLOW_REAL_ASANA_ENV = "STAGING_ALLOW_REAL_ASANA"
 
 MICROSOFT_TENANT_ID_ENV = "MICROSOFT_TENANT_ID"
 MICROSOFT_CLIENT_ID_ENV = "MICROSOFT_CLIENT_ID"
@@ -65,6 +68,9 @@ class AppRuntimeConfig:
     staging_allowed_email_recipients: tuple[str, ...] = ()
     staging_allowed_email_domains: tuple[str, ...] = ()
     staging_allowed_asana_project_gids: tuple[str, ...] = ()
+    staging_allow_real_outlook: bool = False
+    staging_allow_real_outlook_send: bool = False
+    staging_allow_real_asana: bool = False
 
     @classmethod
     def local_default(cls) -> AppRuntimeConfig:
@@ -82,6 +88,9 @@ class AppRuntimeConfig:
             staging_allowed_email_recipients=_parse_recipient_allowlist(load_env_value(STAGING_ALLOWED_EMAIL_RECIPIENTS_ENV)),
             staging_allowed_email_domains=_parse_domain_allowlist(load_env_value(STAGING_ALLOWED_EMAIL_DOMAINS_ENV)),
             staging_allowed_asana_project_gids=_parse_generic_allowlist(load_env_value(STAGING_ALLOWED_ASANA_PROJECT_GIDS_ENV)),
+            staging_allow_real_outlook=_parse_env_flag(load_env_value(STAGING_ALLOW_REAL_OUTLOOK_ENV)),
+            staging_allow_real_outlook_send=_parse_env_flag(load_env_value(STAGING_ALLOW_REAL_OUTLOOK_SEND_ENV)),
+            staging_allow_real_asana=_parse_env_flag(load_env_value(STAGING_ALLOW_REAL_ASANA_ENV)),
         )
 
     @property
@@ -188,9 +197,7 @@ def validate_staging_real_provider_configuration(runtime: AppRuntimeConfig) -> N
     outlook_requested = _outlook_real_provider_requested(runtime)
     asana_requested = _asana_real_provider_requested(runtime)
     if not outlook_requested and not asana_requested:
-        raise RuntimeConfigurationError(
-            "Staging real provider mode requires real Outlook or real Asana configuration."
-        )
+        return
     if outlook_requested:
         _validate_staging_outlook_configuration(runtime)
     if asana_requested:
@@ -223,29 +230,12 @@ def _require_env_values(*names: str) -> None:
         )
 
 
-def _any_env_values(*names: str) -> bool:
-    return any(_normalize_optional_text(load_env_value(name)) is not None for name in names)
-
-
 def _outlook_real_provider_requested(runtime: AppRuntimeConfig) -> bool:
-    if runtime.staging_allowed_email_recipients or runtime.staging_allowed_email_domains:
-        return True
-    return _any_env_values(
-        MICROSOFT_TENANT_ID_ENV,
-        MICROSOFT_CLIENT_ID_ENV,
-        MICROSOFT_CLIENT_SECRET_ENV,
-        OUTLOOK_SENDER_MAILBOX_ENV,
-    )
+    return runtime.staging_allow_real_outlook
 
 
 def _asana_real_provider_requested(runtime: AppRuntimeConfig) -> bool:
-    if runtime.staging_allowed_asana_project_gids:
-        return True
-    return _any_env_values(
-        ASANA_ACCESS_TOKEN_ENV,
-        ASANA_WORKSPACE_GID_ENV,
-        ASANA_DEFAULT_PROJECT_GID_ENV,
-    )
+    return runtime.staging_allow_real_asana
 
 
 def _validate_staging_outlook_configuration(runtime: AppRuntimeConfig) -> None:
@@ -328,3 +318,7 @@ def _split_allowlist(raw_value: str | None) -> tuple[str, ...]:
         if trimmed:
             items.append(trimmed)
     return tuple(items)
+
+
+def _parse_env_flag(raw_value: str | None) -> bool:
+    return _normalize_optional_text(raw_value) is not None and raw_value.strip().lower() == "true"

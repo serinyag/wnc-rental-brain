@@ -19,6 +19,7 @@ from tools.phase_08_workflow.contracts import (
 )
 from tools.phase_08_workflow.execution_runtime import ExecutionAdapterRegistry, execute_workflow_action
 from tools.phase_08_workflow.execution_types import (
+    EXECUTION_FAILURE_ADAPTER_FORBIDDEN,
     EXECUTION_FAILURE_INVALID_EXECUTION_INPUT,
     EXECUTION_FAILURE_ADAPTER_OUTCOME_AMBIGUOUS,
     EXECUTION_FAILURE_ADAPTER_RATE_LIMITED,
@@ -288,6 +289,29 @@ class OutlookAdapterTests(unittest.TestCase):
         self.assertEqual(transport.requests[1]["headers"]["Prefer"], 'IdType="ImmutableId"')
         self.assertEqual(transport.requests[2]["method"], "POST")
         self.assertIn("/messages/immutable-1/send", transport.requests[2]["url"])
+
+    def test_draft_only_execution_never_calls_graph_send(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "token-123", "token_type": "Bearer"}), {}),
+            (201, json.dumps({"id": "immutable-1", "isDraft": True}), {}),
+        )
+        adapter = OutlookExecutionAdapter(
+            config=self.make_adapter(StubOutlookTransport()).config,
+            transport=transport,
+            send_enabled=False,
+        )
+
+        result = adapter.execute(
+            action=make_email_action(1),
+            execution_context=make_execution_context(),
+            idempotency=make_idempotency(),
+        )
+
+        self.assertEqual(result.attempt_status, "failed")
+        self.assertEqual(result.failure_code, EXECUTION_FAILURE_ADAPTER_FORBIDDEN)
+        self.assertEqual(result.response_snapshot["stage"], "draft_created_send_disabled")
+        self.assertEqual(result.external_reference, "outlook:message:immutable-1")
+        self.assertEqual(len(transport.requests), 2)
 
     def test_execute_rejects_unsupported_attachments_without_provider_calls(self) -> None:
         transport = StubOutlookTransport()

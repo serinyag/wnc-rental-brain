@@ -139,6 +139,42 @@ class ProviderSafetyTests(unittest.TestCase):
 
         self.assertEqual(failure_code, EXECUTION_FAILURE_ADAPTER_FORBIDDEN)
 
+    def test_staging_provider_guard_rejects_when_provider_authorization_is_off(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_allowed_email_recipients=("approved@example.com",),
+        )
+        adapter = guard_outlook_execution_adapter(
+            _PassThroughAdapter(OutlookAdapterConfig("tenant", "client", "secret", "sales@example.com")),
+            runtime=runtime,
+            provider_enabled=False,
+        )
+
+        self.assertEqual(
+            adapter.availability_failure_code(action=make_email_action("approved@example.com")),
+            EXECUTION_FAILURE_ADAPTER_FORBIDDEN,
+        )
+
+    def test_staging_asana_guard_rejects_when_provider_authorization_is_off(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_allowed_asana_project_gids=("project-123",),
+        )
+        adapter = guard_asana_execution_adapter(
+            _PassThroughAdapter(AsanaAdapterConfig("token", "workspace", "project-123")),
+            runtime=runtime,
+            provider_enabled=False,
+        )
+
+        self.assertEqual(
+            adapter.availability_failure_code(action=make_asana_action("project-123")),
+            EXECUTION_FAILURE_ADAPTER_FORBIDDEN,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

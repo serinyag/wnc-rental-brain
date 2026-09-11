@@ -79,6 +79,7 @@ class RuntimeEnvironmentTests(unittest.TestCase):
             database_url="postgresql://staging-db",
             staging_basic_auth_username="stage-user",
             staging_basic_auth_password="stage-pass",
+            staging_allow_real_outlook=True,
         )
         with self.assertRaises(RuntimeConfigurationError):
             validate_test_console_startup(
@@ -88,6 +89,22 @@ class RuntimeEnvironmentTests(unittest.TestCase):
                 allow_real_providers=True,
             )
 
+    def test_global_provider_gate_without_provider_authorization_is_a_no_op(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_basic_auth_username="stage-user",
+            staging_basic_auth_password="stage-pass",
+        )
+
+        validate_test_console_startup(
+            runtime=runtime,
+            host="0.0.0.0",
+            allow_non_local_bind=False,
+            allow_real_providers=True,
+        )
+
     def test_staging_real_providers_allow_asana_only_configuration(self) -> None:
         runtime = AppRuntimeConfig(
             app_env=AppEnvironment.STAGING,
@@ -96,6 +113,7 @@ class RuntimeEnvironmentTests(unittest.TestCase):
             staging_basic_auth_username="stage-user",
             staging_basic_auth_password="stage-pass",
             staging_allowed_asana_project_gids=("project-123",),
+            staging_allow_real_asana=True,
         )
 
         def fake_env(name: str) -> str | None:
@@ -114,6 +132,13 @@ class RuntimeEnvironmentTests(unittest.TestCase):
                 allow_non_local_bind=False,
                 allow_real_providers=True,
             )
+
+    def test_staging_provider_authorizations_default_to_disabled(self) -> None:
+        runtime = AppRuntimeConfig.from_env()
+
+        self.assertFalse(runtime.staging_allow_real_outlook)
+        self.assertFalse(runtime.staging_allow_real_outlook_send)
+        self.assertFalse(runtime.staging_allow_real_asana)
 
     def test_email_and_asana_allowlists_are_environment_scoped(self) -> None:
         runtime = AppRuntimeConfig(

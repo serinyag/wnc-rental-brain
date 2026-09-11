@@ -183,6 +183,7 @@ class OutlookEmailPayload:
 class OutlookExecutionAdapter:
     config: OutlookAdapterConfig
     transport: OutlookTransportProtocol
+    send_enabled: bool = True
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         return self.config.availability_failure_code(action=action)
@@ -240,6 +241,15 @@ class OutlookExecutionAdapter:
                 )
 
         external_reference = _external_reference_for_message_id(message_id)
+        if not self.send_enabled:
+            # A draft-only UAT may create the provider draft, but it must not
+            # convert the governed send action into a successful delivery.
+            return _failed_result(
+                failure_code=EXECUTION_FAILURE_ADAPTER_FORBIDDEN,
+                reason="outlook_send_disabled",
+                stage="draft_created_send_disabled",
+                external_reference=external_reference,
+            )
         send_result = self._send_draft(
             access_token=access_token,
             message_id=message_id,
@@ -556,10 +566,12 @@ class OutlookExecutionAdapter:
 def build_outlook_execution_adapter_from_env(
     *,
     transport: OutlookTransportProtocol | None = None,
+    send_enabled: bool = True,
 ) -> OutlookExecutionAdapter:
     return OutlookExecutionAdapter(
         config=OutlookAdapterConfig.from_env(),
         transport=transport or UrllibOutlookTransport(),
+        send_enabled=send_enabled,
     )
 
 

@@ -314,6 +314,82 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         with self.assertRaisesRegex(TestConsoleError, TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV):
             service._build_execution_registry(action=make_action(), execution_mode="real")
 
+    def test_staging_outlook_real_mode_requires_provider_authorization(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_email_recipients=("approved@example.com",),
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        with self.assertRaisesRegex(TestConsoleError, "STAGING_ALLOW_REAL_OUTLOOK"):
+            service._build_execution_registry(action=make_action(), execution_mode="real")
+
+    def test_staging_asana_real_mode_requires_provider_authorization(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_asana_project_gids=("project-123",),
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        with self.assertRaisesRegex(TestConsoleError, "STAGING_ALLOW_REAL_ASANA"):
+            service._build_execution_registry(
+                action=make_action(target_adapter_code="task_surface"),
+                execution_mode="real",
+            )
+
+    def test_provider_health_reports_draft_only_outlook_and_disabled_asana(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_email_recipients=("approved@example.com",),
+                    staging_allowed_asana_project_gids=("project-123",),
+                    staging_allow_real_outlook=True,
+                    staging_allow_real_outlook_send=False,
+                    staging_allow_real_asana=False,
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        with patch(
+            "tools.phase_08_workflow.test_console_service.OutlookAdapterConfig.from_env",
+            return_value=OutlookAdapterConfig("tenant", "client", "secret", "sales@example.com"),
+        ), patch(
+            "tools.phase_08_workflow.test_console_service.AsanaAdapterConfig.from_env",
+            return_value=AsanaAdapterConfig("token", "workspace", "project-123"),
+        ):
+            providers = service._provider_health_statuses()
+
+        self.assertEqual(providers["outlook"], "configured_draft_only")
+        self.assertEqual(providers["asana"], "configured_but_disabled")
+
     def test_default_clock_can_advance_and_reset(self) -> None:
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
@@ -454,6 +530,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                     staging_basic_auth_username="stage-user",
                     staging_basic_auth_password="stage-pass",
                     staging_allowed_asana_project_gids=("project-123",),
+                    staging_allow_real_asana=True,
                 ),
                 allow_real_providers=True,
             ),
