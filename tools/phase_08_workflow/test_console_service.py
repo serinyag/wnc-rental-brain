@@ -2686,13 +2686,13 @@ limit 1;
                 raise TestConsoleError(
                     f"Real provider execution is disabled. Set {TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV}=true to enable it."
                 )
-            if action.target_adapter_code == "email":
+            if action.target_adapter_code in {"email", "outlook"}:
                 if self.config.runtime.is_staging and not self.config.runtime.staging_allow_real_outlook:
                     raise TestConsoleError(
                         "Real Outlook execution is disabled. Set STAGING_ALLOW_REAL_OUTLOOK=true after global approval."
                     )
                 registry.register(
-                    "email",
+                    action.target_adapter_code,
                     guard_outlook_execution_adapter(
                         build_outlook_execution_adapter_from_env(
                             send_enabled=(

@@ -357,6 +357,37 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 execution_mode="real",
             )
 
+    def test_real_provider_registry_supports_governed_outlook_action_code(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_email_recipients=("approved@example.com",),
+                    staging_allow_real_outlook=True,
+                    staging_allow_real_outlook_send=False,
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        with patch(
+            "tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env",
+            return_value=object(),
+        ) as build_adapter:
+            registry = service._build_execution_registry(
+                action=make_action(target_adapter_code="outlook"),
+                execution_mode="real",
+            )
+
+        self.assertIsNotNone(registry.resolve("outlook"))
+        build_adapter.assert_called_once_with(send_enabled=False)
+
     def test_provider_health_reports_draft_only_outlook_and_disabled_asana(self) -> None:
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
