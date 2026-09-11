@@ -178,6 +178,18 @@ class OperatorHarnessClient:
             {"draft_provider": "deterministic_fixture"} if use_deterministic_fixture else {},
         )
 
+    def inspect_governed_outlook_draft(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> dict[str, Any]:
+        """Read the configured staging mailbox Drafts folder without mutation."""
+        return self.request(
+            "GET",
+            f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-read",
+        )
+
     def edit_draft(
         self,
         *,

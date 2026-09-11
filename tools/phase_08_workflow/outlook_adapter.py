@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import json
 import re
 import socket
@@ -181,6 +182,22 @@ class OutlookEmailPayload:
         return "HTML" if self.body_type == "html" else "Text"
 
 
+@dataclass(frozen=True)
+class OutlookDraftReadResult:
+    """Minimal, non-mutating evidence returned by a Graph Drafts-folder read."""
+
+    outcome: str
+    candidate_count: int
+    message_id: str | None = None
+    is_draft: bool | None = None
+    sender_mailbox: str | None = None
+    recipient_matches: bool | None = None
+    subject_matches: bool | None = None
+    body_matches: bool | None = None
+    failure_code: str | None = None
+    provider_error_code: str | None = None
+
+
 @dataclass
 class OutlookExecutionAdapter:
     config: OutlookAdapterConfig
@@ -264,6 +281,123 @@ class OutlookExecutionAdapter:
             access_token=access_token,
             message_id=message_id,
             external_reference=external_reference,
+        )
+
+    def inspect_matching_draft(
+        self,
+        *,
+        recipient_email: str,
+        subject: str,
+        body: str,
+    ) -> OutlookDraftReadResult:
+        """Find one exact draft match using Graph GET requests only.
+
+        This deliberately lives outside ``execute``: it must never create, update,
+        delete, or send a message. It is used only to reconcile an already
+        ambiguous provider outcome before another create is considered.
+        """
+        token_result = self._acquire_access_token()
+        if token_result.result is not None:
+            return OutlookDraftReadResult(
+                outcome="read_failed",
+                candidate_count=0,
+                failure_code=token_result.result.failure_code,
+                provider_error_code=_provider_error_code_from_snapshot(token_result.result.response_snapshot),
+            )
+        access_token = token_result.access_token
+        if access_token is None:
+            return OutlookDraftReadResult(
+                outcome="read_failed",
+                candidate_count=0,
+                failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
+            )
+
+        return self._read_matching_draft(
+            access_token=access_token,
+            recipient_email=recipient_email,
+            subject=subject,
+            body=body,
+        )
+
+    def _read_matching_draft(
+        self,
+        *,
+        access_token: str,
+        recipient_email: str,
+        subject: str,
+        body: str,
+    ) -> OutlookDraftReadResult:
+        query = urllib.parse.urlencode(
+            {
+                "$select": "id,isDraft,from,sender,toRecipients,subject,body,createdDateTime,internetMessageId",
+                "$filter": f"subject eq '{subject.replace("'", "''")}'",
+                "$top": "100",
+            }
+        )
+        url = (
+            f"{self.config.graph_base_url.rstrip('/')}/users/"
+            f"{urllib.parse.quote(self.config.sender_mailbox or '', safe='')}/mailFolders/drafts/messages?{query}"
+        )
+        messages: list[dict[str, Any]] = []
+        for _page_number in range(10):
+            try:
+                status_code, body_text, response_headers = self.transport.request(
+                    method="GET",
+                    url=url,
+                    headers=_graph_read_headers(access_token),
+                    body=None,
+                    timeout_seconds=self.config.timeout_seconds,
+                )
+            except OutlookAmbiguousTransportError:
+                return OutlookDraftReadResult(
+                    outcome="read_failed",
+                    candidate_count=len(messages),
+                    failure_code=EXECUTION_FAILURE_ADAPTER_SERVER_ERROR,
+                )
+            parsed, invalid_json = _load_json(body_text)
+            if invalid_json or not isinstance(parsed, dict):
+                failure_code, _retry_eligible = _classify_http_failure(status_code=status_code)
+                return OutlookDraftReadResult(
+                    outcome="read_failed",
+                    candidate_count=len(messages),
+                    failure_code=(EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED if 200 <= status_code < 300 else failure_code),
+                )
+            if not 200 <= status_code < 300:
+                failure_code, _retry_eligible = _classify_http_failure(status_code=status_code)
+                return OutlookDraftReadResult(
+                    outcome="read_failed",
+                    candidate_count=len(messages),
+                    failure_code=failure_code,
+                    provider_error_code=_extract_provider_error_code(parsed),
+                )
+            page_messages = parsed.get("value")
+            if not isinstance(page_messages, list) or not all(isinstance(item, dict) for item in page_messages):
+                return OutlookDraftReadResult(
+                    outcome="read_failed",
+                    candidate_count=len(messages),
+                    failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
+                )
+            messages.extend(page_messages)
+            next_link = parsed.get("@odata.nextLink")
+            if next_link is None:
+                return _match_outlook_drafts(
+                    messages=messages,
+                    sender_mailbox=self.config.sender_mailbox,
+                    recipient_email=recipient_email,
+                    subject=subject,
+                    body=body,
+                )
+            if not isinstance(next_link, str) or not next_link.startswith(self.config.graph_base_url.rstrip("/")):
+                return OutlookDraftReadResult(
+                    outcome="read_failed",
+                    candidate_count=len(messages),
+                    failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
+                )
+            url = next_link
+        return OutlookDraftReadResult(
+            outcome="read_failed",
+            candidate_count=len(messages),
+            failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
         )
 
     def _acquire_access_token(self) -> _AccessTokenResult:
@@ -734,6 +868,98 @@ def _graph_json_headers(access_token: str) -> dict[str, str]:
         "Accept": "application/json",
         "Prefer": OUTLOOK_IMMUTABLE_ID_HEADER,
     }
+
+
+def _graph_read_headers(access_token: str) -> dict[str, str]:
+    headers = _graph_json_headers(access_token)
+    # Ask Graph to return a deterministic text representation for comparison.
+    headers["Prefer"] = f'{OUTLOOK_IMMUTABLE_ID_HEADER}, outlook.body-content-type="text"'
+    return headers
+
+
+def _match_outlook_drafts(
+    *,
+    messages: list[dict[str, Any]],
+    sender_mailbox: str | None,
+    recipient_email: str,
+    subject: str,
+    body: str,
+) -> OutlookDraftReadResult:
+    expected_recipient = _normalized_email_address(recipient_email)
+    expected_body = _normalized_graph_body(body)
+    exact_matches: list[dict[str, Any]] = []
+    for message in messages:
+        if message.get("isDraft") is not True:
+            continue
+        message_id = message.get("id")
+        if not isinstance(message_id, str) or not message_id.strip():
+            continue
+        recipient_matches = _message_recipient_addresses(message) == (expected_recipient,)
+        subject_matches = message.get("subject") == subject
+        body_matches = _normalized_graph_body(_message_body_content(message)) == expected_body
+        if recipient_matches and subject_matches and body_matches:
+            exact_matches.append(message)
+
+    if not exact_matches:
+        return OutlookDraftReadResult(outcome="no_match", candidate_count=len(messages))
+    if len(exact_matches) != 1:
+        return OutlookDraftReadResult(outcome="ambiguous", candidate_count=len(exact_matches))
+    match = exact_matches[0]
+    return OutlookDraftReadResult(
+        outcome="found",
+        candidate_count=1,
+        message_id=str(match["id"]).strip(),
+        is_draft=True,
+        sender_mailbox=sender_mailbox,
+        recipient_matches=True,
+        subject_matches=True,
+        body_matches=True,
+    )
+
+
+def _message_recipient_addresses(message: Mapping[str, Any]) -> tuple[str, ...]:
+    recipients = message.get("toRecipients")
+    if not isinstance(recipients, list):
+        return ()
+    addresses: list[str] = []
+    for recipient in recipients:
+        if not isinstance(recipient, Mapping):
+            return ()
+        email_address = recipient.get("emailAddress")
+        if not isinstance(email_address, Mapping):
+            return ()
+        address = email_address.get("address")
+        if not isinstance(address, str) or not address.strip():
+            return ()
+        addresses.append(_normalized_email_address(address))
+    return tuple(addresses)
+
+
+def _message_body_content(message: Mapping[str, Any]) -> str:
+    body = message.get("body")
+    if not isinstance(body, Mapping):
+        return ""
+    content = body.get("content")
+    return content if isinstance(content, str) else ""
+
+
+def _normalized_email_address(value: str) -> str:
+    return value.strip().casefold()
+
+
+def _normalized_graph_body(value: str) -> str:
+    # Graph can return deterministic HTML wrapping even for a text draft.
+    text = re.sub(r"(?i)<br\\s*/?>", "\n", value)
+    text = re.sub(r"(?i)</(?:p|div|li|tr|h[1-6])\\s*>", "\n", text)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return " ".join(html.unescape(text).split())
+
+
+def _provider_error_code_from_snapshot(snapshot: Any) -> str | None:
+    if not isinstance(snapshot, Mapping):
+        return None
+    value = snapshot.get("provider_error_code")
+    return value if isinstance(value, str) and value.strip() else None
 
 
 def _classify_token_failure(status_code: int) -> tuple[str, bool]:

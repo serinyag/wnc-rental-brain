@@ -35,6 +35,7 @@ from .contracts import (
     ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
     APPROVAL_POSTURE_APPROVAL_REQUIRED,
+    APPROVAL_REQUEST_STATUS_APPROVED,
     APPROVAL_REQUEST_STATUS_OPEN,
     OPEN_QUESTION_STATUS_ANSWERED_PENDING_VALIDATION,
     PHASE_7_REASONING_STATE_INSUFFICIENT_INFORMATION,
@@ -2530,6 +2531,107 @@ limit 1;
                 f"Case revision: {snapshot.rental_case.case_revision}",
                 f"Workflow events: {len(snapshot.workflow_events)}",
             ),
+        )
+
+    def inspect_governed_outlook_draft(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> OperationReport:
+        """Read one approved staging draft from Graph without mutating either system."""
+        runtime = self.config.runtime
+        if not runtime.is_staging:
+            raise TestConsoleError(
+                "Outlook draft inspection is available only in staging.",
+                failure_code="OUTLOOK_DRAFT_READ_STAGING_ONLY",
+                status=HTTPStatus.FORBIDDEN,
+            )
+        if not self.config.allow_real_providers or not runtime.staging_allow_real_outlook:
+            raise TestConsoleError(
+                "Outlook draft inspection requires the global and Outlook-specific staging authorizations.",
+                failure_code="OUTLOOK_DRAFT_READ_DISABLED",
+                status=HTTPStatus.FORBIDDEN,
+            )
+        revision = self._load_draft_revision_by_id(rental_case_id, draft_revision_id)
+        if revision is None:
+            raise TestConsoleError(
+                f"Inquiry draft revision {draft_revision_id} was not found for RentalCase {rental_case_id}.",
+                failure_code="INQUIRY_DRAFT_NOT_FOUND",
+                status=HTTPStatus.NOT_FOUND,
+            )
+        if not revision.is_current or revision.approval_request_id is None:
+            raise TestConsoleError(
+                "Only a current, approval-bound draft revision can be inspected against Graph.",
+                failure_code="OUTLOOK_DRAFT_READ_REVISION_NOT_CURRENT",
+                status=HTTPStatus.CONFLICT,
+            )
+        if not runtime.is_email_recipient_allowed(revision.recipient_email):
+            raise TestConsoleError(
+                "The approved draft recipient is not allowlisted for staging Outlook inspection.",
+                failure_code="OUTLOOK_DRAFT_READ_RECIPIENT_NOT_ALLOWLISTED",
+                status=HTTPStatus.FORBIDDEN,
+            )
+        snapshot = self._require_case_snapshot(rental_case_id)
+        approval = snapshot.find_approval_request(revision.approval_request_id)
+        action = snapshot.find_workflow_action(revision.workflow_action_id)
+        if (
+            approval is None
+            or approval.status != APPROVAL_REQUEST_STATUS_APPROVED
+            or action is None
+            or action.target_adapter_code != "outlook"
+        ):
+            raise TestConsoleError(
+                "The draft no longer has a current approved Outlook action binding.",
+                failure_code="OUTLOOK_DRAFT_READ_APPROVAL_BINDING_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
+        provider_action = self._project_governed_outlook_execution_action(snapshot, action=action)
+        if provider_action is None:
+            raise TestConsoleError(
+                "The approved draft could not be projected for Outlook validation.",
+                failure_code="OUTLOOK_DRAFT_READ_PROJECTION_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
+        adapter = build_outlook_execution_adapter_from_env(send_enabled=False)
+        availability_failure = adapter.availability_failure_code(action=provider_action)
+        if availability_failure is not None:
+            raise TestConsoleError(
+                "Outlook configuration is not valid for a staging draft read.",
+                failure_code=availability_failure,
+                status=HTTPStatus.SERVICE_UNAVAILABLE,
+            )
+        result = adapter.inspect_matching_draft(
+            recipient_email=revision.recipient_email,
+            subject=revision.subject,
+            body=revision.body_text,
+        )
+        lines = [
+            "Read mode: Microsoft Graph GET only",
+            f"Draft revision id: {revision.inquiry_response_draft_revision_id}",
+            f"Read outcome: {result.outcome}",
+            f"Candidates examined: {result.candidate_count}",
+        ]
+        if result.outcome == "found":
+            lines.extend(
+                (
+                    f"Graph message id: {result.message_id}",
+                    f"Is draft: {'yes' if result.is_draft else 'no'}",
+                    f"Sender mailbox: {result.sender_mailbox}",
+                    f"Recipient matches: {'yes' if result.recipient_matches else 'no'}",
+                    f"Subject matches: {'yes' if result.subject_matches else 'no'}",
+                    f"Body matches: {'yes' if result.body_matches else 'no'}",
+                )
+            )
+        if result.failure_code is not None:
+            lines.append(f"Provider failure code: {result.failure_code}")
+        if result.provider_error_code is not None:
+            lines.append(f"Provider error code: {result.provider_error_code}")
+        return OperationReport(
+            title="Outlook Draft Read Completed",
+            success=result.outcome != "read_failed",
+            lines=tuple(lines),
+            failure_codes=() if result.outcome != "read_failed" else (result.failure_code or "outlook_draft_read_failed",),
         )
 
     def edit_inquiry_response_draft(

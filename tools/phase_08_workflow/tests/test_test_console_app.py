@@ -166,6 +166,14 @@ class _FakeService:
             lines=("Draft revision id: 10",),
         )
 
+    def inspect_governed_outlook_draft(self, **kwargs) -> OperationReport:
+        del kwargs
+        return OperationReport(
+            title="Outlook Draft Read Completed",
+            success=True,
+            lines=("Read mode: Microsoft Graph GET only", "Read outcome: no_match"),
+        )
+
     def edit_inquiry_response_draft(self, **kwargs) -> OperationReport:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Saved", success=True, lines=("Draft revision id: 10",))
@@ -653,6 +661,32 @@ class TestConsoleAppTests(unittest.TestCase):
         payload = json.loads(body)
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["report"]["lines"], ["Read mode: provider-free", "Case revision: 0"])
+
+    def test_operator_api_runs_authenticated_outlook_draft_read(self) -> None:
+        staging_config = TestConsoleConfig(
+            runtime=AppRuntimeConfig(
+                app_env=AppEnvironment.STAGING,
+                app_env_explicit=True,
+                database_url="postgresql://staging-db",
+                staging_basic_auth_username="stage-user",
+                staging_basic_auth_password="stage-pass",
+            )
+        )
+        app = TestConsoleApp(_FakeService(config=staging_config))
+
+        status, headers, body = call_app_response(
+            app,
+            "GET",
+            "/api/operator/cases/1/mailbox/drafts/10/outlook-read",
+            headers=_basic_auth_header("stage-user", "stage-pass"),
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["title"], "Outlook Draft Read Completed")
+        self.assertIn("Read mode: Microsoft Graph GET only", payload["report"]["lines"])
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(

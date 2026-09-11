@@ -14,6 +14,7 @@ from tools.phase_08_workflow.contracts import (
     ACTION_TYPE_REQUEST_CLIENT_INFORMATION,
     ACTION_TYPE_SEND_INQUIRY_RESPONSE,
     APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+    APPROVAL_REQUEST_STATUS_APPROVED,
     EXECUTION_ATTEMPT_STATUS_FAILED,
     EXECUTION_ATTEMPT_STATUS_SUCCEEDED,
     FOLLOW_UP_STATUS_SCHEDULED,
@@ -30,7 +31,7 @@ from tools.phase_08_workflow.contracts import (
 from tools.phase_08_workflow.asana_adapter import AsanaAdapterConfig
 from tools.phase_08_workflow.execution_types import NormalizedExecutionResult
 from tools.phase_08_workflow.governed_client_response import ClientResponseProviderError, DeterministicFakeClientResponseProvider
-from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig
+from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig, OutlookDraftReadResult
 from tools.phase_08_workflow.observation_contracts import InboundObservation, InboundObservationEffect, InboundSourceRecord
 from tools.phase_08_workflow.observation_repository import InMemoryObservationRepository
 from tools.phase_08_workflow.orchestration_repository import InMemoryWorkflowOrchestrationRepository, WorkflowOrchestrationCaseSnapshot
@@ -401,6 +402,85 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         with self.assertRaisesRegex(TestConsoleError, "STAGING_ALLOW_REAL_OUTLOOK"):
             service._build_execution_registry(action=make_action(), execution_mode="real")
+
+    def test_staging_outlook_draft_read_requires_provider_authorization(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_email_recipients=("approved@example.com",),
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        with self.assertRaisesRegex(TestConsoleError, "global and Outlook-specific"):
+            service.inspect_governed_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+    def test_staging_outlook_draft_read_reports_exact_graph_match_without_persistence(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allowed_email_recipients=("approved@example.com",),
+                    staging_allow_real_outlook=True,
+                    staging_allow_real_outlook_send=False,
+                ),
+                allow_real_providers=True,
+            ),
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            approval_request_id=51,
+            workflow_action_id=61,
+            recipient_email="approved@example.com",
+            subject="Synthetic inquiry response",
+            body_text="This is a governed synthetic draft.",
+            is_current=True,
+        )
+        action = SimpleNamespace(target_adapter_code="outlook")
+        snapshot = SimpleNamespace(
+            find_approval_request=lambda _approval_id: SimpleNamespace(status=APPROVAL_REQUEST_STATUS_APPROVED),
+            find_workflow_action=lambda _action_id: action,
+        )
+        adapter = SimpleNamespace(
+            availability_failure_code=lambda **_kwargs: None,
+            inspect_matching_draft=lambda **_kwargs: OutlookDraftReadResult(
+                outcome="found",
+                candidate_count=1,
+                message_id="immutable-draft-id",
+                is_draft=True,
+                sender_mailbox="approved@example.com",
+                recipient_matches=True,
+                subject_matches=True,
+                body_matches=True,
+            ),
+        )
+
+        with patch.object(service, "_load_draft_revision_by_id", return_value=revision), patch.object(
+            service, "_require_case_snapshot", return_value=snapshot
+        ), patch.object(service, "_project_governed_outlook_execution_action", return_value=action), patch(
+            "tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env",
+            return_value=adapter,
+        ):
+            report = service.inspect_governed_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+        self.assertTrue(report.success)
+        self.assertIn("Read mode: Microsoft Graph GET only", report.lines)
+        self.assertIn("Graph message id: immutable-draft-id", report.lines)
+        self.assertIn("Body matches: yes", report.lines)
 
     def test_staging_asana_real_mode_requires_provider_authorization(self) -> None:
         service = TestConsoleService(

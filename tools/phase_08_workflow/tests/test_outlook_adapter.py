@@ -253,6 +253,60 @@ class OutlookAdapterTests(unittest.TestCase):
             },
         )
 
+    def test_inspect_matching_draft_uses_only_token_post_and_graph_get(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "access-token", "token_type": "Bearer"}), {}),
+            (
+                200,
+                json.dumps(
+                    {
+                        "value": [
+                            {
+                                "id": "immutable-draft-id",
+                                "isDraft": True,
+                                "subject": "Need your event details",
+                                "toRecipients": [{"emailAddress": {"address": "client@example.com"}}],
+                                "body": {"contentType": "text", "content": "Please confirm the final guest count."},
+                            }
+                        ]
+                    }
+                ),
+                {},
+            ),
+        )
+
+        result = self.make_adapter(transport).inspect_matching_draft(
+            recipient_email="client@example.com",
+            subject="Need your event details",
+            body="Please confirm the final guest count.",
+        )
+
+        self.assertEqual(result.outcome, "found")
+        self.assertEqual(result.message_id, "immutable-draft-id")
+        self.assertTrue(result.is_draft)
+        self.assertTrue(result.recipient_matches)
+        self.assertTrue(result.subject_matches)
+        self.assertTrue(result.body_matches)
+        self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
+        self.assertIn("/mailFolders/drafts/messages?", str(transport.requests[1]["url"]))
+        self.assertNotIn("/send", str(transport.requests[1]["url"]))
+
+    def test_inspect_matching_draft_reports_no_match_without_mutation(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "access-token", "token_type": "Bearer"}), {}),
+            (200, json.dumps({"value": []}), {}),
+        )
+
+        result = self.make_adapter(transport).inspect_matching_draft(
+            recipient_email="client@example.com",
+            subject="Need your event details",
+            body="Please confirm the final guest count.",
+        )
+
+        self.assertEqual(result.outcome, "no_match")
+        self.assertEqual(result.candidate_count, 0)
+        self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
+
     def test_availability_rejects_reply_mode_in_this_phase(self) -> None:
         adapter = self.make_adapter(StubOutlookTransport())
         action = make_email_action(
