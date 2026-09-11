@@ -315,6 +315,19 @@ class TestConsoleApp:
                     "report": self._serialize_for_json(report),
                 },
             )
+        if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "drafts" and parts[7] == "outlook-human-edit-reconcile" and method == "POST":
+            report = self.service.reconcile_human_edited_outlook_draft(
+                rental_case_id=rental_case_id,
+                draft_revision_id=int(parts[6]),
+            )
+            return self._respond_json(
+                start_response,
+                {
+                    **self._base_operator_payload(),
+                    "ok": report.success,
+                    "report": self._serialize_for_json(report),
+                },
+            )
         if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "actions" and parts[7] == "generate" and method == "POST":
             workflow_action_id = int(parts[6])
             report = self.service.generate_inquiry_response_draft(

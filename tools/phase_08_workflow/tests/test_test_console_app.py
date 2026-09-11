@@ -182,6 +182,14 @@ class _FakeService:
             lines=("Historical execution attempt left immutable: yes",),
         )
 
+    def reconcile_human_edited_outlook_draft(self, **kwargs) -> OperationReport:
+        del kwargs
+        return OperationReport(
+            title="Outlook Human Edit Reconciled",
+            success=True,
+            lines=("Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_PASS",),
+        )
+
     def edit_inquiry_response_draft(self, **kwargs) -> OperationReport:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Saved", success=True, lines=("Draft revision id: 10",))
@@ -711,6 +719,22 @@ class TestConsoleAppTests(unittest.TestCase):
         payload = json.loads(body)
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["report"]["title"], "Prior Outlook Draft Reconciled")
+
+    def test_operator_api_reconciles_human_edited_outlook_draft(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/1/mailbox/drafts/10/outlook-human-edit-reconcile",
+            body=b"{}",
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["title"], "Outlook Human Edit Reconciled")
 
     def test_staging_clock_routes_fail_closed(self) -> None:
         staging_config = TestConsoleConfig(

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import difflib
 import hashlib
+import html
 import json
 import logging
 import os
@@ -109,6 +111,7 @@ from .inquiry_intake import (
     apply_inquiry_intake,
 )
 from .governed_client_response import (
+    ClientResponseDraft,
     ClientResponseProviderError,
     DeterministicFakeClientResponseProvider,
     GovernedClientResponseProvider,
@@ -170,7 +173,11 @@ from .orchestration_repository import (
 )
 from .orchestration_runtime import apply_approval_decision, reconcile_workflow_orchestration
 from .orchestration_types import ApprovalDecisionInput, ORCHESTRATION_DECISION_APPROVED, ORCHESTRATION_DECISION_REJECTED
-from .outlook_adapter import OutlookAdapterConfig, build_outlook_execution_adapter_from_env
+from .outlook_adapter import (
+    OutlookAdapterConfig,
+    OutlookDraftSnapshot,
+    build_outlook_execution_adapter_from_env,
+)
 from .phase7_consumption_repository import (
     InMemoryPhase7ConsumptionRepository,
     SupabasePhase7ConsumptionRepository,
@@ -434,6 +441,56 @@ class OperationReport:
     success: bool
     lines: tuple[str, ...]
     failure_codes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class _OutlookHumanEditDiff:
+    subject_changed: bool
+    body_changed: bool
+    recipients_changed: bool
+    formatting_only_changed: bool
+    original_subject: str
+    original_body: str
+    current_subject: str
+    current_body: str
+    current_to_recipients: tuple[str, ...]
+    current_cc_recipients: tuple[str, ...]
+    body_content_type: str | None
+    last_modified_at: str | None
+    body_diff_lines: tuple[str, ...]
+
+    @property
+    def meaningful_change(self) -> bool:
+        return self.subject_changed or self.body_changed or self.recipients_changed
+
+    def to_payload(self) -> dict[str, Any]:
+        return {
+            "subject_changed": self.subject_changed,
+            "body_changed": self.body_changed,
+            "recipients_changed": self.recipients_changed,
+            "formatting_only_changed": self.formatting_only_changed,
+            "current_to_recipients": list(self.current_to_recipients),
+            "current_cc_recipients": list(self.current_cc_recipients),
+            "body_content_type": self.body_content_type,
+            "last_modified_at": self.last_modified_at,
+        }
+
+    def report_lines(self) -> tuple[str, ...]:
+        body_diff = "\n".join(self.body_diff_lines) if self.body_diff_lines else "(no wording changes)"
+        return (
+            f"Original subject: {self.original_subject}",
+            f"Original body:\n{self.original_body}",
+            f"Human-edited Outlook subject: {self.current_subject}",
+            f"Human-edited Outlook body:\n{self.current_body}",
+            f"Current To recipients: {', '.join(self.current_to_recipients) or '(none)'}",
+            f"Current Cc recipients: {', '.join(self.current_cc_recipients) or '(none)'}",
+            f"Body content type: {self.body_content_type or '(not returned)'}",
+            f"Last modified: {self.last_modified_at or '(not returned)'}",
+            f"Subject changes: {'changed' if self.subject_changed else 'unchanged'}",
+            f"Body wording changes:\n{body_diff}",
+            f"Recipient changes: {'changed' if self.recipients_changed else 'unchanged'}",
+            f"Formatting-only changes: {'yes' if self.formatting_only_changed else 'no'}",
+        )
 
 
 @dataclass(frozen=True)
@@ -2724,6 +2781,322 @@ limit 1;
             ),
         )
 
+    def reconcile_human_edited_outlook_draft(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> OperationReport:
+        """Accept one human Outlook edit only after a read-only governed revalidation."""
+        runtime = self.config.runtime
+        if (
+            not runtime.is_staging
+            or not self.config.allow_real_providers
+            or not runtime.staging_allow_real_outlook
+            or runtime.staging_allow_real_outlook_send
+        ):
+            return self._outlook_human_edit_safety_blocked(
+                "Staging requires Outlook draft-only authorization with sending disabled."
+            )
+        prior_revision = self._load_draft_revision_by_id(rental_case_id, draft_revision_id)
+        if prior_revision is None or not prior_revision.is_current or prior_revision.approval_request_id is None:
+            return self._outlook_human_edit_safety_blocked(
+                "The originating revision is not the current approval-bound draft."
+            )
+        if not runtime.is_email_recipient_allowed(prior_revision.recipient_email):
+            return self._outlook_human_edit_safety_blocked(
+                "The originating draft recipient is not allowlisted for staging."
+            )
+        snapshot = self._require_case_snapshot(rental_case_id)
+        action = snapshot.find_workflow_action(prior_revision.workflow_action_id)
+        approval = snapshot.find_approval_request(prior_revision.approval_request_id)
+        if (
+            action is None
+            or action.target_adapter_code != "outlook"
+            or approval is None
+            or approval.status != APPROVAL_REQUEST_STATUS_APPROVED
+            or approval.target_entity_reference
+            != f"workflow_action:{action.workflow_action_id}:draft_revision:{prior_revision.inquiry_response_draft_revision_id}"
+        ):
+            return self._outlook_human_edit_safety_blocked(
+                "The originating Outlook action or exact-revision approval binding is invalid."
+            )
+        graph_message_ids = {
+            _outlook_message_id_from_external_reference(str(event.structured_payload.get("external_reference") or ""))
+            for event in snapshot.workflow_events
+            if (
+                event.event_type_code == "outlook_draft_reconciled_after_adapter_code_mismatch"
+                and event.structured_payload.get("workflow_action_id") == action.workflow_action_id
+                and event.structured_payload.get("draft_revision_id")
+                == prior_revision.inquiry_response_draft_revision_id
+            )
+        }
+        graph_message_ids.discard(None)
+        if len(graph_message_ids) != 1:
+            return self._outlook_human_edit_safety_blocked(
+                "The originating Graph draft binding is missing or ambiguous."
+            )
+        graph_message_id = next(iter(graph_message_ids))
+        adapter = build_outlook_execution_adapter_from_env(send_enabled=False)
+        availability_failure = adapter.availability_failure_code(action=action)
+        if availability_failure is not None:
+            return self._outlook_human_edit_safety_blocked(
+                "Outlook configuration is not valid for a draft-only reconciliation.",
+                failure_code=availability_failure,
+            )
+
+        # This is the sole Graph operation in the reconciliation path.
+        graph_draft = adapter.read_draft_snapshot(message_id=graph_message_id)
+        if graph_draft.outcome != "found" or not graph_draft.is_draft:
+            return self._outlook_human_edit_safety_blocked(
+                "The originating Graph message could not be read as an existing draft.",
+                failure_code=graph_draft.failure_code or "outlook_human_edit_graph_draft_not_found",
+            )
+        if (
+            graph_draft.sender_mailbox is None
+            or graph_draft.sender_mailbox.casefold() != (adapter.config.sender_mailbox or "").casefold()
+        ):
+            return self._outlook_human_edit_safety_blocked(
+                "The Graph draft sender does not match the configured staging mailbox."
+            )
+
+        diff = _outlook_human_edit_diff(prior_revision=prior_revision, graph_draft=graph_draft)
+        if not diff.meaningful_change:
+            self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code="outlook_human_edit_not_detected",
+                source_reference=f"outlook:message:{graph_message_id}",
+                occurred_at=self.now(),
+                structured_payload={
+                    "workflow_action_id": action.workflow_action_id,
+                    "originating_draft_revision_id": prior_revision.inquiry_response_draft_revision_id,
+                    "graph_message_id": graph_message_id,
+                    "original_content_hash": prior_revision.content_hash,
+                    "comparison": diff.to_payload(),
+                    "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
+                },
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            )
+            return OperationReport(
+                title="Outlook Human Edit Not Detected",
+                success=False,
+                lines=(
+                    "Outcome: OUTLOOK_HUMAN_EDIT_NOT_DETECTED",
+                    *diff.report_lines(),
+                    "Graph mutations: 0",
+                ),
+                failure_codes=("OUTLOOK_HUMAN_EDIT_NOT_DETECTED",),
+            )
+
+        self._create_console_event(
+            rental_case_id=rental_case_id,
+            event_type_code="outlook_human_edit_detected",
+            source_reference=f"outlook:message:{graph_message_id}",
+            occurred_at=self.now(),
+            structured_payload={
+                "workflow_action_id": action.workflow_action_id,
+                "originating_draft_revision_id": prior_revision.inquiry_response_draft_revision_id,
+                "graph_message_id": graph_message_id,
+                "original_content_hash": prior_revision.content_hash,
+                "candidate_content_hash": _json_digest({"subject": graph_draft.subject, "body": graph_draft.body}),
+                "comparison": diff.to_payload(),
+                "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
+            },
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+        )
+        recipient_failure_codes = _outlook_recipient_validation_codes(
+            graph_draft=graph_draft,
+            originating_recipient=prior_revision.recipient_email,
+            recipient_allowed=runtime.is_email_recipient_allowed,
+        )
+        detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
+        current_draft = ClientResponseDraft(
+            subject=graph_draft.subject or "",
+            body=graph_draft.body or "",
+            question_ids=tuple(question_id for question_id, _question in contract.open_client_questions),
+            provider_code="outlook_human_edit",
+        )
+        validation = validate_client_response_draft(
+            contract=contract,
+            draft=current_draft,
+            current_case_revision=current_snapshot.rental_case.case_revision,
+            current_context_hash=contract.context_hash,
+        )
+        validation_codes = (*recipient_failure_codes, *validation.failure_codes)
+        if validation_codes:
+            self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code="outlook_human_edit_validation_failed",
+                source_reference=f"outlook:message:{graph_message_id}",
+                occurred_at=self.now(),
+                structured_payload={
+                    "workflow_action_id": action.workflow_action_id,
+                    "originating_draft_revision_id": prior_revision.inquiry_response_draft_revision_id,
+                    "graph_message_id": graph_message_id,
+                    "original_content_hash": prior_revision.content_hash,
+                    "candidate_content_hash": _json_digest({"subject": current_draft.subject, "body": current_draft.body}),
+                    "source_case_revision": current_snapshot.rental_case.case_revision,
+                    "context_hash": contract.context_hash,
+                    "validation_codes": list(validation_codes),
+                    "comparison": diff.to_payload(),
+                    "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
+                },
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            )
+            return OperationReport(
+                title="Outlook Human Edit Validation Failed",
+                success=False,
+                lines=(
+                    "Outcome: OUTLOOK_HUMAN_EDIT_VALIDATION_FAILED",
+                    f"Validation codes: {', '.join(validation_codes)}",
+                    f"Current case revision: {current_snapshot.rental_case.case_revision}",
+                    f"Current context hash: {contract.context_hash}",
+                    *diff.report_lines(),
+                    "Graph mutations: 0",
+                ),
+                failure_codes=tuple(validation_codes),
+            )
+
+        target_action = self._ensure_governed_client_response_action(
+            current_snapshot,
+            response_intent=contract.response_intent.code,
+            context_hash=contract.context_hash,
+        )
+        current_snapshot = self._require_case_snapshot(rental_case_id)
+        target_action = current_snapshot.find_workflow_action(target_action.workflow_action_id) or target_action
+        context = self._build_governed_client_response_context(
+            current_snapshot,
+            action=target_action,
+            metadata=detail.metadata,
+            open_question_ids=tuple(question_id for question_id, _question in contract.open_client_questions),
+            contract=contract,
+        )
+        content = self._content_from_governed_client_response(
+            subject=current_draft.subject,
+            body=current_draft.body,
+            open_questions=contract.open_client_questions,
+        )
+        revision = self._create_draft_revision(
+            context=context,
+            content=content,
+            draft_source=INQUIRY_DRAFT_SOURCE_HUMAN_EDITED,
+            created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            supersedes_draft_revision_id=prior_revision.inquiry_response_draft_revision_id,
+        )
+        new_approval = self._replace_draft_approval(
+            rental_case_id=rental_case_id,
+            workflow_action=target_action,
+            revision=revision,
+            superseded_revision=prior_revision,
+        )
+        revision = self._bind_approval_request_to_draft_revision(
+            rental_case_id=rental_case_id,
+            draft_revision_id=revision.inquiry_response_draft_revision_id,
+            approval_request_id=new_approval.approval_request_id,
+            draft_status=INQUIRY_DRAFT_STATUS_NEEDS_APPROVAL,
+            updated_at=self.now(),
+        )
+        self._create_console_event(
+            rental_case_id=rental_case_id,
+            event_type_code="outlook_human_edit_revision_created",
+            source_reference=f"outlook:message:{graph_message_id}",
+            occurred_at=self.now(),
+            structured_payload={
+                "originating_workflow_action_id": action.workflow_action_id,
+                "workflow_action_id": target_action.workflow_action_id,
+                "originating_draft_revision_id": prior_revision.inquiry_response_draft_revision_id,
+                "draft_revision_id": revision.inquiry_response_draft_revision_id,
+                "approval_request_id": new_approval.approval_request_id,
+                "graph_message_id": graph_message_id,
+                "source_case_revision": context.source_case_revision,
+                "context_hash": contract.context_hash,
+                "original_content_hash": prior_revision.content_hash,
+                "content_hash": revision.content_hash,
+                "validation_result": "passed",
+                "comparison": diff.to_payload(),
+                "graph_operations": {"get": 1, "patch": 0, "create": 0, "send": 0},
+            },
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+        )
+        return OperationReport(
+            title="Outlook Human Edit Reconciled",
+            success=True,
+            lines=(
+                "Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_PASS",
+                f"Originating draft revision id: {prior_revision.inquiry_response_draft_revision_id}",
+                f"New draft revision id: {revision.inquiry_response_draft_revision_id}",
+                f"New approval request id: {new_approval.approval_request_id}",
+                f"Graph message id: {graph_message_id}",
+                f"Current case revision: {context.source_case_revision}",
+                f"Current context hash: {contract.context_hash}",
+                "Validation: PASS",
+                "Prior approval authorizes new revision: no",
+                "New revision approved: no",
+                f"Originating revision status: {prior_revision.draft_status}",
+                f"New revision status: {revision.draft_status}",
+                "Historical execution attempt left immutable: yes",
+                *diff.report_lines(),
+                "Graph GET calls: 1",
+                "Graph PATCH calls: 0",
+                "Graph draft creates: 0",
+                "Graph send calls: 0",
+            ),
+        )
+
+    def _outlook_human_edit_safety_blocked(
+        self,
+        reason: str,
+        *,
+        failure_code: str = "OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED",
+    ) -> OperationReport:
+        return OperationReport(
+            title="Outlook Human Edit Reconciliation Safety Blocked",
+            success=False,
+            lines=(
+                "Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED",
+                reason,
+                "Graph mutations: 0",
+            ),
+            failure_codes=(failure_code,),
+        )
+
+    def _build_current_governed_draft_contract(
+        self,
+        rental_case_id: int,
+    ) -> tuple[CaseConsoleSnapshot, WorkflowOrchestrationCaseSnapshot, Any]:
+        """Rebuild the normal governed draft contract without a generation call."""
+        detail = self.load_case_detail(rental_case_id)
+        snapshot = detail.orchestration_snapshot
+        latest_evidence = next(
+            (bundle.raw_evidence for bundle in detail.evidence_bundles if bundle.raw_evidence is not None),
+            None,
+        )
+        resolution_items = with_workflow_actions(derive_resolution_items(snapshot), snapshot.workflow_actions)
+        guidance_topics = detect_guidance_topics(snapshot, None if latest_evidence is None else latest_evidence.body)
+        try:
+            contextual_guidance = retrieve_contextual_guidance(
+                search=self.contextual_guidance_search,
+                topics=guidance_topics,
+                rental_type_code=snapshot.rental_case.rental_type_code,
+            )
+        except Exception:
+            # Guidance retrieval is advisory and must not weaken governed validation.
+            contextual_guidance = ()
+        contract = build_draft_contract(
+            snapshot=snapshot,
+            recipient_label=detail.metadata.client_label,
+            latest_client_message=None if latest_evidence is None else latest_evidence.body,
+            commercial_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.commercial_snapshot),
+            feasibility_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.feasibility_snapshot),
+            resolution_items=resolution_items,
+            contextual_guidance=contextual_guidance,
+        )
+        return detail, snapshot, contract
+
     def edit_inquiry_response_draft(
         self,
         *,
@@ -4794,6 +5167,83 @@ def _normalize_optional_text(value: str | None) -> str | None:
         return None
     trimmed = value.strip()
     return trimmed or None
+
+
+def _outlook_message_id_from_external_reference(external_reference: str) -> str | None:
+    prefix = "outlook:message:"
+    if not external_reference.startswith(prefix):
+        return None
+    message_id = external_reference[len(prefix) :].strip()
+    return message_id or None
+
+
+def _canonical_outlook_transport_text(value: str) -> str:
+    """Ignore only deterministic Graph HTML and whitespace transport noise."""
+    text = re.sub(r"(?i)<br\\s*/?>", "\n", value)
+    text = re.sub(r"(?i)</(?:p|div|li|tr|h[1-6])\\s*>", "\n", text)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return " ".join(html.unescape(text).replace("\r\n", "\n").replace("\r", "\n").split())
+
+
+def _canonical_outlook_subject(value: str) -> str:
+    return " ".join(value.replace("\r\n", "\n").replace("\r", "\n").split())
+
+
+def _outlook_human_edit_diff(
+    *,
+    prior_revision: InquiryResponseDraftRevision,
+    graph_draft: OutlookDraftSnapshot,
+) -> _OutlookHumanEditDiff:
+    current_subject = graph_draft.subject or ""
+    current_body = graph_draft.body or ""
+    expected_recipients = (prior_revision.recipient_email.strip().casefold(),)
+    subject_changed = _canonical_outlook_subject(prior_revision.subject) != _canonical_outlook_subject(current_subject)
+    body_changed = _canonical_outlook_transport_text(prior_revision.body_text) != _canonical_outlook_transport_text(current_body)
+    recipients_changed = graph_draft.to_recipients != expected_recipients or bool(graph_draft.cc_recipients)
+    raw_changed = prior_revision.subject != current_subject or prior_revision.body_text != current_body
+    body_diff_lines = tuple(
+        difflib.unified_diff(
+            prior_revision.body_text.splitlines(),
+            current_body.splitlines(),
+            fromfile=f"DraftRevision {prior_revision.inquiry_response_draft_revision_id}",
+            tofile="Current Outlook Draft",
+            lineterm="",
+        )
+    )
+    return _OutlookHumanEditDiff(
+        subject_changed=subject_changed,
+        body_changed=body_changed,
+        recipients_changed=recipients_changed,
+        formatting_only_changed=raw_changed and not (subject_changed or body_changed or recipients_changed),
+        original_subject=prior_revision.subject,
+        original_body=prior_revision.body_text,
+        current_subject=current_subject,
+        current_body=current_body,
+        current_to_recipients=graph_draft.to_recipients,
+        current_cc_recipients=graph_draft.cc_recipients,
+        body_content_type=graph_draft.body_content_type,
+        last_modified_at=graph_draft.last_modified_at,
+        body_diff_lines=body_diff_lines,
+    )
+
+
+def _outlook_recipient_validation_codes(
+    *,
+    graph_draft: OutlookDraftSnapshot,
+    originating_recipient: str,
+    recipient_allowed: Callable[[str], bool],
+) -> tuple[str, ...]:
+    expected_recipient = originating_recipient.strip().casefold()
+    codes: list[str] = []
+    if graph_draft.to_recipients != (expected_recipient,):
+        codes.append("outlook_human_edit_recipient_changed")
+    if graph_draft.cc_recipients:
+        codes.append("outlook_human_edit_cc_recipient_not_supported")
+    if not graph_draft.to_recipients or any(not recipient_allowed(value) for value in graph_draft.to_recipients):
+        codes.append("outlook_human_edit_recipient_not_allowlisted")
+    if any(not recipient_allowed(value) for value in graph_draft.cc_recipients):
+        codes.append("outlook_human_edit_cc_recipient_not_allowlisted")
+    return tuple(codes)
 
 
 def _report_line_value(lines: tuple[str, ...], prefix: str) -> str | None:

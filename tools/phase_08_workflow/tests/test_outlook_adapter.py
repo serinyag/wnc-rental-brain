@@ -307,6 +307,39 @@ class OutlookAdapterTests(unittest.TestCase):
         self.assertEqual(result.candidate_count, 0)
         self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
 
+    def test_read_draft_snapshot_uses_one_immutable_id_graph_get_without_mutation(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "access-token", "token_type": "Bearer"}), {}),
+            (
+                200,
+                json.dumps(
+                    {
+                        "id": "immutable-draft-id",
+                        "isDraft": True,
+                        "from": {"emailAddress": {"address": "sales@wnc.example"}},
+                        "toRecipients": [{"emailAddress": {"address": "client@example.com"}}],
+                        "ccRecipients": [],
+                        "subject": "Need your event details",
+                        "body": {"contentType": "text", "content": "Please confirm the final guest count."},
+                        "lastModifiedDateTime": "2026-08-13T12:00:00Z",
+                    }
+                ),
+                {},
+            ),
+        )
+
+        result = self.make_adapter(transport).read_draft_snapshot(message_id="immutable-draft-id")
+
+        self.assertEqual(result.outcome, "found")
+        self.assertTrue(result.is_draft)
+        self.assertEqual(result.subject, "Need your event details")
+        self.assertEqual(result.body, "Please confirm the final guest count.")
+        self.assertEqual(result.to_recipients, ("client@example.com",))
+        self.assertEqual(result.sender_mailbox, "sales@wnc.example")
+        self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
+        self.assertIn("/messages/immutable-draft-id?", str(transport.requests[1]["url"]))
+        self.assertNotIn("/send", str(transport.requests[1]["url"]))
+
     def test_availability_rejects_reply_mode_in_this_phase(self) -> None:
         adapter = self.make_adapter(StubOutlookTransport())
         action = make_email_action(

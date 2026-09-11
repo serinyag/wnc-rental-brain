@@ -198,6 +198,24 @@ class OutlookDraftReadResult:
     provider_error_code: str | None = None
 
 
+@dataclass(frozen=True)
+class OutlookDraftSnapshot:
+    """A read-only representation of one immutable-ID Graph draft."""
+
+    outcome: str
+    message_id: str | None = None
+    subject: str | None = None
+    body: str | None = None
+    body_content_type: str | None = None
+    to_recipients: tuple[str, ...] = ()
+    cc_recipients: tuple[str, ...] = ()
+    is_draft: bool | None = None
+    sender_mailbox: str | None = None
+    last_modified_at: str | None = None
+    failure_code: str | None = None
+    provider_error_code: str | None = None
+
+
 @dataclass
 class OutlookExecutionAdapter:
     config: OutlookAdapterConfig
@@ -317,6 +335,111 @@ class OutlookExecutionAdapter:
             recipient_email=recipient_email,
             subject=subject,
             body=body,
+        )
+
+    def read_draft_snapshot(self, *, message_id: str) -> OutlookDraftSnapshot:
+        """Read exactly one existing draft by immutable Graph message ID.
+
+        This intentionally uses a single Graph ``GET`` after token acquisition.
+        It is not an execution path and cannot create, update, delete, or send a
+        message.
+        """
+        normalized_message_id = message_id.strip()
+        if not normalized_message_id:
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID,
+            )
+        token_result = self._acquire_access_token()
+        if token_result.result is not None:
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=token_result.result.failure_code,
+                provider_error_code=_provider_error_code_from_snapshot(token_result.result.response_snapshot),
+            )
+        access_token = token_result.access_token
+        if access_token is None:
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
+            )
+        return self._read_draft_snapshot(access_token=access_token, message_id=normalized_message_id)
+
+    def _read_draft_snapshot(
+        self,
+        *,
+        access_token: str,
+        message_id: str,
+    ) -> OutlookDraftSnapshot:
+        query = urllib.parse.urlencode(
+            {
+                "$select": "id,isDraft,from,sender,toRecipients,ccRecipients,subject,body,lastModifiedDateTime",
+            }
+        )
+        url = (
+            f"{self.config.graph_base_url.rstrip('/')}/users/"
+            f"{urllib.parse.quote(self.config.sender_mailbox or '', safe='')}/messages/"
+            f"{urllib.parse.quote(message_id, safe='')}?{query}"
+        )
+        try:
+            status_code, body_text, _response_headers = self.transport.request(
+                method="GET",
+                url=url,
+                headers=_graph_read_headers(access_token),
+                body=None,
+                timeout_seconds=self.config.timeout_seconds,
+            )
+        except OutlookAmbiguousTransportError:
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=EXECUTION_FAILURE_ADAPTER_SERVER_ERROR,
+            )
+        parsed, invalid_json = _load_json(body_text)
+        if invalid_json or not isinstance(parsed, dict):
+            failure_code, _retry_eligible = _classify_http_failure(status_code=status_code)
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=(EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED if 200 <= status_code < 300 else failure_code),
+            )
+        if not 200 <= status_code < 300:
+            failure_code, _retry_eligible = _classify_http_failure(status_code=status_code)
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=failure_code,
+                provider_error_code=_extract_provider_error_code(parsed),
+            )
+        returned_message_id = parsed.get("id")
+        subject = parsed.get("subject")
+        is_draft = parsed.get("isDraft")
+        if (
+            not isinstance(returned_message_id, str)
+            or returned_message_id.strip() != message_id
+            or not isinstance(subject, str)
+            or not isinstance(is_draft, bool)
+        ):
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
+            )
+        body = parsed.get("body")
+        if not isinstance(body, Mapping) or not isinstance(body.get("content"), str):
+            return OutlookDraftSnapshot(
+                outcome="read_failed",
+                failure_code=EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
+            )
+        body_content_type = body.get("contentType")
+        last_modified_at = parsed.get("lastModifiedDateTime")
+        return OutlookDraftSnapshot(
+            outcome="found",
+            message_id=returned_message_id.strip(),
+            subject=subject,
+            body=body["content"],
+            body_content_type=body_content_type if isinstance(body_content_type, str) else None,
+            to_recipients=_message_recipient_addresses(parsed),
+            cc_recipients=_message_recipient_addresses(parsed, field_name="ccRecipients"),
+            is_draft=is_draft,
+            sender_mailbox=_message_sender_address(parsed),
+            last_modified_at=last_modified_at if isinstance(last_modified_at, str) and last_modified_at.strip() else None,
         )
 
     def _read_matching_draft(
@@ -917,8 +1040,12 @@ def _match_outlook_drafts(
     )
 
 
-def _message_recipient_addresses(message: Mapping[str, Any]) -> tuple[str, ...]:
-    recipients = message.get("toRecipients")
+def _message_recipient_addresses(
+    message: Mapping[str, Any],
+    *,
+    field_name: str = "toRecipients",
+) -> tuple[str, ...]:
+    recipients = message.get(field_name)
     if not isinstance(recipients, list):
         return ()
     addresses: list[str] = []
@@ -933,6 +1060,20 @@ def _message_recipient_addresses(message: Mapping[str, Any]) -> tuple[str, ...]:
             return ()
         addresses.append(_normalized_email_address(address))
     return tuple(addresses)
+
+
+def _message_sender_address(message: Mapping[str, Any]) -> str | None:
+    for field_name in ("sender", "from"):
+        sender = message.get(field_name)
+        if not isinstance(sender, Mapping):
+            continue
+        email_address = sender.get("emailAddress")
+        if not isinstance(email_address, Mapping):
+            continue
+        address = email_address.get("address")
+        if isinstance(address, str) and address.strip():
+            return _normalized_email_address(address)
+    return None
 
 
 def _message_body_content(message: Mapping[str, Any]) -> str:

@@ -203,6 +203,19 @@ class OperatorHarnessClient:
             {},
         )
 
+    def reconcile_human_edited_outlook_draft(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> dict[str, Any]:
+        """Re-read and govern one existing human-edited Outlook draft without mutation."""
+        return self.request(
+            "POST",
+            f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-human-edit-reconcile",
+            {},
+        )
+
     def edit_draft(
         self,
         *,

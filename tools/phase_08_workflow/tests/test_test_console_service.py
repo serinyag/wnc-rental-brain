@@ -4,7 +4,7 @@ import subprocess
 import unittest
 from dataclasses import replace
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from tools.runtime_environment import AppEnvironment, AppRuntimeConfig
 from tools.phase_08_workflow.contracts import (
@@ -31,7 +31,7 @@ from tools.phase_08_workflow.contracts import (
 from tools.phase_08_workflow.asana_adapter import AsanaAdapterConfig
 from tools.phase_08_workflow.execution_types import NormalizedExecutionResult
 from tools.phase_08_workflow.governed_client_response import ClientResponseProviderError, DeterministicFakeClientResponseProvider
-from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig, OutlookDraftReadResult
+from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig, OutlookDraftReadResult, OutlookDraftSnapshot
 from tools.phase_08_workflow.observation_contracts import InboundObservation, InboundObservationEffect, InboundSourceRecord
 from tools.phase_08_workflow.observation_repository import InMemoryObservationRepository
 from tools.phase_08_workflow.orchestration_repository import InMemoryWorkflowOrchestrationRepository, WorkflowOrchestrationCaseSnapshot
@@ -423,6 +423,137 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         with self.assertRaisesRegex(TestConsoleError, "global and Outlook-specific"):
             service.inspect_governed_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+    def test_human_edit_reconciliation_fails_closed_when_outlook_send_is_enabled(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_basic_auth_username="stage-user",
+                    staging_basic_auth_password="stage-pass",
+                    staging_allow_real_outlook=True,
+                    staging_allow_real_outlook_send=True,
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+        self.assertFalse(report.success)
+        self.assertEqual(report.failure_codes, ("OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED",))
+        self.assertIn("Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_SAFETY_BLOCKED", report.lines)
+
+    def test_human_edit_reconciliation_creates_only_a_new_approval_bound_revision(self) -> None:
+        runtime = AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING,
+            app_env_explicit=True,
+            database_url="postgresql://staging-db",
+            staging_basic_auth_username="stage-user",
+            staging_basic_auth_password="stage-pass",
+            staging_allowed_email_recipients=("approved@example.com",),
+            staging_allow_real_outlook=True,
+            staging_allow_real_outlook_send=False,
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
+        )
+        prior_revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=41,
+            approval_request_id=51,
+            workflow_action_id=61,
+            recipient_email="approved@example.com",
+            subject="Original subject",
+            body_text="Original body",
+            content_hash="original-content-hash",
+            draft_status="send_failed",
+            is_current=True,
+        )
+        original_action = SimpleNamespace(workflow_action_id=61, target_adapter_code="outlook")
+        target_action = SimpleNamespace(workflow_action_id=62)
+        approval = SimpleNamespace(
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference="workflow_action:61:draft_revision:41",
+        )
+        event = SimpleNamespace(
+            event_type_code="outlook_draft_reconciled_after_adapter_code_mismatch",
+            structured_payload={
+                "workflow_action_id": 61,
+                "draft_revision_id": 41,
+                "external_reference": "outlook:message:immutable-draft-id",
+            },
+        )
+        initial_snapshot = SimpleNamespace(
+            workflow_events=(event,),
+            find_workflow_action=lambda action_id: original_action if action_id == 61 else None,
+            find_approval_request=lambda _approval_id: approval,
+        )
+        current_snapshot = SimpleNamespace(
+            rental_case=SimpleNamespace(case_revision=7),
+            find_workflow_action=lambda action_id: target_action if action_id == 62 else None,
+        )
+        adapter = SimpleNamespace(
+            config=SimpleNamespace(sender_mailbox="approved@example.com"),
+            availability_failure_code=lambda **_kwargs: None,
+            read_draft_snapshot=lambda **_kwargs: OutlookDraftSnapshot(
+                outcome="found",
+                message_id="immutable-draft-id",
+                subject="Edited subject",
+                body="Edited body",
+                body_content_type="text",
+                to_recipients=("approved@example.com",),
+                is_draft=True,
+                sender_mailbox="approved@example.com",
+            ),
+        )
+        contract = SimpleNamespace(
+            response_intent=SimpleNamespace(code="REQUEST_CLIENT_INFORMATION"),
+            open_client_questions=(),
+            context_hash="current-context-hash",
+        )
+        detail = SimpleNamespace(metadata=SimpleNamespace(client_label="Acme"))
+        created_revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=42,
+            content_hash="edited-content-hash",
+            draft_status="needs_approval",
+        )
+        new_approval = SimpleNamespace(approval_request_id=52)
+
+        with patch.object(service, "_load_draft_revision_by_id", return_value=prior_revision), patch.object(
+            service, "_require_case_snapshot", side_effect=(initial_snapshot, current_snapshot)
+        ), patch(
+            "tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env", return_value=adapter
+        ) as build_adapter, patch.object(
+            service, "_build_current_governed_draft_contract", return_value=(detail, current_snapshot, contract)
+        ), patch(
+            "tools.phase_08_workflow.test_console_service.validate_client_response_draft",
+            return_value=SimpleNamespace(failure_codes=()),
+        ), patch.object(service, "_ensure_governed_client_response_action", return_value=target_action), patch.object(
+            service, "_build_governed_client_response_context", return_value=SimpleNamespace(source_case_revision=7)
+        ), patch.object(service, "_content_from_governed_client_response", return_value=SimpleNamespace()), patch.object(
+            service, "_create_draft_revision", return_value=created_revision
+        ) as create_revision, patch.object(service, "_replace_draft_approval", return_value=new_approval), patch.object(
+            service, "_bind_approval_request_to_draft_revision", return_value=created_revision
+        ), patch.object(service, "_create_console_event"):
+            report = service.reconcile_human_edited_outlook_draft(rental_case_id=1, draft_revision_id=41)
+
+        self.assertTrue(report.success)
+        self.assertIn("Outcome: OUTLOOK_HUMAN_EDIT_RECONCILIATION_PASS", report.lines)
+        self.assertIn("Prior approval authorizes new revision: no", report.lines)
+        build_adapter.assert_called_once_with(send_enabled=False)
+        create_revision.assert_called_once_with(
+            context=ANY,
+            content=ANY,
+            draft_source="human_edited",
+            created_by_reference="test_console:operator",
+            supersedes_draft_revision_id=41,
+        )
 
     def test_staging_outlook_draft_read_reports_exact_graph_match_without_persistence(self) -> None:
         service = TestConsoleService(
