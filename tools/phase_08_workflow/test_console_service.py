@@ -2689,23 +2689,32 @@ limit 1;
                 failure_code="OUTLOOK_SEND_READINESS_ACTION_INVALID",
                 status=HTTPStatus.NOT_FOUND,
             )
-        revision = self._load_current_draft_revision_for_conversation(
-            rental_case_id,
-            conversation_key=self._draft_conversation_key(action),
-        )
-        if revision is None or revision.workflow_action_id != action.workflow_action_id:
+        revision = self._action_bound_draft_revision(snapshot, action=action)
+        if revision is None:
             raise TestConsoleError(
                 "The workflow action is not bound to the current governed draft revision.",
                 failure_code="OUTLOOK_SEND_READINESS_DRAFT_BINDING_INVALID",
                 status=HTTPStatus.CONFLICT,
             )
-        approval = (
-            None
-            if revision.approval_request_id is None
-            else snapshot.find_approval_request(revision.approval_request_id)
-        )
+        _detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
+        if (
+            revision.source_case_revision != current_snapshot.rental_case.case_revision
+            or revision.context_hash != contract.context_hash
+            or self._has_blocking_operator_annotations(revision)
+            or not self.config.runtime.is_email_recipient_allowed(revision.recipient_email)
+        ):
+            raise TestConsoleError(
+                "The governed Outlook draft no longer matches current send truth.",
+                failure_code="OUTLOOK_SEND_READINESS_CONTEXT_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
         exact_reference = f"workflow_action:{action.workflow_action_id}:draft_revision:{revision.inquiry_response_draft_revision_id}"
-        exact_approval = approval is not None and approval.target_entity_reference == exact_reference
+        approval = self._exact_approval_for_action_revision(
+            snapshot,
+            exact_reference=exact_reference,
+            fallback_approval_request_id=revision.approval_request_id,
+        )
+        exact_approval = approval is not None
         approved = exact_approval and approval.status == APPROVAL_REQUEST_STATUS_APPROVED
         return OperationReport(
             title="Governed Outlook Send Readiness Verified",
@@ -2715,10 +2724,168 @@ limit 1;
                 "Graph operations: 0",
                 f"Workflow action id: {action.workflow_action_id}",
                 f"Draft revision id: {revision.inquiry_response_draft_revision_id}",
-                f"Approval request id: {revision.approval_request_id}",
+                f"Approval request id: {None if approval is None else approval.approval_request_id}",
                 f"Exact approval target: {exact_reference}",
                 f"Exact approval required: {'no' if approved else 'yes'}",
+                "Exact revision integrity: pass",
+                "Current case/context: pass",
+                "Recipient allowlist: pass",
                 f"Readiness: {'final_integrity_check_required' if approved else 'approval_required'}",
+                "Outlook send performed: no",
+            ),
+        )
+
+    def prepare_governed_outlook_send_recovery(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> OperationReport:
+        """Create an append-only, unapproved retry after a pre-provider send failure."""
+        snapshot = self._require_case_snapshot(rental_case_id)
+        revision = self._load_draft_revision_by_id(rental_case_id, draft_revision_id)
+        if revision is None or not revision.is_current or revision.draft_status != INQUIRY_DRAFT_STATUS_SEND_FAILED:
+            raise TestConsoleError(
+                "Only the current failed governed draft can receive a recovery send action.",
+                failure_code="OUTLOOK_SEND_RECOVERY_DRAFT_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
+        origin_action = snapshot.find_workflow_action(revision.workflow_action_id)
+        if (
+            origin_action is None
+            or origin_action.action_type != ACTION_TYPE_SEND_INQUIRY_RESPONSE
+            or origin_action.target_adapter_code != "outlook"
+            or origin_action.status != WORKFLOW_ACTION_STATUS_FAILED
+        ):
+            raise TestConsoleError(
+                "The failed draft does not have a failed governed Outlook action to recover.",
+                failure_code="OUTLOOK_SEND_RECOVERY_ORIGIN_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
+        origin_approval = (
+            None
+            if revision.approval_request_id is None
+            else snapshot.find_approval_request(revision.approval_request_id)
+        )
+        if (
+            origin_approval is None
+            or origin_approval.status != APPROVAL_REQUEST_STATUS_APPROVED
+            or origin_approval.target_entity_reference
+            != f"workflow_action:{origin_action.workflow_action_id}:draft_revision:{revision.inquiry_response_draft_revision_id}"
+        ):
+            raise TestConsoleError(
+                "The failed draft does not retain its exact historical approval evidence.",
+                failure_code="OUTLOOK_SEND_RECOVERY_HISTORY_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
+        _detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
+        if (
+            revision.source_case_revision != current_snapshot.rental_case.case_revision
+            or revision.context_hash != contract.context_hash
+            or self._has_blocking_operator_annotations(revision)
+            or not self.config.runtime.is_email_recipient_allowed(revision.recipient_email)
+        ):
+            raise TestConsoleError(
+                "The failed draft no longer matches current governed truth for recovery.",
+                failure_code="OUTLOOK_SEND_RECOVERY_CONTEXT_INVALID",
+                status=HTTPStatus.CONFLICT,
+            )
+        # This proves the already-bound draft identity from local audit data only.
+        self._bound_outlook_message_id(snapshot=snapshot, action=origin_action, revision=revision)
+        payload = {
+            "conversation_key": revision.conversation_key,
+            "recovery_draft_revision_id": revision.inquiry_response_draft_revision_id,
+            "recovery_origin_workflow_action_id": origin_action.workflow_action_id,
+            "draft_content_hash": revision.content_hash,
+            "context_hash": revision.context_hash,
+            "recipient_email": revision.recipient_email,
+        }
+        timestamp = self.now()
+        action = self.orchestration_repository.create_workflow_action(
+            WorkflowAction(
+                workflow_action_id=1,
+                workflow_action_uuid="workflow-action",
+                rental_case_id=rental_case_id,
+                action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+                action_category=origin_action.action_category,
+                target_adapter_code="outlook",
+                reason_entity_type=origin_action.reason_entity_type,
+                reason_entity_id=origin_action.reason_entity_id,
+                reason_entity_reference=origin_action.reason_entity_reference,
+                approval_posture=APPROVAL_POSTURE_APPROVAL_REQUIRED,
+                status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
+                semantic_subject_hash=revision.context_hash,
+                source_case_revision=revision.source_case_revision,
+                idempotency_key=(
+                    f"{revision.conversation_key}:outlook_send_recovery:"
+                    f"draft_revision:{revision.inquiry_response_draft_revision_id}:"
+                    f"origin_action:{origin_action.workflow_action_id}"
+                ),
+                structured_payload=payload,
+                target_scope_key=origin_action.target_scope_key,
+                supersedes_workflow_action_id=origin_action.workflow_action_id,
+                created_at=timestamp,
+                updated_at=timestamp,
+            )
+        )
+        exact_reference = f"workflow_action:{action.workflow_action_id}:draft_revision:{revision.inquiry_response_draft_revision_id}"
+        approval = self._exact_approval_for_action_revision(snapshot, exact_reference=exact_reference)
+        if approval is None:
+            approval = self.orchestration_repository.create_approval_request(
+                ApprovalRequest(
+                    approval_request_id=1,
+                    rental_case_id=rental_case_id,
+                    target_entity_type="workflow_action",
+                    target_entity_id=action.workflow_action_id,
+                    target_entity_reference=exact_reference,
+                    approval_type="client_communication_send",
+                    reason_text=(
+                        f"Approve exact recovery send for inquiry response draft revision "
+                        f"{revision.inquiry_response_draft_revision_id}."
+                    ),
+                    evidence_reference_keys=(
+                        f"workflow_action:{action.workflow_action_id}",
+                        f"workflow_action:{origin_action.workflow_action_id}",
+                        f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}",
+                    ),
+                    required_approver_role="client_communication_review",
+                    required_approver_reference=(
+                        f"semantic:approval:workflow_action:{action.workflow_action_id}:"
+                        f"draft_revision:{revision.inquiry_response_draft_revision_id}"
+                    ),
+                    status=APPROVAL_REQUEST_STATUS_OPEN,
+                    supersedes_approval_request_id=origin_approval.approval_request_id,
+                    created_at=timestamp,
+                )
+            )
+            self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code="outlook_send_recovery_prepared",
+                source_reference=f"workflow_action:{action.workflow_action_id}",
+                occurred_at=timestamp,
+                structured_payload={
+                    "workflow_action_id": action.workflow_action_id,
+                    "origin_workflow_action_id": origin_action.workflow_action_id,
+                    "draft_revision_id": revision.inquiry_response_draft_revision_id,
+                    "approval_request_id": approval.approval_request_id,
+                    "content_hash": revision.content_hash,
+                    "context_hash": revision.context_hash,
+                    "recipient_email": revision.recipient_email,
+                },
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            )
+        return OperationReport(
+            title="Governed Outlook Send Recovery Prepared",
+            success=True,
+            lines=(
+                "Read mode: provider-free",
+                "Graph operations: 0",
+                f"Draft revision id: {revision.inquiry_response_draft_revision_id}",
+                f"Historical workflow action id: {origin_action.workflow_action_id}",
+                f"Recovery workflow action id: {action.workflow_action_id}",
+                f"Recovery approval request id: {approval.approval_request_id}",
+                f"Recovery approval status: {approval.status}",
                 "Outlook send performed: no",
             ),
         )
@@ -4928,19 +5095,20 @@ returning
             ACTION_TYPE_SEND_INQUIRY_RESPONSE,
         }:
             return
-        current_revision = self._load_current_draft_revision_for_conversation(
-            snapshot.rental_case.rental_case_id,
-            conversation_key=self._draft_conversation_key(action),
-        )
+        current_revision = self._action_bound_draft_revision(snapshot, action=action)
         if current_revision is None:
+            unbound_current_revision = self._load_current_draft_revision_for_conversation(
+                snapshot.rental_case.rental_case_id,
+                conversation_key=self._draft_conversation_key(action),
+            )
+            if unbound_current_revision is not None:
+                raise TestConsoleError(
+                    "The current inquiry-response draft belongs to a newer workflow action and this action can no longer execute.",
+                    failure_code="INQUIRY_DRAFT_ACTION_MISMATCH",
+                )
             raise TestConsoleError(
                 "No current inquiry-response draft exists for this workflow action.",
                 failure_code="INQUIRY_DRAFT_REQUIRED",
-            )
-        if current_revision.workflow_action_id != action.workflow_action_id:
-            raise TestConsoleError(
-                "The current inquiry-response draft belongs to a newer workflow action and this action can no longer execute.",
-                failure_code="INQUIRY_DRAFT_ACTION_MISMATCH",
             )
         display_status = self._draft_display_status(snapshot, current_revision, action=action)
         if display_status == INQUIRY_DRAFT_STATUS_STALE:
@@ -4948,7 +5116,11 @@ returning
                 "The current inquiry-response draft is stale and cannot be sent.",
                 failure_code="INQUIRY_DRAFT_STALE",
             )
-        if current_revision.draft_status != INQUIRY_DRAFT_STATUS_APPROVED:
+        is_recovery = self._is_exact_outlook_send_recovery(action, revision=current_revision)
+        if (
+            current_revision.draft_status != INQUIRY_DRAFT_STATUS_APPROVED
+            and not (is_recovery and current_revision.draft_status == INQUIRY_DRAFT_STATUS_SEND_FAILED)
+        ):
             raise TestConsoleError(
                 "Only the current approved inquiry-response draft can be sent.",
                 failure_code="INQUIRY_DRAFT_NOT_APPROVED",
@@ -4958,10 +5130,12 @@ returning
                 "The current inquiry-response draft has unresolved blocking operator annotations and cannot be sent.",
                 failure_code="INQUIRY_DRAFT_BLOCKING_OPERATOR_ANNOTATION",
             )
-        approval = (
-            None
-            if current_revision.approval_request_id is None
-            else snapshot.find_approval_request(current_revision.approval_request_id)
+        approval = self._exact_approval_for_action_revision(
+            snapshot,
+            exact_reference=(
+                f"workflow_action:{action.workflow_action_id}:"
+                f"draft_revision:{current_revision.inquiry_response_draft_revision_id}"
+            ),
         )
         if (
             approval is None
@@ -4986,11 +5160,8 @@ returning
             or action.target_adapter_code != "outlook"
         ):
             return action
-        revision = self._load_current_draft_revision_for_conversation(
-            snapshot.rental_case.rental_case_id,
-            conversation_key=self._draft_conversation_key(action),
-        )
-        if revision is None or revision.workflow_action_id != action.workflow_action_id:
+        revision = self._action_bound_draft_revision(snapshot, action=action)
+        if revision is None:
             raise TestConsoleError(
                 "The approved inquiry-response draft is no longer bound to this workflow action.",
                 failure_code="INQUIRY_DRAFT_ACTION_MISMATCH",
@@ -5012,6 +5183,13 @@ returning
             "body_type": "text",
             "message_mode": "new",
         }
+        if self._is_exact_outlook_send_recovery(action, revision=revision):
+            payload.update(
+                {
+                    "recovery_draft_revision_id": revision.inquiry_response_draft_revision_id,
+                    "recovery_origin_workflow_action_id": revision.workflow_action_id,
+                }
+            )
         if revision.draft_source == INQUIRY_DRAFT_SOURCE_HUMAN_EDITED:
             payload.update(
                 {
@@ -5026,6 +5204,68 @@ returning
         if revision.recipient_label:
             payload["recipient_name"] = revision.recipient_label
         return replace(action, structured_payload=payload)
+
+    def _action_bound_draft_revision(
+        self,
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        action: WorkflowAction,
+    ) -> InquiryResponseDraftRevision | None:
+        """Resolve either an originating action or a strict append-only send recovery."""
+        rental_case_id = action.rental_case_id
+        revision = self._load_current_draft_revision_for_conversation(
+            rental_case_id,
+            conversation_key=self._draft_conversation_key(action),
+        )
+        if revision is not None and revision.workflow_action_id == action.workflow_action_id:
+            return revision
+        recovery_revision_id = action.structured_payload.get("recovery_draft_revision_id")
+        if not isinstance(recovery_revision_id, int) or isinstance(recovery_revision_id, bool):
+            return None
+        recovery_revision = self._load_draft_revision_by_id(rental_case_id, recovery_revision_id)
+        if recovery_revision is None or not recovery_revision.is_current:
+            return None
+        if self._is_exact_outlook_send_recovery(action, revision=recovery_revision):
+            return recovery_revision
+        return None
+
+    @staticmethod
+    def _is_exact_outlook_send_recovery(
+        action: WorkflowAction,
+        *,
+        revision: InquiryResponseDraftRevision,
+    ) -> bool:
+        payload = action.structured_payload
+        return (
+            action.supersedes_workflow_action_id == revision.workflow_action_id
+            and payload.get("recovery_draft_revision_id") == revision.inquiry_response_draft_revision_id
+            and payload.get("recovery_origin_workflow_action_id") == revision.workflow_action_id
+            and payload.get("conversation_key") == revision.conversation_key
+            and payload.get("draft_content_hash") == revision.content_hash
+            and payload.get("context_hash") == revision.context_hash
+            and payload.get("recipient_email") == revision.recipient_email
+        )
+
+    @staticmethod
+    def _exact_approval_for_action_revision(
+        snapshot: WorkflowOrchestrationCaseSnapshot,
+        *,
+        exact_reference: str,
+        fallback_approval_request_id: int | None = None,
+    ) -> ApprovalRequest | None:
+        if not hasattr(snapshot, "approval_requests"):
+            if fallback_approval_request_id is None:
+                return None
+            approval = snapshot.find_approval_request(fallback_approval_request_id)
+            return None if approval is None or approval.target_entity_reference != exact_reference else approval
+        matching = [
+            approval
+            for approval in snapshot.approval_requests
+            if approval.target_entity_reference == exact_reference
+        ]
+        if len(matching) != 1:
+            return None
+        return matching[0]
 
     def _outlook_send_enabled_at_transport_boundary(self) -> bool:
         """Keep the send switch evaluated at the exact outbound transport boundary."""
@@ -5056,7 +5296,8 @@ returning
             for event in snapshot.workflow_events
             if (
                 event.event_type_code == "outlook_human_edit_revision_created"
-                and event.structured_payload.get("workflow_action_id") == action.workflow_action_id
+                and event.structured_payload.get("workflow_action_id")
+                == revision.workflow_action_id
                 and event.structured_payload.get("draft_revision_id")
                 == revision.inquiry_response_draft_revision_id
             )
@@ -5087,7 +5328,11 @@ returning
             )
             if (
                 revision is None
-                or revision.workflow_action_id != action.workflow_action_id
+                or not revision.is_current
+                or not (
+                    revision.workflow_action_id == action.workflow_action_id
+                    or self._is_exact_outlook_send_recovery(action, revision=revision)
+                )
                 or revision.conversation_key != action.structured_payload.get("conversation_key")
                 or revision.content_hash != action.structured_payload.get("draft_content_hash")
                 or revision.context_hash != action.structured_payload.get("context_hash")
@@ -5101,14 +5346,19 @@ returning
                 or email_payload.body != revision.body_text
             ):
                 return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "approved_draft_content_projection_changed"
-            approval = (
-                None
-                if revision.approval_request_id is None
-                else snapshot.find_approval_request(revision.approval_request_id)
+            approval = self._exact_approval_for_action_revision(
+                snapshot,
+                exact_reference=(
+                    f"workflow_action:{action.workflow_action_id}:"
+                    f"draft_revision:{revision.inquiry_response_draft_revision_id}"
+                ),
+                fallback_approval_request_id=revision.approval_request_id,
             )
             if (
-                not revision.is_current
-                or revision.draft_status != INQUIRY_DRAFT_STATUS_APPROVED
+                (
+                    revision.draft_status != INQUIRY_DRAFT_STATUS_APPROVED
+                    and not self._is_exact_outlook_send_recovery(action, revision=revision)
+                )
                 or self._has_blocking_operator_annotations(revision)
                 or approval is None
                 or approval.status != APPROVAL_REQUEST_STATUS_APPROVED

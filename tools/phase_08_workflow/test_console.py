@@ -349,6 +349,12 @@ class TestConsoleApp:
                     "report": self._serialize_for_json(report),
                 },
             )
+        if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "drafts" and parts[7] == "outlook-send-recovery" and method == "POST":
+            report = self.service.prepare_governed_outlook_send_recovery(
+                rental_case_id=rental_case_id,
+                draft_revision_id=int(parts[6]),
+            )
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         if len(parts) == 7 and parts[4] == "actions" and parts[6] == "outlook-send-readiness" and method == "GET":
             report = self.service.inspect_governed_outlook_send_readiness(
                 rental_case_id=rental_case_id,

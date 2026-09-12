@@ -207,6 +207,14 @@ class _FakeService:
             lines=("Read mode: provider-free", "Exact approval required: yes", "Graph operations: 0"),
         )
 
+    def prepare_governed_outlook_send_recovery(self, **kwargs) -> OperationReport:
+        del kwargs
+        return OperationReport(
+            title="Governed Outlook Send Recovery Prepared",
+            success=True,
+            lines=("Graph operations: 0", "Recovery approval status: open"),
+        )
+
     def edit_inquiry_response_draft(self, **kwargs) -> OperationReport:
         del kwargs
         return OperationReport(title="Inquiry Response Draft Saved", success=True, lines=("Draft revision id: 10",))
@@ -820,6 +828,23 @@ class TestConsoleAppTests(unittest.TestCase):
         payload = json.loads(body)
         self.assertTrue(payload["ok"])
         self.assertIn("Exact approval required: yes", payload["report"]["lines"])
+        self.assertIn("Graph operations: 0", payload["report"]["lines"])
+
+    def test_operator_api_prepares_provider_free_outlook_send_recovery(self) -> None:
+        app = TestConsoleApp(_FakeService())
+
+        status, headers, body = call_app_response(
+            app,
+            "POST",
+            "/api/operator/cases/424/mailbox/drafts/144/outlook-send-recovery",
+            body=b"{}",
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(headers["Content-Type"], "application/json; charset=utf-8")
+        payload = json.loads(body)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["report"]["title"], "Governed Outlook Send Recovery Prepared")
         self.assertIn("Graph operations: 0", payload["report"]["lines"])
 
     def test_staging_clock_routes_fail_closed(self) -> None:

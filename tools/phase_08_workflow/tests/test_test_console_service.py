@@ -4,7 +4,7 @@ import subprocess
 import unittest
 from dataclasses import replace
 from types import SimpleNamespace
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, Mock, patch
 
 from tools.runtime_environment import AppEnvironment, AppRuntimeConfig
 from tools.phase_08_workflow.contracts import (
@@ -480,7 +480,9 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
             observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
+            ),
         )
         snapshot = SimpleNamespace(
             case_decisions=(
@@ -515,7 +517,9 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
             observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
+            ),
         )
 
         with self.assertRaisesRegex(TestConsoleError, TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV):
@@ -1299,7 +1303,9 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
             observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
+            ),
         )
         action = replace(
             make_action(target_adapter_code="outlook"),
@@ -1309,6 +1315,10 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             inquiry_response_draft_revision_id=144,
             workflow_action_id=action.workflow_action_id,
             approval_request_id=184,
+            source_case_revision=0,
+            context_hash="context-144",
+            recipient_email="approved@example.test",
+            context_payload={},
         )
         approval = SimpleNamespace(
             approval_request_id=184,
@@ -1322,6 +1332,10 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
             service, "_load_current_draft_revision_for_conversation", return_value=revision
+        ), patch.object(
+            service,
+            "_build_current_governed_draft_contract",
+            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=0)), SimpleNamespace(context_hash="context-144")),
         ):
             report = service.inspect_governed_outlook_send_readiness(
                 rental_case_id=424,
@@ -1333,6 +1347,180 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertIn("Graph operations: 0", report.lines)
         self.assertIn("Approval request id: 184", report.lines)
         self.assertIn("Exact approval required: yes", report.lines)
+
+    def test_outlook_send_recovery_binding_is_append_only_and_exact(self) -> None:
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=144,
+            workflow_action_id=586,
+            conversation_key="governed_client_response:424",
+            content_hash="content-hash-144",
+            context_hash="context-144",
+            recipient_email="approved@example.test",
+        )
+        action = replace(
+            make_action(target_adapter_code="outlook"),
+            workflow_action_id=587,
+            supersedes_workflow_action_id=586,
+            structured_payload={
+                "conversation_key": "governed_client_response:424",
+                "recovery_draft_revision_id": 144,
+                "recovery_origin_workflow_action_id": 586,
+                "draft_content_hash": "content-hash-144",
+                "context_hash": "context-144",
+                "recipient_email": "approved@example.test",
+            },
+        )
+
+        self.assertTrue(TestConsoleService._is_exact_outlook_send_recovery(action, revision=revision))
+        self.assertFalse(
+            TestConsoleService._is_exact_outlook_send_recovery(
+                replace(action, structured_payload={**action.structured_payload, "draft_content_hash": "forged"}),
+                revision=revision,
+            )
+        )
+
+    def test_outlook_send_recovery_readiness_requires_a_new_exact_approval(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
+            ),
+        )
+        action = replace(
+            make_action(target_adapter_code="outlook"),
+            workflow_action_id=587,
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            supersedes_workflow_action_id=586,
+            structured_payload={
+                "conversation_key": "governed_client_response:424",
+                "recovery_draft_revision_id": 144,
+                "recovery_origin_workflow_action_id": 586,
+                "draft_content_hash": "content-hash-144",
+                "context_hash": "context-144",
+                "recipient_email": "approved@example.test",
+            },
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=144,
+            workflow_action_id=586,
+            conversation_key="governed_client_response:424",
+            content_hash="content-hash-144",
+            context_hash="context-144",
+            recipient_email="approved@example.test",
+            is_current=True,
+            approval_request_id=184,
+            source_case_revision=0,
+            context_payload={},
+        )
+        recovery_approval = SimpleNamespace(
+            approval_request_id=185,
+            status="open",
+            target_entity_reference="workflow_action:587:draft_revision:144",
+        )
+        snapshot = SimpleNamespace(
+            find_workflow_action=lambda _action_id: action,
+            approval_requests=(recovery_approval,),
+        )
+
+        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
+            service, "_load_current_draft_revision_for_conversation", return_value=revision
+        ), patch.object(service, "_load_draft_revision_by_id", return_value=revision), patch.object(
+            service,
+            "_build_current_governed_draft_contract",
+            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=0)), SimpleNamespace(context_hash="context-144")),
+        ):
+            report = service.inspect_governed_outlook_send_readiness(
+                rental_case_id=424,
+                workflow_action_id=587,
+            )
+
+        self.assertIn("Approval request id: 185", report.lines)
+        self.assertIn("Exact approval required: yes", report.lines)
+        self.assertIn("Readiness: approval_required", report.lines)
+
+    def test_prepare_outlook_send_recovery_preserves_the_failed_origin(self) -> None:
+        repository = SimpleNamespace(
+            create_workflow_action=Mock(),
+            create_approval_request=Mock(),
+        )
+        service = TestConsoleService(
+            orchestration_repository=repository,
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
+            ),
+        )
+        origin_action = replace(
+            make_action(target_adapter_code="outlook"),
+            workflow_action_id=586,
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            status=WORKFLOW_ACTION_STATUS_FAILED,
+            source_case_revision=3,
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=144,
+            workflow_action_id=586,
+            conversation_key="governed_client_response:424",
+            content_hash="content-hash-144",
+            context_hash="context-144",
+            recipient_email="approved@example.test",
+            source_case_revision=3,
+            approval_request_id=184,
+            is_current=True,
+            draft_status="send_failed",
+            context_payload={},
+        )
+        origin_approval = SimpleNamespace(
+            approval_request_id=184,
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference="workflow_action:586:draft_revision:144",
+        )
+        snapshot = SimpleNamespace(
+            find_workflow_action=lambda action_id: origin_action if action_id == 586 else None,
+            find_approval_request=lambda approval_id: origin_approval if approval_id == 184 else None,
+            approval_requests=(origin_approval,),
+            workflow_events=(
+                SimpleNamespace(
+                    event_type_code="outlook_human_edit_revision_created",
+                    structured_payload={
+                        "workflow_action_id": 586,
+                        "draft_revision_id": 144,
+                        "graph_message_id": "bound-draft-144",
+                    },
+                ),
+            ),
+        )
+        created_action = replace(
+            origin_action,
+            workflow_action_id=587,
+            status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
+            supersedes_workflow_action_id=586,
+        )
+        created_approval = SimpleNamespace(approval_request_id=185, status="open")
+
+        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
+            service, "_load_draft_revision_by_id", return_value=revision
+        ), patch.object(
+            service,
+            "_build_current_governed_draft_contract",
+            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=3)), SimpleNamespace(context_hash="context-144")),
+        ), patch.object(repository, "create_workflow_action", return_value=created_action) as create_action, patch.object(
+            repository, "create_approval_request", return_value=created_approval
+        ) as create_approval, patch.object(service, "_create_console_event") as create_event:
+            report = service.prepare_governed_outlook_send_recovery(
+                rental_case_id=424,
+                draft_revision_id=144,
+            )
+
+        recovery_input = create_action.call_args.args[0]
+        self.assertEqual(recovery_input.supersedes_workflow_action_id, 586)
+        self.assertEqual(recovery_input.structured_payload["recovery_draft_revision_id"], 144)
+        self.assertEqual(recovery_input.structured_payload["draft_content_hash"], "content-hash-144")
+        self.assertEqual(create_approval.call_args.args[0].supersedes_approval_request_id, 184)
+        create_event.assert_called_once()
+        self.assertIn("Recovery workflow action id: 587", report.lines)
+        self.assertIn("Recovery approval status: open", report.lines)
 
     def test_pre_send_validator_rejects_a_rebound_outlook_message_id(self) -> None:
         service = TestConsoleService(

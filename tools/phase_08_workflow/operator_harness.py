@@ -244,6 +244,19 @@ class OperatorHarnessClient:
             f"/api/operator/cases/{rental_case_id}/actions/{workflow_action_id}/outlook-send-readiness",
         )
 
+    def prepare_governed_outlook_send_recovery(
+        self,
+        *,
+        rental_case_id: int,
+        draft_revision_id: int,
+    ) -> dict[str, Any]:
+        """Create a provider-free, unapproved exact-draft recovery send action."""
+        return self.request(
+            "POST",
+            f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-send-recovery",
+            {},
+        )
+
     def edit_draft(
         self,
         *,
