@@ -480,9 +480,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
             observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
-            ),
+            config=TestConsoleConfig(),
         )
         snapshot = SimpleNamespace(
             case_decisions=(
@@ -517,9 +515,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         service = TestConsoleService(
             orchestration_repository=_DummyRepository(),
             observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
-            ),
+            config=TestConsoleConfig(),
         )
 
         with self.assertRaisesRegex(TestConsoleError, TEST_CONSOLE_ALLOW_REAL_PROVIDERS_ENV):
