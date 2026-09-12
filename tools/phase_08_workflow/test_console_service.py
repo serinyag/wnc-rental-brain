@@ -5003,6 +5003,10 @@ returning
         payload: dict[str, Any] = {
             "recipient_email": revision.recipient_email,
             "recipient_reference": f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}",
+            "conversation_key": revision.conversation_key,
+            "draft_revision_id": revision.inquiry_response_draft_revision_id,
+            "draft_content_hash": revision.content_hash,
+            "context_hash": revision.context_hash,
             "subject": revision.subject,
             "body": revision.body_text,
             "body_type": "text",
@@ -5017,9 +5021,6 @@ returning
                         action=action,
                         revision=revision,
                     ),
-                    "draft_revision_id": revision.inquiry_response_draft_revision_id,
-                    "draft_content_hash": revision.content_hash,
-                    "context_hash": revision.context_hash,
                 }
             )
         if revision.recipient_label:
@@ -5077,11 +5078,20 @@ returning
         """Re-read governed truth before the adapter performs its final Graph GET/send boundary."""
         try:
             snapshot = self._require_case_snapshot(execution_context.rental_case_id)
-            revision = self._load_current_draft_revision_for_conversation(
+            draft_revision_id = action.structured_payload.get("draft_revision_id")
+            if not isinstance(draft_revision_id, int) or isinstance(draft_revision_id, bool):
+                return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_draft_action_binding_changed"
+            revision = self._load_draft_revision_by_id(
                 execution_context.rental_case_id,
-                conversation_key=self._draft_conversation_key(action),
+                draft_revision_id,
             )
-            if revision is None or revision.workflow_action_id != action.workflow_action_id:
+            if (
+                revision is None
+                or revision.workflow_action_id != action.workflow_action_id
+                or revision.conversation_key != action.structured_payload.get("conversation_key")
+                or revision.content_hash != action.structured_payload.get("draft_content_hash")
+                or revision.context_hash != action.structured_payload.get("context_hash")
+            ):
                 return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_draft_action_binding_changed"
             if (
                 email_payload.recipient_reference

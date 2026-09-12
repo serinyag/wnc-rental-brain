@@ -27,6 +27,7 @@ from tools.phase_08_workflow.contracts import (
     RentalCase,
     WorkflowAction,
     WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
+    WORKFLOW_ACTION_STATUS_EXECUTING,
     WORKFLOW_ACTION_STATUS_FAILED,
     WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
     WORKFLOW_ACTION_STATUS_SUCCEEDED,
@@ -1255,6 +1256,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         revision = SimpleNamespace(
             inquiry_response_draft_revision_id=41,
             workflow_action_id=action.workflow_action_id,
+            conversation_key="idem:1",
             source_case_revision=3,
             draft_source="human_edited",
             recipient_email="approved@example.com",
@@ -1288,7 +1290,10 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(projected.structured_payload["body"], "This is a governed synthetic draft.")
         self.assertEqual(projected.structured_payload["message_mode"], "existing_draft")
         self.assertEqual(projected.structured_payload["graph_message_id"], "immutable-draft-41")
+        self.assertEqual(projected.structured_payload["conversation_key"], "idem:1")
+        self.assertEqual(projected.structured_payload["draft_revision_id"], 41)
         self.assertEqual(projected.structured_payload["draft_content_hash"], "content-hash-41")
+        self.assertEqual(projected.structured_payload["context_hash"], "context-hash-41")
 
     def test_outlook_send_readiness_requires_the_successor_exact_approval(self) -> None:
         service = TestConsoleService(
@@ -1345,10 +1350,17 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         action = replace(
             make_action(target_adapter_code="outlook"),
             action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            structured_payload={
+                "conversation_key": "governed_client_response:424",
+                "draft_revision_id": 144,
+                "draft_content_hash": "content-hash-144",
+                "context_hash": "context-144",
+            },
         )
         revision = SimpleNamespace(
             inquiry_response_draft_revision_id=144,
             workflow_action_id=action.workflow_action_id,
+            conversation_key="governed_client_response:424",
             approval_request_id=184,
             is_current=True,
             draft_status="approved",
@@ -1357,6 +1369,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             body_text="Approved body",
             source_case_revision=3,
             context_hash="context-144",
+            content_hash="content-hash-144",
             context_payload={},
         )
         approval = SimpleNamespace(
@@ -1386,7 +1399,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         )
 
         with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
-            service, "_load_current_draft_revision_for_conversation", return_value=revision
+            service, "_load_draft_revision_by_id", return_value=revision
         ), patch.object(
             service,
             "_build_current_governed_draft_contract",
@@ -1399,6 +1412,92 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             )
 
         self.assertEqual(failure, ("outlook_send_governance_invalid", "outlook_draft_binding_changed"))
+
+    def test_pre_send_validator_uses_exact_projected_revision_across_action_lifecycle_transition(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_allowed_email_recipients=("approved@example.test",),
+                )
+            ),
+        )
+        action = replace(
+            make_action(target_adapter_code="outlook"),
+            workflow_action_id=586,
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            status=WORKFLOW_ACTION_STATUS_EXECUTING,
+            source_case_revision=3,
+            structured_payload={
+                "conversation_key": "governed_client_response:424",
+                "draft_revision_id": 144,
+                "draft_content_hash": "content-hash-144",
+                "context_hash": "context-144",
+            },
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=144,
+            workflow_action_id=586,
+            conversation_key="governed_client_response:424",
+            approval_request_id=184,
+            is_current=True,
+            draft_status="approved",
+            recipient_email="approved@example.test",
+            subject="Approved subject",
+            body_text="Approved body",
+            source_case_revision=3,
+            context_hash="context-144",
+            content_hash="content-hash-144",
+            context_payload={},
+        )
+        approval = SimpleNamespace(
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference="workflow_action:586:draft_revision:144",
+        )
+        snapshot = SimpleNamespace(
+            find_approval_request=lambda _approval_id: approval,
+            workflow_events=(
+                SimpleNamespace(
+                    event_type_code="outlook_human_edit_revision_created",
+                    structured_payload={
+                        "workflow_action_id": 586,
+                        "draft_revision_id": 144,
+                        "graph_message_id": "immutable-draft-144",
+                    },
+                ),
+            ),
+        )
+        payload = SimpleNamespace(
+            recipient_reference="inquiry_response_draft:144",
+            recipient_email="approved@example.test",
+            subject="Approved subject",
+            body="Approved body",
+            graph_message_id="immutable-draft-144",
+        )
+        current_snapshot = SimpleNamespace(rental_case=SimpleNamespace(case_revision=3))
+
+        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
+            service, "_load_draft_revision_by_id", return_value=revision
+        ), patch.object(
+            service,
+            "_load_current_draft_revision_for_conversation",
+            side_effect=AssertionError("pre-send identity must not use a current-action selector"),
+        ), patch.object(
+            service,
+            "_build_current_governed_draft_contract",
+            return_value=(SimpleNamespace(), current_snapshot, SimpleNamespace(context_hash="context-144")),
+        ):
+            failure = service._validate_governed_outlook_pre_send(
+                action,
+                SimpleNamespace(rental_case_id=424),
+                payload,
+            )
+
+        self.assertIsNone(failure)
 
     def test_staging_uses_an_explicitly_allowlisted_synthetic_recipient(self) -> None:
         service = TestConsoleService(
