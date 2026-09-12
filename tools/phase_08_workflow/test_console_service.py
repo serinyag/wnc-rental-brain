@@ -2699,7 +2699,7 @@ limit 1;
         _detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
         if (
             revision.source_case_revision != current_snapshot.rental_case.case_revision
-            or revision.context_hash != contract.context_hash
+            or self._governed_context_hash(action, revision=revision) != contract.context_hash
             or self._has_blocking_operator_annotations(revision)
             or not self.config.runtime.is_email_recipient_allowed(revision.recipient_email)
         ):
@@ -2781,7 +2781,7 @@ limit 1;
         _detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
         if (
             revision.source_case_revision != current_snapshot.rental_case.case_revision
-            or revision.context_hash != contract.context_hash
+            or self._governed_context_hash(origin_action, revision=revision) != contract.context_hash
             or self._has_blocking_operator_annotations(revision)
             or not self.config.runtime.is_email_recipient_allowed(revision.recipient_email)
         ):
@@ -2798,6 +2798,7 @@ limit 1;
             "recovery_origin_workflow_action_id": origin_action.workflow_action_id,
             "draft_content_hash": revision.content_hash,
             "context_hash": revision.context_hash,
+            "governed_context_hash": self._governed_context_hash(origin_action, revision=revision),
             "recipient_email": revision.recipient_email,
         }
         timestamp = self.now()
@@ -2814,7 +2815,7 @@ limit 1;
                 reason_entity_reference=origin_action.reason_entity_reference,
                 approval_posture=APPROVAL_POSTURE_APPROVAL_REQUIRED,
                 status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
-                semantic_subject_hash=revision.context_hash,
+                semantic_subject_hash=self._governed_context_hash(origin_action, revision=revision),
                 source_case_revision=revision.source_case_revision,
                 idempotency_key=(
                     f"{revision.conversation_key}:outlook_send_recovery:"
@@ -5178,6 +5179,7 @@ returning
             "draft_revision_id": revision.inquiry_response_draft_revision_id,
             "draft_content_hash": revision.content_hash,
             "context_hash": revision.context_hash,
+            "governed_context_hash": self._governed_context_hash(action, revision=revision),
             "subject": revision.subject,
             "body": revision.body_text,
             "body_type": "text",
@@ -5245,6 +5247,21 @@ returning
             and payload.get("context_hash") == revision.context_hash
             and payload.get("recipient_email") == revision.recipient_email
         )
+
+    @staticmethod
+    def _governed_context_hash(
+        action: WorkflowAction,
+        *,
+        revision: InquiryResponseDraftRevision,
+    ) -> str:
+        """Keep the case-truth hash distinct from immutable draft-content context."""
+        governed_hash = action.structured_payload.get("governed_context_hash")
+        if isinstance(governed_hash, str) and governed_hash:
+            return governed_hash
+        action_hash = action.structured_payload.get("context_hash")
+        if isinstance(action_hash, str) and action_hash:
+            return action_hash
+        return revision.context_hash
 
     @staticmethod
     def _exact_approval_for_action_revision(
@@ -5373,7 +5390,7 @@ returning
             )
             if (
                 revision.source_case_revision != current_snapshot.rental_case.case_revision
-                or revision.context_hash != contract.context_hash
+                or self._governed_context_hash(action, revision=revision) != contract.context_hash
             ):
                 return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_governed_context_changed"
             current_message_id = self._bound_outlook_message_id(

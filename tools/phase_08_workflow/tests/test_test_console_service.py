@@ -1363,6 +1363,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 "recovery_origin_workflow_action_id": 586,
                 "draft_content_hash": "content-hash-144",
                 "context_hash": "context-144",
+                "governed_context_hash": "governed-context-424",
                 "recipient_email": "approved@example.test",
             },
         )
@@ -1394,6 +1395,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
                 "recovery_origin_workflow_action_id": 586,
                 "draft_content_hash": "content-hash-144",
                 "context_hash": "context-144",
+                "governed_context_hash": "governed-context-424",
                 "recipient_email": "approved@example.test",
             },
         )
@@ -1424,7 +1426,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         ), patch.object(service, "_load_draft_revision_by_id", return_value=revision), patch.object(
             service,
             "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=0)), SimpleNamespace(context_hash="context-144")),
+            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=0)), SimpleNamespace(context_hash="governed-context-424")),
         ):
             report = service.inspect_governed_outlook_send_readiness(
                 rental_case_id=424,
@@ -1453,6 +1455,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
             status=WORKFLOW_ACTION_STATUS_FAILED,
             source_case_revision=3,
+            structured_payload={"context_hash": "governed-context-424"},
         )
         revision = SimpleNamespace(
             inquiry_response_draft_revision_id=144,
@@ -1500,7 +1503,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         ), patch.object(
             service,
             "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=3)), SimpleNamespace(context_hash="context-144")),
+            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=3)), SimpleNamespace(context_hash="governed-context-424")),
         ), patch.object(repository, "create_workflow_action", return_value=created_action) as create_action, patch.object(
             repository, "create_approval_request", return_value=created_approval
         ) as create_approval, patch.object(service, "_create_console_event") as create_event:
@@ -1513,6 +1516,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(recovery_input.supersedes_workflow_action_id, 586)
         self.assertEqual(recovery_input.structured_payload["recovery_draft_revision_id"], 144)
         self.assertEqual(recovery_input.structured_payload["draft_content_hash"], "content-hash-144")
+        self.assertEqual(recovery_input.structured_payload["governed_context_hash"], "governed-context-424")
         self.assertEqual(create_approval.call_args.args[0].supersedes_approval_request_id, 184)
         create_event.assert_called_once()
         self.assertIn("Recovery workflow action id: 587", report.lines)
