@@ -6,9 +6,10 @@ from typing import Any, Callable, Protocol
 from tools.runtime_environment import AppRuntimeConfig
 
 from .asana_adapter import AsanaActionInputError, AsanaExecutionAdapter, _resolve_project_gid
-from .contracts import WorkflowAction
+from .contracts import EXECUTION_ATTEMPT_STATUS_FAILED, WorkflowAction
 from .execution_types import (
     EXECUTION_FAILURE_ADAPTER_FORBIDDEN,
+    NormalizedExecutionResult,
 )
 from .outlook_adapter import OutlookActionInputError, OutlookExecutionAdapter, _parse_outlook_email_payload
 
@@ -34,6 +35,13 @@ class EnvironmentGuardedExecutionAdapter:
         return None
 
     def execute(self, *, action: WorkflowAction, execution_context: Any, idempotency: Any) -> Any:
+        if not self.guard(action):
+            return NormalizedExecutionResult(
+                adapter_code=action.target_adapter_code,
+                attempt_status=EXECUTION_ATTEMPT_STATUS_FAILED,
+                response_snapshot={"stage": "provider_safety", "reason": "provider_execution_disabled"},
+                failure_code=EXECUTION_FAILURE_ADAPTER_FORBIDDEN,
+            )
         return self.delegate.execute(
             action=action,
             execution_context=execution_context,

@@ -233,6 +233,17 @@ class OperatorHarnessClient:
             f"/api/operator/cases/{rental_case_id}/mailbox/drafts/{draft_revision_id}/outlook-human-edit-preflight",
         )
 
+    def inspect_governed_outlook_send_readiness(
+        self,
+        *,
+        rental_case_id: int,
+        workflow_action_id: int,
+    ) -> dict[str, Any]:
+        return self.request(
+            "GET",
+            f"/api/operator/cases/{rental_case_id}/actions/{workflow_action_id}/outlook-send-readiness",
+        )
+
     def edit_draft(
         self,
         *,

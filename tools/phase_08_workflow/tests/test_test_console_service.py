@@ -1208,7 +1208,9 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             )
 
         self.assertIsNotNone(registry.resolve("outlook"))
-        build_adapter.assert_called_once_with(send_enabled=False)
+        build_adapter.assert_called_once()
+        self.assertTrue(callable(build_adapter.call_args.kwargs["send_enabled"]))
+        self.assertIsNone(build_adapter.call_args.kwargs["pre_send_validator"])
 
     def test_projected_outlook_adapter_preserves_provider_outcome_under_canonical_action_code(self) -> None:
         provider_result = NormalizedExecutionResult(
@@ -1254,12 +1256,27 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             inquiry_response_draft_revision_id=41,
             workflow_action_id=action.workflow_action_id,
             source_case_revision=3,
+            draft_source="human_edited",
             recipient_email="approved@example.com",
             recipient_label="Synthetic Client",
             subject="Synthetic inquiry response",
             body_text="This is a governed synthetic draft.",
+            content_hash="content-hash-41",
+            context_hash="context-hash-41",
         )
-        snapshot = SimpleNamespace(rental_case=SimpleNamespace(rental_case_id=1))
+        snapshot = SimpleNamespace(
+            rental_case=SimpleNamespace(rental_case_id=1),
+            workflow_events=(
+                SimpleNamespace(
+                    event_type_code="outlook_human_edit_revision_created",
+                    structured_payload={
+                        "workflow_action_id": action.workflow_action_id,
+                        "draft_revision_id": 41,
+                        "graph_message_id": "immutable-draft-41",
+                    },
+                ),
+            ),
+        )
 
         with patch.object(service, "_load_current_draft_revision_for_conversation", return_value=revision):
             projected = service._project_governed_outlook_execution_action(snapshot, action=action)
@@ -1269,7 +1286,119 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(projected.structured_payload["recipient_name"], "Synthetic Client")
         self.assertEqual(projected.structured_payload["subject"], "Synthetic inquiry response")
         self.assertEqual(projected.structured_payload["body"], "This is a governed synthetic draft.")
-        self.assertEqual(projected.structured_payload["message_mode"], "new")
+        self.assertEqual(projected.structured_payload["message_mode"], "existing_draft")
+        self.assertEqual(projected.structured_payload["graph_message_id"], "immutable-draft-41")
+        self.assertEqual(projected.structured_payload["draft_content_hash"], "content-hash-41")
+
+    def test_outlook_send_readiness_requires_the_successor_exact_approval(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+        )
+        action = replace(
+            make_action(target_adapter_code="outlook"),
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=144,
+            workflow_action_id=action.workflow_action_id,
+            approval_request_id=184,
+        )
+        approval = SimpleNamespace(
+            approval_request_id=184,
+            status="open",
+            target_entity_reference=f"workflow_action:{action.workflow_action_id}:draft_revision:144",
+        )
+        snapshot = SimpleNamespace(
+            find_workflow_action=lambda _action_id: action,
+            find_approval_request=lambda _approval_id: approval,
+        )
+
+        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
+            service, "_load_current_draft_revision_for_conversation", return_value=revision
+        ):
+            report = service.inspect_governed_outlook_send_readiness(
+                rental_case_id=424,
+                workflow_action_id=action.workflow_action_id,
+            )
+
+        self.assertTrue(report.success)
+        self.assertIn("Read mode: provider-free", report.lines)
+        self.assertIn("Graph operations: 0", report.lines)
+        self.assertIn("Approval request id: 184", report.lines)
+        self.assertIn("Exact approval required: yes", report.lines)
+
+    def test_pre_send_validator_rejects_a_rebound_outlook_message_id(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_allowed_email_recipients=("approved@example.test",),
+                )
+            ),
+        )
+        action = replace(
+            make_action(target_adapter_code="outlook"),
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+        )
+        revision = SimpleNamespace(
+            inquiry_response_draft_revision_id=144,
+            workflow_action_id=action.workflow_action_id,
+            approval_request_id=184,
+            is_current=True,
+            draft_status="approved",
+            recipient_email="approved@example.test",
+            subject="Approved subject",
+            body_text="Approved body",
+            source_case_revision=3,
+            context_hash="context-144",
+            context_payload={},
+        )
+        approval = SimpleNamespace(
+            status=APPROVAL_REQUEST_STATUS_APPROVED,
+            target_entity_reference=f"workflow_action:{action.workflow_action_id}:draft_revision:144",
+        )
+        snapshot = SimpleNamespace(
+            find_approval_request=lambda _approval_id: approval,
+            workflow_events=(
+                SimpleNamespace(
+                    event_type_code="outlook_human_edit_revision_created",
+                    structured_payload={
+                        "workflow_action_id": action.workflow_action_id,
+                        "draft_revision_id": 144,
+                        "graph_message_id": "current-immutable-id",
+                    },
+                ),
+            ),
+        )
+        current_snapshot = SimpleNamespace(rental_case=SimpleNamespace(case_revision=3))
+        payload = SimpleNamespace(
+            recipient_reference="inquiry_response_draft:144",
+            recipient_email="approved@example.test",
+            subject="Approved subject",
+            body="Approved body",
+            graph_message_id="stale-immutable-id",
+        )
+
+        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
+            service, "_load_current_draft_revision_for_conversation", return_value=revision
+        ), patch.object(
+            service,
+            "_build_current_governed_draft_contract",
+            return_value=(SimpleNamespace(), current_snapshot, SimpleNamespace(context_hash="context-144")),
+        ):
+            failure = service._validate_governed_outlook_pre_send(
+                action,
+                SimpleNamespace(rental_case_id=424),
+                payload,
+            )
+
+        self.assertEqual(failure, ("outlook_send_governance_invalid", "outlook_draft_binding_changed"))
 
     def test_staging_uses_an_explicitly_allowlisted_synthetic_recipient(self) -> None:
         service = TestConsoleService(
@@ -1329,6 +1458,27 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         self.assertEqual(providers["outlook"], "configured_draft_only")
         self.assertEqual(providers["asana"], "configured_but_disabled")
+
+    def test_outlook_send_switch_is_re_read_at_transport_boundary(self) -> None:
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(
+                runtime=AppRuntimeConfig(
+                    app_env=AppEnvironment.STAGING,
+                    app_env_explicit=True,
+                    database_url="postgresql://staging-db",
+                    staging_allow_real_outlook=True,
+                    staging_allow_real_outlook_send=True,
+                ),
+                allow_real_providers=True,
+            ),
+        )
+
+        with patch.dict("os.environ", {"STAGING_ALLOW_REAL_OUTLOOK_SEND": "false"}, clear=False):
+            self.assertFalse(service._outlook_send_enabled_at_transport_boundary())
+        with patch.dict("os.environ", {"STAGING_ALLOW_REAL_OUTLOOK_SEND": "true"}, clear=False):
+            self.assertTrue(service._outlook_send_enabled_at_transport_boundary())
 
     def test_default_clock_can_advance_and_reset(self) -> None:
         service = TestConsoleService(

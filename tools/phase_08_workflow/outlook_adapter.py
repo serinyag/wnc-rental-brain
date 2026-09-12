@@ -9,7 +9,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from typing import Any, Mapping, Protocol
+from typing import Any, Callable, Mapping, Protocol
 
 import certifi
 
@@ -40,6 +40,7 @@ from .execution_types import (
     EXECUTION_FAILURE_ADAPTER_RESOURCE_NOT_FOUND,
     EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED,
     EXECUTION_FAILURE_ADAPTER_SERVER_ERROR,
+    EXECUTION_FAILURE_OUTLOOK_DRAFT_CHANGED_AFTER_APPROVAL,
     ExecutionContext,
     ExecutionIdempotencyContext,
     NormalizedExecutionResult,
@@ -53,6 +54,7 @@ OUTLOOK_PROVIDER_NAME = "microsoft_graph_outlook"
 OUTLOOK_EXTERNAL_REFERENCE_PREFIX = "outlook:message:"
 OUTLOOK_IMMUTABLE_ID_HEADER = 'IdType="ImmutableId"'
 OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW = "new"
+OUTLOOK_SUPPORTED_MESSAGE_MODE_EXISTING_DRAFT = "existing_draft"
 
 OUTLOOK_SUPPORTED_ACTION_TYPES = frozenset(
     {
@@ -183,6 +185,7 @@ class OutlookEmailPayload:
     body: str
     body_type: str
     message_mode: str
+    graph_message_id: str | None = None
 
     @property
     def graph_body_type(self) -> str:
@@ -230,7 +233,8 @@ class OutlookDraftSnapshot:
 class OutlookExecutionAdapter:
     config: OutlookAdapterConfig
     transport: OutlookTransportProtocol
-    send_enabled: bool = True
+    send_enabled: bool | Callable[[], bool] = True
+    pre_send_validator: Callable[[WorkflowAction, ExecutionContext, OutlookEmailPayload], tuple[str, str] | None] | None = None
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         return self.config.availability_failure_code(action=action)
@@ -255,7 +259,7 @@ class OutlookExecutionAdapter:
             )
 
         retry_state = _resolve_retry_state(execution_context.prior_attempts)
-        if retry_state.failure_code is not None:
+        if email_payload.message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW and retry_state.failure_code is not None:
             return _failed_result(
                 failure_code=retry_state.failure_code,
                 reason=retry_state.reason,
@@ -274,7 +278,9 @@ class OutlookExecutionAdapter:
                 stage="token",
             )
 
-        message_id = retry_state.message_id
+        message_id = email_payload.graph_message_id
+        if email_payload.message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW:
+            message_id = retry_state.message_id
         if message_id is None:
             draft_result = self._create_draft(
                 access_token=access_token,
@@ -291,7 +297,18 @@ class OutlookExecutionAdapter:
                 )
 
         external_reference = _external_reference_for_message_id(message_id)
-        if not self.send_enabled:
+        if email_payload.message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_EXISTING_DRAFT:
+            validation_failure = self._validate_existing_draft_send(
+                action=action,
+                execution_context=execution_context,
+                email_payload=email_payload,
+                access_token=access_token,
+                message_id=message_id,
+                external_reference=external_reference,
+            )
+            if validation_failure is not None:
+                return validation_failure
+        if not self._is_send_enabled():
             # A draft-only UAT may create the provider draft, but it must not
             # convert the governed send action into a successful delivery.
             return _failed_result(
@@ -313,6 +330,52 @@ class OutlookExecutionAdapter:
             message_id=message_id,
             external_reference=external_reference,
         )
+
+    def _validate_existing_draft_send(
+        self,
+        *,
+        action: WorkflowAction,
+        execution_context: ExecutionContext,
+        email_payload: OutlookEmailPayload,
+        access_token: str,
+        message_id: str,
+        external_reference: str,
+    ) -> NormalizedExecutionResult | None:
+        if self.pre_send_validator is not None:
+            validation = self.pre_send_validator(action, execution_context, email_payload)
+            if validation is not None:
+                failure_code, reason = validation
+                return _failed_result(
+                    failure_code=failure_code,
+                    reason=reason,
+                    stage="pre_send_governance",
+                    external_reference=external_reference,
+                )
+
+        # This immutable-ID GET is deliberately the final provider read before /send.
+        draft = self._read_draft_snapshot(access_token=access_token, message_id=message_id)
+        failure_reason = _existing_draft_send_failure_reason(
+            draft=draft,
+            expected=email_payload,
+            configured_mailbox=self.config.sender_mailbox,
+        )
+        if failure_reason is None:
+            return None
+        failure_code = (
+            draft.failure_code
+            if draft.outcome != "found" and draft.failure_code is not None
+            else EXECUTION_FAILURE_OUTLOOK_DRAFT_CHANGED_AFTER_APPROVAL
+        )
+        return _failed_result(
+            failure_code=failure_code,
+            reason=failure_reason,
+            stage="pre_send_draft_integrity",
+            external_reference=external_reference,
+        )
+
+    def _is_send_enabled(self) -> bool:
+        value = self.send_enabled() if callable(self.send_enabled) else self.send_enabled
+        return value is True
 
     def inspect_matching_draft(
         self,
@@ -843,12 +906,14 @@ class OutlookExecutionAdapter:
 def build_outlook_execution_adapter_from_env(
     *,
     transport: OutlookTransportProtocol | None = None,
-    send_enabled: bool = True,
+    send_enabled: bool | Callable[[], bool] = True,
+    pre_send_validator: Callable[[WorkflowAction, ExecutionContext, OutlookEmailPayload], tuple[str, str] | None] | None = None,
 ) -> OutlookExecutionAdapter:
     return OutlookExecutionAdapter(
         config=OutlookAdapterConfig.from_env(),
         transport=transport or UrllibOutlookTransport(),
         send_enabled=send_enabled,
+        pre_send_validator=pre_send_validator,
     )
 
 
@@ -905,10 +970,21 @@ def _parse_outlook_email_payload(payload: Mapping[str, Any]) -> OutlookEmailPayl
             reason="unsupported_body_type",
         )
     message_mode = _require_non_empty_string(payload.get("message_mode"), field_name="message_mode").lower()
-    if message_mode != OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW:
+    if message_mode not in {OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW, OUTLOOK_SUPPORTED_MESSAGE_MODE_EXISTING_DRAFT}:
         raise OutlookActionInputError(
             failure_code=EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID,
-            reason="reply_mode_not_supported_in_phase_8_7b",
+            reason="message_mode_not_supported",
+        )
+    graph_message_id = _optional_non_empty_string(payload.get("graph_message_id"), field_name="graph_message_id")
+    if message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_EXISTING_DRAFT and graph_message_id is None:
+        raise OutlookActionInputError(
+            failure_code=EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID,
+            reason="existing_draft_requires_graph_message_id",
+        )
+    if message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW and graph_message_id is not None:
+        raise OutlookActionInputError(
+            failure_code=EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID,
+            reason="new_draft_must_not_supply_graph_message_id",
         )
     if _optional_non_empty_string(payload.get("source_message_reference"), field_name="source_message_reference") is not None:
         raise OutlookActionInputError(
@@ -944,7 +1020,48 @@ def _parse_outlook_email_payload(payload: Mapping[str, Any]) -> OutlookEmailPayl
         body=body,
         body_type=body_type,
         message_mode=message_mode,
+        graph_message_id=graph_message_id,
     )
+
+
+def _existing_draft_send_failure_reason(
+    *,
+    draft: OutlookDraftSnapshot,
+    expected: OutlookEmailPayload,
+    configured_mailbox: str | None,
+) -> str | None:
+    if draft.outcome != "found":
+        return "bound_outlook_draft_read_failed"
+    if draft.message_id != expected.graph_message_id:
+        return "bound_outlook_draft_identity_changed"
+    if draft.is_draft is not True:
+        return "bound_outlook_message_is_not_a_draft"
+    if draft.to_recipients != (expected.recipient_email.strip().casefold(),) or draft.cc_recipients:
+        return "outlook_draft_recipients_changed_after_approval"
+    if _canonical_outlook_subject(draft.subject or "") != _canonical_outlook_subject(expected.subject):
+        return "outlook_draft_subject_changed_after_approval"
+    if _canonical_outlook_transport_text(draft.body or "") != _canonical_outlook_transport_text(expected.body):
+        return "outlook_draft_body_changed_after_approval"
+    mailbox = (configured_mailbox or "").strip().casefold()
+    if not mailbox:
+        return "configured_outlook_mailbox_missing"
+    if any(
+        value is not None and value.strip().casefold() != mailbox
+        for value in (draft.from_mailbox, draft.sender_mailbox)
+    ):
+        return "outlook_draft_mailbox_identity_changed"
+    return None
+
+
+def _canonical_outlook_transport_text(value: str) -> str:
+    text = re.sub(r"(?i)<br\\s*/?>", "\n", value)
+    text = re.sub(r"(?i)</(?:p|div|li|tr|h[1-6])\\s*>", "\n", text)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return " ".join(html.unescape(text).replace("\r\n", "\n").replace("\r", "\n").split())
+
+
+def _canonical_outlook_subject(value: str) -> str:
+    return " ".join(value.replace("\r\n", "\n").replace("\r", "\n").split())
 
 
 def _build_create_draft_payload(email_payload: OutlookEmailPayload) -> dict[str, Any]:

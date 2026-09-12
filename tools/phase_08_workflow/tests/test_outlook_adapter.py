@@ -25,6 +25,8 @@ from tools.phase_08_workflow.execution_types import (
     EXECUTION_FAILURE_ADAPTER_OUTCOME_AMBIGUOUS,
     EXECUTION_FAILURE_ADAPTER_RATE_LIMITED,
     EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID,
+    EXECUTION_FAILURE_OUTLOOK_DRAFT_CHANGED_AFTER_APPROVAL,
+    EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID,
     ExecutionContext,
     ExecutionIdempotencyContext,
     WorkflowActionExecutionRequest,
@@ -419,6 +421,85 @@ class OutlookAdapterTests(unittest.TestCase):
         self.assertEqual(result.external_reference, "outlook:message:immutable-1")
         self.assertEqual(len(transport.requests), 2)
 
+    def test_existing_draft_send_disabled_reads_bound_draft_but_never_sends(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "token-123", "token_type": "Bearer"}), {}),
+            (200, json.dumps(_existing_draft_graph_payload()), {}),
+        )
+        adapter = OutlookExecutionAdapter(
+            config=self.make_adapter(StubOutlookTransport()).config,
+            transport=transport,
+            send_enabled=lambda: False,
+        )
+
+        result = adapter.execute(
+            action=make_email_action(1, structured_payload=_existing_draft_payload()),
+            execution_context=make_execution_context(),
+            idempotency=make_idempotency(),
+        )
+
+        self.assertEqual(result.failure_code, EXECUTION_FAILURE_ADAPTER_FORBIDDEN)
+        self.assertEqual(result.response_snapshot["stage"], "draft_created_send_disabled")
+        self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET"])
+        self.assertFalse(any("/send" in str(request["url"]) for request in transport.requests))
+        self.assertFalse(any(request["method"] == "POST" and "/messages" in str(request["url"]) for request in transport.requests[1:]))
+
+    def test_existing_draft_changed_after_approval_is_blocked_before_send(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "token-123", "token_type": "Bearer"}), {}),
+            (200, json.dumps(_existing_draft_graph_payload(subject="Edited after approval")), {}),
+        )
+        result = self.make_adapter(transport).execute(
+            action=make_email_action(1, structured_payload=_existing_draft_payload()),
+            execution_context=make_execution_context(),
+            idempotency=make_idempotency(),
+        )
+
+        self.assertEqual(result.failure_code, EXECUTION_FAILURE_OUTLOOK_DRAFT_CHANGED_AFTER_APPROVAL)
+        self.assertEqual(result.response_snapshot["reason"], "outlook_draft_subject_changed_after_approval")
+        self.assertFalse(any("/send" in str(request["url"]) for request in transport.requests))
+
+    def test_existing_draft_matching_approval_sends_only_bound_message(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "token-123", "token_type": "Bearer"}), {}),
+            (200, json.dumps(_existing_draft_graph_payload()), {}),
+            (202, "", {}),
+            (200, json.dumps({"id": "immutable-existing-1", "isDraft": False, "sentDateTime": "2026-08-13T12:05:00Z"}), {}),
+        )
+        result = self.make_adapter(transport).execute(
+            action=make_email_action(1, structured_payload=_existing_draft_payload()),
+            execution_context=make_execution_context(),
+            idempotency=make_idempotency(),
+        )
+
+        self.assertEqual(result.attempt_status, "succeeded")
+        self.assertEqual(result.external_reference, "outlook:message:immutable-existing-1")
+        self.assertEqual([request["method"] for request in transport.requests], ["POST", "GET", "POST", "GET"])
+        self.assertIn("/messages/immutable-existing-1/send", str(transport.requests[2]["url"]))
+        self.assertFalse(any(request["method"] == "POST" and request["body"] for request in transport.requests[1:]))
+
+    def test_existing_draft_governance_failure_blocks_before_graph_read_and_send(self) -> None:
+        transport = StubOutlookTransport(
+            (200, json.dumps({"access_token": "token-123", "token_type": "Bearer"}), {}),
+        )
+        adapter = OutlookExecutionAdapter(
+            config=self.make_adapter(StubOutlookTransport()).config,
+            transport=transport,
+            pre_send_validator=lambda *_args: (
+                EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID,
+                "exact_approval_or_draft_state_changed",
+            ),
+        )
+
+        result = adapter.execute(
+            action=make_email_action(1, structured_payload=_existing_draft_payload()),
+            execution_context=make_execution_context(),
+            idempotency=make_idempotency(),
+        )
+
+        self.assertEqual(result.failure_code, EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID)
+        self.assertEqual(result.response_snapshot["stage"], "pre_send_governance")
+        self.assertEqual(len(transport.requests), 1)
     def test_execute_rejects_unsupported_attachments_without_provider_calls(self) -> None:
         transport = StubOutlookTransport()
         adapter = self.make_adapter(transport)
@@ -597,6 +678,25 @@ class OutlookAdapterTests(unittest.TestCase):
 
         self.assertEqual(result.failure_codes, (EXECUTION_FAILURE_INVALID_EXECUTION_INPUT,))
         self.assertEqual(transport.requests, [])
+
+
+def _existing_draft_payload() -> dict[str, object]:
+    return {
+        "message_mode": "existing_draft",
+        "graph_message_id": "immutable-existing-1",
+    }
+
+
+def _existing_draft_graph_payload(*, subject: str = "Need your event details") -> dict[str, object]:
+    return {
+        "id": "immutable-existing-1",
+        "isDraft": True,
+        "from": {"emailAddress": {"address": "sales@wnc.example"}},
+        "toRecipients": [{"emailAddress": {"address": "client@example.com"}}],
+        "ccRecipients": [],
+        "subject": subject,
+        "body": {"contentType": "text", "content": "Please confirm the final guest count."},
+    }
 
 
 if __name__ == "__main__":
