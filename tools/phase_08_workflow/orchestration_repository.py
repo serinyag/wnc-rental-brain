@@ -201,6 +201,13 @@ class WorkflowOrchestrationCaseSnapshot:
             return action
         return None
 
+    def find_action_by_idempotency_key(self, idempotency_key: str) -> WorkflowAction | None:
+        """Return an exact action identity regardless of its lifecycle status."""
+        for action in self.workflow_actions:
+            if action.idempotency_key == idempotency_key:
+                return action
+        return None
+
 
 class WorkflowOrchestrationRepositoryProtocol(Protocol):
     def load_case_snapshot(self, rental_case_id: int) -> WorkflowOrchestrationCaseSnapshot | None: ...
@@ -633,7 +640,7 @@ class InMemoryWorkflowOrchestrationRepository:
     def create_workflow_action(self, workflow_action: WorkflowAction) -> WorkflowAction:
         existing_snapshot = self.load_case_snapshot(workflow_action.rental_case_id)
         if existing_snapshot is not None:
-            existing = existing_snapshot.find_active_action_by_idempotency_key(workflow_action.idempotency_key)
+            existing = existing_snapshot.find_action_by_idempotency_key(workflow_action.idempotency_key)
             if existing is not None:
                 return existing
         self._workflow_action_id += 1
@@ -3178,7 +3185,7 @@ returning
         return _approval_from_row(self.query_runner(sql, expect_json=True)["rows"][0])
 
     def create_workflow_action(self, workflow_action: WorkflowAction) -> WorkflowAction:
-        existing = self._select_existing_active_action(
+        existing = self._select_existing_action_by_idempotency_key(
             workflow_action.rental_case_id,
             workflow_action.idempotency_key,
         )
@@ -3221,6 +3228,7 @@ values (
   {_sql_timestamptz(workflow_action.due_at)},
   {_sql_int(workflow_action.supersedes_workflow_action_id)}
 )
+on conflict (rental_case_id, idempotency_key) do nothing
 returning
   id as workflow_action_id,
   workflow_action_uuid::text as workflow_action_uuid,
@@ -3243,7 +3251,16 @@ returning
   created_at::text as created_at,
   updated_at::text as updated_at;
 """.strip()
-        return WorkflowAction(**self.query_runner(sql, expect_json=True)["rows"][0])
+        rows = self.query_runner(sql, expect_json=True)["rows"]
+        if rows:
+            return WorkflowAction(**rows[0])
+        existing = self._select_existing_action_by_idempotency_key(
+            workflow_action.rental_case_id,
+            workflow_action.idempotency_key,
+        )
+        if existing is None:
+            raise RuntimeError("Workflow action insert conflicted without an exact persisted action.")
+        return existing
 
     def start_workflow_action_execution(
         self,
@@ -4114,7 +4131,7 @@ limit 1;
         rows = self.query_runner(sql, expect_json=True)["rows"]
         return None if not rows else _approval_from_row(rows[0])
 
-    def _select_existing_active_action(self, rental_case_id: int, idempotency_key: str) -> WorkflowAction | None:
+    def _select_existing_action_by_idempotency_key(self, rental_case_id: int, idempotency_key: str) -> WorkflowAction | None:
         sql = f"""
 select
   id as workflow_action_id,
@@ -4140,7 +4157,6 @@ select
 from public.workflow_actions
 where rental_case_id = {rental_case_id}
   and idempotency_key = {sql_text(idempotency_key)}
-  and status not in ('succeeded', 'failed', 'cancelled', 'superseded')
 limit 1;
 """.strip()
         rows = self.query_runner(sql, expect_json=True)["rows"]

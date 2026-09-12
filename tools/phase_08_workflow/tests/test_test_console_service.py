@@ -26,7 +26,10 @@ from tools.phase_08_workflow.contracts import (
     OpenQuestion,
     RentalCase,
     WorkflowAction,
+    WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
+    WORKFLOW_ACTION_STATUS_FAILED,
     WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE,
+    WORKFLOW_ACTION_STATUS_SUCCEEDED,
 )
 from tools.phase_08_workflow.asana_adapter import AsanaAdapterConfig
 from tools.phase_08_workflow.execution_types import NormalizedExecutionResult
@@ -34,7 +37,11 @@ from tools.phase_08_workflow.governed_client_response import ClientResponseProvi
 from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig, OutlookDraftReadResult, OutlookDraftSnapshot
 from tools.phase_08_workflow.observation_contracts import InboundObservation, InboundObservationEffect, InboundSourceRecord
 from tools.phase_08_workflow.observation_repository import InMemoryObservationRepository
-from tools.phase_08_workflow.orchestration_repository import InMemoryWorkflowOrchestrationRepository, WorkflowOrchestrationCaseSnapshot
+from tools.phase_08_workflow.orchestration_repository import (
+    InMemoryWorkflowOrchestrationRepository,
+    SupabaseWorkflowOrchestrationRepository,
+    WorkflowOrchestrationCaseSnapshot,
+)
 from tools.phase_08_workflow.test_console_projection import TestConsoleCaseMetadata
 from tools.phase_08_workflow.test_console_service import (
     TEST_CONSOLE_INQUIRY_FOLLOW_UP_DELAY_DAYS_ENV,
@@ -141,8 +148,16 @@ class _GovernedClientResponseLifecycleService(_MetadataService):
         self.calls.append("fresh_authoritative_reread")
         return self.snapshot
 
-    def _ensure_governed_client_response_action(self, _snapshot, *, response_intent: str, context_hash: str):
-        del response_intent, context_hash
+    def _ensure_governed_client_response_action(
+        self,
+        _snapshot,
+        *,
+        response_intent: str,
+        context_hash: str,
+        draft_content_hash: str,
+        recipient_email: str,
+    ):
+        del response_intent, context_hash, draft_content_hash, recipient_email
         return make_action()
 
     def _load_current_draft_revision_for_conversation(self, *_args, **_kwargs):
@@ -251,6 +266,125 @@ def make_action(*, target_adapter_code: str = "email") -> WorkflowAction:
 
 
 class TestConsoleServiceSafetyTests(unittest.TestCase):
+    def test_supabase_action_insert_race_returns_exact_terminal_action(self) -> None:
+        persisted = replace(
+            make_action(),
+            status=WORKFLOW_ACTION_STATUS_FAILED,
+            idempotency_key="exact-terminal-action",
+        )
+        queries: list[str] = []
+
+        def query_runner(sql: str, *, expect_json: bool):
+            self.assertTrue(expect_json)
+            queries.append(sql)
+            if "insert into public.workflow_actions" in sql:
+                return {"rows": []}
+            return {"rows": [] if len(queries) == 1 else [vars(persisted)]}
+
+        repository = SupabaseWorkflowOrchestrationRepository(query_runner=query_runner)
+        returned = repository.create_workflow_action(replace(persisted))
+
+        self.assertEqual(returned, persisted)
+        self.assertEqual(len(queries), 3)
+        self.assertIn("on conflict (rental_case_id, idempotency_key) do nothing", queries[1])
+        self.assertNotIn("status not in", queries[2])
+
+    def test_governed_draft_action_identity_distinguishes_content_and_preserves_failed_history(self) -> None:
+        rental_case = RentalCase(
+            rental_case_id=424,
+            rental_case_uuid="case-424",
+            case_reference_code="RC-9424",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=1,
+            rental_type_code="custom_scope",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            created_at="2026-09-12T09:00:00Z",
+            updated_at="2026-09-12T09:00:00Z",
+        )
+        context_hash = "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4"
+        failed_legacy_action = WorkflowAction(
+            workflow_action_id=582,
+            workflow_action_uuid="action-582",
+            rental_case_id=424,
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            action_category=ACTION_CATEGORY_COMMUNICATION,
+            target_adapter_code="outlook",
+            reason_entity_type="rental_case",
+            reason_entity_reference="governed_client_response:424",
+            approval_posture=APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+            status=WORKFLOW_ACTION_STATUS_FAILED,
+            semantic_subject_hash=context_hash,
+            source_case_revision=1,
+            idempotency_key="governed_client_response:424:successor:d28b470de9a04424",
+            structured_payload={"context_hash": context_hash},
+            created_at="2026-09-12T09:00:00Z",
+            updated_at="2026-09-12T09:01:00Z",
+        )
+        successful_historical_action = replace(
+            failed_legacy_action,
+            workflow_action_id=583,
+            workflow_action_uuid="action-583",
+            status=WORKFLOW_ACTION_STATUS_SUCCEEDED,
+            idempotency_key="governed_client_response:424:successor:successful-legacy-action",
+        )
+        repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={424: rental_case},
+            rental_case_facts={424: []},
+            blockers={424: []},
+            requirements={424: []},
+            open_questions={424: []},
+            approval_requests={424: []},
+            proposed_changes={424: []},
+            reschedule_requests={424: []},
+            case_decisions={424: []},
+            workflow_actions={424: [failed_legacy_action, successful_historical_action]},
+        )
+        service = _MetadataService(
+            orchestration_repository=repository,
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(),
+            now=lambda: "2026-09-12T10:00:00Z",
+        )
+
+        # A retry of an exact terminal identity returns history rather than inserting again.
+        self.assertIs(repository.create_workflow_action(replace(failed_legacy_action)), failed_legacy_action)
+        self.assertIs(repository.create_workflow_action(replace(successful_historical_action)), successful_historical_action)
+
+        first = service._ensure_governed_client_response_action(
+            repository.load_case_snapshot(424),
+            response_intent="request_information",
+            context_hash=context_hash,
+            draft_content_hash="edited-content-hash",
+            recipient_email="Client@Example.Test",
+        )
+        repeat = service._ensure_governed_client_response_action(
+            repository.load_case_snapshot(424),
+            response_intent="request_information",
+            context_hash=context_hash,
+            draft_content_hash="edited-content-hash",
+            recipient_email="client@example.test",
+        )
+        successor = service._ensure_governed_client_response_action(
+            repository.load_case_snapshot(424),
+            response_intent="request_information",
+            context_hash=context_hash,
+            draft_content_hash="later-edited-content-hash",
+            recipient_email="client@example.test",
+        )
+
+        self.assertEqual(first.workflow_action_id, repeat.workflow_action_id)
+        self.assertNotEqual(first.workflow_action_id, failed_legacy_action.workflow_action_id)
+        self.assertNotEqual(successor.workflow_action_id, first.workflow_action_id)
+        self.assertNotEqual(successor.idempotency_key, first.idempotency_key)
+        self.assertEqual(first.status, WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL)
+        self.assertEqual(failed_legacy_action.status, WORKFLOW_ACTION_STATUS_FAILED)
+        self.assertEqual(successful_historical_action.status, WORKFLOW_ACTION_STATUS_SUCCEEDED)
+        self.assertEqual(service._draft_conversation_key(first), "governed_client_response:424")
+        self.assertEqual(service._draft_conversation_key(failed_legacy_action), "governed_client_response:424")
+        self.assertEqual(len(repository.load_case_snapshot(424).workflow_actions), 4)
+
     def test_governed_client_response_fake_provider_uses_fresh_post_provider_state_before_persistence(self) -> None:
         rental_case = RentalCase(
             rental_case_id=1,
@@ -461,11 +595,6 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             staging_allow_real_outlook=True,
             staging_allow_real_outlook_send=False,
         )
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
-        )
         prior_revision = SimpleNamespace(
             inquiry_response_draft_revision_id=41,
             approval_request_id=51,
@@ -491,6 +620,11 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             workflow_events=(event,),
             find_workflow_action=lambda _action_id: action,
             find_approval_request=lambda _approval_id: approval,
+        )
+        service = TestConsoleService(
+            orchestration_repository=_DummyRepository(),
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
         )
 
         with patch.object(service, "_load_draft_revision_by_id", return_value=prior_revision), patch.object(
@@ -551,10 +685,18 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             staging_allow_real_outlook=True,
             staging_allow_real_outlook_send=False,
         )
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
+        current_case = RentalCase(
+            rental_case_id=1,
+            rental_case_uuid="case-1",
+            case_reference_code="RC-9001",
+            lifecycle_state=LIFECYCLE_STATE_INQUIRY_ACTIVE,
+            case_revision=7,
+            rental_type_code="custom_scope",
+            commercial_summary_status="unknown",
+            operational_summary_status="unknown",
+            is_active=True,
+            created_at="2026-09-12T10:00:00Z",
+            updated_at="2026-09-12T10:00:00Z",
         )
         prior_revision = SimpleNamespace(
             inquiry_response_draft_revision_id=41,
@@ -567,8 +709,41 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             draft_status="send_failed",
             is_current=True,
         )
-        original_action = SimpleNamespace(workflow_action_id=61, target_adapter_code="outlook")
-        target_action = SimpleNamespace(workflow_action_id=62)
+        original_action = WorkflowAction(
+            workflow_action_id=61,
+            workflow_action_uuid="action-61",
+            rental_case_id=1,
+            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
+            action_category=ACTION_CATEGORY_COMMUNICATION,
+            target_adapter_code="outlook",
+            reason_entity_type="rental_case",
+            reason_entity_reference="governed_client_response:1",
+            approval_posture=APPROVAL_POSTURE_AUTOMATIC_ALLOWED,
+            status=WORKFLOW_ACTION_STATUS_FAILED,
+            semantic_subject_hash="current-context-hash",
+            source_case_revision=7,
+            idempotency_key="governed_client_response:1:successor:current-context",
+            structured_payload={"context_hash": "current-context-hash"},
+            created_at="2026-09-12T10:00:00Z",
+            updated_at="2026-09-12T10:01:00Z",
+        )
+        repository = InMemoryWorkflowOrchestrationRepository(
+            rental_cases={1: current_case},
+            rental_case_facts={1: []},
+            blockers={1: []},
+            requirements={1: []},
+            open_questions={1: []},
+            approval_requests={1: []},
+            proposed_changes={1: []},
+            reschedule_requests={1: []},
+            case_decisions={1: []},
+            workflow_actions={1: [original_action]},
+        )
+        service = TestConsoleService(
+            orchestration_repository=repository,
+            observation_repository=_DummyRepository(),
+            config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
+        )
         approval = SimpleNamespace(
             status=APPROVAL_REQUEST_STATUS_APPROVED,
             target_entity_reference="workflow_action:61:draft_revision:41",
@@ -586,10 +761,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             find_workflow_action=lambda action_id: original_action if action_id == 61 else None,
             find_approval_request=lambda _approval_id: approval,
         )
-        current_snapshot = SimpleNamespace(
-            rental_case=SimpleNamespace(case_revision=7),
-            find_workflow_action=lambda action_id: target_action if action_id == 62 else None,
-        )
+        current_snapshot = repository.load_case_snapshot(1)
         graph_read = _OutlookHumanEditGraphRead(
             snapshot=OutlookDraftSnapshot(
                 outcome="found",
@@ -622,9 +794,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         ), patch(
             "tools.phase_08_workflow.test_console_service.validate_client_response_draft",
             return_value=SimpleNamespace(failure_codes=()),
-        ), patch.object(service, "_ensure_governed_client_response_action", return_value=target_action), patch.object(
-            service, "_build_governed_client_response_context", return_value=SimpleNamespace(source_case_revision=7)
-        ), patch.object(service, "_content_from_governed_client_response", return_value=SimpleNamespace()), patch.object(
+        ), patch.object(service, "_build_governed_client_response_context", return_value=SimpleNamespace(source_case_revision=7)), patch.object(
             service, "_create_draft_revision", return_value=created_revision
         ) as create_revision, patch.object(service, "_replace_draft_approval", return_value=new_approval), patch.object(
             service, "_bind_approval_request_to_draft_revision", return_value=created_revision
@@ -649,6 +819,13 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(identity_evidence["unavailable_fields"], ["from", "sender"])
         self.assertTrue(identity_evidence["identity_field_unavailable"])
         self.assertEqual(identity_evidence["graph_mailbox_target"], "approved@example.com")
+        persisted_actions = repository.load_case_snapshot(1).workflow_actions
+        self.assertEqual(len(persisted_actions), 2)
+        successor_action = persisted_actions[-1]
+        self.assertNotEqual(successor_action.workflow_action_id, original_action.workflow_action_id)
+        self.assertNotEqual(successor_action.idempotency_key, original_action.idempotency_key)
+        self.assertEqual(successor_action.status, WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL)
+        self.assertEqual(original_action.status, WORKFLOW_ACTION_STATUS_FAILED)
 
     def test_prepare_failure_preserves_exact_database_operation(self) -> None:
         service = TestConsoleService(

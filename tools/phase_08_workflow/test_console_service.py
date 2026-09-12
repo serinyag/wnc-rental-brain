@@ -2556,10 +2556,17 @@ limit 1;
                 validation_codes=validation.failure_codes,
             )
 
+        content = self._content_from_governed_client_response(
+            subject=generated.subject,
+            body=generated.body,
+            open_questions=contract.open_client_questions,
+        )
         action = self._ensure_governed_client_response_action(
             current_snapshot,
-            response_intent=contract.response_intent.code,
-            context_hash=contract.context_hash,
+            response_intent=current_contract.response_intent.code,
+            context_hash=current_contract.context_hash,
+            draft_content_hash=self._draft_action_content_hash(content),
+            recipient_email=self._simulated_recipient_email(rental_case_id, detail.metadata),
         )
         latest_revision = self._load_current_draft_revision_for_conversation(
             rental_case_id,
@@ -2571,11 +2578,6 @@ limit 1;
             metadata=detail.metadata,
             open_question_ids=tuple(question_id for question_id, _ in contract.open_client_questions),
             contract=contract,
-        )
-        content = self._content_from_governed_client_response(
-            subject=generated.subject,
-            body=generated.body,
-            open_questions=contract.open_client_questions,
         )
         revision = self._create_draft_revision(
             context=context,
@@ -3085,6 +3087,11 @@ limit 1;
                 failure_codes=tuple(validation_codes),
             )
 
+        content = self._content_from_governed_client_response(
+            subject=current_draft.subject,
+            body=current_draft.body,
+            open_questions=contract.open_client_questions,
+        )
         target_action = self._reconciliation_operation(
             phase="apply",
             operation="reconcile.persist.ensure_successor_action",
@@ -3093,6 +3100,8 @@ limit 1;
                 current_snapshot,
                 response_intent=contract.response_intent.code,
                 context_hash=contract.context_hash,
+                draft_content_hash=self._draft_action_content_hash(content),
+                recipient_email=prior_revision.recipient_email,
             ),
         )
         context = self._build_governed_client_response_context(
@@ -3101,11 +3110,6 @@ limit 1;
             metadata=detail.metadata,
             open_question_ids=tuple(question_id for question_id, _question in contract.open_client_questions),
             contract=contract,
-        )
-        content = self._content_from_governed_client_response(
-            subject=current_draft.subject,
-            body=current_draft.body,
-            open_questions=contract.open_client_questions,
         )
         revision = self._reconciliation_operation(
             phase="apply",
@@ -4284,29 +4288,34 @@ limit 1;
         *,
         response_intent: str,
         context_hash: str,
+        draft_content_hash: str,
+        recipient_email: str,
     ) -> WorkflowAction:
+        """Ensure an executable action for one exact immutable client-facing draft."""
         conversation_key = f"governed_client_response:{snapshot.rental_case.rental_case_id}"
-        existing = next(
-            (
-                action
-                for action in snapshot.workflow_actions
-                if action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE
-                and self._draft_conversation_key(action) == conversation_key
-                and action.source_case_revision == snapshot.rental_case.case_revision
-                and action.structured_payload.get("context_hash") == context_hash
-                and action.status not in {
-                    WORKFLOW_ACTION_STATUS_CANCELLED,
-                    WORKFLOW_ACTION_STATUS_FAILED,
-                    WORKFLOW_ACTION_STATUS_SUPERSEDED,
-                    WORKFLOW_ACTION_STATUS_SUCCEEDED,
-                }
-            ),
-            None,
+        recipient_identity_hash = _json_digest({"recipient_email": recipient_email.strip().casefold()})
+        idempotency_key = self._governed_client_response_action_idempotency_key(
+            rental_case_id=snapshot.rental_case.rental_case_id,
+            context_hash=context_hash,
+            draft_content_hash=draft_content_hash,
+            recipient_identity_hash=recipient_identity_hash,
         )
-        if existing is not None:
-            return existing
+        matches = tuple(action for action in snapshot.workflow_actions if action.idempotency_key == idempotency_key)
+        if len(matches) > 1:
+            raise TestConsoleError(
+                "Multiple workflow actions share an exact governed draft identity.",
+                failure_code="GOVERNED_DRAFT_ACTION_IDENTITY_CONFLICT",
+            )
+        if matches:
+            return self._validate_exact_governed_draft_action(
+                matches[0],
+                conversation_key=conversation_key,
+                context_hash=context_hash,
+                draft_content_hash=draft_content_hash,
+                recipient_identity_hash=recipient_identity_hash,
+            )
         timestamp = self.now()
-        return self.orchestration_repository.create_workflow_action(
+        action = self.orchestration_repository.create_workflow_action(
             WorkflowAction(
                 workflow_action_id=1,
                 workflow_action_uuid="workflow-action",
@@ -4320,10 +4329,13 @@ limit 1;
                 status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
                 semantic_subject_hash=context_hash,
                 source_case_revision=snapshot.rental_case.case_revision,
-                idempotency_key=f"{conversation_key}:successor:{context_hash[:16]}",
+                idempotency_key=idempotency_key,
                 structured_payload={
                     "response_intent": response_intent,
                     "context_hash": context_hash,
+                    "conversation_key": conversation_key,
+                    "draft_content_hash": draft_content_hash,
+                    "recipient_identity_hash": recipient_identity_hash,
                     "purpose": "governed_client_response_draft",
                     "reason": "operator_requested_governed_client_response",
                 },
@@ -4331,6 +4343,53 @@ limit 1;
                 updated_at=timestamp,
             )
         )
+        return self._validate_exact_governed_draft_action(
+            action,
+            conversation_key=conversation_key,
+            context_hash=context_hash,
+            draft_content_hash=draft_content_hash,
+            recipient_identity_hash=recipient_identity_hash,
+        )
+
+    @staticmethod
+    def _draft_action_content_hash(content: InquiryResponseDraftContent) -> str:
+        return _json_digest(json.loads(content_hash_payload(content)))
+
+    @staticmethod
+    def _governed_client_response_action_idempotency_key(
+        *,
+        rental_case_id: int,
+        context_hash: str,
+        draft_content_hash: str,
+        recipient_identity_hash: str,
+    ) -> str:
+        return (
+            f"governed_client_response:{rental_case_id}:context:{context_hash}:"
+            f"content:{draft_content_hash}:recipient:{recipient_identity_hash}"
+        )
+
+    @staticmethod
+    def _validate_exact_governed_draft_action(
+        action: WorkflowAction,
+        *,
+        conversation_key: str,
+        context_hash: str,
+        draft_content_hash: str,
+        recipient_identity_hash: str,
+    ) -> WorkflowAction:
+        payload = action.structured_payload
+        if (
+            action.action_type != ACTION_TYPE_SEND_INQUIRY_RESPONSE
+            or payload.get("conversation_key") != conversation_key
+            or payload.get("context_hash") != context_hash
+            or payload.get("draft_content_hash") != draft_content_hash
+            or payload.get("recipient_identity_hash") != recipient_identity_hash
+        ):
+            raise TestConsoleError(
+                "The existing workflow action conflicts with the requested exact draft identity.",
+                failure_code="GOVERNED_DRAFT_ACTION_IDENTITY_CONFLICT",
+            )
+        return action
 
     def _ensure_resolution_workflow_actions(
         self,
@@ -5037,6 +5096,11 @@ where rental_case_id = {rental_case_id}
         return action_candidates[0] if action_candidates else None
 
     def _draft_conversation_key(self, action: WorkflowAction) -> str:
+        explicit_value = action.structured_payload.get("conversation_key")
+        if isinstance(explicit_value, str):
+            explicit_key = _normalize_optional_text(explicit_value)
+            if explicit_key is not None:
+                return explicit_key
         base, _, _ = action.idempotency_key.partition(":successor:")
         return base or action.idempotency_key
 
