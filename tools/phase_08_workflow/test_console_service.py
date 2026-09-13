@@ -175,6 +175,12 @@ from .orchestration_repository import (
 )
 from .orchestration_runtime import apply_approval_decision, reconcile_workflow_orchestration
 from .orchestration_types import ApprovalDecisionInput, ORCHESTRATION_DECISION_APPROVED, ORCHESTRATION_DECISION_REJECTED
+from .outlook_action_contract import (
+    CONTRACT_VERSION, RESERVATION_VERSION, GOVERNED_PURPOSE, GOVERNED_REASON,
+    OutlookActionIntent, OutlookContractError, OutlookExecutionInput,
+    build_governed_outlook_action, reserve_governed_outlook_action,
+    validate_outlook_action, exact_approval_target,
+)
 from .outlook_adapter import (
     OutlookAdapterConfig,
     OutlookDraftSnapshot,
@@ -262,6 +268,7 @@ class _ProjectedWorkflowActionExecutionAdapter:
 
     delegate: Any
     projected_action: WorkflowAction
+    simulated: bool = False
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         del action
@@ -273,6 +280,10 @@ class _ProjectedWorkflowActionExecutionAdapter:
             execution_context=execution_context,
             idempotency=idempotency,
         )
+        if self.simulated and isinstance(result, NormalizedExecutionResult):
+            result = replace(result, response_snapshot={**result.response_snapshot, "provider_mode": "deterministic_fake"},
+                             external_reference=(f"fake:outlook:{action.workflow_action_id}:{idempotency.attempt_number}"
+                                                 if result.external_reference is not None else None))
         # The provider projection may be registered under a canonical action code
         # (for example, ``outlook``) while the provider uses its legacy ``email`` code.
         if isinstance(result, NormalizedExecutionResult):
@@ -647,7 +658,7 @@ def _local_provider_lines(allow_real_providers: bool) -> tuple[str, ...]:
         return ("REAL PROVIDER EXECUTION DISABLED", "email -> deterministic fake", "task_surface -> deterministic fake")
     return (
         "REAL PROVIDER EXECUTION ENABLED",
-        "email -> Outlook / Microsoft Graph",
+        "outlook -> Microsoft Graph (canonical governed actions only)",
         "task_surface -> Asana",
     )
 
@@ -2569,7 +2580,13 @@ limit 1;
             context_hash=current_contract.context_hash,
             draft_content_hash=self._draft_action_content_hash(content),
             recipient_email=self._simulated_recipient_email(rental_case_id, detail.metadata),
+            provenance="deterministic_fixture" if use_deterministic_fixture else "governed_model",
         )
+        if action.structured_payload.get("contract_version") == CONTRACT_VERSION:
+            return OperationReport(title="Governed Client Response Draft Exists", success=True,
+                                   lines=(f"Workflow action id: {action.workflow_action_id}",
+                                          f"Draft revision id: {action.structured_payload['draft_revision_id']}",
+                                          "Exact immutable draft already exists; approval state preserved."))
         latest_revision = self._load_current_draft_revision_for_conversation(
             rental_case_id,
             conversation_key=self._draft_conversation_key(action),
@@ -2596,6 +2613,8 @@ limit 1;
                 else latest_revision.inquiry_response_draft_revision_id
             ),
         )
+        if action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE:
+            action = self._bind_governed_outlook_action(action=action, revision=revision, case=current_snapshot.rental_case)
         approval = self._replace_draft_approval(
             rental_case_id=rental_case_id,
             workflow_action=action,
@@ -2696,6 +2715,12 @@ limit 1;
                 failure_code="OUTLOOK_SEND_READINESS_DRAFT_BINDING_INVALID",
                 status=HTTPStatus.CONFLICT,
             )
+        value = validate_outlook_action(action)
+        self._validate_outlook_revision_binding(snapshot, action=action, revision=revision, value=value)
+        if (revision.draft_status not in {INQUIRY_DRAFT_STATUS_NEEDS_APPROVAL, INQUIRY_DRAFT_STATUS_APPROVED}
+                and not (self._is_exact_outlook_send_recovery(action, revision=revision)
+                         and revision.draft_status == INQUIRY_DRAFT_STATUS_SEND_FAILED)):
+            raise OutlookContractError("draft_status")
         _detail, current_snapshot, contract = self._build_current_governed_draft_contract(rental_case_id)
         if (
             revision.source_case_revision != current_snapshot.rental_case.case_revision
@@ -2714,6 +2739,9 @@ limit 1;
             exact_reference=exact_reference,
             fallback_approval_request_id=revision.approval_request_id,
         )
+        if (approval is None or approval.target_entity_type != "workflow_action"
+                or approval.target_entity_id != action.workflow_action_id):
+            raise OutlookContractError("approval_target")
         exact_approval = approval is not None
         approved = exact_approval and approval.status == APPROVAL_REQUEST_STATUS_APPROVED
         return OperationReport(
@@ -2727,6 +2755,10 @@ limit 1;
                 f"Approval request id: {None if approval is None else approval.approval_request_id}",
                 f"Exact approval target: {exact_reference}",
                 f"Exact approval required: {'no' if approved else 'yes'}",
+                "Canonical payload validation: PASS",
+                "Execution-input validation: PASS",
+                "Pre-send governance input validation: PASS",
+                f"Send gate: {'enabled' if self._outlook_send_enabled_at_transport_boundary() else 'disabled'}",
                 "Exact revision integrity: pass",
                 "Current case/context: pass",
                 "Recipient allowlist: pass",
@@ -2767,6 +2799,17 @@ limit 1;
             if revision.approval_request_id is None
             else snapshot.find_approval_request(revision.approval_request_id)
         )
+        # A retry of an unknown provider outcome could duplicate a delivery.
+        # Only locally recorded stages that precede /send are recoverable.
+        for attempt in snapshot.execution_attempts:
+            if attempt.workflow_action_id != origin_action.workflow_action_id:
+                continue
+            if (attempt.status != EXECUTION_ATTEMPT_STATUS_FAILED
+                    or attempt.response_snapshot.get("stage") not in {
+                        "token", "pre_send_governance", "pre_send_draft_integrity", "draft_created_send_disabled",
+                    }):
+                raise TestConsoleError("The origin does not prove a failure before send.",
+                                       failure_code="OUTLOOK_SEND_RECOVERY_OUTCOME_UNSAFE")
         if (
             origin_approval is None
             or origin_approval.status != APPROVAL_REQUEST_STATUS_APPROVED
@@ -2790,45 +2833,57 @@ limit 1;
                 failure_code="OUTLOOK_SEND_RECOVERY_CONTEXT_INVALID",
                 status=HTTPStatus.CONFLICT,
             )
-        # This proves the already-bound draft identity from local audit data only.
-        self._bound_outlook_message_id(snapshot=snapshot, action=origin_action, revision=revision)
-        payload = {
-            "conversation_key": revision.conversation_key,
-            "recovery_draft_revision_id": revision.inquiry_response_draft_revision_id,
-            "recovery_origin_workflow_action_id": origin_action.workflow_action_id,
-            "draft_content_hash": revision.content_hash,
-            "context_hash": revision.context_hash,
-            "governed_context_hash": self._governed_context_hash(origin_action, revision=revision),
-            "recipient_email": revision.recipient_email,
-        }
+        # Intent is copied from authoritative origin evidence, never guessed in execution.
+        intent = OutlookActionIntent.from_payload(origin_action.structured_payload)
+        if intent.response_intent != contract.response_intent.code:
+            raise OutlookContractError("response_intent_changed")
+        graph_message_id = self._bound_outlook_message_id(snapshot=snapshot, action=origin_action, revision=revision)
+        prior_recoveries = [candidate for candidate in snapshot.workflow_actions
+                           if candidate.structured_payload.get("recovery_draft_revision_id") == draft_revision_id
+                           and candidate.structured_payload.get("recovery_origin_workflow_action_id") == origin_action.workflow_action_id]
+        if any(candidate.status in {WORKFLOW_ACTION_STATUS_SUCCEEDED, WORKFLOW_ACTION_STATUS_EXECUTING}
+               for candidate in prior_recoveries):
+            raise TestConsoleError("This exact draft already has a completed or executing recovery.",
+                                   failure_code="OUTLOOK_SEND_RECOVERY_ALREADY_EXECUTED")
+        active = [candidate for candidate in prior_recoveries
+                  if candidate.structured_payload.get("contract_version") == CONTRACT_VERSION
+                  and candidate.status in {WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL, WORKFLOW_ACTION_STATUS_APPROVED,
+                                           WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE}]
+        if len(active) > 1:
+            raise OutlookContractError("recovery_lineage_conflict")
+        predecessor = max((candidate.workflow_action_id for candidate in prior_recoveries), default=None)
+        # An existing canonical, unexecuted lineage is idempotent. A terminal
+        # recovery gets a new identity that explicitly records its predecessor.
+        if active:
+            predecessor = active[0].structured_payload["recovery_predecessor_action_id"]
+        elif predecessor is not None:
+            for attempt in snapshot.execution_attempts:
+                if attempt.workflow_action_id == predecessor and (attempt.status != EXECUTION_ATTEMPT_STATUS_FAILED
+                        or attempt.response_snapshot.get("stage") not in {
+                            "token", "pre_send_governance", "pre_send_draft_integrity", "draft_created_send_disabled"}):
+                    raise TestConsoleError("The preceding recovery does not prove a failure before send.",
+                                           failure_code="OUTLOOK_SEND_RECOVERY_OUTCOME_UNSAFE")
         timestamp = self.now()
-        action = self.orchestration_repository.create_workflow_action(
-            WorkflowAction(
-                workflow_action_id=1,
-                workflow_action_uuid="workflow-action",
-                rental_case_id=rental_case_id,
-                action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-                action_category=origin_action.action_category,
-                target_adapter_code="outlook",
-                reason_entity_type=origin_action.reason_entity_type,
-                reason_entity_id=origin_action.reason_entity_id,
-                reason_entity_reference=origin_action.reason_entity_reference,
-                approval_posture=APPROVAL_POSTURE_APPROVAL_REQUIRED,
-                status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
-                semantic_subject_hash=self._governed_context_hash(origin_action, revision=revision),
-                source_case_revision=revision.source_case_revision,
-                idempotency_key=(
-                    f"{revision.conversation_key}:outlook_send_recovery:"
-                    f"draft_revision:{revision.inquiry_response_draft_revision_id}:"
-                    f"origin_action:{origin_action.workflow_action_id}"
-                ),
-                structured_payload=payload,
-                target_scope_key=origin_action.target_scope_key,
-                supersedes_workflow_action_id=origin_action.workflow_action_id,
-                created_at=timestamp,
-                updated_at=timestamp,
-            )
+        reservation = reserve_governed_outlook_action(
+            case=current_snapshot.rental_case, intent=intent, conversation_key=revision.conversation_key,
+            content_hash=revision.content_hash, context_hash=contract.context_hash,
+            recipient_email=revision.recipient_email, provenance="outlook_send_recovery",
+            origin_action_id=origin_action.workflow_action_id, graph_message_id=graph_message_id,
+            recovery_revision_id=revision.inquiry_response_draft_revision_id, now=timestamp,
+            recovery_predecessor_action_id=predecessor,
         )
+        build_governed_outlook_action(reservation=reservation, case=current_snapshot.rental_case, revision=revision,
+            intent=intent, governed_context_hash=contract.context_hash, provenance="outlook_send_recovery",
+            graph_message_id=graph_message_id)
+        matches = [candidate for candidate in snapshot.workflow_actions
+                   if candidate.structured_payload.get("plan_identity") == reservation.idempotency_key]
+        if len(matches) > 1:
+            raise OutlookContractError("plan_identity_conflict")
+        action = matches[0] if matches else self.orchestration_repository.create_workflow_action(reservation)
+        action = self._bind_governed_outlook_action(action=action, revision=revision, case=current_snapshot.rental_case)
+        # Validate the complete provider input before exposing an approval request.
+        self._validate_outlook_revision_binding(snapshot, action=action, revision=revision,
+                                                value=validate_outlook_action(action))
         exact_reference = f"workflow_action:{action.workflow_action_id}:draft_revision:{revision.inquiry_response_draft_revision_id}"
         approval = self._exact_approval_for_action_revision(snapshot, exact_reference=exact_reference)
         if approval is None:
@@ -3189,6 +3244,16 @@ limit 1;
         action = plan.action
         graph_message_id = plan.graph_message_id
         graph_draft = graph_read.snapshot
+        current_origin = self._load_draft_revision_by_id(rental_case_id, prior_revision.inquiry_response_draft_revision_id)
+        if (current_origin is None or not current_origin.is_current
+                or current_origin.workflow_action_id != action.workflow_action_id
+                or current_origin.content_hash != prior_revision.content_hash
+                or current_origin.approval_request_id != plan.approval.approval_request_id):
+            return self._outlook_human_edit_safety_blocked("The originating revision changed during reconciliation.",
+                                                         failure_code="OUTLOOK_DRAFT_BINDING_INVALID")
+        if (graph_draft.message_id != graph_message_id or graph_draft.outcome != "found" or graph_draft.is_draft is not True):
+            return self._outlook_human_edit_safety_blocked("The trusted snapshot does not match the bound draft.",
+                                                         failure_code="OUTLOOK_DRAFT_BINDING_INVALID")
         identity = _assess_outlook_draft_identity(
             configured_mailbox=graph_read.configured_mailbox,
             graph_from_mailbox=graph_draft.from_mailbox,
@@ -3321,8 +3386,15 @@ limit 1;
                 context_hash=contract.context_hash,
                 draft_content_hash=self._draft_action_content_hash(content),
                 recipient_email=prior_revision.recipient_email,
+                provenance="outlook_human_edit",
+                origin_action_id=action.workflow_action_id,
+                graph_message_id=graph_message_id,
             ),
         )
+        if target_action.structured_payload.get("contract_version") == CONTRACT_VERSION:
+            return OperationReport(title="Outlook Human Edit Already Reconciled", success=True,
+                                   lines=(f"Workflow action id: {target_action.workflow_action_id}",
+                                          "Exact immutable draft already exists; approval state preserved."))
         context = self._build_governed_client_response_context(
             current_snapshot,
             action=target_action,
@@ -3341,6 +3413,9 @@ limit 1;
                 created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
                 supersedes_draft_revision_id=prior_revision.inquiry_response_draft_revision_id,
             ),
+        )
+        target_action = self._bind_governed_outlook_action(
+            action=target_action, revision=revision, case=current_snapshot.rental_case,
         )
         new_approval = self._reconciliation_operation(
             phase="apply",
@@ -3516,28 +3591,17 @@ limit 1;
             return self._outlook_human_edit_safety_blocked(
                 "The originating Outlook action or exact-revision approval binding is invalid."
             )
-        graph_message_ids = {
-            _outlook_message_id_from_external_reference(str(event.structured_payload.get("external_reference") or ""))
-            for event in snapshot.workflow_events
-            if (
-                event.event_type_code == "outlook_draft_reconciled_after_adapter_code_mismatch"
-                and event.structured_payload.get("workflow_action_id") == action.workflow_action_id
-                and event.structured_payload.get("draft_revision_id")
-                == prior_revision.inquiry_response_draft_revision_id
-            )
-        }
-        graph_message_ids.discard(None)
-        if len(graph_message_ids) != 1:
-            return self._outlook_human_edit_safety_blocked(
-                "The originating Graph draft binding is missing or ambiguous."
-            )
+        try:
+            graph_message_id = self._bound_outlook_message_id(snapshot=snapshot, action=action, revision=prior_revision)
+        except TestConsoleError:
+            return self._outlook_human_edit_safety_blocked("The originating Graph draft binding is missing or ambiguous.")
         return _OutlookHumanEditReconciliationPlan(
             rental_case_id=rental_case_id,
             prior_revision=prior_revision,
             snapshot=snapshot,
             action=action,
             approval=approval,
-            graph_message_id=next(iter(graph_message_ids)),
+            graph_message_id=graph_message_id,
             reads=tuple(reads),
         )
 
@@ -3831,7 +3895,7 @@ limit 1;
             provider_action=provider_action,
             outlook_pre_send_validator=(
                 self._validate_governed_outlook_pre_send
-                if provider_action is not action and execution_mode == "real"
+                if provider_action is not action
                 else None
             ),
         )
@@ -3901,7 +3965,20 @@ limit 1;
         outlook_pre_send_validator: Callable[..., tuple[str, str] | None] | None = None,
     ) -> ExecutionAdapterRegistry:
         registry = build_default_fake_execution_registry(now=self.now)
-        if execution_mode == "retryable_failure":
+        if execution_mode == "success" and action.target_adapter_code == "outlook":
+            from .outlook_adapter import OutlookExecutionAdapter
+            from .outlook_simulation import DeterministicOutlookTransport
+            value = validate_outlook_action(action)
+            if outlook_pre_send_validator is None:
+                raise OutlookContractError("pre_send_validator")
+            transport = DeterministicOutlookTransport(value, occurred_at=self.now())
+            adapter = OutlookExecutionAdapter(
+                config=OutlookAdapterConfig(tenant_id="synthetic", client_id="synthetic", client_secret="synthetic",
+                    sender_mailbox=transport.mailbox), transport=transport, send_enabled=True,
+                pre_send_validator=outlook_pre_send_validator,
+            )
+            registry.register("outlook", _ProjectedWorkflowActionExecutionAdapter(adapter, provider_action or action, simulated=True))
+        elif execution_mode == "retryable_failure":
             registry.register(
                 action.target_adapter_code,
                 fake_retryable_failure_adapter(action.target_adapter_code, now=self.now),
@@ -3931,6 +4008,9 @@ limit 1;
                     raise TestConsoleError(
                         "Real Outlook execution is disabled. Set STAGING_ALLOW_REAL_OUTLOOK=true after global approval."
                     )
+                validate_outlook_action(action)
+                if outlook_pre_send_validator is None:
+                    raise OutlookContractError("pre_send_validator")
                 outlook_adapter = guard_outlook_execution_adapter(
                     build_outlook_execution_adapter_from_env(
                         send_enabled=self._outlook_send_enabled_at_transport_boundary,
@@ -3993,6 +4073,12 @@ limit 1;
         snapshot = self._require_case_snapshot(rental_case_id)
         self._invalidate_stale_drafts(snapshot)
         snapshot = self._require_case_snapshot(rental_case_id)
+        approval_request = snapshot.find_approval_request(approval_request_id)
+        if decision == ORCHESTRATION_DECISION_APPROVED and approval_request is not None and approval_request.target_entity_type == "workflow_action":
+            approval_action = snapshot.find_workflow_action(approval_request.target_entity_id)
+            if approval_action is not None and approval_action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE:
+                self.inspect_governed_outlook_send_readiness(rental_case_id=rental_case_id,
+                                                             workflow_action_id=approval_action.workflow_action_id)
         linked_draft = self._load_draft_revision_by_approval_request_id(rental_case_id, approval_request_id)
         linked_action = None
         if linked_draft is not None:
@@ -4400,6 +4486,9 @@ limit 1;
         snapshot: WorkflowOrchestrationCaseSnapshot,
         action: WorkflowAction,
     ) -> WorkflowAction:
+        if action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE or action.target_adapter_code == "outlook":
+            raise TestConsoleError("Use governed generation or Outlook human-edit reconciliation to create a new exact action.",
+                                   failure_code="GOVERNED_OUTLOOK_BUILDER_REQUIRED")
         conversation_key = self._draft_conversation_key(action)
         if action.status in {WORKFLOW_ACTION_STATUS_PROPOSED, WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL}:
             return action
@@ -4514,106 +4603,51 @@ limit 1;
         context_hash: str,
         draft_content_hash: str,
         recipient_email: str,
+        provenance: str = "governed_model",
+        origin_action_id: int | None = None,
+        graph_message_id: str | None = None,
     ) -> WorkflowAction:
         """Ensure an executable action for one exact immutable client-facing draft."""
-        conversation_key = f"governed_client_response:{snapshot.rental_case.rental_case_id}"
-        recipient_identity_hash = _json_digest({"recipient_email": recipient_email.strip().casefold()})
-        idempotency_key = self._governed_client_response_action_idempotency_key(
-            rental_case_id=snapshot.rental_case.rental_case_id,
-            context_hash=context_hash,
-            draft_content_hash=draft_content_hash,
-            recipient_identity_hash=recipient_identity_hash,
+        reservation = reserve_governed_outlook_action(
+            case=snapshot.rental_case,
+            intent=OutlookActionIntent(response_intent, GOVERNED_PURPOSE, GOVERNED_REASON),
+            conversation_key=f"governed_client_response:{snapshot.rental_case.rental_case_id}",
+            content_hash=draft_content_hash, context_hash=context_hash, recipient_email=recipient_email,
+            provenance=provenance, origin_action_id=origin_action_id, graph_message_id=graph_message_id,
+            now=self.now(),
         )
-        matches = tuple(action for action in snapshot.workflow_actions if action.idempotency_key == idempotency_key)
+        matches = [action for action in snapshot.workflow_actions
+                   if action.structured_payload.get("plan_identity") == reservation.idempotency_key]
         if len(matches) > 1:
-            raise TestConsoleError(
-                "Multiple workflow actions share an exact governed draft identity.",
-                failure_code="GOVERNED_DRAFT_ACTION_IDENTITY_CONFLICT",
-            )
+            raise OutlookContractError("plan_identity_conflict")
         if matches:
-            return self._validate_exact_governed_draft_action(
-                matches[0],
-                conversation_key=conversation_key,
-                context_hash=context_hash,
-                draft_content_hash=draft_content_hash,
-                recipient_identity_hash=recipient_identity_hash,
-            )
-        timestamp = self.now()
-        action = self.orchestration_repository.create_workflow_action(
-            WorkflowAction(
-                workflow_action_id=1,
-                workflow_action_uuid="workflow-action",
-                rental_case_id=snapshot.rental_case.rental_case_id,
-                action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-                action_category=ACTION_CATEGORY_COMMUNICATION,
-                target_adapter_code="outlook",
-                reason_entity_type="rental_case",
-                reason_entity_reference=f"governed_client_response:{snapshot.rental_case.rental_case_id}",
-                approval_posture=APPROVAL_POSTURE_APPROVAL_REQUIRED,
-                status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
-                semantic_subject_hash=context_hash,
-                source_case_revision=snapshot.rental_case.case_revision,
-                idempotency_key=idempotency_key,
-                structured_payload={
-                    "response_intent": response_intent,
-                    "context_hash": context_hash,
-                    "conversation_key": conversation_key,
-                    "draft_content_hash": draft_content_hash,
-                    "recipient_identity_hash": recipient_identity_hash,
-                    "purpose": "governed_client_response_draft",
-                    "reason": "operator_requested_governed_client_response",
-                },
-                created_at=timestamp,
-                updated_at=timestamp,
-            )
+            existing = matches[0]
+            if existing.structured_payload.get("contract_version") == CONTRACT_VERSION:
+                validate_outlook_action(existing)
+            elif {**existing.structured_payload, "recipient_email": existing.structured_payload["recipient_email"].strip().casefold()} != {
+                    **reservation.structured_payload, "recipient_email": recipient_email.strip().casefold()}:
+                raise OutlookContractError("reservation_identity_conflict")
+            return existing
+        return self.orchestration_repository.create_workflow_action(reservation)
+
+    def _bind_governed_outlook_action(self, *, action: WorkflowAction, revision: InquiryResponseDraftRevision,
+                                      case: RentalCase) -> WorkflowAction:
+        if action.structured_payload.get("contract_version") == CONTRACT_VERSION:
+            value = validate_outlook_action(action)
+            if value.draft_revision_id != revision.inquiry_response_draft_revision_id:
+                raise OutlookContractError("draft_revision_id")
+            return action
+        plan = action.structured_payload
+        bound = build_governed_outlook_action(
+            reservation=action, case=case, revision=revision,
+            intent=OutlookActionIntent.from_payload(plan), governed_context_hash=action.semantic_subject_hash,
+            provenance=plan["provenance"], graph_message_id=plan["graph_message_id"],
         )
-        return self._validate_exact_governed_draft_action(
-            action,
-            conversation_key=conversation_key,
-            context_hash=context_hash,
-            draft_content_hash=draft_content_hash,
-            recipient_identity_hash=recipient_identity_hash,
-        )
+        return self.orchestration_repository.bind_outlook_action(action, bound)
 
     @staticmethod
     def _draft_action_content_hash(content: InquiryResponseDraftContent) -> str:
         return _json_digest(json.loads(content_hash_payload(content)))
-
-    @staticmethod
-    def _governed_client_response_action_idempotency_key(
-        *,
-        rental_case_id: int,
-        context_hash: str,
-        draft_content_hash: str,
-        recipient_identity_hash: str,
-    ) -> str:
-        return (
-            f"governed_client_response:{rental_case_id}:context:{context_hash}:"
-            f"content:{draft_content_hash}:recipient:{recipient_identity_hash}"
-        )
-
-    @staticmethod
-    def _validate_exact_governed_draft_action(
-        action: WorkflowAction,
-        *,
-        conversation_key: str,
-        context_hash: str,
-        draft_content_hash: str,
-        recipient_identity_hash: str,
-    ) -> WorkflowAction:
-        payload = action.structured_payload
-        if (
-            action.action_type != ACTION_TYPE_SEND_INQUIRY_RESPONSE
-            or payload.get("conversation_key") != conversation_key
-            or payload.get("context_hash") != context_hash
-            or payload.get("draft_content_hash") != draft_content_hash
-            or payload.get("recipient_identity_hash") != recipient_identity_hash
-        ):
-            raise TestConsoleError(
-                "The existing workflow action conflicts with the requested exact draft identity.",
-                failure_code="GOVERNED_DRAFT_ACTION_IDENTITY_CONFLICT",
-            )
-        return action
 
     def _ensure_resolution_workflow_actions(
         self,
@@ -4858,6 +4892,10 @@ returning
         revision: InquiryResponseDraftRevision,
         superseded_revision: InquiryResponseDraftRevision | None,
     ) -> ApprovalRequest:
+        if workflow_action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE:
+            value = validate_outlook_action(workflow_action)
+            if value.draft_revision_id != revision.inquiry_response_draft_revision_id:
+                raise OutlookContractError("draft_revision_id")
         snapshot = self._require_case_snapshot(rental_case_id)
         for approval in snapshot.approval_requests:
             if approval.status != APPROVAL_REQUEST_STATUS_OPEN:
@@ -5172,40 +5210,38 @@ returning
                 "The approved inquiry-response draft was created from a different case revision.",
                 failure_code="INQUIRY_DRAFT_STALE",
             )
-        payload: dict[str, Any] = {
-            "recipient_email": revision.recipient_email,
-            "recipient_reference": f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}",
-            "conversation_key": revision.conversation_key,
+        value = validate_outlook_action(action)
+        self._validate_outlook_revision_binding(snapshot, action=action, revision=revision, value=value)
+        return replace(action, structured_payload=value.to_payload())
+
+    def _validate_outlook_revision_binding(self, snapshot, *, action, revision, value) -> None:
+        annotations = revision.context_payload.get("operator_annotations")
+        if (not isinstance(annotations, list)
+                or any(not isinstance(item, dict) or type(item.get("blocking")) is not bool for item in annotations)):
+            raise OutlookContractError("operator_annotations")
+        expected = {
+            "rental_case_id": revision.rental_case_id,
+            "source_case_revision": revision.source_case_revision,
             "draft_revision_id": revision.inquiry_response_draft_revision_id,
+            "draft_origin_workflow_action_id": revision.workflow_action_id,
+            "conversation_key": revision.conversation_key,
             "draft_content_hash": revision.content_hash,
             "context_hash": revision.context_hash,
-            "governed_context_hash": self._governed_context_hash(action, revision=revision),
+            "recipient_email": revision.recipient_email,
             "subject": revision.subject,
             "body": revision.body_text,
-            "body_type": "text",
-            "message_mode": "new",
         }
-        if self._is_exact_outlook_send_recovery(action, revision=revision):
-            payload.update(
-                {
-                    "recovery_draft_revision_id": revision.inquiry_response_draft_revision_id,
-                    "recovery_origin_workflow_action_id": revision.workflow_action_id,
-                }
-            )
-        if revision.draft_source == INQUIRY_DRAFT_SOURCE_HUMAN_EDITED:
-            payload.update(
-                {
-                    "message_mode": "existing_draft",
-                    "graph_message_id": self._bound_outlook_message_id(
-                        snapshot=snapshot,
-                        action=action,
-                        revision=revision,
-                    ),
-                }
-            )
-        if revision.recipient_label:
-            payload["recipient_name"] = revision.recipient_label
-        return replace(action, structured_payload=payload)
+        for name, actual in expected.items():
+            if getattr(value, name) != actual:
+                raise OutlookContractError(name)
+        if not revision.is_current:
+            raise OutlookContractError("draft_revision_id")
+        if value.message_mode == "existing_draft":
+            bound_id = self._bound_outlook_message_id(snapshot=snapshot, action=action, revision=revision)
+            if value.graph_message_id != bound_id:
+                raise OutlookContractError("graph_message_id")
+        elif revision.draft_source == INQUIRY_DRAFT_SOURCE_HUMAN_EDITED:
+            raise OutlookContractError("message_mode")
 
     def _action_bound_draft_revision(
         self,
@@ -5308,18 +5344,19 @@ returning
         action: WorkflowAction,
         revision: InquiryResponseDraftRevision,
     ) -> str:
-        message_ids = {
-            str(event.structured_payload.get("graph_message_id") or "").strip()
-            for event in snapshot.workflow_events
-            if (
-                event.event_type_code == "outlook_human_edit_revision_created"
-                and event.structured_payload.get("workflow_action_id")
-                == revision.workflow_action_id
-                and event.structured_payload.get("draft_revision_id")
-                == revision.inquiry_response_draft_revision_id
-            )
-        }
-        message_ids.discard("")
+        message_ids: set[str] = set()
+        for event in snapshot.workflow_events:
+            payload = event.structured_payload
+            if (payload.get("workflow_action_id") != revision.workflow_action_id
+                    or payload.get("draft_revision_id") != revision.inquiry_response_draft_revision_id):
+                continue
+            message_id = None
+            if event.event_type_code == "outlook_human_edit_revision_created":
+                message_id = payload.get("graph_message_id")
+            elif event.event_type_code == "outlook_draft_reconciled_after_adapter_code_mismatch":
+                message_id = _outlook_message_id_from_external_reference(str(payload.get("external_reference") or ""))
+            if isinstance(message_id, str) and message_id.strip():
+                message_ids.add(message_id.strip())
         if len(message_ids) != 1:
             raise TestConsoleError(
                 "The approved inquiry-response draft does not have one bound Outlook draft identity.",
@@ -5335,7 +5372,13 @@ returning
     ) -> tuple[str, str] | None:
         """Re-read governed truth before the adapter performs its final Graph GET/send boundary."""
         try:
+            value = validate_outlook_action(action)
             snapshot = self._require_case_snapshot(execution_context.rental_case_id)
+            persisted_action = snapshot.find_workflow_action(action.workflow_action_id)
+            if (persisted_action is None or persisted_action.structured_payload != action.structured_payload
+                    or persisted_action.idempotency_key != action.idempotency_key
+                    or persisted_action.status not in {WORKFLOW_ACTION_STATUS_READY_TO_EXECUTE, WORKFLOW_ACTION_STATUS_EXECUTING}):
+                return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_action_identity_changed"
             draft_revision_id = action.structured_payload.get("draft_revision_id")
             if not isinstance(draft_revision_id, int) or isinstance(draft_revision_id, bool):
                 return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_draft_action_binding_changed"
@@ -5355,6 +5398,7 @@ returning
                 or revision.context_hash != action.structured_payload.get("context_hash")
             ):
                 return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_draft_action_binding_changed"
+            self._validate_outlook_revision_binding(snapshot, action=action, revision=revision, value=value)
             if (
                 email_payload.recipient_reference
                 != f"inquiry_response_draft:{revision.inquiry_response_draft_revision_id}"
@@ -5379,6 +5423,8 @@ returning
                 or self._has_blocking_operator_annotations(revision)
                 or approval is None
                 or approval.status != APPROVAL_REQUEST_STATUS_APPROVED
+                or approval.target_entity_type != "workflow_action"
+                or approval.target_entity_id != action.workflow_action_id
                 or approval.target_entity_reference
                 != f"workflow_action:{action.workflow_action_id}:draft_revision:{revision.inquiry_response_draft_revision_id}"
             ):
@@ -5393,14 +5439,11 @@ returning
                 or self._governed_context_hash(action, revision=revision) != contract.context_hash
             ):
                 return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_governed_context_changed"
-            current_message_id = self._bound_outlook_message_id(
-                snapshot=snapshot,
-                action=action,
-                revision=revision,
-            )
-            if email_payload.graph_message_id != current_message_id:
-                return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "outlook_draft_binding_changed"
-        except (TestConsoleError, TestConsoleReadError):
+            if value.message_mode == "existing_draft":
+                current_message_id = self._bound_outlook_message_id(snapshot=snapshot, action=action, revision=revision)
+                if email_payload.graph_message_id != current_message_id:
+                    return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "outlook_draft_binding_changed"
+        except (TestConsoleError, TestConsoleReadError, OutlookContractError):
             return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, "current_governed_truth_unavailable"
         return None
 
@@ -5554,6 +5597,8 @@ where rental_case_id = {rental_case_id}
             explicit_key = _normalize_optional_text(explicit_value)
             if explicit_key is not None:
                 return explicit_key
+        # Legacy history still needs a display grouping; executable inputs are
+        # checked by OutlookExecutionInput and never receive this fallback.
         base, _, _ = action.idempotency_key.partition(":successor:")
         return base or action.idempotency_key
 

@@ -276,6 +276,15 @@ def execute_workflow_action(
         )
     try:
         _validate_action_payload(action.action_type, action.structured_payload)
+        if action.target_adapter_code == "outlook" or action.action_type == "SEND_INQUIRY_RESPONSE":
+            from .outlook_action_contract import validate_outlook_action
+            value = validate_outlook_action(action)
+            approvals = [approval for approval in snapshot.approval_requests
+                         if approval.target_entity_reference == value.approval_target]
+            if (len(approvals) != 1 or approvals[0].status != "approved"
+                    or approvals[0].target_entity_type != "workflow_action"
+                    or approvals[0].target_entity_id != action.workflow_action_id):
+                raise ValueError("outlook_exact_approval_required")
     except ValueError:
         return _execution_failure_result(
             rental_case_id=action.rental_case_id,
@@ -339,7 +348,8 @@ def execute_workflow_action(
         started_at=started_at,
         prior_attempts=tuple(
             sorted(
-                snapshot.execution_attempts,
+                (attempt for attempt in snapshot.execution_attempts
+                 if attempt.workflow_action_id == action.workflow_action_id),
                 key=lambda attempt: (attempt.attempt_number, attempt.execution_attempt_id),
             )
         ),

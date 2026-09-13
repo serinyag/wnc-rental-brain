@@ -8,7 +8,7 @@ import ssl
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Protocol
 
 import certifi
@@ -258,6 +258,18 @@ class OutlookExecutionAdapter:
                 reason=exc.reason,
             )
 
+        if action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE:
+            from .outlook_action_contract import OutlookContractError, validate_outlook_action
+            try:
+                validate_outlook_action(action)
+            except OutlookContractError as exc:
+                return _failed_result(failure_code=EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID, reason=str(exc))
+            if self.pre_send_validator is None:
+                return _failed_result(failure_code=EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID, reason="pre_send_validator_required")
+            validation = self.pre_send_validator(action, execution_context, email_payload)
+            if validation is not None:
+                return _failed_result(failure_code=validation[0], reason=validation[1], stage="pre_send_governance")
+
         retry_state = _resolve_retry_state(execution_context.prior_attempts)
         if email_payload.message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_NEW and retry_state.failure_code is not None:
             return _failed_result(
@@ -297,7 +309,8 @@ class OutlookExecutionAdapter:
                 )
 
         external_reference = _external_reference_for_message_id(message_id)
-        if email_payload.message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_EXISTING_DRAFT:
+        if (email_payload.message_mode == OUTLOOK_SUPPORTED_MESSAGE_MODE_EXISTING_DRAFT
+                or action.action_type == ACTION_TYPE_SEND_INQUIRY_RESPONSE):
             validation_failure = self._validate_existing_draft_send(
                 action=action,
                 execution_context=execution_context,
@@ -356,7 +369,7 @@ class OutlookExecutionAdapter:
         draft = self._read_draft_snapshot(access_token=access_token, message_id=message_id)
         failure_reason = _existing_draft_send_failure_reason(
             draft=draft,
-            expected=email_payload,
+            expected=replace(email_payload, graph_message_id=message_id),
             configured_mailbox=self.config.sender_mailbox,
         )
         if failure_reason is None:

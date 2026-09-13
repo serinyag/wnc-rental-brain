@@ -276,6 +276,8 @@ class WorkflowOrchestrationRepositoryProtocol(Protocol):
 
     def create_workflow_action(self, workflow_action: WorkflowAction) -> WorkflowAction: ...
 
+    def bind_outlook_action(self, reservation: WorkflowAction, action: WorkflowAction) -> WorkflowAction: ...
+
     def start_workflow_action_execution(
         self,
         request: WorkflowActionExecutionRequest,
@@ -641,8 +643,13 @@ class InMemoryWorkflowOrchestrationRepository:
         existing_snapshot = self.load_case_snapshot(workflow_action.rental_case_id)
         if existing_snapshot is not None:
             existing = existing_snapshot.find_action_by_idempotency_key(workflow_action.idempotency_key)
+            if existing is None:
+                existing = next((a for a in existing_snapshot.workflow_actions
+                                 if a.structured_payload.get("plan_identity") == workflow_action.idempotency_key), None)
             if existing is not None:
                 return existing
+        from .outlook_action_contract import validate_outlook_action_creation
+        validate_outlook_action_creation(workflow_action)
         self._workflow_action_id += 1
         persisted = replace(
             workflow_action,
@@ -651,6 +658,23 @@ class InMemoryWorkflowOrchestrationRepository:
         )
         self.workflow_actions.setdefault(workflow_action.rental_case_id, []).append(persisted)
         return persisted
+
+    def bind_outlook_action(self, reservation: WorkflowAction, action: WorkflowAction) -> WorkflowAction:
+        from .outlook_action_contract import RESERVATION_VERSION, OutlookContractError, validate_outlook_action
+        validate_outlook_action(action)
+        snapshot = self.load_case_snapshot(action.rental_case_id)
+        existing = snapshot.find_workflow_action(action.workflow_action_id)
+        if existing == action:
+            return existing
+        if (existing != reservation or existing.structured_payload.get("contract_version") != RESERVATION_VERSION
+                or existing.status != WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL
+                or any(a.target_entity_type == "workflow_action" and a.target_entity_id == action.workflow_action_id
+                       for a in snapshot.approval_requests)
+                or any(a.workflow_action_id == action.workflow_action_id for a in snapshot.execution_attempts)):
+            raise OutlookContractError("reservation_already_bound")
+        actions = self.workflow_actions[action.rental_case_id]
+        actions[actions.index(existing)] = action
+        return action
 
     def start_workflow_action_execution(
         self,
@@ -3191,6 +3215,8 @@ returning
         )
         if existing is not None:
             return existing
+        from .outlook_action_contract import validate_outlook_action_creation
+        validate_outlook_action_creation(workflow_action)
         sql = f"""
 insert into public.workflow_actions (
   rental_case_id,
@@ -3228,7 +3254,7 @@ values (
   {_sql_timestamptz(workflow_action.due_at)},
   {_sql_int(workflow_action.supersedes_workflow_action_id)}
 )
-on conflict (rental_case_id, idempotency_key) do nothing
+on conflict do nothing
 returning
   id as workflow_action_id,
   workflow_action_uuid::text as workflow_action_uuid,
@@ -3260,6 +3286,33 @@ returning
         )
         if existing is None:
             raise RuntimeError("Workflow action insert conflicted without an exact persisted action.")
+        return existing
+
+    def bind_outlook_action(self, reservation: WorkflowAction, action: WorkflowAction) -> WorkflowAction:
+        from .outlook_action_contract import RESERVATION_VERSION, OutlookContractError, validate_outlook_action
+        validate_outlook_action(action)
+        # Only a new, never-approved reservation can acquire its immutable binding.
+        # Historical actions have no reservation marker and cannot match this CAS.
+        sql = f"""
+update public.workflow_actions as a
+set structured_payload = {_sql_json(action.structured_payload)},
+    idempotency_key = {sql_text(action.idempotency_key)}
+where a.id = {action.workflow_action_id}
+  and a.rental_case_id = {action.rental_case_id}
+  and a.status = 'awaiting_approval'
+  and a.structured_payload = {_sql_json(reservation.structured_payload)}
+  and a.structured_payload->>'contract_version' = {sql_text(RESERVATION_VERSION)}
+  and a.idempotency_key = {sql_text(reservation.idempotency_key)}
+  and not exists (select 1 from public.rental_case_approval_requests p
+                  where p.rental_case_id = a.rental_case_id
+                    and p.target_entity_type = 'workflow_action' and p.target_entity_id = a.id)
+  and not exists (select 1 from public.workflow_execution_attempts e where e.workflow_action_id = a.id)
+returning a.id;
+""".strip()
+        self.query_runner(sql, expect_json=True)
+        existing = self._select_existing_action_by_idempotency_key(action.rental_case_id, action.idempotency_key)
+        if existing is None or existing.structured_payload != action.structured_payload:
+            raise OutlookContractError("reservation_already_bound")
         return existing
 
     def start_workflow_action_execution(
@@ -4156,7 +4209,8 @@ select
   updated_at::text as updated_at
 from public.workflow_actions
 where rental_case_id = {rental_case_id}
-  and idempotency_key = {sql_text(idempotency_key)}
+  and (idempotency_key = {sql_text(idempotency_key)}
+       or structured_payload->>'plan_identity' = {sql_text(idempotency_key)})
 limit 1;
 """.strip()
         rows = self.query_runner(sql, expect_json=True)["rows"]

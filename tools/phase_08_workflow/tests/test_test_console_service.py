@@ -62,6 +62,53 @@ from tools.phase_08_workflow.test_console_service import (
 )
 
 
+from tools.phase_08_workflow.outlook_action_contract import (
+    OutlookContractError, OutlookActionIntent, validate_outlook_action, recipient_identity_hash,
+)
+from tools.phase_08_workflow.outlook_adapter import _parse_outlook_email_payload
+from tools.phase_08_workflow.tests.test_outlook_action_contract import canonical_fixture, NOW, INTENT
+from tools.phase_08_workflow.tests.test_execution_runtime import make_repo
+
+
+class _CanonicalFixtureService(TestConsoleService):
+    def __init__(self, path="human_edit"):
+        case, self.revision, reservation, action = canonical_fixture(path=path)
+        repository = make_repo(case, actions=(reservation,))
+        self.action = repository.bind_outlook_action(reservation, action)
+        super().__init__(orchestration_repository=repository, observation_repository=SimpleNamespace(),
+            config=TestConsoleConfig(runtime=AppRuntimeConfig(app_env=AppEnvironment.STAGING,
+                staging_allowed_email_recipients=(self.revision.recipient_email,))), now=lambda: NOW)
+        if path in {"human_edit", "recovery"}:
+            repository.create_workflow_event(rental_case_id=424, event_type_code="outlook_human_edit_revision_created",
+                source_type="test", source_reference="test", actor_type="system", actor_reference="test",
+                occurred_at=NOW, event_identity_key="bound-fixture", structured_payload={
+                    "workflow_action_id": self.revision.workflow_action_id, "draft_revision_id": 144,
+                    "graph_message_id": "bound-144"})
+        self.approval = self._replace_draft_approval(rental_case_id=424, workflow_action=action,
+                                                    revision=self.revision, superseded_revision=None)
+
+    def _require_case_snapshot(self, rental_case_id):
+        return self.orchestration_repository.load_case_snapshot(rental_case_id)
+
+    def _load_draft_revision_by_id(self, rental_case_id, draft_revision_id):
+        return self.revision if rental_case_id == 424 and draft_revision_id == self.revision.inquiry_response_draft_revision_id else None
+
+    def _load_current_draft_revision_for_conversation(self, rental_case_id, *, conversation_key):
+        return self.revision if rental_case_id == 424 and conversation_key == self.revision.conversation_key else None
+
+    def _build_current_governed_draft_contract(self, rental_case_id):
+        return None, self._require_case_snapshot(rental_case_id), SimpleNamespace(
+            context_hash=self.action.structured_payload["governed_context_hash"],
+            response_intent=SimpleNamespace(code=INTENT.response_intent))
+
+    def approve_fixture(self):
+        self.revision = replace(self.revision, draft_status="approved")
+        repo = self.orchestration_repository
+        repo.approval_requests[424] = [replace(self.approval, status="approved", decided_at=NOW)]
+        self.action = replace(self.action, status="ready_to_execute")
+        repo.workflow_actions[424] = [self.action]
+
+
 class _DummyRepository:
     def load_case_snapshot(self, rental_case_id: int):  # pragma: no cover - defensive only
         del rental_case_id
@@ -157,8 +204,9 @@ class _GovernedClientResponseLifecycleService(_MetadataService):
         context_hash: str,
         draft_content_hash: str,
         recipient_email: str,
+        provenance: str,
     ):
-        del response_intent, context_hash, draft_content_hash, recipient_email
+        del response_intent, context_hash, draft_content_hash, recipient_email, provenance
         return make_action()
 
     def _load_current_draft_revision_for_conversation(self, *_args, **_kwargs):
@@ -287,7 +335,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         self.assertEqual(returned, persisted)
         self.assertEqual(len(queries), 3)
-        self.assertIn("on conflict (rental_case_id, idempotency_key) do nothing", queries[1])
+        self.assertIn("on conflict do nothing", queries[1])
         self.assertNotIn("status not in", queries[2])
 
     def test_governed_draft_action_identity_distinguishes_content_and_preserves_failed_history(self) -> None:
@@ -355,21 +403,21 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
 
         first = service._ensure_governed_client_response_action(
             repository.load_case_snapshot(424),
-            response_intent="request_information",
+            response_intent="REQUEST_CLIENT_INFORMATION",
             context_hash=context_hash,
             draft_content_hash="edited-content-hash",
             recipient_email="Client@Example.Test",
         )
         repeat = service._ensure_governed_client_response_action(
             repository.load_case_snapshot(424),
-            response_intent="request_information",
+            response_intent="REQUEST_CLIENT_INFORMATION",
             context_hash=context_hash,
             draft_content_hash="edited-content-hash",
             recipient_email="client@example.test",
         )
         successor = service._ensure_governed_client_response_action(
             repository.load_case_snapshot(424),
-            response_intent="request_information",
+            response_intent="REQUEST_CLIENT_INFORMATION",
             context_hash=context_hash,
             draft_content_hash="later-edited-content-hash",
             recipient_email="client@example.test",
@@ -746,6 +794,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             config=TestConsoleConfig(runtime=runtime, allow_real_providers=True),
         )
         approval = SimpleNamespace(
+            approval_request_id=51,
             status=APPROVAL_REQUEST_STATUS_APPROVED,
             target_entity_reference="workflow_action:61:draft_revision:41",
         )
@@ -799,7 +848,7 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             service, "_create_draft_revision", return_value=created_revision
         ) as create_revision, patch.object(service, "_replace_draft_approval", return_value=new_approval), patch.object(
             service, "_bind_approval_request_to_draft_revision", return_value=created_revision
-        ), patch.object(service, "_create_console_event") as create_event:
+        ), patch.object(service, "_bind_governed_outlook_action", side_effect=lambda **kw: kw["action"]), patch.object(service, "_create_console_event") as create_event:
             prepared = service.prepare_outlook_reconciliation(rental_case_id=1, draft_revision_id=41)
             self.assertNotIsInstance(prepared, OperationReport)
             report = service.apply_outlook_reconciliation(prepared, graph_read)
@@ -1181,37 +1230,15 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
             )
 
     def test_real_provider_registry_supports_governed_outlook_action_code(self) -> None:
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(
-                    app_env=AppEnvironment.STAGING,
-                    app_env_explicit=True,
-                    database_url="postgresql://staging-db",
-                    staging_basic_auth_username="stage-user",
-                    staging_basic_auth_password="stage-pass",
-                    staging_allowed_email_recipients=("approved@example.com",),
-                    staging_allow_real_outlook=True,
-                    staging_allow_real_outlook_send=False,
-                ),
-                allow_real_providers=True,
-            ),
-        )
-
-        with patch(
-            "tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env",
-            return_value=object(),
-        ) as build_adapter:
-            registry = service._build_execution_registry(
-                action=make_action(target_adapter_code="outlook"),
-                execution_mode="real",
-            )
-
+        service = _CanonicalFixtureService()
+        service.config = TestConsoleConfig(allow_real_providers=True, runtime=AppRuntimeConfig(
+            app_env=AppEnvironment.STAGING, staging_allow_real_outlook=True,
+            staging_allowed_email_recipients=(service.revision.recipient_email,)))
+        with patch("tools.phase_08_workflow.test_console_service.build_outlook_execution_adapter_from_env") as factory:
+            registry = service._build_execution_registry(action=service.action, execution_mode="real",
+                provider_action=service.action, outlook_pre_send_validator=service._validate_governed_outlook_pre_send)
         self.assertIsNotNone(registry.resolve("outlook"))
-        build_adapter.assert_called_once()
-        self.assertTrue(callable(build_adapter.call_args.kwargs["send_enabled"]))
-        self.assertIsNone(build_adapter.call_args.kwargs["pre_send_validator"])
+        self.assertIs(factory.call_args.kwargs["pre_send_validator"].__self__, service)
 
     def test_projected_outlook_adapter_preserves_provider_outcome_under_canonical_action_code(self) -> None:
         provider_result = NormalizedExecutionResult(
@@ -1237,112 +1264,24 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         self.assertEqual(result.response_snapshot["stage"], "draft_created_send_disabled")
 
     def test_governed_outlook_execution_projects_the_current_approved_draft(self) -> None:
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(),
-        )
-        action = replace(
-            make_action(target_adapter_code="outlook"),
-            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-            source_case_revision=3,
-            structured_payload={
-                "response_intent": "COMPLETE_INQUIRY_RESPONSE",
-                "context_hash": "context-123",
-                "purpose": "governed_client_response_draft",
-                "reason": "operator_requested_governed_client_response",
-            },
-        )
-        revision = SimpleNamespace(
-            inquiry_response_draft_revision_id=41,
-            workflow_action_id=action.workflow_action_id,
-            conversation_key="idem:1",
-            source_case_revision=3,
-            draft_source="human_edited",
-            recipient_email="approved@example.com",
-            recipient_label="Synthetic Client",
-            subject="Synthetic inquiry response",
-            body_text="This is a governed synthetic draft.",
-            content_hash="content-hash-41",
-            context_hash="context-hash-41",
-        )
-        snapshot = SimpleNamespace(
-            rental_case=SimpleNamespace(rental_case_id=1),
-            workflow_events=(
-                SimpleNamespace(
-                    event_type_code="outlook_human_edit_revision_created",
-                    structured_payload={
-                        "workflow_action_id": action.workflow_action_id,
-                        "draft_revision_id": 41,
-                        "graph_message_id": "immutable-draft-41",
-                    },
-                ),
-            ),
-        )
-
-        with patch.object(service, "_load_current_draft_revision_for_conversation", return_value=revision):
-            projected = service._project_governed_outlook_execution_action(snapshot, action=action)
-
-        self.assertEqual(action.structured_payload["context_hash"], "context-123")
-        self.assertEqual(projected.structured_payload["recipient_email"], "approved@example.com")
-        self.assertEqual(projected.structured_payload["recipient_name"], "Synthetic Client")
-        self.assertEqual(projected.structured_payload["subject"], "Synthetic inquiry response")
-        self.assertEqual(projected.structured_payload["body"], "This is a governed synthetic draft.")
-        self.assertEqual(projected.structured_payload["message_mode"], "existing_draft")
-        self.assertEqual(projected.structured_payload["graph_message_id"], "immutable-draft-41")
-        self.assertEqual(projected.structured_payload["conversation_key"], "idem:1")
-        self.assertEqual(projected.structured_payload["draft_revision_id"], 41)
-        self.assertEqual(projected.structured_payload["draft_content_hash"], "content-hash-41")
-        self.assertEqual(projected.structured_payload["context_hash"], "context-hash-41")
+        service = _CanonicalFixtureService()
+        service.approve_fixture()
+        original = dict(service.action.structured_payload)
+        projected = service._project_governed_outlook_execution_action(service._require_case_snapshot(424), action=service.action)
+        self.assertEqual(projected.structured_payload, original)
+        self.assertIsNot(projected.structured_payload, service.action.structured_payload)
+        validate_outlook_action(projected)
+        self.assertEqual(projected.structured_payload["conversation_key"], service.revision.conversation_key)
+        self.assertEqual(projected.structured_payload["graph_message_id"], "bound-144")
 
     def test_outlook_send_readiness_requires_the_successor_exact_approval(self) -> None:
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
-            ),
-        )
-        action = replace(
-            make_action(target_adapter_code="outlook"),
-            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-        )
-        revision = SimpleNamespace(
-            inquiry_response_draft_revision_id=144,
-            workflow_action_id=action.workflow_action_id,
-            approval_request_id=184,
-            source_case_revision=0,
-            context_hash="context-144",
-            recipient_email="approved@example.test",
-            context_payload={},
-        )
-        approval = SimpleNamespace(
-            approval_request_id=184,
-            status="open",
-            target_entity_reference=f"workflow_action:{action.workflow_action_id}:draft_revision:144",
-        )
-        snapshot = SimpleNamespace(
-            find_workflow_action=lambda _action_id: action,
-            find_approval_request=lambda _approval_id: approval,
-        )
-
-        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
-            service, "_load_current_draft_revision_for_conversation", return_value=revision
-        ), patch.object(
-            service,
-            "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=0)), SimpleNamespace(context_hash="context-144")),
-        ):
-            report = service.inspect_governed_outlook_send_readiness(
-                rental_case_id=424,
-                workflow_action_id=action.workflow_action_id,
-            )
-
+        service = _CanonicalFixtureService()
+        report = service.inspect_governed_outlook_send_readiness(rental_case_id=424, workflow_action_id=587)
         self.assertTrue(report.success)
-        self.assertIn("Read mode: provider-free", report.lines)
-        self.assertIn("Graph operations: 0", report.lines)
-        self.assertIn("Approval request id: 184", report.lines)
         self.assertIn("Exact approval required: yes", report.lines)
+        self.assertIn("Execution-input validation: PASS", report.lines)
+        self.assertIn("Send gate: disabled", report.lines)
+        self.assertEqual(service.orchestration_repository.execution_attempts[424], [])
 
     def test_outlook_send_recovery_binding_is_append_only_and_exact(self) -> None:
         revision = SimpleNamespace(
@@ -1377,314 +1316,59 @@ class TestConsoleServiceSafetyTests(unittest.TestCase):
         )
 
     def test_outlook_send_recovery_readiness_requires_a_new_exact_approval(self) -> None:
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
-            ),
-        )
-        action = replace(
-            make_action(target_adapter_code="outlook"),
-            workflow_action_id=587,
-            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-            supersedes_workflow_action_id=586,
-            structured_payload={
-                "conversation_key": "governed_client_response:424",
-                "recovery_draft_revision_id": 144,
-                "recovery_origin_workflow_action_id": 586,
-                "draft_content_hash": "content-hash-144",
-                "context_hash": "context-144",
-                "governed_context_hash": "governed-context-424",
-                "recipient_email": "approved@example.test",
-            },
-        )
-        revision = SimpleNamespace(
-            inquiry_response_draft_revision_id=144,
-            workflow_action_id=586,
-            conversation_key="governed_client_response:424",
-            content_hash="content-hash-144",
-            context_hash="context-144",
-            recipient_email="approved@example.test",
-            is_current=True,
-            approval_request_id=184,
-            source_case_revision=0,
-            context_payload={},
-        )
-        recovery_approval = SimpleNamespace(
-            approval_request_id=185,
-            status="open",
-            target_entity_reference="workflow_action:587:draft_revision:144",
-        )
-        snapshot = SimpleNamespace(
-            find_workflow_action=lambda _action_id: action,
-            approval_requests=(recovery_approval,),
-        )
-
-        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
-            service, "_load_current_draft_revision_for_conversation", return_value=revision
-        ), patch.object(service, "_load_draft_revision_by_id", return_value=revision), patch.object(
-            service,
-            "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=0)), SimpleNamespace(context_hash="governed-context-424")),
-        ):
-            report = service.inspect_governed_outlook_send_readiness(
-                rental_case_id=424,
-                workflow_action_id=587,
-            )
-
-        self.assertIn("Approval request id: 185", report.lines)
+        service = _CanonicalFixtureService("recovery")
+        report = service.inspect_governed_outlook_send_readiness(rental_case_id=424, workflow_action_id=587)
         self.assertIn("Exact approval required: yes", report.lines)
-        self.assertIn("Readiness: approval_required", report.lines)
+        repo = service.orchestration_repository
+        repo.approval_requests[424] = [replace(service.approval, target_entity_id=586,
+            target_entity_reference="workflow_action:586:draft_revision:144", status="approved", decided_at=NOW)]
+        with self.assertRaises(OutlookContractError):
+            service.inspect_governed_outlook_send_readiness(rental_case_id=424, workflow_action_id=587)
 
     def test_prepare_outlook_send_recovery_preserves_the_failed_origin(self) -> None:
-        repository = SimpleNamespace(
-            create_workflow_action=Mock(),
-            create_approval_request=Mock(),
-        )
-        service = TestConsoleService(
-            orchestration_repository=repository,
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(staging_allowed_email_recipients=("approved@example.test",))
-            ),
-        )
-        origin_action = replace(
-            make_action(target_adapter_code="outlook"),
-            workflow_action_id=586,
-            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-            status=WORKFLOW_ACTION_STATUS_FAILED,
-            source_case_revision=3,
-            structured_payload={"context_hash": "governed-context-424"},
-        )
-        revision = SimpleNamespace(
-            inquiry_response_draft_revision_id=144,
-            workflow_action_id=586,
-            conversation_key="governed_client_response:424",
-            content_hash="content-hash-144",
-            context_hash="context-144",
-            recipient_email="approved@example.test",
-            source_case_revision=3,
-            approval_request_id=184,
-            is_current=True,
-            draft_status="send_failed",
-            context_payload={},
-        )
-        origin_approval = SimpleNamespace(
-            approval_request_id=184,
-            status=APPROVAL_REQUEST_STATUS_APPROVED,
-            target_entity_reference="workflow_action:586:draft_revision:144",
-        )
-        snapshot = SimpleNamespace(
-            find_workflow_action=lambda action_id: origin_action if action_id == 586 else None,
-            find_approval_request=lambda approval_id: origin_approval if approval_id == 184 else None,
-            approval_requests=(origin_approval,),
-            workflow_events=(
-                SimpleNamespace(
-                    event_type_code="outlook_human_edit_revision_created",
-                    structured_payload={
-                        "workflow_action_id": 586,
-                        "draft_revision_id": 144,
-                        "graph_message_id": "bound-draft-144",
-                    },
-                ),
-            ),
-        )
-        created_action = replace(
-            origin_action,
-            workflow_action_id=587,
-            status=WORKFLOW_ACTION_STATUS_AWAITING_APPROVAL,
-            supersedes_workflow_action_id=586,
-        )
-        created_approval = SimpleNamespace(approval_request_id=185, status="open")
-
-        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
-            service, "_load_draft_revision_by_id", return_value=revision
-        ), patch.object(
-            service,
-            "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), SimpleNamespace(rental_case=SimpleNamespace(case_revision=3)), SimpleNamespace(context_hash="governed-context-424")),
-        ), patch.object(repository, "create_workflow_action", return_value=created_action) as create_action, patch.object(
-            repository, "create_approval_request", return_value=created_approval
-        ) as create_approval, patch.object(service, "_create_console_event") as create_event:
-            report = service.prepare_governed_outlook_send_recovery(
-                rental_case_id=424,
-                draft_revision_id=144,
-            )
-
-        recovery_input = create_action.call_args.args[0]
-        self.assertEqual(recovery_input.supersedes_workflow_action_id, 586)
-        self.assertEqual(recovery_input.structured_payload["recovery_draft_revision_id"], 144)
-        self.assertEqual(recovery_input.structured_payload["draft_content_hash"], "content-hash-144")
-        self.assertEqual(recovery_input.structured_payload["governed_context_hash"], "governed-context-424")
-        self.assertEqual(create_approval.call_args.args[0].supersedes_approval_request_id, 184)
-        create_event.assert_called_once()
-        self.assertIn("Recovery workflow action id: 587", report.lines)
-        self.assertIn("Recovery approval status: open", report.lines)
+        service = _CanonicalFixtureService("recovery")
+        repo = service.orchestration_repository
+        # Seed historical records directly: they predate the canonical contract.
+        origin = replace(service.action, workflow_action_id=586, status="failed", structured_payload={
+            "response_intent": INTENT.response_intent, "purpose": INTENT.purpose, "reason": INTENT.reason,
+            "context_hash": "governed-424"})
+        malformed = replace(service.action, workflow_action_id=587, status="ready_to_execute",
+                            structured_payload={"recovery_draft_revision_id": 144})
+        repo.workflow_actions[424] = [origin, malformed]
+        old_approval = replace(service.approval, approval_request_id=184, target_entity_id=586,
+                              target_entity_reference="workflow_action:586:draft_revision:144", status="approved", decided_at=NOW)
+        repo.approval_requests[424] = [old_approval]
+        with patch.object(service, "_create_console_event"):
+            report = service.prepare_governed_outlook_send_recovery(rental_case_id=424, draft_revision_id=144)
+        created = repo.workflow_actions[424][-1]
+        validate_outlook_action(created)
+        self.assertNotIn(created.workflow_action_id, (586, 587))
+        self.assertEqual(created.structured_payload["response_intent"], INTENT.response_intent)
+        self.assertEqual(created.structured_payload["graph_message_id"], "bound-144")
+        self.assertEqual(repo.workflow_actions[424][:2], [origin, malformed])
+        self.assertEqual(repo.approval_requests[424][0], old_approval)
+        self.assertEqual(repo.approval_requests[424][-1].status, "open")
+        self.assertTrue(report.success)
+        with patch.object(service, "_create_console_event"):
+            service.prepare_governed_outlook_send_recovery(rental_case_id=424, draft_revision_id=144)
+        self.assertEqual(len(repo.workflow_actions[424]), 3)
 
     def test_pre_send_validator_rejects_a_rebound_outlook_message_id(self) -> None:
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(
-                    app_env=AppEnvironment.STAGING,
-                    app_env_explicit=True,
-                    database_url="postgresql://staging-db",
-                    staging_allowed_email_recipients=("approved@example.test",),
-                )
-            ),
-        )
-        action = replace(
-            make_action(target_adapter_code="outlook"),
-            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-            structured_payload={
-                "conversation_key": "governed_client_response:424",
-                "draft_revision_id": 144,
-                "draft_content_hash": "content-hash-144",
-                "context_hash": "context-144",
-            },
-        )
-        revision = SimpleNamespace(
-            inquiry_response_draft_revision_id=144,
-            workflow_action_id=action.workflow_action_id,
-            conversation_key="governed_client_response:424",
-            approval_request_id=184,
-            is_current=True,
-            draft_status="approved",
-            recipient_email="approved@example.test",
-            subject="Approved subject",
-            body_text="Approved body",
-            source_case_revision=3,
-            context_hash="context-144",
-            content_hash="content-hash-144",
-            context_payload={},
-        )
-        approval = SimpleNamespace(
-            status=APPROVAL_REQUEST_STATUS_APPROVED,
-            target_entity_reference=f"workflow_action:{action.workflow_action_id}:draft_revision:144",
-        )
-        snapshot = SimpleNamespace(
-            find_approval_request=lambda _approval_id: approval,
-            workflow_events=(
-                SimpleNamespace(
-                    event_type_code="outlook_human_edit_revision_created",
-                    structured_payload={
-                        "workflow_action_id": action.workflow_action_id,
-                        "draft_revision_id": 144,
-                        "graph_message_id": "current-immutable-id",
-                    },
-                ),
-            ),
-        )
-        current_snapshot = SimpleNamespace(rental_case=SimpleNamespace(case_revision=3))
-        payload = SimpleNamespace(
-            recipient_reference="inquiry_response_draft:144",
-            recipient_email="approved@example.test",
-            subject="Approved subject",
-            body="Approved body",
-            graph_message_id="stale-immutable-id",
-        )
-
-        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
-            service, "_load_draft_revision_by_id", return_value=revision
-        ), patch.object(
-            service,
-            "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), current_snapshot, SimpleNamespace(context_hash="context-144")),
-        ):
-            failure = service._validate_governed_outlook_pre_send(
-                action,
-                SimpleNamespace(rental_case_id=424),
-                payload,
-            )
-
+        service = _CanonicalFixtureService()
+        service.approve_fixture()
+        payload = replace(_parse_outlook_email_payload(service.action.structured_payload), graph_message_id="arbitrary-message")
+        failure = service._validate_governed_outlook_pre_send(service.action, SimpleNamespace(rental_case_id=424), payload)
         self.assertEqual(failure, ("outlook_send_governance_invalid", "outlook_draft_binding_changed"))
 
     def test_pre_send_validator_uses_exact_projected_revision_across_action_lifecycle_transition(self) -> None:
-        service = TestConsoleService(
-            orchestration_repository=_DummyRepository(),
-            observation_repository=_DummyRepository(),
-            config=TestConsoleConfig(
-                runtime=AppRuntimeConfig(
-                    app_env=AppEnvironment.STAGING,
-                    app_env_explicit=True,
-                    database_url="postgresql://staging-db",
-                    staging_allowed_email_recipients=("approved@example.test",),
-                )
-            ),
-        )
-        action = replace(
-            make_action(target_adapter_code="outlook"),
-            workflow_action_id=586,
-            action_type=ACTION_TYPE_SEND_INQUIRY_RESPONSE,
-            status=WORKFLOW_ACTION_STATUS_EXECUTING,
-            source_case_revision=3,
-            structured_payload={
-                "conversation_key": "governed_client_response:424",
-                "draft_revision_id": 144,
-                "draft_content_hash": "content-hash-144",
-                "context_hash": "context-144",
-            },
-        )
-        revision = SimpleNamespace(
-            inquiry_response_draft_revision_id=144,
-            workflow_action_id=586,
-            conversation_key="governed_client_response:424",
-            approval_request_id=184,
-            is_current=True,
-            draft_status="approved",
-            recipient_email="approved@example.test",
-            subject="Approved subject",
-            body_text="Approved body",
-            source_case_revision=3,
-            context_hash="context-144",
-            content_hash="content-hash-144",
-            context_payload={},
-        )
-        approval = SimpleNamespace(
-            status=APPROVAL_REQUEST_STATUS_APPROVED,
-            target_entity_reference="workflow_action:586:draft_revision:144",
-        )
-        snapshot = SimpleNamespace(
-            find_approval_request=lambda _approval_id: approval,
-            workflow_events=(
-                SimpleNamespace(
-                    event_type_code="outlook_human_edit_revision_created",
-                    structured_payload={
-                        "workflow_action_id": 586,
-                        "draft_revision_id": 144,
-                        "graph_message_id": "immutable-draft-144",
-                    },
-                ),
-            ),
-        )
-        payload = SimpleNamespace(
-            recipient_reference="inquiry_response_draft:144",
-            recipient_email="approved@example.test",
-            subject="Approved subject",
-            body="Approved body",
-            graph_message_id="immutable-draft-144",
-        )
-        current_snapshot = SimpleNamespace(rental_case=SimpleNamespace(case_revision=3))
-
-        with patch.object(service, "_require_case_snapshot", return_value=snapshot), patch.object(
-            service, "_load_draft_revision_by_id", return_value=revision
-        ), patch.object(
-            service,
-            "_load_current_draft_revision_for_conversation",
-            side_effect=AssertionError("pre-send identity must not use a current-action selector"),
-        ), patch.object(
-            service,
-            "_build_current_governed_draft_contract",
-            return_value=(SimpleNamespace(), current_snapshot, SimpleNamespace(context_hash="context-144")),
-        ):
-            failure = service._validate_governed_outlook_pre_send(
-                action,
-                SimpleNamespace(rental_case_id=424),
-                payload,
-            )
-
+        service = _CanonicalFixtureService()
+        service.approve_fixture()
+        action = service.action
+        service.orchestration_repository.workflow_actions[424] = [replace(action, status="executing")]
+        with patch.object(service, "_load_current_draft_revision_for_conversation",
+                          side_effect=AssertionError("must not infer identity from lifecycle selector")):
+            failure = service._validate_governed_outlook_pre_send(action, SimpleNamespace(rental_case_id=424),
+                                                                  _parse_outlook_email_payload(action.structured_payload))
         self.assertIsNone(failure)
 
     def test_staging_uses_an_explicitly_allowlisted_synthetic_recipient(self) -> None:

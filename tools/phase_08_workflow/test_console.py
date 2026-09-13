@@ -17,6 +17,7 @@ from typing import Any, Callable
 from urllib.parse import parse_qs
 from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
+from .outlook_action_contract import CONTRACT_VERSION, OutlookContractError
 from .clock import parse_timestamp
 from .test_console_service import (
     STRUCTURED_OBSERVATION_CLAIM_KIND_OPTIONS,
@@ -96,6 +97,11 @@ class TestConsoleApp:
             status = HTTPStatus.NOT_FOUND
             failure_code = "NOT_FOUND"
             return self._respond_text(start_response, HTTPStatus.NOT_FOUND, "Not found.")
+        except OutlookContractError as error:
+            status = HTTPStatus.CONFLICT
+            failure_code = "OUTLOOK_ACTION_CONTRACT_INVALID"
+            return self._respond_json_error(start_response, status=HTTPStatus.CONFLICT,
+                message=str(error), failure_code="OUTLOOK_ACTION_CONTRACT_INVALID")
         except TestConsoleError as error:
             status = error.status
             failure_code = error.failure_code
@@ -1091,7 +1097,9 @@ class TestConsoleApp:
                 options.append('<option value="timeout">Fake timeout</option>')
                 options.append('<option value="ambiguous">Fake ambiguous</option>')
                 if detail.provider_mode_lines and detail.provider_mode_lines[0] == "REAL PROVIDER EXECUTION ENABLED":
-                    if action.target_adapter_code in {"email", "task_surface"}:
+                    if (action.target_adapter_code == "task_surface" or (
+                            action.target_adapter_code == "outlook"
+                            and action.structured_payload.get("contract_version") == CONTRACT_VERSION)):
                         options.append('<option value="real">Real provider</option>')
                 actions = (
                     f'<form method="post" action="/cases/{rental_case_id}/actions/{action.workflow_action_id}/execute" class="inline">'
