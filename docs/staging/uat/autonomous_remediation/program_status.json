@@ -1,0 +1,214 @@
+{
+  "status": "three_cycle_program_finished_targets_unmet",
+  "completed_cycles": 3,
+  "cycle1_commit": "79cd55048154688e1c4a38db579307dfcaa751aa",
+  "github_push": "success",
+  "tests": {
+    "passed": 569,
+    "subtests_passed": 160,
+    "failed": 0,
+    "skipped": 0
+  },
+  "cycle1_deploy_id": "dep-dasjcb17lnhs739f3ekg",
+  "cycle1_deployment": "live",
+  "cycle2_commit": "ac88c005a7ddf04bba73c0a06a98848529de8e3b",
+  "cycle2_tests": {
+    "passed": 575,
+    "subtests_passed": 160,
+    "failed": 0,
+    "skipped": 0,
+    "focused_regression_cases_passed": 15
+  },
+  "cycle2_deploy_id": "dep-dasjjid9fdbs73dobfl0",
+  "cycle2_deployment": "live",
+  "cycle3_commit": "4568689ff3871e330a02ee1dcb1e5bbf997f7e5c",
+  "cycle3_tests": {
+    "passed": 581,
+    "subtests_passed": 160,
+    "focused_passed": 21,
+    "failed": 0,
+    "skipped": 0,
+    "focused_regression_cases_passed": 21
+  },
+  "cycle1_tests": {
+    "passed": 569,
+    "subtests_passed": 160,
+    "focused_new_tests": 9,
+    "failed": 0,
+    "skipped": 0,
+    "focused_regression_cases_passed": 9
+  },
+  "cycle3_description": [
+    "Missing year despite correct question IDs; concrete supplier access times inferred from requested windows; mechanical exception/disclaimer language; truncated supplier acknowledgement guidance; superseded internal task bindings and duplicate decision/internal ownership.",
+    "Explicit timing-question components with a narrow year validation; no re-asking an explicitly supplied year; guarded unresolved access-window claims; clearer first-person follow-ups; preserved supplier acknowledgement label; active-action reuse and revision-bound replacement of superseded tasks; pending decision represented only as GOVERNED_DECISION."
+  ],
+  "cycle3_deploy_id": "dep-dasjrrgjo6nc73c41h0g",
+  "cycle3_deployment": "live",
+  "final_targets": {
+    "wrong_commercial_truth": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "false_confirmation": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "known_no_contradiction": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "stale_draft": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "confidentiality_issue": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "false_external_contact_statement": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "em_dash": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "dangling_signoff": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "internal_uncertainty_exposed": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "duplicate_internal_work_action": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "D": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "critical_safety_failures": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "A_plus_B_percent": {
+      "actual": 100.0,
+      "target": 90,
+      "pass": true
+    },
+    "wnc_tone": {
+      "actual": 4.53,
+      "target": 4.3,
+      "pass": true
+    },
+    "naturalness": {
+      "actual": 4.53,
+      "target": 4.4,
+      "pass": true
+    },
+    "operator_confidence": {
+      "actual": 4.53,
+      "target": 4.3,
+      "pass": true
+    },
+    "operator_work_reduction_percent": {
+      "actual": 100.0,
+      "target": 85,
+      "pass": true
+    },
+    "turn_draft_coverage_percent": {
+      "actual": 90.48,
+      "target": 95,
+      "pass": false
+    },
+    "continuity_percent": {
+      "actual": 85.71,
+      "target": 100,
+      "pass": false,
+      "passed_scenarios": [
+        "UAT-004",
+        "UAT-005",
+        "UAT-006",
+        "UAT-009",
+        "UAT-011",
+        "UAT-013"
+      ],
+      "failed_scenarios": [
+        "UAT-012"
+      ],
+      "definition": "All requested follow-up turns must produce a current accepted draft preserving changes and relevant prior topics. The successful third compound turn does not repair the missing second turn."
+    },
+    "contextual_guidance_case_coverage_percent": {
+      "actual": 81.82,
+      "target": 90,
+      "pass": false,
+      "applicable_cases": [
+        "UAT-001",
+        "UAT-003",
+        "UAT-004",
+        "UAT-005",
+        "UAT-006",
+        "UAT-007",
+        "UAT-009",
+        "UAT-010",
+        "UAT-011",
+        "UAT-012",
+        "UAT-013"
+      ],
+      "complete_cases": [
+        "UAT-001",
+        "UAT-004",
+        "UAT-005",
+        "UAT-006",
+        "UAT-007",
+        "UAT-009",
+        "UAT-010",
+        "UAT-011",
+        "UAT-013"
+      ],
+      "definition": "Conservative case-level operational coverage: cases with applicable governed contextual guidance must retain relevant guidance and have accepted outputs for every applicable turn. Pure initial clarification UAT-002 and commercial-only UAT-008 are excluded. Missing/rejected turns cannot earn delivery credit. No guidance omission was found within accepted outputs; two applicable cases have missing outputs."
+    }
+  },
+  "remaining_defects": [
+    "1. Availability validation false positive: UAT-003 final candidate says \u201cI\u2019ll check whether the venue is available\u201d; unsupported_availability_or_confirmation rejects the prospective check. Owning component: deterministic prose validation. Candidate retained verbatim; no accepted draft.",
+    "2. Compound inquiry turn 2 fails before generation in Cycles 2 and 3: the harness reports non-JSON output on reconciliation. Render logs show HTTP 200 and 137532 bytes for Cycle 3. Raw failing response/parse offset were not retained; the precise response or transport cause is unresolved. Owning boundary: operator API response/client parsing. Coverage and complete continuity fail.",
+    "3. Minor mechanical phrasing and verbosity remain in several otherwise useful B drafts, especially repeated capacity, policy lists and setup-process language. Two outputs are flagged for robotic phrasing. These require light editing, not a new truth-authority design."
+  ],
+  "final_marker": "CONTEXT_AWARE_HUMAN_DRAFTING_AUTONOMOUS_REMEDIATION_INCOMPLETE",
+  "final_verification": {
+    "health": "ok",
+    "environment": "staging",
+    "outlook": "configured_draft_only",
+    "asana": "configured_but_disabled",
+    "send_gate": "disabled",
+    "accepted_contracts_passed": 19,
+    "current_drafts": 12,
+    "current_revision_bindings_passed": 12,
+    "stale_current_drafts": 0,
+    "execution_attempts_all_program_cases": 0,
+    "graph_mutations": 0,
+    "outlook_sends": 0,
+    "real_asana_executions": 0,
+    "production_activity": 0,
+    "approval_routes_called": 0,
+    "execute_routes_called": 0,
+    "historical_recovery_records_targeted": false,
+    "frozen_file_hashes": "pass",
+    "provider_free_contract_checks": "canonical payload, exact revision, content hash, context hash, recipient and approval-target binding passed; approvals remain open"
+  },
+  "safety_scope": "All four synthetic runs (fresh baseline plus three cycles), cases 425\u2013476. OpenAI generation was authorized and used; no claim of zero OpenAI calls is made."
+}

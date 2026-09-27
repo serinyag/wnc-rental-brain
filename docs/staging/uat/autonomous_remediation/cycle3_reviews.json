@@ -1,0 +1,272 @@
+{
+  "UAT-001/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Specific capacity and current fee; natural future availability check without confirming a booking."
+  ],
+  "UAT-002/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      4,
+      5,
+      5
+    ],
+    [],
+    "Warm, useful questions cover date including year, times, guests, event type and rental preference."
+  ],
+  "UAT-004/1": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      4,
+      5,
+      4
+    ],
+    [],
+    "Separates supported audio, conditional projection and custom hologram feasibility. Current audio provision is slightly mechanical wording."
+  ],
+  "UAT-004/2": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Preserves optional hologram context and offers a specific check of projection requirements."
+  ],
+  "UAT-005/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      4,
+      5,
+      5
+    ],
+    [],
+    "Answers catering and kitchen questions from current guidance while keeping venue and facilitator checks prospective."
+  ],
+  "UAT-005/2": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      3,
+      5,
+      4
+    ],
+    [
+      "robotic_phrasing"
+    ],
+    "Retains buffet, setup and facilitation context; safe access wording. The long policy paragraph and rather than assuming a window phrase need light editing."
+  ],
+  "UAT-006/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Brief and useful current capacity/fee response with an explicit future availability check."
+  ],
+  "UAT-006/2": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Accurately updates scope, guest count, date and time without carrying forward superseded details."
+  ],
+  "UAT-007/1": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      4,
+      5,
+      4
+    ],
+    [],
+    "Asks the missing year and times and supplies relevant kitchen guidance; date check phrasing is slightly form-like."
+  ],
+  "UAT-008/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Acknowledges budget and flexibility naturally, states the current fee and promises a check without granting an exception."
+  ],
+  "UAT-009/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Warm returning-client acknowledgement with current fee and a prospective waiver check."
+  ],
+  "UAT-009/2": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      4,
+      4,
+      4
+    ],
+    [
+      "robotic_phrasing"
+    ],
+    "Correctly keeps current fee authority over the historical waiver; repeats capacity and uses slightly mechanical process wording."
+  ],
+  "UAT-010/1": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      4,
+      5,
+      4
+    ],
+    [],
+    "Separates known capacity from custom aerial-rig review and states governed access restrictions. Wording is a little formal."
+  ],
+  "UAT-011/1": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      3,
+      4,
+      4
+    ],
+    [],
+    "Useful current supplier, kitchen and technical rules, with no invented clock-time permission. The lengthy checklist needs light shortening and a clearer personal follow-up."
+  ],
+  "UAT-011/2": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      3,
+      5,
+      4
+    ],
+    [],
+    "Loading route remains an internal check; current access and equipment rules are supplied. Repeated capacity and policy detail make this longer than necessary."
+  ],
+  "UAT-012/1": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      3,
+      5,
+      4
+    ],
+    [],
+    "Covers catering, audio, conditional projection, facilitator and fee request; asks full timing and guests. Several policy paragraphs need light compression."
+  ],
+  "UAT-012/3": [
+    "B",
+    [
+      5,
+      4,
+      4,
+      5,
+      3,
+      5,
+      4
+    ],
+    [],
+    "Retains the compound topics and new timing with correct fee and prospective internal/external checks. Safe but lengthy; this does not compensate for missing turn 2."
+  ],
+  "UAT-013/1": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Specific current capacity and fee with a clear prospective check for the requested date."
+  ],
+  "UAT-013/2": [
+    "A",
+    [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    [],
+    "Short acknowledgement accurately carries the date/time change and unchanged remaining details."
+  ]
+}

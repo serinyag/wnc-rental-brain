@@ -1,0 +1,110 @@
+[
+  {
+    "case_id": 464,
+    "scenario_id": "UAT-001",
+    "display_status": "needs_approval",
+    "revision_id": 197,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 465,
+    "scenario_id": "UAT-002",
+    "display_status": "needs_approval",
+    "revision_id": 198,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": false
+  },
+  {
+    "case_id": 467,
+    "scenario_id": "UAT-004",
+    "display_status": "needs_approval",
+    "revision_id": 200,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 468,
+    "scenario_id": "UAT-005",
+    "display_status": "needs_approval",
+    "revision_id": 202,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 469,
+    "scenario_id": "UAT-006",
+    "display_status": "needs_approval",
+    "revision_id": 204,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 470,
+    "scenario_id": "UAT-007",
+    "display_status": "needs_approval",
+    "revision_id": 205,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": false
+  },
+  {
+    "case_id": 471,
+    "scenario_id": "UAT-008",
+    "display_status": "needs_approval",
+    "revision_id": 206,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 472,
+    "scenario_id": "UAT-009",
+    "display_status": "needs_approval",
+    "revision_id": 208,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 473,
+    "scenario_id": "UAT-010",
+    "display_status": "needs_approval",
+    "revision_id": 209,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 474,
+    "scenario_id": "UAT-011",
+    "display_status": "needs_approval",
+    "revision_id": 211,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 475,
+    "scenario_id": "UAT-012",
+    "display_status": "needs_approval",
+    "revision_id": 213,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  },
+  {
+    "case_id": 476,
+    "scenario_id": "UAT-013",
+    "display_status": "needs_approval",
+    "revision_id": 215,
+    "case_revision_matches": true,
+    "can_simulate_send": false,
+    "annotation_blocks_approval": true
+  }
+]

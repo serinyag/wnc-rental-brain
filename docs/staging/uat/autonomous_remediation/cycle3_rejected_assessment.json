@@ -1,0 +1,32 @@
+{
+  "UAT-003/1": {
+    "grade": "A (candidate only; rejected, excluded from accepted metrics)",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 5,
+      "naturalness": 5,
+      "clarity": 5,
+      "concision": 5,
+      "next_step_clarity": 5,
+      "operator_confidence": 5
+    },
+    "checks": {
+      "robotic_phrasing": false,
+      "internal_uncertainty_exposed": false,
+      "false_external_contact_statement": false,
+      "relevant_policy_guidance_omitted": false,
+      "wrong_commercial_truth": false,
+      "false_confirmation": false,
+      "unsupported_assertion": false,
+      "known_no_contradiction": false,
+      "unnecessary_client_question": false,
+      "missed_client_question": false,
+      "em_dash": false,
+      "dangling_signoff": false,
+      "stale_draft": false,
+      "confidentiality_issue": false,
+      "duplicate_internal_work_action": false
+    },
+    "reason": "The exact candidate promises to check whether the venue is available. It does not claim availability is confirmed. The unsupported_availability_or_confirmation rejection is a demonstrated false positive."
+  }
+}

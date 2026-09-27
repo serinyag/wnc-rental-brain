@@ -1,0 +1,22 @@
+{
+"UAT-001/1":["B",[5,4,4,5,4,4,4],[],"Useful capacity and fee answer, with a natural availability next action; event details are still over-repeated."],
+"UAT-002/1":["B",[5,4,4,5,4,5,4],[],"Complete safe client questions; one long question could be split for easier reading."],
+"UAT-003/1":["B",[5,3,3,4,4,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Answers capacity from current 110-person limit; still appends an unconfirmed-date disclaimer."],
+"UAT-004/1":["B",[5,4,4,5,4,4,4],[],"Separates supported audio, conditional projector facts and the custom hologram request."],
+"UAT-004/2":["A",[5,4,5,5,5,4,5],[],"Retains optional-hologram clarification and explains specific projector conditions concisely."],
+"UAT-005/1":["A",[5,5,5,5,4,5,5],[],"Warm, useful kitchen guidance and a straightforward future follow-up without claiming contact occurred."],
+"UAT-005/2":["B",[5,4,4,5,4,4,4],[],"Retains buffet/setup and facilitator flexibility with current kitchen rules; capacity/fee additions could be shorter."],
+"UAT-006/1":["A",[5,4,5,5,5,4,5],[],"Concise acknowledgement, capacity and current fee, without boilerplate disclaimer."],
+"UAT-006/2":["A",[5,5,5,5,5,4,5],[],"Accurately acknowledges all requested changes without implying acceptance."],
+"UAT-007/1":["C",[5,4,4,4,3,3,3],["missed_client_question"],"Again asks only hours while the full date/year remains missing. Kitchen guidance is useful but lengthy."],
+"UAT-008/1":["B",[5,3,3,4,4,3,4],["robotic_phrasing"],"Current fee and pending exception remain safe; the repeated fee and budget caveat are mechanical."],
+"UAT-009/1":["B",[5,4,4,5,5,4,4],[],"Uses current fee instead of historical waiver; approval-status phrasing could be more natural."],
+"UAT-009/2":["B",[5,3,3,5,4,4,4],["robotic_phrasing"],"Maintains current process and fee; repeats capacity and negative approval status."],
+"UAT-010/1":["B",[5,4,4,5,5,4,4],[],"Separates capacity from custom technical approval and keeps the unusual requirement visible."],
+"UAT-011/1":["B",[5,4,4,5,3,4,4],[],"Specific kitchen, projector, microphone and access policies are useful; applying policy to a hypothetical rental start should be clearer."],
+"UAT-011/2":["C",[4,3,3,4,2,3,3],["unsupported_assertion"],"Concrete unloading recommendation is too assertive while the arrival-window task is unresolved; designated loading-route provision is not established in the supplied guidance. Significant shortening and conditional wording are needed."],
+"UAT-012/1":["B",[5,4,4,5,3,4,4],[],"Covers technical, catering, facilitator, fee request and missing client facts; could be more concise."],
+"UAT-012/3":["B",[5,4,4,5,3,4,4],[],"Carries all earlier topics and the new timing forward, including current fee. Useful but still long."],
+"UAT-013/1":["A",[5,4,5,5,5,4,5],[],"Clear grounded acknowledgement and fee without a disclaimer."],
+"UAT-013/2":["B",[5,3,3,5,4,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Requested date/time and unchanged details are correct; the considered/not-confirmed sentence is mechanical."]
+}

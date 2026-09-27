@@ -1,0 +1,18 @@
+{
+  "scenario": "UAT-012",
+  "turn": 2,
+  "reproduced_in": [
+    "cycle2 case 462",
+    "cycle3 case 475"
+  ],
+  "client_error": "Operator endpoint returned non-JSON output.",
+  "generation_called": false,
+  "render_log_source": "Render staging application logs viewed in authenticated dashboard",
+  "render_log_lines": [
+    "2026-09-27 16:14:35,249 INFO __main__ test_console_http method=POST path=/api/operator/cases/475/reconcile status=200 failure_code=OK duration_ms=3301.1",
+    "127.0.0.1 - - [27/Sep/2026 16:14:35] \"POST /api/operator/cases/475/reconcile HTTP/1.1\" 200 137532"
+  ],
+  "code_inspection": "The client reads the entire response and raises this error on json.JSONDecodeError. The server reconciliation route serializes using json.dumps with application/json and explicit Content-Length. No size cap was found in these paths.",
+  "conclusion": "Client-side JSON parsing failed despite an application log reporting HTTP 200. The failing raw response and parse offset were not retained, so the transport/response cause is unresolved; a backend exception or truncation is not proven. No draft generation occurred for this turn.",
+  "program_boundary": "Three cycles completed; no fourth implementation or deployment was performed."
+}

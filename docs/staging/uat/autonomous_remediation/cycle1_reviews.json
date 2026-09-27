@@ -1,0 +1,18 @@
+{
+"UAT-001/1":["B",[5,4,4,5,4,4,4],[],"Capacity and fee are answered correctly; the availability next action is natural, but the prose could be shorter."],
+"UAT-002/1":["B",[5,4,4,4,4,5,4],[],"All required questions are present but crowded into one long sentence."],
+"UAT-004/1":["C",[5,3,3,4,4,3,3],["internal_uncertainty_exposed","relevant_policy_guidance_omitted"],"Audio is answered; the projector's known equipment and specific compatibility conditions are omitted."],
+"UAT-004/2":["C",[5,3,3,4,4,3,3],["internal_uncertainty_exposed","relevant_policy_guidance_omitted"],"Tracks optional hologram but projection still gets a generic unconfirmed statement."],
+"UAT-005/1":["B",[5,3,3,4,3,4,4],["robotic_phrasing","internal_uncertainty_exposed"],"Useful specific kitchen and cleaning guidance; date/facilitator disclaimers need editing."],
+"UAT-005/2":["B",[5,3,3,4,3,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Buffet and setup update retained with kitchen guidance, but capacity and disclaimer repeat unnecessarily."],
+"UAT-006/1":["B",[5,3,3,5,4,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Accurate fee and capacity; mechanical disclaimer and weak next step."],
+"UAT-007/1":["C",[5,4,4,4,3,3,3],["missed_client_question"],"Useful kitchen guidance, but the required full date/year question is reduced to start and finish times."],
+"UAT-008/1":["B",[5,4,4,5,4,4,4],[],"Current booking fee and flexibility request stay separate; repeats the amount unnecessarily."],
+"UAT-009/1":["B",[5,4,4,4,3,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Current pricing overrides precedent correctly; boilerplate capacity and disclaimer burden the reply."],
+"UAT-009/2":["B",[5,3,3,4,3,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Safe current commercial truth, but procedural wording and repeated disclaimer."],
+"UAT-010/1":["C",[5,2,2,3,4,2,2],["robotic_phrasing","internal_uncertainty_exposed"],"Capacity is now answered but custom feasibility and date remain a mechanical negative response."],
+"UAT-011/1":["B",[5,3,3,4,3,3,4],["robotic_phrasing","internal_uncertainty_exposed","relevant_policy_guidance_omitted"],"Microphone supplier requirement and kitchen constraints are useful; projector conditions omitted and waste guidance is too broad."],
+"UAT-011/2":["C",[5,3,3,4,3,2,3],["missed_client_question"],"Acknowledges loading route and handover but does not create specific checks or provide a useful next step."],
+"UAT-012/3":["C",[5,3,3,4,4,3,3],["relevant_policy_guidance_omitted","missed_client_question"],"Current fee is answered; kitchen, facilitation and projection continuity are lost, while declined DJ equipment is reintroduced."],
+"UAT-013/1":["B",[5,3,3,4,3,3,4],["robotic_phrasing","internal_uncertainty_exposed"],"Accurate acknowledgement and fee, but repetitive capacity and confirmation disclaimer."]
+}
