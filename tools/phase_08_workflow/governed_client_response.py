@@ -71,6 +71,8 @@ DRAFT_VALIDATION_DANGLING_SIGNOFF = "dangling_signoff"
 DRAFT_VALIDATION_EXTERNAL_CONTACT_NOT_RECORDED = "external_contact_not_recorded"
 DRAFT_VALIDATION_INTERNAL_UNCERTAINTY = "internal_uncertainty_exposed"
 DRAFT_VALIDATION_SYSTEM_SENDER = "system_sender_not_allowed"
+DRAFT_VALIDATION_MISSING_QUESTION_COMPONENT = "missing_client_question_component"
+DRAFT_VALIDATION_UNRESOLVED_ACCESS_WINDOW = "unresolved_access_window_claim"
 
 
 class ClientResponseProviderError(RuntimeError):
@@ -288,7 +290,7 @@ def build_draft_contract(
     questions = tuple(
         sorted(
             (
-                (int(question.open_question_id), str(question.human_question_text))
+                (int(question.open_question_id), _client_question_text(question, (*prior_client_messages, latest_client_message or "")))
                 for question in getattr(snapshot, "open_questions", ())
                 if getattr(question, "status", None) in {"open", "answered_pending_validation"}
                 and str(getattr(question, "requested_from_role", "")).startswith("client")
@@ -316,6 +318,7 @@ def build_draft_contract(
         "Do not describe a pending decision or fee adjustment as approved.",
         "Do not use historical precedent as current policy.",
         "Do not use an em dash in the subject or body.",
+        "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it.",
     ]
     if intent.code == RESPONSE_INTENT_COMMUNICATE_RESTRICTION:
         forbidden.append("Do not represent a known restriction as supported.")
@@ -477,6 +480,8 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     if tuple(draft.question_ids) != expected_questions:
         failures.append(DRAFT_VALIDATION_OPEN_QUESTION_SET_MISMATCH)
     body = draft.body.lower()
+    if any("including year" in question.lower() for _, question in contract.open_client_questions) and not re.search(r"\byear\b", body):
+        failures.append(DRAFT_VALIDATION_MISSING_QUESTION_COMPONENT)
     combined = f"{draft.subject}\n{draft.body}"
     if "—" in combined:
         failures.append(DRAFT_VALIDATION_EM_DASH_NOT_ALLOWED)
@@ -507,6 +512,12 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     asserted_fees = euro_amounts(combined)
     if not asserted_fees.issubset(allowed_fees):
         failures.append(DRAFT_VALIDATION_COMMERCIAL_ASSERTION_NOT_ALLOWED)
+    unresolved_logistics = any(item.blocking and item.proposition_key.startswith("logistics:")
+                               and item.resolution_status != "RESOLVED" for item in contract.resolution_items)
+    if unresolved_logistics and re.search(
+        r"\b(?:(?:may|can|should) (?:arrive|begin|start).{0,24}\b\d{1,2}[:.]\d{2}|use \d{1,2}[:.]\d{2} as|(?:unloading|setup|deliveries).{0,20}(?:at|from) \d{1,2}[:.]\d{2})\b", body
+    ):
+        failures.append(DRAFT_VALIDATION_UNRESOLVED_ACCESS_WINDOW)
     external_contact_required = any(
         item.resolution_owner == RESOLUTION_OWNER_EXTERNAL_PARTY
         and item.resolution_status == RESOLUTION_STATUS_CONTACT_REQUIRED
@@ -519,6 +530,20 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     ):
         failures.append(DRAFT_VALIDATION_INTERNAL_UNCERTAINTY)
     return DraftValidationResult(is_valid=not failures, failure_codes=tuple(failures))
+
+
+def _client_question_text(question: Any, client_messages: tuple[str, ...]) -> str:
+    text = str(question.human_question_text)
+    if getattr(question, "question_type", None) == "requested_event_timing":
+        # Avoid re-asking a year explicitly supplied in this current client thread.
+        # This selects question wording only; no case fact or date is established here.
+        months = "january|february|march|april|may|june|july|august|september|october|november|december"
+        supplied_year = any(re.search(
+            rf"\b(?:19|20|21)\d{{2}}-\d{{2}}-\d{{2}}\b|\b(?:{months})\s+(?:\d{{1,2}},?\s+)?(?:19|20|21)\d{{2}}\b|\byear\s+(?:is\s+)?(?:19|20|21)\d{{2}}\b",
+            message, re.IGNORECASE) for message in client_messages)
+        if not supplied_year:
+            return "What full date (including year), start time and finish time is the client requesting?"
+    return text
 
 
 def _semantic_states(snapshot: Any) -> tuple[str, ...]:
@@ -548,9 +573,12 @@ def _provider_system_prompt() -> str:
         "Do not repeat all event details or every catalogue entry. Choose the practical guidance that helps this particular client. "
         "Do not append a boilerplate booking or availability disclaimer to an acknowledgement or factual answer. "
         "Avoid unsupported commitments by limiting claims to known facts; a short natural next action is enough where needed. "
+        "When a client needs follow-up, say what you will check in plain first-person language rather than announcing an unconfirmed status. "
+        "For an exception request, the current fee plus acknowledgement of the question is usually enough; do not repeatedly announce that it has not been approved. "
         "For known-conditional equipment, explain what exists and its specific conditions instead of withholding all useful information. "
         "If food or catering is relevant and kitchen guidance is supplied, explain the useful kitchen limitation naturally. "
         "Acknowledge changed facts, and ask only the supplied open client questions. Never ask to reconfirm facts already supplied. "
+        "Cover every required component of an open question, including the year when requested. A day and month alone do not establish a year. "
         "WNC staff handle internal checks outside this email. Never describe generic internal uncertainty as awaiting confirmation, "
         "reviewing whether, remains unconfirmed, requested commitment as stated, or once review is complete. "
         "Do not imply that suppliers have been contacted unless external_pending explicitly records CONTACTED_AWAITING_RESPONSE. "

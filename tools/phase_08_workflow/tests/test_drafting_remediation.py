@@ -200,4 +200,71 @@ def test_logistics_requests_create_stable_internal_checks_without_contact_claims
     assert len({i.proposition_key for i in items})==3
     c=contract(resolution_items=items)
     assert c.to_provider_payload()['external_pending']==[]
-    assert 'loading route' not in str(c.to_provider_payload())
+    assert 'Confirm the supplier loading route' not in str(c.to_provider_payload())
+
+
+def test_timing_question_requires_missing_year_not_just_returned_question_id():
+    q=SimpleNamespace(open_question_id=7,human_question_text='What date and time is requested?',
+        question_type='requested_event_timing',status='open',requested_from_role='client')
+    c=build_draft_contract(snapshot=snapshot(open_questions=(q,)),recipient_label='Lena',latest_client_message='19 November')
+    assert 'including year' in c.open_client_questions[0][1]
+    def validate(body):
+        return validate_client_response_draft(contract=c,draft=ClientResponseDraft('Date',body,(7,)),
+            current_case_revision=2,current_context_hash=c.context_hash)
+    assert 'missing_client_question_component' in validate('What start and end times do you need on 19 November?').failure_codes
+    assert validate('Which year is 19 November, and what start and finish times do you need?').is_valid
+    assert 'missing_client_question_component' not in codes(contract(),'What start time would you prefer?')
+
+
+def test_timing_projection_does_not_reask_an_explicit_client_year():
+    q=SimpleNamespace(open_question_id=7,human_question_text='What date and time is requested?',
+        question_type='requested_event_timing',status='open',requested_from_role='client')
+    for message in ('19 November 2026','November 19, 2026','2026-11-19','The year is 2026'):
+        c=build_draft_contract(snapshot=snapshot(open_questions=(q,)),recipient_label='Lena',latest_client_message=message)
+        assert 'including year' not in c.open_client_questions[0][1]
+
+
+def test_supplier_acknowledgement_keeps_what_must_be_acknowledged():
+    guidance=retrieve_contextual_guidance(search=_Search(({
+        'document_code':'SERV-004','authority_classification':'authoritative',
+        'body_text':'Supplier ID: TEMPLATE\nVenue-rule acknowledgement: Required before delivery\nInternal notes: Not client prose',
+    },)),topics=('external_supplier_setup',),rental_type_code=None)
+    assert 'Venue-rule acknowledgement: Required before delivery' in guidance[0].client_safe_guidance
+    assert 'Internal notes' not in guidance[0].client_safe_guidance
+
+
+def test_unresolved_supplier_windows_cannot_be_authorized_from_requested_times():
+    fields=(SimpleNamespace(field_code='layout_requirements',value_payload={'notes':'Suppliers will arrive during setup'},stale_observation=False),)
+    items=derive_resolution_items(snapshot(),observed_fields=fields)
+    assert any(i.proposition_key.startswith('logistics:supplier_arrival:') for i in items)
+    c=contract(resolution_items=items)
+    for body in ('Suppliers may arrive from 13:30.', 'Please use 14:00 as the estimated unloading time.', 'Setup can begin at 14:00.'):
+        assert 'unresolved_access_window_claim' in codes(c,body)
+    assert 'unresolved_access_window_claim' not in codes(c,'Setup begins at the confirmed rental start. I will check the supplier access details for you.')
+
+
+def test_decision_blocker_does_not_create_a_second_internal_approval_task():
+    decision=SimpleNamespace(case_decision_id=58,status='proposed',decision_type='booking_fee_override')
+    b=blocker(1747,'case_decision_approval_required','Approval must be approved')
+    b.origin_entity_type='case_decision';b.origin_entity_reference='case_decision:58'
+    items=derive_resolution_items(snapshot(case_decisions=(decision,),blockers=(b,)))
+    assert len(items)==1 and items[0].resolution_owner=='GOVERNED_DECISION'
+
+
+def test_internal_work_reuses_active_action_and_replaces_superseded_binding():
+    from tools.phase_08_workflow.test_console_service import TestConsoleService
+    from tools.phase_08_workflow.context_aware_drafting import with_workflow_actions
+    b=blocker(3,'confirmation_required','Check setup')
+    item=derive_resolution_items(snapshot(blockers=(b,)))[0]
+    prior=SimpleNamespace(workflow_action_id=4,status='superseded',structured_payload={'resolution_item_key':item.proposition_key})
+    assert with_workflow_actions((item,),(prior,))[0].workflow_action_id is None
+    service=object.__new__(TestConsoleService);service.now=lambda:'2026-09-27T12:00:00Z'
+    created=[];service.orchestration_repository=SimpleNamespace(create_workflow_action=lambda action:created.append(action))
+    s=snapshot(workflow_actions=(prior,))
+    service._ensure_resolution_workflow_actions(s,(item,))
+    assert len(created)==1 and ':revision:2' in created[0].idempotency_key
+    active=replace(created[0],workflow_action_id=5)
+    s.workflow_actions=(prior,active)
+    service._ensure_resolution_workflow_actions(s,(item,))
+    assert len(created)==1
+    assert with_workflow_actions((item,),s.workflow_actions)[0].workflow_action_id==5

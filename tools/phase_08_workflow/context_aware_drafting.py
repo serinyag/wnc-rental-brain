@@ -159,6 +159,11 @@ def derive_resolution_items(snapshot: Any, *, observed_fields: tuple[Any, ...] =
             continue
         if getattr(blocker, "blocker_type", None) == "missing_client_information":
             continue
+        if getattr(blocker, "origin_entity_type", None) == "case_decision":
+            # Pending decisions already have a GOVERNED_DECISION item above.
+            # Do not turn the approval requirement into duplicate internal check work.
+            if any(item.proposition_key == getattr(blocker, "origin_entity_reference", None) for item in items):
+                continue
         blocker_key = f"blocker:{blocker.blocker_id}"
         projection = next((p for p in getattr(snapshot, "reasoning_projections", ())
                            if getattr(blocker, "origin_entity_reference", "") ==
@@ -205,7 +210,7 @@ def derive_resolution_items(snapshot: Any, *, observed_fields: tuple[Any, ...] =
         for token, topic, message in (
             ("loading", "loading_route", "Confirm the supplier loading route"),
             ("handover", "venue_handover", "Confirm venue handover requirements"),
-            ("arrival", "supplier_arrival", "Confirm supplier arrival and setup windows"),
+            ("arriv", "supplier_arrival", "Confirm supplier arrival and setup windows"),
         ):
             if token in notes:
                 case = getattr(snapshot, "rental_case", None)
@@ -236,6 +241,7 @@ def with_workflow_actions(
         str(getattr(action, "structured_payload", {}).get("resolution_item_key")): action
         for action in actions
         if getattr(action, "structured_payload", {}).get("resolution_item_key")
+        and getattr(action, "status", None) not in {"superseded", "cancelled", "failed"}
     }
     enriched: list[ResolutionItem] = []
     for item in items:
@@ -376,7 +382,8 @@ def _client_guidance_text(row: dict[str, Any]) -> str:
         return text
     allowed = ("Rule: ", "Client responsibility: ", "Delivery requirements: ", "Cleaning implications: ",
                "Waste responsibility: ", "Venue-rule acknowledgement: ")
-    lines = [line.split(": ", 1)[1] for line in text.splitlines() if line.startswith(allowed)]
+    lines = [line if line.startswith("Venue-rule acknowledgement: ") else line.split(": ", 1)[1]
+             for line in text.splitlines() if line.startswith(allowed)]
     # Short already-projected guidance supplied by a search adapter has no catalogue fields.
     return " ".join(lines) if ": " in text else text
 

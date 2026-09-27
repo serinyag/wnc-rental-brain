@@ -4729,6 +4729,10 @@ limit 1;
                 continue
             if item.resolution_status not in {RESOLUTION_STATUS_REQUIRED, RESOLUTION_STATUS_CONTACT_REQUIRED}:
                 continue
+            if any(action.structured_payload.get("resolution_item_key") == item.proposition_key
+                   and action.status not in {"superseded", "cancelled", "failed"}
+                   for action in snapshot.workflow_actions):
+                continue
             task_kind = (
                 "external_contact_required"
                 if item.resolution_owner == RESOLUTION_OWNER_EXTERNAL_PARTY
@@ -4752,7 +4756,7 @@ limit 1;
                     source_case_revision=snapshot.rental_case.case_revision,
                     idempotency_key=(
                         f"context_aware_resolution:{snapshot.rental_case.rental_case_id}:"
-                        f"{item.proposition_key}:{item.resolution_status}"
+                        f"{item.proposition_key}:{item.resolution_status}:revision:{snapshot.rental_case.case_revision}"
                     ),
                     structured_payload={
                         "task_kind": task_kind,
