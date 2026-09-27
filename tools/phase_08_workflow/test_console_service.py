@@ -122,6 +122,7 @@ from .governed_client_response import (
     validate_client_response_draft,
 )
 from .context_aware_drafting import (
+    ContextualGuidance,
     ContextualGuidanceSearch,
     Phase5HybridGuidanceSearch,
     RESOLUTION_OWNER_EXTERNAL_PARTY,
@@ -1797,7 +1798,7 @@ limit 1;
         if rental_type_code == "entire_venue":
             row = self._first_row(
                 f"""
-select applicability_status, capacity_evaluation_status, within_capacity
+select applicability_status, capacity_evaluation_status, within_capacity, max_guests
 from api.evaluate_capacity(
   null,
   'entire_venue',
@@ -2040,6 +2041,7 @@ limit 1;
             "capacity_evaluation_status": status,
             "applicability_status": status_row.get("applicability_status"),
             "within_capacity": status_row.get("within_capacity"),
+            "published_max_guests": status_row.get("max_guests", source_snapshot.get("published_max_guests")),
         }
         if status == "within_capacity":
             return self._make_synthetic_authority_issue(
@@ -2479,6 +2481,7 @@ limit 1;
         except Exception:
             # Retrieval failure cannot promote uncertainty or block a safe draft.
             contextual_guidance = ()
+        contextual_guidance += self._current_client_policy_guidance(detail, snapshot)
         contract = build_draft_contract(
             snapshot=snapshot,
             recipient_label=detail.metadata.client_label,
@@ -3754,6 +3757,7 @@ limit 1;
         except Exception:
             # Guidance retrieval is advisory and must not weaken governed validation.
             contextual_guidance = ()
+        contextual_guidance += self._current_client_policy_guidance(detail, snapshot)
         contract = build_draft_contract(
             snapshot=snapshot,
             recipient_label=detail.metadata.client_label,
@@ -3764,6 +3768,45 @@ limit 1;
             contextual_guidance=contextual_guidance,
         )
         return detail, snapshot, contract
+
+    def _current_client_policy_guidance(
+        self, detail: CaseConsoleSnapshot, snapshot: WorkflowOrchestrationCaseSnapshot,
+    ) -> tuple[ContextualGuidance, ...]:
+        """Expose specific evaluated Phase 4 outcomes, not internal reasoning or historical text."""
+        observed = {item.field_code: item for item in self._build_observed_field_candidates(detail.evidence_bundles)}
+        guidance: list[ContextualGuidance] = []
+        capacity = self._capacity_authority_issue(snapshot, observed_by_field=observed)
+        if capacity is not None and capacity.semantic_state_code in {"known_yes", "known_no"}:
+            scope = snapshot.rental_case.rental_type_code.replace("_", " ")
+            guests = self._current_guest_count(snapshot)
+            outcome = "within" if capacity.semantic_state_code == "known_yes" else "outside"
+            maximum = capacity.source_snapshot.get("published_max_guests")
+            guidance.append(ContextualGuidance(
+                "capacity", f"The requested {guests} guests are {outcome} the current capacity rules for {scope}. "
+                + (f"The applicable maximum is {maximum} guests. " if isinstance(maximum, int) else "")
+                +
+                "This capacity assessment does not establish date availability or approve the event.",
+                "phase4:" + capacity.issue_code,
+            ))
+        technical = self._technical_authority_issue(observed_by_field=observed)
+        if technical is not None:
+            for item in technical.source_snapshot.get("triggered_requirements", ()):
+                state = item["semantic_state_code"]
+                source = item["source_snapshot"]
+                name = str(item["observed_requirement"]).replace("_", " ")
+                status = source.get("support_status")
+                if state == "known_yes":
+                    text = f"{name}: current technical provision is {str(status).replace('_', ' ')}."
+                    if source.get("requires_confirmation"):
+                        text += " Event-specific arrangements still need an internal check."
+                elif state == "known_no":
+                    text = f"{name}: " + ("requires an external supplier." if status == "external_supplier_required"
+                                           else "is not available from WNC's standard provision.")
+                else:
+                    # No capability assertion can be derived from an unresolved result.
+                    continue
+                guidance.append(ContextualGuidance("technical_capabilities", text, "phase4:" + item["issue_code"]))
+        return tuple(guidance)
 
     def edit_inquiry_response_draft(
         self,

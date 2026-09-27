@@ -36,7 +36,9 @@ STYLE_PROFILE = (
     "Use a warm, concise, conversational WNC rental voice.",
     "Open with Hi <first name> when a recipient name is available.",
     "Acknowledge the specific message naturally and vary the opening.",
-    "Use plain language, practical next steps, and a complete WNC signoff.",
+    "Use plain language and practical next steps. Return no signature block or valediction.",
+    "Answer known facts separately from unresolved matters; never make the whole inquiry sound uncertain.",
+    "Avoid applicable fee, requested commitment as stated, awaiting confirmation, and once review is complete.",
     "Do not use em dashes or bureaucratic workflow language.",
 )
 
@@ -103,19 +105,19 @@ class ContextualGuidanceSearch(Protocol):
 class Phase5HybridGuidanceSearch:
     """Read-only Phase 5 FTS retrieval; embeddings are intentionally not generated here."""
 
-    result_limit: int = 3
+    result_limit: int = 8
 
     def search(self, *, topic: str, query_text: str, rental_type_code: str | None) -> tuple[dict[str, Any], ...]:
-        del topic
         from tools.phase_05_search.search_hybrid import run_hybrid_search
 
         rows, _elapsed_ms = run_hybrid_search(
             query_text=query_text,
             result_limit=self.result_limit,
-            candidate_pool_limit=10,
+            candidate_pool_limit=20,
             query_embedding=None,
             embedding_model_id=None,
             rental_type_code=rental_type_code,
+            document_code={"catering_kitchen": "SERV-003", "external_supplier_setup": "SERV-004"}.get(topic),
         )
         return tuple(rows)
 
@@ -158,7 +160,13 @@ def derive_resolution_items(snapshot: Any) -> tuple[ResolutionItem, ...]:
         if getattr(blocker, "blocker_type", None) == "missing_client_information":
             continue
         blocker_key = f"blocker:{blocker.blocker_id}"
-        is_external = _is_external_blocker(blocker)
+        projection = next((p for p in getattr(snapshot, "reasoning_projections", ())
+                           if getattr(blocker, "origin_entity_reference", "") ==
+                           f"reasoning_projection:{getattr(p, 'projection_identity_key', '')}"), None)
+        source_keys = " ".join(getattr(projection, "grounding_reference_keys", ())).lower()
+        # Generic workflow blocker prose loses the proposition. Recover its typed
+        # origin before classifying ownership; task creation is never contact evidence.
+        is_external = _is_external_blocker(blocker) or "test_console:facilitator_" in source_keys
         contacted = is_external and _external_contact_recorded(events, blocker_key)
         owner = RESOLUTION_OWNER_EXTERNAL_PARTY if is_external else RESOLUTION_OWNER_WNC_INTERNAL
         status = (
@@ -176,13 +184,29 @@ def derive_resolution_items(snapshot: Any) -> tuple[ResolutionItem, ...]:
         items.append(
             ResolutionItem(
                 proposition_key=blocker_key,
-                message=_operator_message(blocker),
+                message=("Contact facilitator about the requested availability and format" if "test_console:facilitator_" in source_keys
+                         else "Confirm event-specific technical setup" if "test_console:technical_" in source_keys
+                         else "Confirm the requested room layout against capacity requirements" if "test_console:capacity_" in source_keys
+                         else _operator_message(blocker)),
                 resolution_owner=owner,
                 resolution_status=status,
                 client_visibility=visibility,
                 blocking=True,
             )
         )
+    case = getattr(snapshot, "rental_case", None)
+    start, end = getattr(case, "active_event_start", None), getattr(case, "active_event_end", None)
+    if start and end and getattr(case, "lifecycle_state", "") in {"inquiry_active", "proposal_in_progress"}:
+        key = f"availability:{start}:{end}"
+        if not any("availability" in item.message.lower() and item.resolution_owner == RESOLUTION_OWNER_WNC_INTERNAL for item in items):
+            items.append(ResolutionItem(
+                proposition_key=key,
+                message=f"Confirm {getattr(case, 'rental_type_code', 'venue').replace('_', ' ')} availability for {start} to {end}",
+                resolution_owner=RESOLUTION_OWNER_WNC_INTERNAL,
+                resolution_status=RESOLUTION_STATUS_REQUIRED,
+                client_visibility=CLIENT_VISIBILITY_INTERNAL_ONLY,
+                blocking=True,
+            ))
     return tuple(items)
 
 
@@ -273,7 +297,7 @@ def retrieve_contextual_guidance(
         for row in search.search(topic=topic, query_text=_topic_query(topic), rental_type_code=rental_type_code):
             if accepted >= limit_per_topic or not _is_client_safe_current_guidance(row):
                 continue
-            text = str(row.get("body_text") or "").strip()
+            text = _client_guidance_text(row)
             source = str(row.get("document_code") or "").strip()
             if not text or not source:
                 continue
@@ -313,12 +337,24 @@ def _topic_query(topic: str) -> str:
     return {
         # Phase 5 FTS uses its own lexical index. Broad topic terms preserve
         # recall here; authority and document filters below remain the safety gate.
-        "catering_kitchen": "catering",
+        "catering_kitchen": "kitchen",
         "external_supplier_setup": "supplier",
         "technical_capabilities": "technical",
         "facilitator_process": "facilitator",
         "capacity": "venue",
     }[topic]
+
+
+def _client_guidance_text(row: dict[str, Any]) -> str:
+    """Select client-useful policy lines, never catalogue pricing or internal notes."""
+    text = str(row.get("body_text") or "").strip()
+    if row.get("document_code") not in {"SERV-003", "SERV-004"}:
+        return text
+    allowed = ("Rule: ", "Client responsibility: ", "Delivery requirements: ", "Cleaning implications: ",
+               "Waste responsibility: ", "Venue-rule acknowledgement: ")
+    lines = [line.split(": ", 1)[1] for line in text.splitlines() if line.startswith(allowed)]
+    # Short already-projected guidance supplied by a search adapter has no catalogue fields.
+    return " ".join(lines) if ": " in text else text
 
 
 def _is_client_safe_current_guidance(row: dict[str, Any]) -> bool:

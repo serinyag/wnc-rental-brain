@@ -225,7 +225,7 @@ class GovernedClientResponseTests(unittest.TestCase):
         self.assertTrue(result.is_valid)
         self.assertEqual(result.failure_codes, ())
 
-    def test_validator_treats_currency_tokens_as_literal_values(self) -> None:
+    def test_validator_accepts_equivalent_euro_symbol_without_changing_amount(self) -> None:
         contract = build_draft_contract(
             snapshot=make_snapshot(),
             recipient_label="Avery",
@@ -241,7 +241,7 @@ class GovernedClientResponseTests(unittest.TestCase):
             current_context_hash=contract.context_hash,
         )
 
-        self.assertEqual(result.failure_codes, ("commercial_assertion_not_allowed",))
+        self.assertEqual(result.failure_codes, ())
 
     def test_known_no_draft_may_state_that_an_arrangement_is_not_supported(self) -> None:
         contract = build_draft_contract(

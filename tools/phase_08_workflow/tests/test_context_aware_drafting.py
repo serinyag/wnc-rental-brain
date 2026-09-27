@@ -116,7 +116,7 @@ class ContextAwareDraftingTests(unittest.TestCase):
             rental_type_code="studio_space",
         )
         self.assertEqual([(item.topic, item.client_safe_guidance) for item in guidance], [("catering_kitchen", "Kitchen guidance.")])
-        self.assertEqual(_topic_query("catering_kitchen"), "catering")
+        self.assertEqual(_topic_query("catering_kitchen"), "kitchen")
         self.assertEqual(_topic_query("external_supplier_setup"), "supplier")
 
     def test_irrelevant_topics_are_not_requested(self) -> None:
@@ -156,7 +156,9 @@ class ContextAwareDraftingTests(unittest.TestCase):
     def test_internal_annotations_are_not_sent_to_provider_payload(self) -> None:
         item = ResolutionItem("blocker:2", "Confirm Studio availability", RESOLUTION_OWNER_WNC_INTERNAL, "REQUIRED", CLIENT_VISIBILITY_INTERNAL_ONLY, True)
         contract = build_draft_contract(snapshot=snapshot(), recipient_label="Avery", latest_client_message=None, resolution_items=(item,))
-        self.assertEqual(contract.to_provider_payload()["resolution_items"], [])
+        self.assertNotIn("resolution_items", contract.to_provider_payload())
+        self.assertNotIn("pending_internal_confirmations", contract.to_provider_payload())
+        self.assertNotIn(item.message, str(contract.to_provider_payload()))
         self.assertEqual(contract.operator_annotations[0].message, "Confirm Studio availability")
 
 
