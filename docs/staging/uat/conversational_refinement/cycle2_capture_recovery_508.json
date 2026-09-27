@@ -1,0 +1,3283 @@
+{
+  "captured_at": "2026-09-27T17:49:27.027355+00:00",
+  "request": "GET /api/operator/cases/508",
+  "provider_calls": 0,
+  "snapshot": {
+    "case": {
+      "asana_master_task_reference": null,
+      "evidence_bundles": [
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:50.236957+00",
+              "disposition_code": "create_reschedule_request",
+              "inbound_observation_effect_id": 2313,
+              "inbound_observation_id": 2313,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": 33,
+              "reason_codes": [
+                "reschedule_candidate"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14151
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": {
+                "active_event_end": "2026-11-13T20:00:00Z",
+                "active_event_start": "2026-11-13T15:00:00Z"
+              },
+              "claim_kind": "change_request",
+              "created_at": "2026-09-27 17:39:50.236957+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2313,
+              "inbound_source_record_id": 2608,
+              "observation_identity_key": "active_event_window|change_candidate|change_request|test_console:active_event_window|{\"active_event_end\":\"2026-11-13T20:00:00Z\",\"active_event_start\":\"2026-11-13T15:00:00Z\"}|",
+              "observation_type": "change_candidate",
+              "observed_against_case_revision": 2,
+              "rental_case_id": 508,
+              "reported_domain_code": "timing",
+              "reported_field_code": "active_event_window",
+              "source_evidence_reference": "test_console:active_event_window",
+              "source_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "timing",
+              "target_field_code": "active_event_window",
+              "updated_at": "2026-09-27 17:39:50.236957+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:50.236957+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2:observation:3",
+            "evidence_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2:observation:3",
+            "inbound_source_record_id": 2608,
+            "occurred_at": "2026-09-27 17:39:50.134868+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:50.134868+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:088a35871df63d033dc055487c21631693483515f89c72fd0ed39fbe2784f0c0",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:49.215436+00",
+              "disposition_code": "no_workflow_effect",
+              "inbound_observation_effect_id": 2312,
+              "inbound_observation_id": 2312,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "new_information_candidate",
+                "no_direct_truth_mutation"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14150
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": "entire_venue",
+              "claim_kind": "change_request",
+              "created_at": "2026-09-27 17:39:49.215436+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2312,
+              "inbound_source_record_id": 2607,
+              "observation_identity_key": "requested_rental_scope|change_candidate|change_request|test_console:requested_rental_scope|\"entire_venue\"|",
+              "observation_type": "change_candidate",
+              "observed_against_case_revision": 2,
+              "rental_case_id": 508,
+              "reported_domain_code": "event_profile",
+              "reported_field_code": "requested_rental_scope",
+              "source_evidence_reference": "test_console:requested_rental_scope",
+              "source_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "event_profile",
+              "target_field_code": "requested_rental_scope",
+              "updated_at": "2026-09-27 17:39:49.215436+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:49.215436+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2:observation:2",
+            "evidence_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2:observation:2",
+            "inbound_source_record_id": 2607,
+            "occurred_at": "2026-09-27 17:39:49.043016+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:49.043016+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:7184fdeef2bcedfb799af97259e8a0c0d9397c50df6c542a7acbb838c6dea565",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:48.005308+00",
+              "disposition_code": "create_proposed_change",
+              "inbound_observation_effect_id": 2311,
+              "inbound_observation_id": 2311,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": 29,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "existing_value_changed",
+                "material_impact"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14149
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": 30,
+              "claim_kind": "change_request",
+              "created_at": "2026-09-27 17:39:48.005308+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2311,
+              "inbound_source_record_id": 2606,
+              "observation_identity_key": "guest_count|change_candidate|change_request|test_console:guest_count|30|",
+              "observation_type": "change_candidate",
+              "observed_against_case_revision": 2,
+              "rental_case_id": 508,
+              "reported_domain_code": "event_profile",
+              "reported_field_code": "guest_count",
+              "source_evidence_reference": "test_console:guest_count",
+              "source_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "event_profile",
+              "target_field_code": "guest_count",
+              "updated_at": "2026-09-27 17:39:48.005308+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:48.005308+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2:observation:1",
+            "evidence_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2:observation:1",
+            "inbound_source_record_id": 2606,
+            "occurred_at": "2026-09-27 17:39:47.851341+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:47.851341+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:ebc73b6666f453630ec90c6698b3b3a5da00d7ce485760723e9af5f33df51383",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [],
+          "observations": [],
+          "raw_evidence": {
+            "body": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+            "external_test_reference": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2",
+            "inbound_source_record_id": 2605,
+            "occurred_at": "2026-09-27 17:39:46.946891+00",
+            "sender": "Theo Martin <theo.martin@example.test>",
+            "source_label": "real_model_governed_drafting_uat",
+            "subject": "Re: Initial planning meeting - revised plan",
+            "workflow_event_id": 14148
+          },
+          "source_record": {
+            "association_basis": "test_console_explicit_case",
+            "association_status": "resolved",
+            "case_reference_hint": null,
+            "confidentiality_posture": null,
+            "conversation_reference": "Re: Initial planning meeting - revised plan",
+            "created_at": "2026-09-27 17:39:46.947001+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2",
+            "evidence_excerpt": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2",
+            "inbound_source_record_id": 2605,
+            "occurred_at": "2026-09-27 17:39:46.946891+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:46.946891+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "Theo Martin <theo.martin@example.test>",
+            "sender_actor_type": "client",
+            "source_hash": "sha256:5508f736db39796f7a9d654424cd7af176d5f5c8bb9e6ac1842a480a2f498f56",
+            "source_location_reference": "real_model_governed_drafting_uat",
+            "source_record_type": "message",
+            "source_system_code": "email"
+          }
+        },
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:30.312982+00",
+              "disposition_code": "no_workflow_effect",
+              "inbound_observation_effect_id": 2310,
+              "inbound_observation_id": 2310,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "schedule_candidate_pending_inquiry_intake",
+                "no_direct_truth_mutation"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14132
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": {
+                "active_event_end": "2026-11-12T16:00:00Z",
+                "active_event_start": "2026-11-12T13:00:00Z"
+              },
+              "claim_kind": "new_information",
+              "created_at": "2026-09-27 17:39:30.312982+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2310,
+              "inbound_source_record_id": 2604,
+              "observation_identity_key": "active_event_window|fact_candidate|new_information|test_console:active_event_window|{\"active_event_end\":\"2026-11-12T16:00:00Z\",\"active_event_start\":\"2026-11-12T13:00:00Z\"}|",
+              "observation_type": "fact_candidate",
+              "observed_against_case_revision": 1,
+              "rental_case_id": 508,
+              "reported_domain_code": "timing",
+              "reported_field_code": "active_event_window",
+              "source_evidence_reference": "test_console:active_event_window",
+              "source_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "timing",
+              "target_field_code": "active_event_window",
+              "updated_at": "2026-09-27 17:39:30.312982+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:30.312982+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:4",
+            "evidence_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:4",
+            "inbound_source_record_id": 2604,
+            "occurred_at": "2026-09-27 17:39:30.14218+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:30.14218+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:aad4403e5c23f5747a77351a9cd091bf7177449b457ace09ee766fc67bf57cf5",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:28.821586+00",
+              "disposition_code": "open_question_answer_candidate",
+              "inbound_observation_effect_id": 2309,
+              "inbound_observation_id": 2309,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": 1958,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "question_answer_candidate",
+                "new_information_candidate"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14131
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": "studio_space",
+              "claim_kind": "new_information",
+              "created_at": "2026-09-27 17:39:28.821586+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2309,
+              "inbound_source_record_id": 2603,
+              "observation_identity_key": "requested_rental_scope|fact_candidate|new_information|test_console:requested_rental_scope|\"studio_space\"|",
+              "observation_type": "fact_candidate",
+              "observed_against_case_revision": 1,
+              "rental_case_id": 508,
+              "reported_domain_code": "event_profile",
+              "reported_field_code": "requested_rental_scope",
+              "source_evidence_reference": "test_console:requested_rental_scope",
+              "source_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "event_profile",
+              "target_field_code": "requested_rental_scope",
+              "updated_at": "2026-09-27 17:39:28.821586+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:28.821586+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:3",
+            "evidence_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:3",
+            "inbound_source_record_id": 2603,
+            "occurred_at": "2026-09-27 17:39:28.693004+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:28.693004+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:94b3e84452686cee4e51dce1e58c18b9b6cafb67e0d3c2d66f89c0753dda54b2",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:27.298126+00",
+              "disposition_code": "open_question_answer_candidate",
+              "inbound_observation_effect_id": 2308,
+              "inbound_observation_id": 2308,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": 1957,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "question_answer_candidate",
+                "new_information_candidate"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14130
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": 16,
+              "claim_kind": "new_information",
+              "created_at": "2026-09-27 17:39:27.298126+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2308,
+              "inbound_source_record_id": 2602,
+              "observation_identity_key": "guest_count|fact_candidate|new_information|test_console:guest_count|16|",
+              "observation_type": "fact_candidate",
+              "observed_against_case_revision": 1,
+              "rental_case_id": 508,
+              "reported_domain_code": "event_profile",
+              "reported_field_code": "guest_count",
+              "source_evidence_reference": "test_console:guest_count",
+              "source_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "event_profile",
+              "target_field_code": "guest_count",
+              "updated_at": "2026-09-27 17:39:27.298126+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:27.298126+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:2",
+            "evidence_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:2",
+            "inbound_source_record_id": 2602,
+            "occurred_at": "2026-09-27 17:39:27.120597+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:27.120597+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:06c09e6e8499b5ed2e4832c77bb76e7623496cde0e87e03bfaefdeccf69d7447",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [
+            {
+              "created_at": "2026-09-27 17:39:25.501437+00",
+              "disposition_code": "open_question_answer_candidate",
+              "inbound_observation_effect_id": 2307,
+              "inbound_observation_id": 2307,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": 1959,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "question_answer_candidate",
+                "new_information_candidate"
+              ],
+              "rental_case_id": 508,
+              "revalidation_required": true,
+              "stale_observation": false,
+              "workflow_event_id": 14129
+            }
+          ],
+          "observations": [
+            {
+              "ambiguity_flags": [],
+              "asserted_by_party_type": "operator",
+              "asserted_by_reference": "real_model_governed_uat:UAT-006",
+              "candidate_value_payload": "planning meeting",
+              "claim_kind": "new_information",
+              "created_at": "2026-09-27 17:39:25.501437+00",
+              "extraction_confidence": 1.0,
+              "inbound_observation_id": 2307,
+              "inbound_source_record_id": 2601,
+              "observation_identity_key": "event_type|fact_candidate|new_information|test_console:event_type|\"planning meeting\"|",
+              "observation_type": "fact_candidate",
+              "observed_against_case_revision": 1,
+              "rental_case_id": 508,
+              "reported_domain_code": "event_profile",
+              "reported_field_code": "event_type",
+              "source_evidence_reference": "test_console:event_type",
+              "source_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+              "status": "validated",
+              "supersedes_inbound_observation_id": null,
+              "target_domain_code": "event_profile",
+              "target_field_code": "event_type",
+              "updated_at": "2026-09-27 17:39:25.501437+00"
+            }
+          ],
+          "raw_evidence": null,
+          "source_record": {
+            "association_basis": "explicit_rental_case_id",
+            "association_status": "resolved",
+            "case_reference_hint": "RC-20260927173842996",
+            "confidentiality_posture": null,
+            "conversation_reference": null,
+            "created_at": "2026-09-27 17:39:25.501437+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:1",
+            "evidence_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1:observation:1",
+            "inbound_source_record_id": 2601,
+            "occurred_at": "2026-09-27 17:39:25.313295+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:25.313295+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "real_model_governed_uat:UAT-006",
+            "sender_actor_type": "operator",
+            "source_hash": "sha256:d7a359183181a898056c9c99f6d368e43e9d1a1519b938f6104a41d7c36181be",
+            "source_location_reference": null,
+            "source_record_type": "operator_note",
+            "source_system_code": "manual_input"
+          }
+        },
+        {
+          "effects": [],
+          "observations": [],
+          "raw_evidence": {
+            "body": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+            "external_test_reference": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1",
+            "inbound_source_record_id": 2600,
+            "occurred_at": "2026-09-27 17:39:23.979144+00",
+            "sender": "Theo Martin <theo.martin@example.test>",
+            "source_label": "real_model_governed_drafting_uat",
+            "subject": "Initial planning meeting",
+            "workflow_event_id": 14128
+          },
+          "source_record": {
+            "association_basis": "test_console_explicit_case",
+            "association_status": "resolved",
+            "case_reference_hint": null,
+            "confidentiality_posture": null,
+            "conversation_reference": "Initial planning meeting",
+            "created_at": "2026-09-27 17:39:23.979287+00",
+            "dedupe_key": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1",
+            "evidence_excerpt": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+            "external_source_id": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1",
+            "inbound_source_record_id": 2600,
+            "occurred_at": "2026-09-27 17:39:23.979144+00",
+            "pi_posture": null,
+            "received_at": "2026-09-27 17:39:23.979144+00",
+            "resolved_rental_case_id": 508,
+            "sender_actor_reference": "Theo Martin <theo.martin@example.test>",
+            "sender_actor_type": "client",
+            "source_hash": "sha256:55de48a6932a29c4002c77f41caa413263d3542542903ff30caf15353da06da2",
+            "source_location_reference": "real_model_governed_drafting_uat",
+            "source_record_type": "message",
+            "source_system_code": "email"
+          }
+        }
+      ],
+      "evidence_notice": null,
+      "human_work_preview": [
+        "Resolve blocker: The proposed change must be accepted, rejected, or superseded.",
+        "Approval needed: Approve inquiry response draft revision 265 before simulated send.",
+        "Workflow action: Send Inquiry Response [Awaiting Approval]",
+        "Workflow action: Review proposed change 29 (material_impact). [Ready To Execute]",
+        "Workflow action: Review proposed change 30 (unknown_impact). [Ready To Execute]",
+        "Workflow action: Review reschedule request 33. [Ready To Execute]",
+        "Workflow action: Confirm: The proposed change must be accepted, rejected, or superseded [Ready To Execute]",
+        "Workflow action: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00 [Ready To Execute]",
+        "Workflow action: Send Inquiry Response [Awaiting Approval]"
+      ],
+      "metadata": {
+        "client_label": "Theo Martin",
+        "contact_email": "theo.martin@example.test",
+        "created_at": "2026-09-27 17:38:42.996537+00",
+        "created_by": "test_console:operator",
+        "event_reference": "UAT-006 real-model governed drafting UAT synthetic inquiry",
+        "label": "UAT-006 Client changes the plan conversational-drafting-cycle2-20260927-173313"
+      },
+      "orchestration_snapshot": {
+        "approval_requests": [
+          {
+            "approval_request_id": 324,
+            "approval_type": "client_communication_send",
+            "created_at": "2026-09-27 17:39:45.321859+00",
+            "decided_at": "2026-09-27 17:39:52.027925+00",
+            "decided_by_reference": null,
+            "decision_notes": "Draft source context became stale.",
+            "decision_payload": null,
+            "evidence_reference_keys": [
+              "workflow_action:1102",
+              "inquiry_response_draft:264"
+            ],
+            "reason_text": "Approve inquiry response draft revision 264 before simulated send.",
+            "rental_case_id": 508,
+            "required_approver_reference": "semantic:approval:workflow_action:1102:draft_revision:264",
+            "required_approver_role": "client_communication_review",
+            "status": "cancelled",
+            "supersedes_approval_request_id": null,
+            "target_entity_id": 1102,
+            "target_entity_reference": "workflow_action:1102:draft_revision:264",
+            "target_entity_type": "workflow_action",
+            "updated_at": "2026-09-27 17:39:52.110524+00"
+          },
+          {
+            "approval_request_id": 325,
+            "approval_type": "client_communication_send",
+            "created_at": "2026-09-27 17:40:04.105981+00",
+            "decided_at": null,
+            "decided_by_reference": null,
+            "decision_notes": null,
+            "decision_payload": null,
+            "evidence_reference_keys": [
+              "workflow_action:1108",
+              "inquiry_response_draft:265"
+            ],
+            "reason_text": "Approve inquiry response draft revision 265 before simulated send.",
+            "rental_case_id": 508,
+            "required_approver_reference": "semantic:approval:workflow_action:1108:draft_revision:265",
+            "required_approver_role": "client_communication_review",
+            "status": "open",
+            "supersedes_approval_request_id": null,
+            "target_entity_id": 1108,
+            "target_entity_reference": "workflow_action:1108:draft_revision:265",
+            "target_entity_type": "workflow_action",
+            "updated_at": "2026-09-27 17:40:04.105981+00"
+          }
+        ],
+        "artifacts": [],
+        "blockers": [
+          {
+            "blocked_subject_id": null,
+            "blocked_subject_reference": "open_question:1956",
+            "blocked_subject_type": "transition",
+            "blocker_id": 1984,
+            "blocker_type": "missing_client_information",
+            "opened_at": "2026-09-27 17:39:19.515907+00",
+            "origin_entity_id": 1956,
+            "origin_entity_reference": "open_question:1956",
+            "origin_entity_type": "open_question",
+            "rental_case_id": 508,
+            "resolution_condition_text": "Open question 1956 must be resolved.",
+            "resolution_reference": "resolved:blocker:question:1956",
+            "resolved_at": "2026-09-27 17:39:33.40356+00",
+            "severity": "high",
+            "status": "resolved",
+            "supersedes_blocker_id": null
+          },
+          {
+            "blocked_subject_id": null,
+            "blocked_subject_reference": "open_question:1957",
+            "blocked_subject_type": "transition",
+            "blocker_id": 1985,
+            "blocker_type": "missing_client_information",
+            "opened_at": "2026-09-27 17:39:19.515907+00",
+            "origin_entity_id": 1957,
+            "origin_entity_reference": "open_question:1957",
+            "origin_entity_type": "open_question",
+            "rental_case_id": 508,
+            "resolution_condition_text": "Open question 1957 must be resolved.",
+            "resolution_reference": "resolved:blocker:question:1957",
+            "resolved_at": "2026-09-27 17:39:33.40356+00",
+            "severity": "high",
+            "status": "resolved",
+            "supersedes_blocker_id": null
+          },
+          {
+            "blocked_subject_id": null,
+            "blocked_subject_reference": "open_question:1958",
+            "blocked_subject_type": "transition",
+            "blocker_id": 1986,
+            "blocker_type": "missing_client_information",
+            "opened_at": "2026-09-27 17:39:19.515907+00",
+            "origin_entity_id": 1958,
+            "origin_entity_reference": "open_question:1958",
+            "origin_entity_type": "open_question",
+            "rental_case_id": 508,
+            "resolution_condition_text": "Open question 1958 must be resolved.",
+            "resolution_reference": "resolved:blocker:question:1958",
+            "resolved_at": "2026-09-27 17:39:33.40356+00",
+            "severity": "high",
+            "status": "resolved",
+            "supersedes_blocker_id": null
+          },
+          {
+            "blocked_subject_id": null,
+            "blocked_subject_reference": "open_question:1959",
+            "blocked_subject_type": "transition",
+            "blocker_id": 1987,
+            "blocker_type": "missing_client_information",
+            "opened_at": "2026-09-27 17:39:19.515907+00",
+            "origin_entity_id": 1959,
+            "origin_entity_reference": "open_question:1959",
+            "origin_entity_type": "open_question",
+            "rental_case_id": 508,
+            "resolution_condition_text": "Open question 1959 must be resolved.",
+            "resolution_reference": "resolved:blocker:question:1959",
+            "resolved_at": "2026-09-27 17:39:33.40356+00",
+            "severity": "high",
+            "status": "resolved",
+            "supersedes_blocker_id": null
+          },
+          {
+            "blocked_subject_id": null,
+            "blocked_subject_reference": "proposed_change:29",
+            "blocked_subject_type": "action",
+            "blocker_id": 1988,
+            "blocker_type": "proposed_change_review_required",
+            "opened_at": "2026-09-27 17:39:53.604346+00",
+            "origin_entity_id": 29,
+            "origin_entity_reference": "proposed_change:29",
+            "origin_entity_type": "proposed_case_change",
+            "rental_case_id": 508,
+            "resolution_condition_text": "The proposed change must be accepted, rejected, or superseded.",
+            "resolution_reference": "semantic:blocker:change:review:29",
+            "resolved_at": null,
+            "severity": "medium",
+            "status": "open",
+            "supersedes_blocker_id": null
+          }
+        ],
+        "case_decisions": [],
+        "execution_attempts": [],
+        "follow_ups": [
+          {
+            "attempt_count": 0,
+            "cadence_policy_code": "inquiry_cold_weekly",
+            "completed_at": "2026-09-27 17:39:35.402178+00",
+            "context_payload": {
+              "episode_key": "inquiry_episode:304989b1b555f3d6bd2aa9014ea3398443f8e4c393c719f010c68754424214eb",
+              "event_proximity": "unscheduled",
+              "intended_recipient_role": "client",
+              "lead_posture": "cold_inquiry",
+              "open_question_ids": [
+                1956,
+                1957,
+                1958,
+                1959
+              ],
+              "purpose": "request_missing_information",
+              "question_labels": [
+                "Requested schedule",
+                "Guest count",
+                "Requested space",
+                "Event type"
+              ],
+              "question_texts": [
+                "What date and time is the client requesting for the event?",
+                "How many guests are expected?",
+                "Which space or rental scope is the client requesting?",
+                "What type of event is the client planning?"
+              ],
+              "question_types": [
+                "requested_event_timing",
+                "expected_guest_count",
+                "requested_rental_scope",
+                "requested_event_type"
+              ],
+              "reason": "Client information is still missing for: Requested schedule, Guest count, Requested space, Event type.",
+              "recipient_reference": null,
+              "required_field_codes": [
+                "requested_schedule",
+                "guest_count",
+                "requested_space",
+                "event_type"
+              ],
+              "sequence_number": 1
+            },
+            "created_at": "2026-09-27 17:39:21.11658+00",
+            "due_at": "2026-09-27 17:39:21.11658+00",
+            "escalate_after": null,
+            "follow_up_id": 318,
+            "next_action_type": "REQUEST_CLIENT_INFORMATION",
+            "reason_code": "inquiry_missing_information",
+            "rental_case_id": 508,
+            "semantic_identity_key": "inquiry_follow_up:c6056eb48d8de77d7a22451ab2f9a8d57300b63bea682bc4ff5fb24bdfe50eda",
+            "sequence_number": 1,
+            "status": "cancelled",
+            "updated_at": "2026-09-27 17:39:35.535613+00",
+            "urgency_level": "medium",
+            "waiting_for_reference": null,
+            "waiting_for_role": "client"
+          }
+        ],
+        "milestones": [],
+        "open_questions": [
+          {
+            "blocking_scope": "transition",
+            "created_at": "2026-09-27 17:39:18.498712+00",
+            "domain_code": "timing",
+            "human_question_text": "What date and time is the client requesting for the event?",
+            "open_question_id": 1956,
+            "proposed_answer_payload": null,
+            "question_type": "requested_event_timing",
+            "rental_case_id": 508,
+            "requested_from_role": "client",
+            "resolved_at": "2026-09-27 17:39:31.521493+00",
+            "source_reference": "inbound_observation:2310",
+            "status": "resolved",
+            "supersedes_open_question_id": null
+          },
+          {
+            "blocking_scope": "transition",
+            "created_at": "2026-09-27 17:39:18.498712+00",
+            "domain_code": "event_profile",
+            "human_question_text": "How many guests are expected?",
+            "open_question_id": 1957,
+            "proposed_answer_payload": 16,
+            "question_type": "expected_guest_count",
+            "rental_case_id": 508,
+            "requested_from_role": "client",
+            "resolved_at": "2026-09-27 17:39:31.521493+00",
+            "source_reference": "inbound_observation:2308",
+            "status": "resolved",
+            "supersedes_open_question_id": null
+          },
+          {
+            "blocking_scope": "transition",
+            "created_at": "2026-09-27 17:39:18.498712+00",
+            "domain_code": "event_profile",
+            "human_question_text": "Which space or rental scope is the client requesting?",
+            "open_question_id": 1958,
+            "proposed_answer_payload": "studio_space",
+            "question_type": "requested_rental_scope",
+            "rental_case_id": 508,
+            "requested_from_role": "client",
+            "resolved_at": "2026-09-27 17:39:31.521493+00",
+            "source_reference": "inbound_observation:2309",
+            "status": "resolved",
+            "supersedes_open_question_id": null
+          },
+          {
+            "blocking_scope": "transition",
+            "created_at": "2026-09-27 17:39:18.498712+00",
+            "domain_code": "event_profile",
+            "human_question_text": "What type of event is the client planning?",
+            "open_question_id": 1959,
+            "proposed_answer_payload": "planning meeting",
+            "question_type": "requested_event_type",
+            "rental_case_id": 508,
+            "requested_from_role": "client",
+            "resolved_at": "2026-09-27 17:39:31.521493+00",
+            "source_reference": "inbound_observation:2307",
+            "status": "resolved",
+            "supersedes_open_question_id": null
+          }
+        ],
+        "proposed_changes": [
+          {
+            "accepted_at": null,
+            "affected_domain_codes": [
+              "event_profile"
+            ],
+            "change_kind": "guest_count",
+            "created_at": "2026-09-27 17:39:48.005308+00",
+            "detected_at": "2026-09-27 17:39:48.005308+00",
+            "domain_code": "event_profile",
+            "final_value_payload": null,
+            "impact_classification": "material_impact",
+            "prior_value_payload": 16,
+            "proposed_case_change_id": 29,
+            "proposed_value_payload": 30,
+            "rental_case_id": 508,
+            "review_posture": "human_only",
+            "source_reference": "inbound_observation:2311",
+            "status": "proposed",
+            "supersedes_proposed_change_id": null,
+            "updated_at": "2026-09-27 17:39:48.005308+00"
+          },
+          {
+            "accepted_at": null,
+            "affected_domain_codes": [
+              "event_profile"
+            ],
+            "change_kind": "requested_rental_scope",
+            "created_at": "2026-09-27 17:39:51.596456+00",
+            "detected_at": "2026-09-27 17:39:51.596456+00",
+            "domain_code": "event_profile",
+            "final_value_payload": null,
+            "impact_classification": null,
+            "prior_value_payload": "studio_space",
+            "proposed_case_change_id": 30,
+            "proposed_value_payload": "entire_venue",
+            "rental_case_id": 508,
+            "review_posture": null,
+            "source_reference": "inbound_observation:2312",
+            "status": "proposed",
+            "supersedes_proposed_change_id": null,
+            "updated_at": "2026-09-27 17:39:51.596456+00"
+          }
+        ],
+        "reasoning_projections": [
+          {
+            "authority_outcome_classification": "DETERMINISTIC_CURRENT",
+            "conflict_codes": [],
+            "contamination_codes": [],
+            "created_at": "2026-09-27 17:39:33.317104+00",
+            "de_identification_required": false,
+            "degraded_retrieval_summary": {
+              "affected_layers": [],
+              "any_degradation": false,
+              "fallback_reasons": {},
+              "generator_warnings": [],
+              "materially_affects_answer_completeness": false,
+              "per_layer_execution_states": {},
+              "semantic_state_code": "known_yes"
+            },
+            "effective_confidentiality_level": "internal",
+            "grounding_reference_keys": [
+              "test_console:capacity_studio_within_all_published_limits"
+            ],
+            "materially_affects_completeness": false,
+            "personal_information_present": false,
+            "phase_7_context_contract_version": 1,
+            "phase_8_workflow_contract_version": 1,
+            "projection_identity_key": "test-console-projection:d20e2856da26a6971b80597b536e66370d0a3c653b5e2fce02d345103b807ece",
+            "reasoning_projection_id": 476,
+            "reasoning_purpose": "feasibility_review",
+            "reasoning_state_code": "resolved",
+            "relevant_current_truth_item_ids": [],
+            "relevant_guidance_item_ids": [],
+            "relevant_historical_item_ids": [],
+            "rental_case_id": 508,
+            "source_case_revision": 2,
+            "unresolved_authority_codes": [],
+            "warning_codes": [],
+            "workflow_posture": "safe_for_deterministic_use"
+          },
+          {
+            "authority_outcome_classification": "DETERMINISTIC_CURRENT",
+            "conflict_codes": [],
+            "contamination_codes": [],
+            "created_at": "2026-09-27 17:39:53.510503+00",
+            "de_identification_required": false,
+            "degraded_retrieval_summary": {
+              "affected_layers": [],
+              "any_degradation": false,
+              "fallback_reasons": {},
+              "generator_warnings": [],
+              "materially_affects_answer_completeness": false,
+              "per_layer_execution_states": {},
+              "semantic_state_code": "known_yes"
+            },
+            "effective_confidentiality_level": "internal",
+            "grounding_reference_keys": [
+              "test_console:capacity_studio_within_all_published_limits"
+            ],
+            "materially_affects_completeness": false,
+            "personal_information_present": false,
+            "phase_7_context_contract_version": 1,
+            "phase_8_workflow_contract_version": 1,
+            "projection_identity_key": "test-console-projection:c19ceff52fa542f8fa760b5f17e923e5367f86eab6625aa1bbbd4705c852be7e",
+            "reasoning_projection_id": 477,
+            "reasoning_purpose": "feasibility_review",
+            "reasoning_state_code": "resolved",
+            "relevant_current_truth_item_ids": [],
+            "relevant_guidance_item_ids": [],
+            "relevant_historical_item_ids": [],
+            "rental_case_id": 508,
+            "source_case_revision": 3,
+            "unresolved_authority_codes": [],
+            "warning_codes": [],
+            "workflow_posture": "safe_for_deterministic_use"
+          }
+        ],
+        "rental_case": {
+          "active_event_end": "2026-11-12 16:00:00+00",
+          "active_event_start": "2026-11-12 13:00:00+00",
+          "case_reference_code": "RC-20260927173842996",
+          "case_revision": 3,
+          "client_account_ref": null,
+          "commercial_summary_status": "unknown",
+          "created_at": "2026-09-27 17:38:42.996537+00",
+          "current_agreement_artifact_id": null,
+          "current_proposal_artifact_id": null,
+          "dormant_origin_state": null,
+          "dormant_reason_code": null,
+          "dormant_review_at": null,
+          "is_active": true,
+          "lifecycle_state": "inquiry_active",
+          "operational_summary_status": "unknown",
+          "primary_contact_ref": null,
+          "rental_case_id": 508,
+          "rental_case_uuid": "b8e7e443-d386-4755-8661-5c6a1ca04062",
+          "rental_type_code": "studio_space",
+          "resume_target_state": null,
+          "service_level_or_type": "UAT-006 Client changes the plan conversational-drafting-cycle2-20260927-173313",
+          "updated_at": "2026-09-27 17:39:51.709006+00"
+        },
+        "rental_case_facts": [
+          {
+            "created_at": "2026-09-27 17:39:31.521493+00",
+            "domain_code": "event_profile",
+            "established_case_revision": 2,
+            "field_code": "guest_count",
+            "rental_case_fact_id": 913,
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2308",
+            "updated_at": "2026-09-27 17:39:31.521493+00",
+            "value_payload": 16
+          },
+          {
+            "created_at": "2026-09-27 17:39:31.521493+00",
+            "domain_code": "event_profile",
+            "established_case_revision": 2,
+            "field_code": "event_type",
+            "rental_case_fact_id": 914,
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2307",
+            "updated_at": "2026-09-27 17:39:31.521493+00",
+            "value_payload": "planning meeting"
+          }
+        ],
+        "requirements": [],
+        "reschedule_requests": [
+          {
+            "candidate_dates_payload": [],
+            "confirmed_at": null,
+            "confirmed_proposed_change_id": null,
+            "consequence_summary_payload": {
+              "field_code": "active_event_window",
+              "source_observation_id": 2313
+            },
+            "created_at": "2026-09-27 17:39:50.236957+00",
+            "current_active_date_snapshot": {
+              "active_event_end": "2026-11-12T16:00:00Z",
+              "active_event_start": "2026-11-12T13:00:00Z"
+            },
+            "rental_case_id": 508,
+            "requested_date_payload": {
+              "active_event_end": "2026-11-13T20:00:00Z",
+              "active_event_start": "2026-11-13T15:00:00Z"
+            },
+            "reschedule_request_id": 33,
+            "status": "proposed",
+            "updated_at": "2026-09-27 17:39:50.236957+00",
+            "urgency_class": "normal"
+          }
+        ],
+        "workflow_actions": [
+          {
+            "action_category": "communication",
+            "action_type": "REQUEST_CLIENT_INFORMATION",
+            "approval_posture": "approval_required",
+            "created_at": "2026-09-27 17:39:21.694666+00",
+            "due_at": "2026-09-27 17:39:21.11658+00",
+            "idempotency_key": "action:REQUEST_CLIENT_INFORMATION:58ec175a1cfeea0b6fc69066649ec03710dea6332295c03a8363ad3cb37aa19f:1",
+            "reason_entity_id": 318,
+            "reason_entity_reference": "follow_up:318",
+            "reason_entity_type": "follow_up",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "58ec175a1cfeea0b6fc69066649ec03710dea6332295c03a8363ad3cb37aa19f",
+            "source_case_revision": 1,
+            "status": "superseded",
+            "structured_payload": {
+              "due_at": "2026-09-27 17:39:21.11658+00",
+              "follow_up_id": 318,
+              "intended_recipient_role": "client",
+              "open_question_ids": [
+                1956,
+                1957,
+                1958,
+                1959
+              ],
+              "purpose": "request_missing_information",
+              "question_texts": [
+                "What date and time is the client requesting for the event?",
+                "How many guests are expected?",
+                "Which space or rental scope is the client requesting?",
+                "What type of event is the client planning?"
+              ],
+              "reason": "Client information is still missing for: Requested schedule, Guest count, Requested space, Event type.",
+              "reason_code": "inquiry_missing_information",
+              "recipient_reference": null,
+              "required_field_codes": [
+                "requested_schedule",
+                "guest_count",
+                "requested_space",
+                "event_type"
+              ],
+              "sequence_number": 1,
+              "summary": "Prepare client information request for follow-up #1."
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "internal",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:34.009548+00",
+            "workflow_action_id": 1100,
+            "workflow_action_uuid": "e7ee606a-cb5d-443d-9b10-3768e4393768"
+          },
+          {
+            "action_category": "coordination",
+            "action_type": "CREATE_INTERNAL_TASK_ITEM",
+            "approval_posture": "automatic_allowed",
+            "created_at": "2026-09-27 17:39:39.894492+00",
+            "due_at": null,
+            "idempotency_key": "context_aware_resolution:508:availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00:REQUIRED:revision:2",
+            "reason_entity_id": null,
+            "reason_entity_reference": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+            "reason_entity_type": "resolution_item",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "d3aa3635ec9409c60d6d1bbb9d1c4517f2adaf0b9cffb85c481ee3a2aed22b4d",
+            "source_case_revision": 2,
+            "status": "superseded",
+            "structured_payload": {
+              "reason": "context_aware_governed_draft_resolution",
+              "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "REQUIRED",
+              "summary": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+              "task_kind": "wnc_internal_confirmation"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "task_surface",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:54.426882+00",
+            "workflow_action_id": 1101,
+            "workflow_action_uuid": "77c21c4a-d316-4f80-a544-9a2da5c47a17"
+          },
+          {
+            "action_category": "communication",
+            "action_type": "SEND_INQUIRY_RESPONSE",
+            "approval_posture": "approval_required",
+            "created_at": "2026-09-27 17:39:44.895565+00",
+            "due_at": null,
+            "idempotency_key": "governed_outlook_v1:ce9d3ad14d64535ca91eaff3381855c2c57e786beda21d9118b5016664d477db",
+            "reason_entity_id": null,
+            "reason_entity_reference": "governed_client_response:508",
+            "reason_entity_type": "rental_case",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "fa537332aa37f8c5f0b836fe5a870cc4e48396df019caafecd5f72e913dde239",
+            "source_case_revision": 2,
+            "status": "awaiting_approval",
+            "structured_payload": {
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_target": "workflow_action:1102:draft_revision:264",
+              "body": "Hi Theo,\n\nThe Studio is suitable for your 16-person planning meeting. I\u2019ll check availability for 12 November 2026 from 13:00 to 16:00 and get back to you.",
+              "body_type": "text",
+              "context_hash": "eab63042f1f9c8348265bed4b3f5942bf0d7a39034af9e4179e30e68a1b2fad2",
+              "contract_version": "governed_outlook_v1",
+              "conversation_key": "governed_client_response:508",
+              "draft_content_hash": "c74d9ff02a4fdb2addb176cb48378e807b6f525868cb545d62b0d32d4dcb5ccc",
+              "draft_origin_workflow_action_id": 1102,
+              "draft_revision_id": 264,
+              "governed_context_hash": "fa537332aa37f8c5f0b836fe5a870cc4e48396df019caafecd5f72e913dde239",
+              "graph_message_id": null,
+              "message_mode": "new",
+              "plan_identity": "governed_outlook_reservation_v1:508:e7fc476056ceb7a8623fc9f0e7f20357ca39e00121373c584a66e6ebb63e802b",
+              "provenance": "governed_model",
+              "provider_type": "microsoft_graph_outlook",
+              "purpose": "governed_client_response_draft",
+              "reason": "operator_requested_governed_client_response",
+              "recipient_email": "theo.martin@example.test",
+              "recipient_identity_hash": "bf613fa03c8e64701ab4cb2a823d11040dfe477256c82348324e53ea908e1675",
+              "recipient_reference": "inquiry_response_draft:264",
+              "recovery_draft_revision_id": null,
+              "recovery_origin_workflow_action_id": null,
+              "recovery_predecessor_action_id": null,
+              "rental_case_id": 508,
+              "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+              "source_case_revision": 2,
+              "subject": "Studio planning meeting"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "outlook",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:45.02011+00",
+            "workflow_action_id": 1102,
+            "workflow_action_uuid": "739a2605-94b6-44d6-925a-3b83aa3d1570"
+          },
+          {
+            "action_category": "coordination",
+            "action_type": "CREATE_INTERNAL_TASK_ITEM",
+            "approval_posture": "automatic_allowed",
+            "created_at": "2026-09-27 17:39:53.896009+00",
+            "due_at": null,
+            "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:aeabf7ff53ed4f7fc1c22761a39df53cc1dcc3e8570d6ba7bd634da5eb028176:3",
+            "reason_entity_id": null,
+            "reason_entity_reference": "proposed_change:29",
+            "reason_entity_type": "review_item",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "aeabf7ff53ed4f7fc1c22761a39df53cc1dcc3e8570d6ba7bd634da5eb028176",
+            "source_case_revision": 3,
+            "status": "ready_to_execute",
+            "structured_payload": {
+              "reason": "Review proposed change 29 (material_impact).",
+              "summary": "Review proposed change 29 (material_impact).",
+              "task_kind": "proposed_change_review"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "internal",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:53.896009+00",
+            "workflow_action_id": 1103,
+            "workflow_action_uuid": "fdd6ca80-231c-4be9-9c9c-dcf78273c080"
+          },
+          {
+            "action_category": "coordination",
+            "action_type": "CREATE_INTERNAL_TASK_ITEM",
+            "approval_posture": "automatic_allowed",
+            "created_at": "2026-09-27 17:39:54.105278+00",
+            "due_at": null,
+            "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:066cee15c639cb46475e74e93596e5693c8e1401135dcf0ce657052e606596d5:3",
+            "reason_entity_id": null,
+            "reason_entity_reference": "proposed_change:30",
+            "reason_entity_type": "review_item",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "066cee15c639cb46475e74e93596e5693c8e1401135dcf0ce657052e606596d5",
+            "source_case_revision": 3,
+            "status": "ready_to_execute",
+            "structured_payload": {
+              "reason": "Review proposed change 30 (unknown_impact).",
+              "summary": "Review proposed change 30 (unknown_impact).",
+              "task_kind": "proposed_change_review"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "internal",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:54.105278+00",
+            "workflow_action_id": 1104,
+            "workflow_action_uuid": "b6dfdf16-0bef-4617-8e41-462846788376"
+          },
+          {
+            "action_category": "coordination",
+            "action_type": "CREATE_INTERNAL_TASK_ITEM",
+            "approval_posture": "automatic_allowed",
+            "created_at": "2026-09-27 17:39:54.222717+00",
+            "due_at": null,
+            "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:dc9c74aa436c9843179ddd5b1b8975ae8dc5035bae258d31a652576a7e042510:3",
+            "reason_entity_id": 33,
+            "reason_entity_reference": "reschedule_request:33",
+            "reason_entity_type": "reschedule_request",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "dc9c74aa436c9843179ddd5b1b8975ae8dc5035bae258d31a652576a7e042510",
+            "source_case_revision": 3,
+            "status": "ready_to_execute",
+            "structured_payload": {
+              "reason": "Structured reschedule review is required before any downstream action.",
+              "reschedule_request_id": 33,
+              "status": "proposed",
+              "summary": "Review reschedule request 33.",
+              "task_kind": "reschedule_review"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "internal",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:54.222717+00",
+            "workflow_action_id": 1105,
+            "workflow_action_uuid": "7af431ce-263a-43e7-9eb7-23ad79ac8d6a"
+          },
+          {
+            "action_category": "coordination",
+            "action_type": "CREATE_INTERNAL_TASK_ITEM",
+            "approval_posture": "automatic_allowed",
+            "created_at": "2026-09-27 17:39:59.42944+00",
+            "due_at": null,
+            "idempotency_key": "context_aware_resolution:508:blocker:1988:REQUIRED:revision:3",
+            "reason_entity_id": null,
+            "reason_entity_reference": "blocker:1988",
+            "reason_entity_type": "resolution_item",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "efa07c3ba390e951c4b1312167f123d988a0cd089e7b353f33348fd81ba702dd",
+            "source_case_revision": 3,
+            "status": "ready_to_execute",
+            "structured_payload": {
+              "reason": "context_aware_governed_draft_resolution",
+              "resolution_item_key": "blocker:1988",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "REQUIRED",
+              "summary": "Confirm: The proposed change must be accepted, rejected, or superseded",
+              "task_kind": "wnc_internal_confirmation"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "task_surface",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:59.42944+00",
+            "workflow_action_id": 1106,
+            "workflow_action_uuid": "dfad674d-c7c6-4441-bedf-7bd2bd556bc7"
+          },
+          {
+            "action_category": "coordination",
+            "action_type": "CREATE_INTERNAL_TASK_ITEM",
+            "approval_posture": "automatic_allowed",
+            "created_at": "2026-09-27 17:39:59.527918+00",
+            "due_at": null,
+            "idempotency_key": "context_aware_resolution:508:availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00:REQUIRED:revision:3",
+            "reason_entity_id": null,
+            "reason_entity_reference": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+            "reason_entity_type": "resolution_item",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "d3aa3635ec9409c60d6d1bbb9d1c4517f2adaf0b9cffb85c481ee3a2aed22b4d",
+            "source_case_revision": 3,
+            "status": "ready_to_execute",
+            "structured_payload": {
+              "reason": "context_aware_governed_draft_resolution",
+              "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "REQUIRED",
+              "summary": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+              "task_kind": "wnc_internal_confirmation"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "task_surface",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:39:59.527918+00",
+            "workflow_action_id": 1107,
+            "workflow_action_uuid": "fc981fba-0803-4392-b402-4e1dc13681d5"
+          },
+          {
+            "action_category": "communication",
+            "action_type": "SEND_INQUIRY_RESPONSE",
+            "approval_posture": "approval_required",
+            "created_at": "2026-09-27 17:40:03.615984+00",
+            "due_at": null,
+            "idempotency_key": "governed_outlook_v1:9b3afeb35bb8245b477d66d5ee7a007c7bf27372e35d299dc8d9e89da206f79e",
+            "reason_entity_id": null,
+            "reason_entity_reference": "governed_client_response:508",
+            "reason_entity_type": "rental_case",
+            "rental_case_id": 508,
+            "semantic_subject_hash": "4465faaa10a16f2127fe8c371e2de61fb37a162af5b1aaae4fe13ce9fae8f33e",
+            "source_case_revision": 3,
+            "status": "awaiting_approval",
+            "structured_payload": {
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_target": "workflow_action:1108:draft_revision:265",
+              "body": "Hi Theo,\n\nThanks for the update. I\u2019ve changed the enquiry to the entire venue for 30 guests on 13 November 2026, from 15:00 to 20:00. I\u2019ll check the new date and venue request and get back to you.",
+              "body_type": "text",
+              "context_hash": "c181740d88c5cd90a763623ceaa497beeab8e706f2f40b7eb3db6ccd875d4857",
+              "contract_version": "governed_outlook_v1",
+              "conversation_key": "governed_client_response:508",
+              "draft_content_hash": "9f3ed5b6ebea0172874b203430d2aaa8b907e218aa19ad72f2eecf68584268a4",
+              "draft_origin_workflow_action_id": 1108,
+              "draft_revision_id": 265,
+              "governed_context_hash": "4465faaa10a16f2127fe8c371e2de61fb37a162af5b1aaae4fe13ce9fae8f33e",
+              "graph_message_id": null,
+              "message_mode": "new",
+              "plan_identity": "governed_outlook_reservation_v1:508:dfeedb3232fe35ea6003dc858a26933cd3874da9b706c2b62c3834a0dbba65f8",
+              "provenance": "governed_model",
+              "provider_type": "microsoft_graph_outlook",
+              "purpose": "governed_client_response_draft",
+              "reason": "operator_requested_governed_client_response",
+              "recipient_email": "theo.martin@example.test",
+              "recipient_identity_hash": "bf613fa03c8e64701ab4cb2a823d11040dfe477256c82348324e53ea908e1675",
+              "recipient_reference": "inquiry_response_draft:265",
+              "recovery_draft_revision_id": null,
+              "recovery_origin_workflow_action_id": null,
+              "recovery_predecessor_action_id": null,
+              "rental_case_id": 508,
+              "response_intent": "CHANGE_ACKNOWLEDGEMENT",
+              "source_case_revision": 3,
+              "subject": "Updated venue enquiry"
+            },
+            "supersedes_workflow_action_id": null,
+            "target_adapter_code": "outlook",
+            "target_scope_key": null,
+            "updated_at": "2026-09-27 17:40:03.811053+00",
+            "workflow_action_id": 1108,
+            "workflow_action_uuid": "a535ac98-b44a-462c-ab56-a04cf14498a5"
+          }
+        ],
+        "workflow_events": [
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "test-console:case:RC-20260927173842996",
+            "event_type_code": "test_console_case_registered",
+            "occurred_at": "2026-09-27 17:38:42.996537+00",
+            "origin_metadata": {
+              "phase": "8.8a",
+              "surface": "test_console"
+            },
+            "recorded_at": "2026-09-27 17:38:42.996537+00",
+            "rental_case_id": 508,
+            "source_reference": "test_console:create_case",
+            "source_type": "test_console",
+            "structured_payload": {
+              "client_label": "Theo Martin",
+              "contact_email": "theo.martin@example.test",
+              "event_reference": "UAT-006 real-model governed drafting UAT synthetic inquiry",
+              "label": "UAT-006 Client changes the plan conversational-drafting-cycle2-20260927-173313",
+              "test_case": true
+            },
+            "workflow_event_id": 14117,
+            "workflow_event_uuid": "60589703-7713-471f-89f1-ba0ad13f2776"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_schedule:create_open_question:1ba7c5b831580573d1e49246fa856ae463c76491c36a231d743142293b56bd02",
+            "event_type_code": "inquiry_open_question_created",
+            "occurred_at": "2026-09-27 17:39:18.498712+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:18.498712+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_intake:requested_schedule",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 1,
+              "current_value": null,
+              "effect_code": "create_open_question",
+              "field_code": "requested_schedule",
+              "proposed_value": null,
+              "reason_code": "missing_core_field",
+              "source_observation_ids": []
+            },
+            "workflow_event_id": 14118,
+            "workflow_event_uuid": "aa54755a-8789-488e-b2dd-fc5ef4f0f8a2"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:guest_count:create_open_question:4a1d727e5472ef9310f8ff542e379238a2196573735ac3cf8974fa24d3aa4ad1",
+            "event_type_code": "inquiry_open_question_created",
+            "occurred_at": "2026-09-27 17:39:18.498712+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:18.498712+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_intake:guest_count",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 1,
+              "current_value": null,
+              "effect_code": "create_open_question",
+              "field_code": "guest_count",
+              "proposed_value": null,
+              "reason_code": "missing_core_field",
+              "source_observation_ids": []
+            },
+            "workflow_event_id": 14119,
+            "workflow_event_uuid": "1c13571b-83a5-433b-88c6-20783b23db08"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_space:create_open_question:71852ee82294d6417e721d86664e53d8ffc05cb839c2bacda83b12e0b3934ea6",
+            "event_type_code": "inquiry_open_question_created",
+            "occurred_at": "2026-09-27 17:39:18.498712+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:18.498712+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_intake:requested_space",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 1,
+              "current_value": null,
+              "effect_code": "create_open_question",
+              "field_code": "requested_space",
+              "proposed_value": null,
+              "reason_code": "missing_core_field",
+              "source_observation_ids": []
+            },
+            "workflow_event_id": 14120,
+            "workflow_event_uuid": "e3d75c39-2ac2-44fd-ad92-04bbc8348d15"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:event_type:create_open_question:5af0f5c5706122458ffae0c05a7a2f0d124cab0ccb9fe23878b0a4d120b19e66",
+            "event_type_code": "inquiry_open_question_created",
+            "occurred_at": "2026-09-27 17:39:18.498712+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:18.498712+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_intake:event_type",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 1,
+              "current_value": null,
+              "effect_code": "create_open_question",
+              "field_code": "event_type",
+              "proposed_value": null,
+              "reason_code": "missing_core_field",
+              "source_observation_ids": []
+            },
+            "workflow_event_id": 14121,
+            "workflow_event_uuid": "3aa2a525-4307-4401-af12-849b70516fd6"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:create:blocker:question:1956:1",
+            "event_type_code": "orchestration_blocker_created",
+            "occurred_at": "2026-09-27 17:39:19.515907+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:19.515907+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+              "semantic_issue_key": "blocker:question:1956"
+            },
+            "workflow_event_id": 14122,
+            "workflow_event_uuid": "68bafb88-d421-4392-a759-4ccef031a0a0"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:create:blocker:question:1957:1",
+            "event_type_code": "orchestration_blocker_created",
+            "occurred_at": "2026-09-27 17:39:19.515907+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:19.515907+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+              "semantic_issue_key": "blocker:question:1957"
+            },
+            "workflow_event_id": 14123,
+            "workflow_event_uuid": "b0631a1e-4d2f-4ea3-8dc5-df6df153236d"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:create:blocker:question:1958:1",
+            "event_type_code": "orchestration_blocker_created",
+            "occurred_at": "2026-09-27 17:39:19.515907+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:19.515907+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+              "semantic_issue_key": "blocker:question:1958"
+            },
+            "workflow_event_id": 14124,
+            "workflow_event_uuid": "3021603e-50c6-481e-a7c7-0f8a176dc215"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:create:blocker:question:1959:1",
+            "event_type_code": "orchestration_blocker_created",
+            "occurred_at": "2026-09-27 17:39:19.515907+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:19.515907+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+              "semantic_issue_key": "blocker:question:1959"
+            },
+            "workflow_event_id": 14125,
+            "workflow_event_uuid": "90a5f5aa-e563-450a-a1fb-2a3b323c4969"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry_waiting:follow_up:inquiry_follow_up:c6056eb48d8de77d7a22451ab2f9a8d57300b63bea682bc4ff5fb24bdfe50eda:4ab8609fc3cbc00aab788444936c940411866b58b3ceb8c9525fcc86fa46b219",
+            "event_type_code": "inquiry_follow_up_scheduled",
+            "occurred_at": "2026-09-27 17:39:21.11658+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:21.11658+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_follow_up:c6056eb48d8de77d7a22451ab2f9a8d57300b63bea682bc4ff5fb24bdfe50eda",
+            "source_type": "inquiry_waiting_runtime",
+            "structured_payload": {
+              "due_at": "2026-09-27 17:39:21.11658+00",
+              "follow_up_id": 318,
+              "open_question_ids": [
+                1956,
+                1957,
+                1958,
+                1959
+              ],
+              "plan_fingerprint": "4ab8609fc3cbc00aab788444936c940411866b58b3ceb8c9525fcc86fa46b219",
+              "required_field_codes": [
+                "requested_schedule",
+                "guest_count",
+                "requested_space",
+                "event_type"
+              ],
+              "sequence_number": 1
+            },
+            "workflow_event_id": 14126,
+            "workflow_event_uuid": "08b1f219-7949-4843-94a2-08b8a720bee7"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:action:create:1100:1",
+            "event_type_code": "workflow_action_created",
+            "occurred_at": "2026-09-27 17:39:21.11658+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:21.11658+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_DUE_FOLLOW_UP",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "action_type": "REQUEST_CLIENT_INFORMATION",
+              "approval_posture": "approval_required",
+              "rule_code": "RULE_DUE_FOLLOW_UP",
+              "status": "awaiting_approval",
+              "workflow_action_id": 1100
+            },
+            "workflow_event_id": 14127,
+            "workflow_event_uuid": "fdf56afb-2e69-49ee-8819-11015bf05c77"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "test_console_raw_evidence_recorded:508:1fc0f939ab5295af4cb13338582e219d44145720fb79e4b66165b489df42ff1d",
+            "event_type_code": "test_console_raw_evidence_recorded",
+            "occurred_at": "2026-09-27 17:39:23.979144+00",
+            "origin_metadata": {
+              "phase": "8.8a",
+              "surface": "test_console"
+            },
+            "recorded_at": "2026-09-27 17:39:23.979144+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2600",
+            "source_type": "test_console",
+            "structured_payload": {
+              "body": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+              "case_reference_code": "UAT-006 real-model governed drafting UAT synthetic inquiry",
+              "external_test_reference": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:1",
+              "inbound_source_record_id": 2600,
+              "received_at": "2026-09-27T17:39:23.979144Z",
+              "sender": "Theo Martin <theo.martin@example.test>",
+              "source_label": "real_model_governed_drafting_uat",
+              "subject": "Initial planning meeting"
+            },
+            "workflow_event_id": 14128,
+            "workflow_event_uuid": "5a8287c0-b4a3-4208-b060-57393d7532ab"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2601:event_type|fact_candidate|new_information|test_console:event_type|\"planning meeting\"|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:25.501437+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:25.501437+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2601",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "open_question_answer_candidate",
+              "failure_codes": [],
+              "inbound_observation_id": 2307,
+              "inbound_source_record_id": 2601,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": 1959,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "question_answer_candidate",
+                "new_information_candidate"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14129,
+            "workflow_event_uuid": "f53af926-1a03-4276-95ad-d1ec4ad5f68b"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2602:guest_count|fact_candidate|new_information|test_console:guest_count|16|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:27.298126+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:27.298126+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2602",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "open_question_answer_candidate",
+              "failure_codes": [],
+              "inbound_observation_id": 2308,
+              "inbound_source_record_id": 2602,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": 1957,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "question_answer_candidate",
+                "new_information_candidate"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14130,
+            "workflow_event_uuid": "8d0147ab-8e0c-465e-9541-3fecf6d3480a"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2603:requested_rental_scope|fact_candidate|new_information|test_console:requested_rental_scope|\"studio_space\"|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:28.821586+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:28.821586+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2603",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "open_question_answer_candidate",
+              "failure_codes": [],
+              "inbound_observation_id": 2309,
+              "inbound_source_record_id": 2603,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": 1958,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "question_answer_candidate",
+                "new_information_candidate"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14131,
+            "workflow_event_uuid": "1e4a575b-55d2-47cc-a5e4-2c4c83d65353"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2604:active_event_window|fact_candidate|new_information|test_console:active_event_window|{\"active_event_end\":\"2026-11-12T16:00:00Z\",\"active_event_start\":\"2026-11-12T13:00:00Z\"}|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:30.312982+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:30.312982+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2604",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "no_workflow_effect",
+              "failure_codes": [],
+              "inbound_observation_id": 2310,
+              "inbound_source_record_id": 2604,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "schedule_candidate_pending_inquiry_intake",
+                "no_direct_truth_mutation"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14132,
+            "workflow_event_uuid": "6ed582a3-1fc9-447f-9048-1733c610e46b"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_schedule:promote_current_value:f02f44cd4ee7e8fcf4e7ead97173836724d69f9d6263dd980fe2dca9ea326553",
+            "event_type_code": "case_fact_promoted_from_observation",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2310",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "promote_current_value",
+              "field_code": "requested_schedule",
+              "proposed_value": {
+                "active_event_end": "2026-11-12T16:00:00Z",
+                "active_event_start": "2026-11-12T13:00:00Z"
+              },
+              "reason_code": "initial_current_value_established",
+              "source_observation_ids": [
+                2310
+              ]
+            },
+            "workflow_event_id": 14133,
+            "workflow_event_uuid": "d379a6ec-351b-4ba8-b8fe-e26775923798"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_schedule:resolve_open_question:2afe47a56e98cc63a5c79ed4e1b45bcaf5fd139b3cd75ea70951a30b799e64b7",
+            "event_type_code": "inquiry_open_question_resolved",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2310",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "resolve_open_question",
+              "field_code": "requested_schedule",
+              "proposed_value": {
+                "active_event_end": "2026-11-12T16:00:00Z",
+                "active_event_start": "2026-11-12T13:00:00Z"
+              },
+              "reason_code": "resolved_by_promoted_value",
+              "source_observation_ids": [
+                2310
+              ]
+            },
+            "workflow_event_id": 14134,
+            "workflow_event_uuid": "1621eaf9-ba6e-4447-8b88-f275a0ff1e73"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:guest_count:promote_current_value:bc34ce89767886b2f833693a834c720a056dbaea53485421802d665097deac95",
+            "event_type_code": "case_fact_promoted_from_observation",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2308",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "promote_current_value",
+              "field_code": "guest_count",
+              "proposed_value": 16,
+              "reason_code": "initial_current_value_established",
+              "source_observation_ids": [
+                2308
+              ]
+            },
+            "workflow_event_id": 14135,
+            "workflow_event_uuid": "263e0166-15f6-45a5-8abc-359c6c8379bf"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:guest_count:resolve_open_question:05a9827cd7ec99bfdd4cf63cb09f23ddc68831c132a236dcb750686c0e35c7d4",
+            "event_type_code": "inquiry_open_question_resolved",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2308",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "resolve_open_question",
+              "field_code": "guest_count",
+              "proposed_value": 16,
+              "reason_code": "resolved_by_promoted_value",
+              "source_observation_ids": [
+                2308
+              ]
+            },
+            "workflow_event_id": 14136,
+            "workflow_event_uuid": "36a800aa-eb89-4cb3-b01e-61e51019174c"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_space:promote_current_value:2d01cfa4c5356a8904e16326ddea75f9bb84a741040b1841b0d9d9f08ca3d599",
+            "event_type_code": "case_fact_promoted_from_observation",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2309",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "promote_current_value",
+              "field_code": "requested_space",
+              "proposed_value": "studio_space",
+              "reason_code": "initial_current_value_established",
+              "source_observation_ids": [
+                2309
+              ]
+            },
+            "workflow_event_id": 14137,
+            "workflow_event_uuid": "57ff00d9-8163-433b-8253-fb4cd7609354"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_space:resolve_open_question:d151841f3b247ba1c9e33fe5138799470f705ace084e437794f48951ea7edc21",
+            "event_type_code": "inquiry_open_question_resolved",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2309",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "resolve_open_question",
+              "field_code": "requested_space",
+              "proposed_value": "studio_space",
+              "reason_code": "resolved_by_promoted_value",
+              "source_observation_ids": [
+                2309
+              ]
+            },
+            "workflow_event_id": 14138,
+            "workflow_event_uuid": "398e6c27-dc09-4e80-8dfd-0c7aaa5e0246"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:event_type:promote_current_value:41e59544a74d8147e9c6c5088e398a4eedca37f48bddb46e934805ab6aab6def",
+            "event_type_code": "case_fact_promoted_from_observation",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2307",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "promote_current_value",
+              "field_code": "event_type",
+              "proposed_value": "planning meeting",
+              "reason_code": "initial_current_value_established",
+              "source_observation_ids": [
+                2307
+              ]
+            },
+            "workflow_event_id": 14139,
+            "workflow_event_uuid": "9a20313f-9ceb-4255-a5e3-f322fdbaea34"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:event_type:resolve_open_question:0cf96764dc6077b7fc47a52efe3eeaa84631ff2bb1cd538be42522e755967102",
+            "event_type_code": "inquiry_open_question_resolved",
+            "occurred_at": "2026-09-27 17:39:31.521493+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:31.521493+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2307",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 2,
+              "current_value": null,
+              "effect_code": "resolve_open_question",
+              "field_code": "event_type",
+              "proposed_value": "planning meeting",
+              "reason_code": "resolved_by_promoted_value",
+              "source_observation_ids": [
+                2307
+              ]
+            },
+            "workflow_event_id": 14140,
+            "workflow_event_uuid": "ded39293-7933-4fe6-bd83-0215f80910ba"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:resolved:1984:2",
+            "event_type_code": "blocker_resolved",
+            "occurred_at": "2026-09-27 17:39:33.40356+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:33.40356+00",
+            "rental_case_id": 508,
+            "source_reference": "blocker:question:1956",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "blocker_id": 1984,
+              "resolution_reference": "resolved:blocker:question:1956"
+            },
+            "workflow_event_id": 14141,
+            "workflow_event_uuid": "6e28961e-3e28-455c-acdf-103f2e22b47a"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:resolved:1985:2",
+            "event_type_code": "blocker_resolved",
+            "occurred_at": "2026-09-27 17:39:33.40356+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:33.40356+00",
+            "rental_case_id": 508,
+            "source_reference": "blocker:question:1957",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "blocker_id": 1985,
+              "resolution_reference": "resolved:blocker:question:1957"
+            },
+            "workflow_event_id": 14142,
+            "workflow_event_uuid": "d5492b49-5df6-416f-889a-d703d4804ffc"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:resolved:1986:2",
+            "event_type_code": "blocker_resolved",
+            "occurred_at": "2026-09-27 17:39:33.40356+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:33.40356+00",
+            "rental_case_id": 508,
+            "source_reference": "blocker:question:1958",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "blocker_id": 1986,
+              "resolution_reference": "resolved:blocker:question:1958"
+            },
+            "workflow_event_id": 14143,
+            "workflow_event_uuid": "28f97aac-7414-434c-9d83-70bbd7690772"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:resolved:1987:2",
+            "event_type_code": "blocker_resolved",
+            "occurred_at": "2026-09-27 17:39:33.40356+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:33.40356+00",
+            "rental_case_id": 508,
+            "source_reference": "blocker:question:1959",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "blocker_id": 1987,
+              "resolution_reference": "resolved:blocker:question:1959"
+            },
+            "workflow_event_id": 14144,
+            "workflow_event_uuid": "4a2857ae-189a-4198-974e-4d04b3ea28fb"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:action:supersede:1100:2",
+            "event_type_code": "workflow_action_superseded",
+            "occurred_at": "2026-09-27 17:39:33.40356+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:33.40356+00",
+            "rental_case_id": 508,
+            "source_reference": "action:REQUEST_CLIENT_INFORMATION:58ec175a1cfeea0b6fc69066649ec03710dea6332295c03a8363ad3cb37aa19f:1",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "idempotency_key": "action:REQUEST_CLIENT_INFORMATION:58ec175a1cfeea0b6fc69066649ec03710dea6332295c03a8363ad3cb37aa19f:1",
+              "workflow_action_id": 1100
+            },
+            "workflow_event_id": 14145,
+            "workflow_event_uuid": "aac5fa8c-6e2d-4359-9a05-7235a1f0c0d1"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "follow_up_status_updated:318:scheduled:cancelled:0",
+            "event_type_code": "follow_up_status_updated",
+            "occurred_at": "2026-09-27 17:39:35.402178+00",
+            "origin_metadata": {
+              "phase": "8.6"
+            },
+            "recorded_at": "2026-09-27 17:39:35.402178+00",
+            "rental_case_id": 508,
+            "source_reference": "follow_up:318",
+            "source_type": "execution_runtime",
+            "structured_payload": {
+              "attempt_count_after": 0,
+              "attempt_count_before": 0,
+              "follow_up_id": 318,
+              "status_after": "cancelled",
+              "status_before": "scheduled"
+            },
+            "workflow_event_id": 14146,
+            "workflow_event_uuid": "c8a0eab6-61b0-4e11-9c15-030b9ff76327"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "governed_client_response_draft_generated:508:2852d64c5f285830532f8aa0250e2c37fa439c64c1350a45c13587f26d1d813a",
+            "event_type_code": "governed_client_response_draft_generated",
+            "occurred_at": "2026-09-27 17:39:45.396927+00",
+            "origin_metadata": {
+              "phase": "8.8a",
+              "surface": "test_console"
+            },
+            "recorded_at": "2026-09-27 17:39:45.396927+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_response_draft:264",
+            "source_type": "test_console",
+            "structured_payload": {
+              "approval_request_id": 324,
+              "context_hash": "fa537332aa37f8c5f0b836fe5a870cc4e48396df019caafecd5f72e913dde239",
+              "contextual_guidance_topics": [
+                "capacity"
+              ],
+              "draft_revision_id": 264,
+              "model": "gpt-5.6-sol",
+              "operator_annotations": [
+                {
+                  "blocking": true,
+                  "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                  "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                  "type": "INTERNAL_CONFIRMATION",
+                  "workflow_action_id": 1101
+                }
+              ],
+              "provider": "openai",
+              "provider_incomplete_reason": null,
+              "provider_request_id": "req_61dcad2e59bf467d802fccd6fcbfe6cf",
+              "provider_response_id": "resp_0346528beddeb574016ab954dc86e087d2b3504add4cfa4735",
+              "provider_response_status": "completed",
+              "resolution_items": [
+                {
+                  "blocking": true,
+                  "client_visibility": "INTERNAL_ONLY",
+                  "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                  "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                  "resolution_owner": "WNC_INTERNAL",
+                  "resolution_status": "ACTION_CREATED",
+                  "workflow_action_id": 1101
+                }
+              ],
+              "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+              "validation_failure_codes": [],
+              "workflow_action_id": 1102
+            },
+            "workflow_event_id": 14147,
+            "workflow_event_uuid": "b9f95dce-2bfd-42f7-a561-70233487805c"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "test_console_raw_evidence_recorded:508:28e64e320671a9ee8bd977c6e7b3d654bcb680293a99389d3193528671bdf1ca",
+            "event_type_code": "test_console_raw_evidence_recorded",
+            "occurred_at": "2026-09-27 17:39:46.946891+00",
+            "origin_metadata": {
+              "phase": "8.8a",
+              "surface": "test_console"
+            },
+            "recorded_at": "2026-09-27 17:39:46.946891+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2605",
+            "source_type": "test_console",
+            "structured_payload": {
+              "body": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+              "case_reference_code": "UAT-006 real-model governed drafting UAT synthetic inquiry",
+              "external_test_reference": "real-model-governed-uat:UAT-006:conversational-drafting-cycle2-20260927-173313:508:turn:2",
+              "inbound_source_record_id": 2605,
+              "received_at": "2026-09-27T17:39:46.946891Z",
+              "sender": "Theo Martin <theo.martin@example.test>",
+              "source_label": "real_model_governed_drafting_uat",
+              "subject": "Re: Initial planning meeting - revised plan"
+            },
+            "workflow_event_id": 14148,
+            "workflow_event_uuid": "76866968-93e5-4e41-bdeb-9d24ef810adf"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2606:guest_count|change_candidate|change_request|test_console:guest_count|30|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:48.005308+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:48.005308+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2606",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "create_proposed_change",
+              "failure_codes": [],
+              "inbound_observation_id": 2311,
+              "inbound_source_record_id": 2606,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": 29,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "existing_value_changed",
+                "material_impact"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14149,
+            "workflow_event_uuid": "52f60abc-36b0-4f3b-a52e-fc0925a7c422"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2607:requested_rental_scope|change_candidate|change_request|test_console:requested_rental_scope|\"entire_venue\"|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:49.215436+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:49.215436+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2607",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "no_workflow_effect",
+              "failure_codes": [],
+              "inbound_observation_id": 2312,
+              "inbound_source_record_id": 2607,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": null,
+              "reason_codes": [
+                "new_information_candidate",
+                "no_direct_truth_mutation"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14150,
+            "workflow_event_uuid": "b280f0f9-c6d6-49b4-8319-16d72e1c37f5"
+          },
+          {
+            "actor_reference": "real_model_governed_uat:UAT-006",
+            "actor_type": "operator",
+            "event_identity_key": "inbound-observation:2608:active_event_window|change_candidate|change_request|test_console:active_event_window|{\"active_event_end\":\"2026-11-13T20:00:00Z\",\"active_event_start\":\"2026-11-13T15:00:00Z\"}|",
+            "event_type_code": "inbound_observation_recorded",
+            "occurred_at": "2026-09-27 17:39:50.236957+00",
+            "origin_metadata": {
+              "phase": "8.3"
+            },
+            "recorded_at": "2026-09-27 17:39:50.236957+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_source_record:2608",
+            "source_type": "inbound_observation",
+            "structured_payload": {
+              "disposition_code": "create_reschedule_request",
+              "failure_codes": [],
+              "inbound_observation_id": 2313,
+              "inbound_source_record_id": 2608,
+              "linked_case_decision_id": null,
+              "linked_open_question_id": null,
+              "linked_proposed_change_id": null,
+              "linked_requirement_id": null,
+              "linked_reschedule_request_id": 33,
+              "reason_codes": [
+                "reschedule_candidate"
+              ],
+              "revalidation_required": true,
+              "stale_observation": false
+            },
+            "workflow_event_id": 14151,
+            "workflow_event_uuid": "02078f74-77d6-49d0-bc3b-66f7adfb2bb6"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry-intake:requested_space:create_proposed_change:5d385e24540d37743f6dbe4d004420641c2f2c2e715c000f6df70e54673324c9",
+            "event_type_code": "inquiry_change_proposed",
+            "occurred_at": "2026-09-27 17:39:51.596456+00",
+            "origin_metadata": {
+              "phase": "8.8b"
+            },
+            "recorded_at": "2026-09-27 17:39:51.596456+00",
+            "rental_case_id": 508,
+            "source_reference": "inbound_observation:2312",
+            "source_type": "inquiry_intake_runtime",
+            "structured_payload": {
+              "case_revision": 3,
+              "current_value": "studio_space",
+              "effect_code": "create_proposed_change",
+              "field_code": "requested_space",
+              "proposed_value": "entire_venue",
+              "reason_code": "existing_value_changed",
+              "source_observation_ids": [
+                2312
+              ]
+            },
+            "workflow_event_id": 14152,
+            "workflow_event_uuid": "88695965-7efc-4853-8529-5ae6197e3b7a"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "inquiry_response_draft_invalidated_stale:508:1d6c5c7f2f077026d6d78aaf0fbb4b880797fc92d3475b4ba92d40b9e7d1e181",
+            "event_type_code": "inquiry_response_draft_invalidated_stale",
+            "occurred_at": "2026-09-27 17:39:52.112742+00",
+            "origin_metadata": {
+              "phase": "8.8a",
+              "surface": "test_console"
+            },
+            "recorded_at": "2026-09-27 17:39:52.112742+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_response_draft:264",
+            "source_type": "test_console",
+            "structured_payload": {
+              "current_case_revision": 3,
+              "draft_revision_id": 264,
+              "source_case_revision": 2,
+              "workflow_action_id": 1102
+            },
+            "workflow_event_id": 14153,
+            "workflow_event_uuid": "e8e79746-5e03-4f56-b6ae-67bdf222b023"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:blocker:create:blocker:change:review:29:3",
+            "event_type_code": "orchestration_blocker_created",
+            "occurred_at": "2026-09-27 17:39:53.604346+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:53.604346+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_PROPOSED_CHANGE_REVIEW",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "rule_code": "RULE_PROPOSED_CHANGE_REVIEW",
+              "semantic_issue_key": "blocker:change:review:29"
+            },
+            "workflow_event_id": 14154,
+            "workflow_event_uuid": "cba1b809-d9fa-497a-978e-9c6300632d74"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:action:create:1103:3",
+            "event_type_code": "workflow_action_created",
+            "occurred_at": "2026-09-27 17:39:53.604346+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:53.604346+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_PROPOSED_CHANGE_REVIEW",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "action_type": "CREATE_INTERNAL_TASK_ITEM",
+              "approval_posture": "automatic_allowed",
+              "rule_code": "RULE_PROPOSED_CHANGE_REVIEW",
+              "status": "ready_to_execute",
+              "workflow_action_id": 1103
+            },
+            "workflow_event_id": 14155,
+            "workflow_event_uuid": "eaa404d9-fa28-4d10-92c8-e65d42b1534c"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:action:create:1104:3",
+            "event_type_code": "workflow_action_created",
+            "occurred_at": "2026-09-27 17:39:53.604346+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:53.604346+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_PROPOSED_CHANGE_REVIEW",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "action_type": "CREATE_INTERNAL_TASK_ITEM",
+              "approval_posture": "automatic_allowed",
+              "rule_code": "RULE_PROPOSED_CHANGE_REVIEW",
+              "status": "ready_to_execute",
+              "workflow_action_id": 1104
+            },
+            "workflow_event_id": 14156,
+            "workflow_event_uuid": "48601b35-9eb3-4ea5-b2e8-d9cd5314de1a"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:action:create:1105:3",
+            "event_type_code": "workflow_action_created",
+            "occurred_at": "2026-09-27 17:39:53.604346+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:53.604346+00",
+            "rental_case_id": 508,
+            "source_reference": "RULE_RESCHEDULE_REVIEW",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "action_type": "CREATE_INTERNAL_TASK_ITEM",
+              "approval_posture": "automatic_allowed",
+              "rule_code": "RULE_RESCHEDULE_REVIEW",
+              "status": "ready_to_execute",
+              "workflow_action_id": 1105
+            },
+            "workflow_event_id": 14157,
+            "workflow_event_uuid": "193107bb-94dc-4c7a-abd0-a2c7ba3883d5"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "orchestration:action:supersede:1101:3",
+            "event_type_code": "workflow_action_superseded",
+            "occurred_at": "2026-09-27 17:39:53.604346+00",
+            "origin_metadata": {
+              "phase": "8.5r"
+            },
+            "recorded_at": "2026-09-27 17:39:53.604346+00",
+            "rental_case_id": 508,
+            "source_reference": "context_aware_resolution:508:availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00:REQUIRED:revision:2",
+            "source_type": "orchestration_runtime",
+            "structured_payload": {
+              "idempotency_key": "context_aware_resolution:508:availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00:REQUIRED:revision:2",
+              "workflow_action_id": 1101
+            },
+            "workflow_event_id": 14158,
+            "workflow_event_uuid": "06e8ba97-f1dd-4e40-82fb-8a836392fe73"
+          },
+          {
+            "actor_reference": "test_console:operator",
+            "actor_type": "operator",
+            "event_identity_key": "governed_client_response_draft_generated:508:b56ed830e94ad606bf31735bb2b6f71832d473b2707648c8ac77baa19372e764",
+            "event_type_code": "governed_client_response_draft_generated",
+            "occurred_at": "2026-09-27 17:40:04.136342+00",
+            "origin_metadata": {
+              "phase": "8.8a",
+              "surface": "test_console"
+            },
+            "recorded_at": "2026-09-27 17:40:04.136342+00",
+            "rental_case_id": 508,
+            "source_reference": "inquiry_response_draft:265",
+            "source_type": "test_console",
+            "structured_payload": {
+              "approval_request_id": 325,
+              "context_hash": "4465faaa10a16f2127fe8c371e2de61fb37a162af5b1aaae4fe13ce9fae8f33e",
+              "contextual_guidance_topics": [
+                "capacity"
+              ],
+              "draft_revision_id": 265,
+              "model": "gpt-5.6-sol",
+              "operator_annotations": [
+                {
+                  "blocking": true,
+                  "message": "The proposed change must be accepted, rejected, or superseded",
+                  "proposition_key": "blocker:1988",
+                  "type": "INTERNAL_CONFIRMATION",
+                  "workflow_action_id": 1106
+                },
+                {
+                  "blocking": true,
+                  "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                  "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                  "type": "INTERNAL_CONFIRMATION",
+                  "workflow_action_id": 1107
+                }
+              ],
+              "provider": "openai",
+              "provider_incomplete_reason": null,
+              "provider_request_id": "req_0b2c5fa320bc4fe78a02636ef4ad17ee",
+              "provider_response_id": "resp_08e03a1b17dfb688016ab954f025e087d2b9392b10c2d70ee9",
+              "provider_response_status": "completed",
+              "resolution_items": [
+                {
+                  "blocking": true,
+                  "client_visibility": "INTERNAL_ONLY",
+                  "message": "The proposed change must be accepted, rejected, or superseded",
+                  "proposition_key": "blocker:1988",
+                  "resolution_owner": "WNC_INTERNAL",
+                  "resolution_status": "ACTION_CREATED",
+                  "workflow_action_id": 1106
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "INTERNAL_ONLY",
+                  "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                  "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                  "resolution_owner": "WNC_INTERNAL",
+                  "resolution_status": "ACTION_CREATED",
+                  "workflow_action_id": 1107
+                }
+              ],
+              "response_intent": "CHANGE_ACKNOWLEDGEMENT",
+              "validation_failure_codes": [],
+              "workflow_action_id": 1108
+            },
+            "workflow_event_id": 14159,
+            "workflow_event_uuid": "9222e22b-481a-4d74-bf39-881635b57656"
+          }
+        ]
+      },
+      "provider_mode_lines": [
+        "REAL PROVIDER EXECUTION ENABLED",
+        "outlook -> Microsoft Graph (canonical governed actions only)",
+        "task_surface -> Asana"
+      ],
+      "simulated_outlook_threads": [
+        {
+          "approval_blocked_by_operator_annotations": true,
+          "can_edit": true,
+          "can_generate": false,
+          "can_regenerate": true,
+          "can_simulate_send": false,
+          "conversation_key": "governed_client_response:508",
+          "current_display_status": "needs_approval",
+          "current_revision": {
+            "approval_request_id": 325,
+            "approved_at": null,
+            "body_text": "Hi Theo,\n\nThanks for the update. I\u2019ve changed the enquiry to the entire venue for 30 guests on 13 November 2026, from 15:00 to 20:00. I\u2019ll check the new date and venue request and get back to you.",
+            "closing_text": "Warm regards,",
+            "content_hash": "9f3ed5b6ebea0172874b203430d2aaa8b907e218aa19ad72f2eecf68584268a4",
+            "context_hash": "c181740d88c5cd90a763623ceaa497beeab8e706f2f40b7eb3db6ccd875d4857",
+            "context_payload": {
+              "allow_empty_open_questions": true,
+              "contact_label": "Theo Martin",
+              "contextual_guidance": [
+                {
+                  "client_safe_guidance": "The requested 16 guests are within the current capacity rules for studio space. The applicable maximum is 40 guests. ",
+                  "source_reference": "phase4:capacity_studio_within_all_published_limits",
+                  "topic": "capacity"
+                }
+              ],
+              "conversation_key": "governed_client_response:508",
+              "current_facts": [
+                {
+                  "domain_code": "event_profile",
+                  "field_code": "guest_count",
+                  "value_payload": 16
+                },
+                {
+                  "domain_code": "event_profile",
+                  "field_code": "event_type",
+                  "value_payload": "planning meeting"
+                }
+              ],
+              "guidance_references": [
+                "WF-003",
+                "WF-004"
+              ],
+              "metadata_summary_lines": [
+                "Governed response intent: CHANGE_ACKNOWLEDGEMENT",
+                "Contract hash: 4465faaa10a16f2127fe8c371e2de61fb37a162af5b1aaae4fe13ce9fae8f33e"
+              ],
+              "open_questions": [],
+              "operator_annotations": [
+                {
+                  "blocking": true,
+                  "message": "The proposed change must be accepted, rejected, or superseded",
+                  "proposition_key": "blocker:1988",
+                  "type": "INTERNAL_CONFIRMATION",
+                  "workflow_action_id": 1106
+                },
+                {
+                  "blocking": true,
+                  "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                  "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                  "type": "INTERNAL_CONFIRMATION",
+                  "workflow_action_id": 1107
+                }
+              ],
+              "recipient_email": "theo.martin@example.test",
+              "recipient_label": "Theo Martin",
+              "rental_case_id": 508,
+              "resolution_items": [
+                {
+                  "blocking": true,
+                  "client_visibility": "INTERNAL_ONLY",
+                  "message": "The proposed change must be accepted, rejected, or superseded",
+                  "proposition_key": "blocker:1988",
+                  "resolution_owner": "WNC_INTERNAL",
+                  "resolution_status": "ACTION_CREATED",
+                  "workflow_action_id": 1106
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "INTERNAL_ONLY",
+                  "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                  "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                  "resolution_owner": "WNC_INTERNAL",
+                  "resolution_status": "ACTION_CREATED",
+                  "workflow_action_id": 1107
+                }
+              ],
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "source_case_revision": 3,
+              "workflow_action_id": 1108
+            },
+            "conversation_key": "governed_client_response:508",
+            "created_at": "2026-09-27 17:40:03.689694+00",
+            "created_by_reference": "test_console:operator",
+            "delivered_at": null,
+            "delivery_external_reference": null,
+            "delivery_failure_code": null,
+            "draft_source": "generated",
+            "draft_status": "needs_approval",
+            "inquiry_response_draft_revision_id": 265,
+            "inquiry_response_draft_revision_uuid": "4a0a907d-159b-4afa-bbcc-7a930547a823",
+            "intro_text": "Governed client response.",
+            "is_current": true,
+            "question_lines": [],
+            "recipient_email": "theo.martin@example.test",
+            "recipient_label": "Theo Martin",
+            "rejected_at": null,
+            "rental_case_id": 508,
+            "salutation": "Hello,",
+            "sender_display_name": null,
+            "sender_email": "wnc-rentals-simulated@example.test",
+            "sender_label": "WNC Rentals (Simulated)",
+            "signoff_text": "WNC Rentals",
+            "source_case_revision": 3,
+            "subject": "Updated venue enquiry",
+            "supersedes_draft_revision_id": null,
+            "updated_at": "2026-09-27 17:40:04.108732+00",
+            "workflow_action_id": 1108
+          },
+          "draft_history": [
+            {
+              "approval_request_id": 325,
+              "approved_at": null,
+              "body_text": "Hi Theo,\n\nThanks for the update. I\u2019ve changed the enquiry to the entire venue for 30 guests on 13 November 2026, from 15:00 to 20:00. I\u2019ll check the new date and venue request and get back to you.",
+              "closing_text": "Warm regards,",
+              "content_hash": "9f3ed5b6ebea0172874b203430d2aaa8b907e218aa19ad72f2eecf68584268a4",
+              "context_hash": "c181740d88c5cd90a763623ceaa497beeab8e706f2f40b7eb3db6ccd875d4857",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Theo Martin",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "The requested 16 guests are within the current capacity rules for studio space. The applicable maximum is 40 guests. ",
+                    "source_reference": "phase4:capacity_studio_within_all_published_limits",
+                    "topic": "capacity"
+                  }
+                ],
+                "conversation_key": "governed_client_response:508",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 16
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "planning meeting"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: CHANGE_ACKNOWLEDGEMENT",
+                  "Contract hash: 4465faaa10a16f2127fe8c371e2de61fb37a162af5b1aaae4fe13ce9fae8f33e"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "The proposed change must be accepted, rejected, or superseded",
+                    "proposition_key": "blocker:1988",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1106
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                    "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1107
+                  }
+                ],
+                "recipient_email": "theo.martin@example.test",
+                "recipient_label": "Theo Martin",
+                "rental_case_id": 508,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "The proposed change must be accepted, rejected, or superseded",
+                    "proposition_key": "blocker:1988",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1106
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                    "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1107
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 3,
+                "workflow_action_id": 1108
+              },
+              "conversation_key": "governed_client_response:508",
+              "created_at": "2026-09-27 17:40:03.689694+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 265,
+              "inquiry_response_draft_revision_uuid": "4a0a907d-159b-4afa-bbcc-7a930547a823",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [],
+              "recipient_email": "theo.martin@example.test",
+              "recipient_label": "Theo Martin",
+              "rejected_at": null,
+              "rental_case_id": 508,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 3,
+              "subject": "Updated venue enquiry",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-09-27 17:40:04.108732+00",
+              "workflow_action_id": 1108
+            },
+            {
+              "approval_request_id": 324,
+              "approved_at": null,
+              "body_text": "Hi Theo,\n\nThe Studio is suitable for your 16-person planning meeting. I\u2019ll check availability for 12 November 2026 from 13:00 to 16:00 and get back to you.",
+              "closing_text": "Warm regards,",
+              "content_hash": "c74d9ff02a4fdb2addb176cb48378e807b6f525868cb545d62b0d32d4dcb5ccc",
+              "context_hash": "eab63042f1f9c8348265bed4b3f5942bf0d7a39034af9e4179e30e68a1b2fad2",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Theo Martin",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "The requested 16 guests are within the current capacity rules for studio space. The applicable maximum is 40 guests. ",
+                    "source_reference": "phase4:capacity_studio_within_all_published_limits",
+                    "topic": "capacity"
+                  }
+                ],
+                "conversation_key": "governed_client_response:508",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 16
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "planning meeting"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: COMPLETE_INQUIRY_RESPONSE",
+                  "Contract hash: fa537332aa37f8c5f0b836fe5a870cc4e48396df019caafecd5f72e913dde239"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                    "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1101
+                  }
+                ],
+                "recipient_email": "theo.martin@example.test",
+                "recipient_label": "Theo Martin",
+                "rental_case_id": 508,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+                    "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1101
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 2,
+                "workflow_action_id": 1102
+              },
+              "conversation_key": "governed_client_response:508",
+              "created_at": "2026-09-27 17:39:44.921075+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 264,
+              "inquiry_response_draft_revision_uuid": "e184b71f-d678-491f-b8ee-9b311445100f",
+              "intro_text": "Governed client response.",
+              "is_current": false,
+              "question_lines": [],
+              "recipient_email": "theo.martin@example.test",
+              "recipient_label": "Theo Martin",
+              "rejected_at": null,
+              "rental_case_id": 508,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 2,
+              "subject": "Studio planning meeting",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-09-27 17:39:52.000586+00",
+              "workflow_action_id": 1102
+            }
+          ],
+          "open_approval_request_id": 325,
+          "question_labels": [],
+          "recipient_email": "theo.martin@example.test",
+          "status_note": null,
+          "thread_label": "Updated venue enquiry",
+          "workflow_action_id": 1108,
+          "workflow_action_status": "awaiting_approval"
+        },
+        {
+          "approval_blocked_by_operator_annotations": false,
+          "can_edit": false,
+          "can_generate": false,
+          "can_regenerate": false,
+          "can_simulate_send": false,
+          "conversation_key": "action:REQUEST_CLIENT_INFORMATION:58ec175a1cfeea0b6fc69066649ec03710dea6332295c03a8363ad3cb37aa19f:1",
+          "current_display_status": null,
+          "current_revision": null,
+          "draft_history": [],
+          "open_approval_request_id": null,
+          "question_labels": [],
+          "recipient_email": "theo.martin@example.test",
+          "status_note": "The current workflow action is stale and needs to be regenerated from the latest case truth.",
+          "thread_label": "Inquiry response for action 1100",
+          "workflow_action_id": 1100,
+          "workflow_action_status": "superseded"
+        }
+      ],
+      "test_metadata_lines": [
+        "Label: UAT-006 Client changes the plan conversational-drafting-cycle2-20260927-173313",
+        "Client / company: Theo Martin",
+        "Test contact email: theo.martin@example.test",
+        "Event reference: UAT-006 real-model governed drafting UAT synthetic inquiry",
+        "Created by: test_console:operator"
+      ],
+      "timeline_notice": null,
+      "workflow_event_limit": 100,
+      "workflow_event_total_count": 43,
+      "working_proposal": {
+        "approvals": [
+          {
+            "detail": "Approve inquiry response draft revision 265 before simulated send.",
+            "label": "Client Communication Send",
+            "source": "workflow_action:1108:draft_revision:265",
+            "state": "blocked",
+            "value": "Open"
+          }
+        ],
+        "blockers": [
+          {
+            "detail": "The proposed change must be accepted, rejected, or superseded.",
+            "label": "Proposed Change Review Required",
+            "source": "proposed_change:29",
+            "state": "blocked",
+            "value": "Medium"
+          }
+        ],
+        "changes": [
+          {
+            "detail": "Status: Proposed. Current: 16. Proposed: 30. Impact: Material Impact. Review posture: Human Only.",
+            "label": "Guest Count",
+            "source": "inbound_observation:2311",
+            "state": "proposed",
+            "value": "30"
+          },
+          {
+            "detail": "Status: Proposed. Current: Studio Space. Proposed: Entire Venue.",
+            "label": "Requested Rental Scope",
+            "source": "inbound_observation:2312",
+            "state": "proposed",
+            "value": "Entire Venue"
+          },
+          {
+            "detail": "Current active schedule: 2026-11-12 | 13:00 - 16:00. Status: Proposed.",
+            "label": "Reschedule request",
+            "source": "reschedule_request:33",
+            "state": "proposed",
+            "value": "2026-11-13 | 15:00 - 20:00"
+          }
+        ],
+        "commercial_snapshot": [
+          {
+            "detail": "Derived from the current active event window.",
+            "label": "Booking fee baseline",
+            "source": "COM-001-XLSM, GOV-002, COM-001-XLSX",
+            "state": "current",
+            "value": "EUR 50 excl. VAT"
+          },
+          {
+            "detail": "Derived from the current active event window.",
+            "label": "VAT",
+            "source": "COM-001-XLSM, GOV-002, COM-001-XLSX",
+            "state": "reference",
+            "value": "21%"
+          },
+          {
+            "detail": null,
+            "label": "Case-specific exceptions",
+            "source": null,
+            "state": "none",
+            "value": "None"
+          },
+          {
+            "detail": "No approved case-specific booking-fee exception is active. Derived from the current active event window.",
+            "label": "Effective booking fee",
+            "source": "COM-001-XLSM, GOV-002, COM-001-XLSX",
+            "state": "current",
+            "value": "EUR 50 excl. VAT"
+          },
+          {
+            "detail": null,
+            "label": "Unresolved commercial items",
+            "source": null,
+            "state": "none",
+            "value": "0"
+          }
+        ],
+        "communication": [
+          {
+            "detail": "From Theo Martin <theo.martin@example.test> via real_model_governed_drafting_uat on 2026-09-27 17:39.",
+            "label": "Last inbound communication",
+            "source": null,
+            "state": "reference",
+            "value": "Re: Initial planning meeting - revised plan"
+          },
+          {
+            "detail": "Why: operator_requested_governed_client_response",
+            "label": "Latest outbound workflow action",
+            "source": "governed_client_response:508",
+            "state": "blocked",
+            "value": "Send Inquiry Response"
+          }
+        ],
+        "feasibility_snapshot": [
+          {
+            "detail": null,
+            "label": "Feasibility as requested",
+            "source": null,
+            "state": "unresolved",
+            "value": "Not yet evaluated"
+          },
+          {
+            "detail": null,
+            "label": "Supported alternative",
+            "source": null,
+            "state": "unresolved",
+            "value": "Not established"
+          },
+          {
+            "detail": null,
+            "label": "Confirmation still required",
+            "source": null,
+            "state": "none",
+            "value": "No"
+          },
+          {
+            "detail": null,
+            "label": "Hard constraint",
+            "source": "proposed_change:29",
+            "state": "blocked",
+            "value": "The proposed change must be accepted, rejected, or superseded."
+          }
+        ],
+        "missing_client_information": [
+          {
+            "detail": null,
+            "label": "Outstanding client information",
+            "source": null,
+            "state": "none",
+            "value": "None"
+          }
+        ],
+        "next_actions": [
+          {
+            "detail": "Why: operator_requested_governed_client_response",
+            "label": "Send Inquiry Response",
+            "source": "governed_client_response:508",
+            "state": "blocked",
+            "value": "Awaiting Approval"
+          },
+          {
+            "detail": "Why: Review proposed change 29 (material_impact).",
+            "label": "Review proposed change 29 (material_impact).",
+            "source": "proposed_change:29",
+            "state": "current",
+            "value": "Ready To Execute"
+          },
+          {
+            "detail": "Why: Review proposed change 30 (unknown_impact).",
+            "label": "Review proposed change 30 (unknown_impact).",
+            "source": "proposed_change:30",
+            "state": "current",
+            "value": "Ready To Execute"
+          },
+          {
+            "detail": "Why: Structured reschedule review is required before any downstream action. Requested schedule: 2026-11-13 | 15:00 - 20:00 [Proposed].",
+            "label": "Review reschedule request 33.",
+            "source": "reschedule_request:33",
+            "state": "current",
+            "value": "Ready To Execute"
+          },
+          {
+            "detail": "Why: context_aware_governed_draft_resolution",
+            "label": "Confirm: The proposed change must be accepted, rejected, or superseded",
+            "source": "blocker:1988",
+            "state": "current",
+            "value": "Ready To Execute"
+          },
+          {
+            "detail": "Why: context_aware_governed_draft_resolution",
+            "label": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 16:00:00+00",
+            "source": "availability:2026-11-12 13:00:00+00:2026-11-12 16:00:00+00",
+            "state": "current",
+            "value": "Ready To Execute"
+          },
+          {
+            "detail": "Why: operator_requested_governed_client_response",
+            "label": "Send Inquiry Response",
+            "source": "governed_client_response:508",
+            "state": "blocked",
+            "value": "Awaiting Approval"
+          }
+        ],
+        "operations": [
+          {
+            "detail": null,
+            "label": "Current working scope",
+            "source": null,
+            "state": "none",
+            "value": "No structured operational facts are established yet."
+          }
+        ],
+        "proposal_freshness": [
+          {
+            "detail": null,
+            "label": "Proposal artifact",
+            "source": null,
+            "state": "unresolved",
+            "value": "Not yet established"
+          }
+        ],
+        "rental_snapshot": [
+          {
+            "detail": null,
+            "label": "Client / company",
+            "source": null,
+            "state": "current",
+            "value": "Theo Martin"
+          },
+          {
+            "detail": null,
+            "label": "Working scope label",
+            "source": null,
+            "state": "current",
+            "value": "UAT-006 Client changes the plan conversational-drafting-cycle2-20260927-173313"
+          },
+          {
+            "detail": null,
+            "label": "Rental type",
+            "source": null,
+            "state": "current",
+            "value": "Studio Space"
+          },
+          {
+            "detail": null,
+            "label": "Requested spaces",
+            "source": null,
+            "state": "current",
+            "value": "Studio Space"
+          },
+          {
+            "detail": null,
+            "label": "Lifecycle status",
+            "source": null,
+            "state": "current",
+            "value": "Inquiry Active"
+          },
+          {
+            "detail": null,
+            "label": "Inquiry reference",
+            "source": null,
+            "state": "reference",
+            "value": "UAT-006 real-model governed drafting UAT synthetic inquiry"
+          },
+          {
+            "detail": null,
+            "label": "Observed requested space",
+            "source": "operator_note / real_model_governed_uat:UAT-006",
+            "state": "proposed",
+            "value": "Entire Venue"
+          },
+          {
+            "detail": null,
+            "label": "Event date",
+            "source": null,
+            "state": "current",
+            "value": "2026-11-12"
+          },
+          {
+            "detail": null,
+            "label": "Event time",
+            "source": null,
+            "state": "current",
+            "value": "13:00 - 16:00"
+          },
+          {
+            "detail": "Reschedule status: Proposed.",
+            "label": "Proposed event date",
+            "source": "reschedule_request:33",
+            "state": "proposed",
+            "value": "2026-11-13"
+          },
+          {
+            "detail": null,
+            "label": "Proposed event time",
+            "source": "reschedule_request:33",
+            "state": "proposed",
+            "value": "15:00 - 20:00"
+          },
+          {
+            "detail": null,
+            "label": "Guest count",
+            "source": null,
+            "state": "current",
+            "value": "16"
+          },
+          {
+            "detail": null,
+            "label": "Observed guest count",
+            "source": "operator_note / real_model_governed_uat:UAT-006",
+            "state": "proposed",
+            "value": "30"
+          },
+          {
+            "detail": null,
+            "label": "Event type",
+            "source": null,
+            "state": "current",
+            "value": "Planning Meeting"
+          },
+          {
+            "detail": null,
+            "label": "Observed event type",
+            "source": "operator_note / real_model_governed_uat:UAT-006",
+            "state": "proposed",
+            "value": "Planning Meeting"
+          }
+        ],
+        "requirements": [
+          {
+            "detail": null,
+            "label": "Outstanding requirements",
+            "source": null,
+            "state": "none",
+            "value": "None"
+          }
+        ],
+        "warnings": [
+          {
+            "detail": "Deterministic Current",
+            "label": "Current authority warning",
+            "source": "test-console-projection:d20e2856da26a6971b80597b536e66370d0a3c653b5e2fce02d345103b807ece",
+            "state": "blocked",
+            "value": "Deterministic Current"
+          },
+          {
+            "detail": "Deterministic Current",
+            "label": "Current authority warning",
+            "source": "test-console-projection:c19ceff52fa542f8fa760b5f17e923e5367f86eab6625aa1bbbd4705c852be7e",
+            "state": "blocked",
+            "value": "Deterministic Current"
+          }
+        ]
+      }
+    },
+    "clock": {
+      "current_time": "2026-09-27T17:49:25.829969Z",
+      "real_current_time": "2026-09-27T17:49:25.829950Z",
+      "simulated": false
+    },
+    "clock_controls_enabled": false,
+    "environment": "staging"
+  }
+}

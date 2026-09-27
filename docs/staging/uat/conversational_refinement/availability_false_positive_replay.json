@@ -1,0 +1,13 @@
+{
+  "source": "autonomous_remediation/cycle3_database_audit.json: case 466 rejected candidate",
+  "subject": "Awards evening on 22 October 2026",
+  "body": "Hi Priya,\n\nThanks for getting in touch. An awards evening for 65 guests is within the whole-venue capacity of 110.\n\nI’ll check whether the venue is available for exclusive use on 22 October 2026 from 18:00 to 23:00. The booking fee is EUR 250 excl. VAT, with VAT at 21%.",
+  "body_sha256": "a5f3157f0edc76337c303ddbd602dd8126dab5a2695f30ee5867df87af4bba42",
+  "original_failure_codes": [
+    "unsupported_availability_or_confirmation"
+  ],
+  "current_failure_codes": [],
+  "result": "PASS",
+  "scope": "Provider-free validator regression with the recorded candidate and matching EUR 250 commercial test fixture; not approval or execution readiness for any historical action.",
+  "provider_calls": 0
+}

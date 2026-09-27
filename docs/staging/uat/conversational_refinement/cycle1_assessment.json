@@ -1,0 +1,685 @@
+{
+  "method": "Direct assistant editorial review of exact synthetic drafts and governed context; independent of the previous numeric grades, no external LLM judge. Flags are subjective editorial assessments; hashes bind reviews to text.",
+  "metrics": {
+    "attempted_turns": 21,
+    "accepted_drafts": 20,
+    "turn_coverage_percent": 95.24,
+    "grades": {
+      "A": 12,
+      "B": 8
+    },
+    "mean_scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4.15,
+      "naturalness": 4.55,
+      "clarity": 4.9,
+      "concision": 4.75,
+      "next_step_clarity": 4.85,
+      "operator_confidence": 4.65
+    },
+    "mean_body_words": 44.2,
+    "human_likeness_flags": {
+      "unnecessary_information": 0,
+      "repeated_information": 2,
+      "policy_copy_feel": 5,
+      "could_be_materially_shorter": 4
+    },
+    "human_operator_failures": 8,
+    "editorial_flags": {
+      "robotic_phrasing": 5,
+      "repeated_policy_block": 2,
+      "system_like_explanation": 1,
+      "unanswered_client_request": 1
+    },
+    "safety_flags": {}
+  },
+  "variation": {
+    "opening_frequency": {
+      "The booking fee is EUR 75 excl": 1,
+      "Thanks for considering WNC for your team offsite": 1,
+      "The whole venue can accommodate an awards evening for 65 colleagues": 1,
+      "Background music is supported": 1,
+      "Understood": 3,
+      "The Studio can accommodate 18 people, and I’ll check the space and a WNC facilitator for 5 November 2026, from 09:30 to 17:00": 1,
+      "A simple buffet should work well with the kitchen, which is best suited to ready-made food, warming, plating and easy assembly rather than large-scale preparation": 1,
+      "The Studio is suitable for your 16-person planning meeting": 1,
+      "I’ve updated the enquiry to 30 guests and the entire venue for 13 November 2026, from 15:00 to 20:00": 1,
+      "A 26-person supper club with an external caterer sounds lovely": 1,
+      "For your leadership session, the booking fee is EUR 75 excl": 1,
+      "Lovely to hear you’re considering another salon with us": 1,
+      "A custom suspended aerial performance rig would need specific technical approval, so I cannot confirm it as included at this stage": 1,
+      "Light background music is supported, and basic slide projection may be possible using the WNC projector, subject to confirming file compatibility, adapters and whether a screenless setup works for you": 1,
+      "Thanks, 24 guests and a roughly 20-minute welcome are helpful details": 1,
+      "Thanks, I have the requested timing as 21 January 2027, from 17:00 to 21:00": 1,
+      "The Studio can accommodate your 16-person planning session": 1,
+      "Thanks for the update": 1
+    },
+    "ending_frequency": {
+      "I’ll check the Studio’s availability for your 20-person workshop on 14 October 2026 from 10:00 to 14:00 and come back to you with the next step.": 1,
+      "Could you send over:\n\n• Your preferred date, including the year, and start and finish times\n• Your expected guest count\n• The type of offsite or activities you’re planning\n• Whether you have a particular space or rental scope in mind\n\nOnce I have those details, I can give you a clearer idea of what would work.": 1,
+      "I’ll check availability for 22 October 2026 from 18:00 to 23:00 and come back to you.": 1,
+      "A small hologram display would be a custom technical setup, so I’ll also check what is realistic for your event.": 1,
+      "Basic projection may be possible with the WNC projector, and I’ll check the file compatibility, any adapters needed, and whether a screenless setup will work.": 1,
+      "The kitchen is best suited to ready-made food, warming, plating and simple assembly rather than large-scale preparation, so please share their planned format and equipment needs.": 1,
+      "I’ll check the morning facilitation options with your flexibility in mind.": 1,
+      "I’ll check availability for 12 November 2026 from 13:00 to 16:00 and get back to you.": 1,
+      "I’ll check the revised request and get back to you.": 1,
+      "To check the date, what year is the 19 November booking for, and what start and finish times would you like?": 1,
+      "I can’t assess whether the usual pricing will fit your budget without a budget figure, but I’ll keep your cost sensitivity in mind.": 1,
+      "VAT, and I’ll check whether we can waive it for this booking as you requested.": 1,
+      "VAT, with 21% VAT, and I’ll check your waiver request for this event.": 1,
+      "I’ll check whether it can be accommodated for your investor dinner on 10 December 2026 and come back to you with what is possible.": 1,
+      "Deliveries, unloading and setup must take place within the rental period unless earlier access is approved in writing.": 1,
+      "How many guests do you expect?": 1,
+      "When you have it, what full date, including the year, and start and finish times are you considering?": 1,
+      "I’ll check how this fits with the Studio and facilitator options.": 1,
+      "I’ll check availability for 7 February 2027 from 10:00 to 13:00 and come back to you.": 1,
+      "I’ll check whether the same planning session can be moved to 8 February 2027 from 14:00 to 17:00 and get back to you.": 1
+    },
+    "phrase_counts": {
+      "I will check": 16,
+      "I have noted": 0,
+      "capacity maximum": 0,
+      "booking fee": 5
+    }
+  },
+  "assessments": [
+    {
+      "scenario_id": "UAT-001",
+      "turn": 1,
+      "draft_revision_id": 237,
+      "content_hash": "366d7070f91446d4676c619ac4c3ce7775c431f55f92bbaf75432c12ce19319d",
+      "body_word_count": 39,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Direct fee answer and specific next step; no irrelevant capacity maximum. Greeting is professional though not especially warm.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-002",
+      "turn": 1,
+      "draft_revision_id": 238,
+      "content_hash": "43fc2884907b6719192475f89691b3d1036ca6a0f996ea52cea7761224dc3f07",
+      "body_word_count": 78,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 5,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Warm opening and a justified list of four missing planning details; no policy or fee invention.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-003",
+      "turn": 1,
+      "draft_revision_id": 239,
+      "content_hash": "b578f07c18d3249b28d249f130c3574ba19ce82ab6f726530a96ab9a26b32dbb",
+      "body_word_count": 29,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Answers accommodation in one natural sentence and separates the date check without quoting the maximum.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-004",
+      "turn": 1,
+      "draft_revision_id": 240,
+      "content_hash": "8e5e267d78ba13f3cbd379fa5271af8de7e966c2c52a2e8b7689c7a010d14ee9",
+      "body_word_count": 58,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 4,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Well compressed and technically accurate, but Background music is supported retains catalogue-style diction.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "robotic_phrasing"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": true,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-004",
+      "turn": 2,
+      "draft_revision_id": 241,
+      "content_hash": "9c14cd7f60fcd6c61bcaba3cc9088e6e7b67176916867d5b423b62a91d2dd1e5",
+      "body_word_count": 43,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 4,
+        "clarity": 5,
+        "concision": 4,
+        "next_step_clarity": 5,
+        "operator_confidence": 4
+      },
+      "reason": "Acknowledges the optional hologram but repeats the earlier projection condition block. Same-revision history was not supplied.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "repeated_policy_block",
+        "robotic_phrasing"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": true,
+        "policy_copy_feel": true,
+        "could_be_materially_shorter": true,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-005",
+      "turn": 1,
+      "draft_revision_id": 242,
+      "content_hash": "db567d369fd58059dcccc524af0a3960a34e3052be65875dba7023a89af5c1f9",
+      "body_word_count": 57,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "A brief suitability answer is useful to the workable-arrangement question; one kitchen constraint replaces the supplier checklist.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-005",
+      "turn": 2,
+      "draft_revision_id": 243,
+      "content_hash": "063d89535fca86d81077c5895362516179b87ac387c40e3979e983e760502ca8",
+      "body_word_count": 46,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 4,
+        "clarity": 5,
+        "concision": 4,
+        "next_step_clarity": 5,
+        "operator_confidence": 4
+      },
+      "reason": "The 45-minute setup detail is acknowledged, but the full kitchen limitation is unnecessarily repeated.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "repeated_policy_block"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": true,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": true,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 1,
+      "draft_revision_id": 244,
+      "content_hash": "a6d37185c5cf152ca7c5a18c4304a4bb1c780b50bcd3b5a583b5fba7a0508f6b",
+      "body_word_count": 27,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "One brief suitability sentence and the requested date check; no maximum-capacity or fee boilerplate.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 2,
+      "draft_revision_id": 245,
+      "content_hash": "065d4460ba8e2809bffa2b81f43449deb871b5ae6cc254c9bd93e1eba258df74",
+      "body_word_count": 31,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Precisely updates the enquiry details without presenting the change as a confirmed booking.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-007",
+      "turn": 1,
+      "draft_revision_id": 246,
+      "content_hash": "a68dfcd31afa0c97c8b7109a09a81b1b02761affe2cc33efba43f94b448ceac9",
+      "body_word_count": 33,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 5,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Specific warm acknowledgement asks only the missing timing; it does not add unrelated kitchen or supplier rules.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-008",
+      "turn": 1,
+      "draft_revision_id": 247,
+      "content_hash": "ec2956bfae39ef09e15ac013dbe7d59b982ee22713fbb2bab986a3934ee9f735",
+      "body_word_count": 52,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 3,
+        "naturalness": 3,
+        "clarity": 4,
+        "concision": 4,
+        "next_step_clarity": 4,
+        "operator_confidence": 4
+      },
+      "reason": "The fee is correct, but cannot assess and cost sensitivity sound analytical rather than like a helpful operator; a practical pricing follow-up would be more useful.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "robotic_phrasing"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": true,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-009",
+      "turn": 1,
+      "draft_revision_id": 248,
+      "content_hash": "2c29b92d1cb578cea1fb25314213384a3a781780824a29593e082cc8e144a280",
+      "body_word_count": 34,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 5,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Warm return-client acknowledgement, exact fee and prospective waiver check; no capacity or historical-policy lecture.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-009",
+      "turn": 2,
+      "draft_revision_id": 249,
+      "content_hash": "2856045fd893a9f57658ab5f4042097c878f956fb45475ff69d20ab10d7a232f",
+      "body_word_count": 38,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 4,
+        "clarity": 5,
+        "concision": 4,
+        "next_step_clarity": 5,
+        "operator_confidence": 4
+      },
+      "reason": "Safe and clear, but the explanation of treating this as a new request repeats the client’s clarification; the acknowledgement and next step could be much shorter.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "system_like_explanation"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": true,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-010",
+      "turn": 1,
+      "draft_revision_id": 250,
+      "content_hash": "9d030131cee4f8e433f87a704db09955ca997dc7758b95315b839ab092e20247",
+      "body_word_count": 47,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 3,
+        "naturalness": 4,
+        "clarity": 5,
+        "concision": 4,
+        "next_step_clarity": 5,
+        "operator_confidence": 4
+      },
+      "reason": "The technical check is correct, but cannot confirm it as included at this stage adds a formal status disclaimer instead of a natural next step.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "robotic_phrasing"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": true,
+        "could_be_materially_shorter": true,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-011",
+      "turn": 2,
+      "draft_revision_id": 251,
+      "content_hash": "3ba011296f6ba337d62f28275ce4d570e7e453a6a001f886b9f447c595038180",
+      "body_word_count": 50,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Focuses on the new handover/loading question with one material access rule; it does not replay kitchen or AV guidance.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 1,
+      "draft_revision_id": 252,
+      "content_hash": "656994d59483f1ae9a318639e07acbd44d6524e2d445769da69ee0aecd2205b7",
+      "body_word_count": 96,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 4,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Much shorter and no supplier checklist, but Light background music is supported retains the mechanical technical-status voice.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "robotic_phrasing"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": true,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 2,
+      "draft_revision_id": 253,
+      "content_hash": "b0f49046ee4e6bd2c5ba9410146424fb92378779a6b4f82c891002639469fd45",
+      "body_word_count": 45,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 5,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Acknowledges the new numbers and short welcome, then asks the outstanding timing question without repeating policy.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 3,
+      "draft_revision_id": 254,
+      "content_hash": "f62f5a481af3e0026793963a0e86471e777330e50df18144e8857c7c9b97f9d1",
+      "body_word_count": 27,
+      "grade": "B",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 4,
+        "clarity": 4,
+        "concision": 5,
+        "next_step_clarity": 3,
+        "operator_confidence": 3
+      },
+      "reason": "The timing acknowledgement is concise but drops the earlier fee question when the governed price becomes available. This is over-compression, not successful continuity.",
+      "safety_flags": [],
+      "editorial_flags": [
+        "unanswered_client_request"
+      ],
+      "human_review": {
+        "human_operator_feel": "FAIL",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-013",
+      "turn": 1,
+      "draft_revision_id": 255,
+      "content_hash": "ea72cd8659c2ab87e12aa637e8f0d0e6729b04390985993c32b130c497a32f0d",
+      "body_word_count": 26,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 4,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Brief suitability acknowledgement and specific date check; no capacity maximum or unsolicited fee.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    },
+    {
+      "scenario_id": "UAT-013",
+      "turn": 2,
+      "draft_revision_id": 256,
+      "content_hash": "d6b521bab1afc512ce5b87a40f559bd5c935cec724916b32223be1c600553bc2",
+      "body_word_count": 29,
+      "grade": "A",
+      "scores": {
+        "factual_grounding": 5,
+        "wnc_tone": 5,
+        "naturalness": 5,
+        "clarity": 5,
+        "concision": 5,
+        "next_step_clarity": 5,
+        "operator_confidence": 5
+      },
+      "reason": "Natural, specific response to the requested timing change, without implying it has been approved.",
+      "safety_flags": [],
+      "editorial_flags": [],
+      "human_review": {
+        "human_operator_feel": "PASS",
+        "unnecessary_information": false,
+        "sentence_only_because_fact_known": false,
+        "repeated_information": false,
+        "policy_copy_feel": false,
+        "could_be_materially_shorter": false,
+        "message_specific": "PASS"
+      }
+    }
+  ]
+}

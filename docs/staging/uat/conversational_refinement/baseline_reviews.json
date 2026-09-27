@@ -1,0 +1,485 @@
+{
+  "UAT-001/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 4,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "The fee answers the explicit question, but the capacity maximum is unnecessary for this straightforward next-step reply.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-002/1": {
+    "grade": "A",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 5,
+      "naturalness": 5,
+      "clarity": 4,
+      "concision": 5,
+      "next_step_clarity": 5,
+      "operator_confidence": 5
+    },
+    "reason": "A concise and natural request for the missing planning details; the long question is still readable.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "PASS",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-003/1": {
+    "grade": "A",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 5,
+      "naturalness": 5,
+      "clarity": 5,
+      "concision": 5,
+      "next_step_clarity": 5,
+      "operator_confidence": 5
+    },
+    "reason": "Capacity directly answers the accommodation question; future availability check remains separate and specific.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "PASS",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-004/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 4,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Correct technical conditions, but a separate screen is not yet established sounds like internal policy wording.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": false,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-004/2": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Acknowledges the optional hologram then repeats audio and the complete projection conditions already covered.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": true,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-005/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 4,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Capacity maximum and multiple kitchen/supplier rules overwhelm the basic feasibility question.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-005/2": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "The new 45-minute setup and flexible facilitation details are buried in repeated kitchen, cleaning and capacity guidance.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": true,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-006/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 4,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "The availability check is useful; an unsolicited booking-fee paragraph is not needed to acknowledge this request.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-006/2": {
+    "grade": "A",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 5,
+      "naturalness": 5,
+      "clarity": 5,
+      "concision": 5,
+      "next_step_clarity": 5,
+      "operator_confidence": 5
+    },
+    "reason": "Specific and concise acknowledgement of changed guest count, scope and timing.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "PASS",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-007/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Asks the missing timing correctly, but adds capacity and a long supplier rule block to a question about checking the date.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-008/1": {
+    "grade": "A",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 5,
+      "naturalness": 5,
+      "clarity": 5,
+      "concision": 5,
+      "next_step_clarity": 5,
+      "operator_confidence": 5
+    },
+    "reason": "Answers the fee question and makes the pricing/flexibility follow-up clear without inventing a concession.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "PASS",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-009/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 4,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Warm returning-client tone and correct fee; the capacity maximum is unrelated to the waiver question.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-009/2": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 4,
+      "operator_confidence": 4
+    },
+    "reason": "Repeats capacity and explains current-process logic instead of simply acknowledging the clarification.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": true,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-010/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 4,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Useful technical review and access rule; unsolicited capacity and formal technical-review wording add unnecessary weight.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-011/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 4,
+      "operator_confidence": 4
+    },
+    "reason": "The client asks several practical questions, but capacity, duplicate waste requirements and appointment detail turn the answer into a policy checklist.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-011/2": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Loading and handover next steps are useful; repeated capacity, kitchen, cleanup and AV policies are unrelated to the new arrival question.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": true,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-012/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Answers the compound inquiry but adds delivery, cleanup and waste rules beyond the one useful kitchen constraint.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-012/2": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "Captures 24 guests and the short welcome, then repeats complete AV and catering blocks instead of focusing on missing timing.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": true,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-012/3": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 3,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "The newly established fee is useful, but AV and kitchen/supplier paragraphs are repeated after a timing-only update.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": true,
+      "policy_copy_feel": true,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-013/1": {
+    "grade": "B",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 4,
+      "naturalness": 4,
+      "clarity": 5,
+      "concision": 4,
+      "next_step_clarity": 5,
+      "operator_confidence": 4
+    },
+    "reason": "The check of the requested date is sufficient; maximum capacity and the unsolicited fee add unnecessary information.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "FAIL",
+      "unnecessary_information": true,
+      "sentence_only_because_fact_known": true,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": true,
+      "message_specific": "PASS"
+    }
+  },
+  "UAT-013/2": {
+    "grade": "A",
+    "scores": {
+      "factual_grounding": 5,
+      "wnc_tone": 5,
+      "naturalness": 5,
+      "clarity": 5,
+      "concision": 5,
+      "next_step_clarity": 5,
+      "operator_confidence": 5
+    },
+    "reason": "Brief, specific acknowledgement of the reschedule request without treating it as approved.",
+    "safety_flags": [],
+    "human_review": {
+      "human_operator_feel": "PASS",
+      "unnecessary_information": false,
+      "sentence_only_because_fact_known": false,
+      "repeated_information": false,
+      "policy_copy_feel": false,
+      "could_be_materially_shorter": false,
+      "message_specific": "PASS"
+    }
+  }
+}

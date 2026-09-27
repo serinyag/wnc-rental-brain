@@ -1,0 +1,198 @@
+{
+  "status": "two_cycles_finished_editorial_targets_unmet",
+  "cycles_deployed": 2,
+  "maximum_cycles": 2,
+  "baseline_render_commit": "4568689ff3871e330a02ee1dcb1e5bbf997f7e5c",
+  "cycle1_changes": [
+    "Minimum-necessary information selection and conversational compression style profile",
+    "Deterministic editorial relevance hints without changing factual authority",
+    "Earlier case-revision draft text for editorial continuity only, included in context hash",
+    "Narrow prospective availability check exemption with independent confirmations still blocked",
+    "Non-JSON response content type, byte count, hash and parse error retained without body disclosure"
+  ],
+  "cycle1_tests": {
+    "focused_passed": 53,
+    "full_passed": 601,
+    "phase8_passed": 384,
+    "subtests_passed": 160,
+    "failed": 0
+  },
+  "safety_boundaries": "Synthetic staging only; no approval, execution, Graph mutation, sending, real Asana, production or environment changes.",
+  "cycles": [
+    {
+      "number": 1,
+      "commit": "a8b9b42ab4042354ae805c18205f766b4736efd5",
+      "tests": {
+        "focused_passed": 53,
+        "full_passed": 601,
+        "phase8_passed": 384,
+        "subtests_passed": 160,
+        "failed": 0
+      },
+      "diagnosis": "Fresh baseline: correct facts but unnecessary capacity/fees, repeated follow-up policy blocks and institutional wording. Prior failed availability wording requires a narrow validator correction; reconciliation parse failure did not reproduce in this 21/21 baseline.",
+      "changes": "Minimum-necessary information selection and conversational compression style profile; Deterministic editorial relevance hints without changing factual authority; Earlier case-revision draft text for editorial continuity only, included in context hash; Narrow prospective availability check exemption with independent confirmations still blocked; Non-JSON response content type, byte count, hash and parse error retained without body disclosure",
+      "deploy_id": "dep-daskrvojo6nc73c84vbg",
+      "deployment": "live"
+    },
+    {
+      "number": 2,
+      "commit": "1eee786f6ce271fda669b5126136bd120fd9ec90",
+      "tests": {
+        "focused_passed": 67,
+        "focused_subtests_passed": 13,
+        "full_passed": 603,
+        "phase8_passed": 386,
+        "subtests_passed": 160,
+        "failed": 0
+      },
+      "diagnosis": "Same-case-revision follow-ups lost draft history and repeated policy; analytical/status wording persisted; over-compression omitted a previously requested fee when it became available. UAT-011 turn 1 reached the 900-token output cap, with no draft persisted.",
+      "changes": "Select the latest draft per earlier client turn using recorded event order, capped at three turns and excluding current-turn regeneration. Preserve unresolved client questions while avoiding answered-policy repetition. Use personal acknowledgements and plain constructive language. Increase the single bounded request output cap from 900 to 1800 tokens; provider/model, one-call design and deterministic validation are unchanged.",
+      "deploy_id": "dep-dasl5t3ncjis73aktd70",
+      "deployment": "live"
+    }
+  ],
+  "cycle2_prepared_changes": [
+    "Use recorded incoming-message event order to select earlier generated or operator-edited draft text, including unchanged case revisions; exclude same-turn generation and regeneration.",
+    "Replace catalogue-status diction and analytical business jargon with ordinary, constructive operator next steps.",
+    "Acknowledge clarifications without explaining evidence classification or historical/current-process logic."
+  ],
+  "cycle2_reason": "Cycle 1 technical and catering follow-ups repeat policy because case revision did not change; pricing and custom technical responses retain analytical/status wording.",
+  "completed_cycles": 2,
+  "final_targets": {
+    "D": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "wrong_commercial_claims": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "false_confirmations": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "known_no_contradictions": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "false_external_contact_statements": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "stale_current_drafts": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "confidentiality_failures": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "em_dashes": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "persisted_turn_draft_coverage_percent": {
+      "actual": 100,
+      "target": 95,
+      "pass": true,
+      "accepted": 21,
+      "attempted": 21,
+      "raw_harness_captures": 20,
+      "recovered_captures": 1,
+      "recovery": "One post-generation GET timed out. The already-persisted draft was recovered and bound to the exact client-message/generation events without another provider call. Raw results and timeout are preserved."
+    },
+    "continuity_percent": {
+      "actual": 100,
+      "target": 100,
+      "pass": true,
+      "passed_scenarios": 7,
+      "total": 7,
+      "definition": "All seven multi-turn cases have an accepted draft for every turn, reflecting changed details and unanswered client requests. UAT-012 turn 3 now answers the newly available fee; UAT-006 turn 2 was recovered from its completed generation event. Editorial repetition is evaluated separately."
+    },
+    "C": {
+      "actual": 0,
+      "target": 0,
+      "pass": true
+    },
+    "B": {
+      "actual": 7,
+      "target": "<=2",
+      "pass": false
+    },
+    "A": {
+      "actual": 14,
+      "target": ">=19 of 21 if all turns persist",
+      "pass": false
+    },
+    "robotic_phrasing_flags": {
+      "actual": 4,
+      "target": 0,
+      "pass": false
+    },
+    "repeated_policy_or_capability_blocks": {
+      "actual": 1,
+      "target": 0,
+      "pass": false
+    },
+    "unnecessary_governed_facts": {
+      "actual": 3,
+      "target": 0,
+      "pass": false
+    },
+    "policy_dump_paragraphs": {
+      "actual": 1,
+      "target": 0,
+      "pass": false
+    },
+    "repeated_unnecessary_capacity_statements": {
+      "actual": 0,
+      "target": 0,
+      "pass": true,
+      "definition": "No repeated numeric capacity maxima or unnecessary repeated capacity explanations. Brief initial suitability answers are distinguished from maximum-capacity boilerplate."
+    }
+  },
+  "coverage_findings": [
+    "UAT-003: the exact previously rejected prospective-availability candidate now passes the deterministic validator in provider-free replay. The final live scenario also persisted its draft. Narrow regression tests still reject actual confirmations and a prospective check followed by a separate confirmation.",
+    "UAT-012 turn 2: the historical non-JSON failure did not reproduce in the fresh baseline, Cycle 1 or Cycle 2. All three compound turns completed in each run. No transport repair or root-cause claim is made. The harness now retains content type, declared/actual byte length, body hash and JSON error/offset/line/column; malformed and empty responses remain errors.",
+    "Cycle 1 UAT-011 turn 1: OpenAI returned incomplete with reason max_output_tokens at the 900-token cap. Cycle 2 increased the same single-call cap to 1800; that scenario completed. Provider/model, one no-tool request and deterministic validation remain unchanged.",
+    "Cycle 2 UAT-006 turn 2: generation completed, then the result GET timed out after 90 seconds. A provider-free read recovered revision 265, tied to the exact incoming message and completed generation event. No new draft was generated. The original timeout and raw artifact are retained. Persisted coverage is 21/21; direct harness capture was 20/21."
+  ],
+  "safety": {
+    "environment": "staging",
+    "health": "ok",
+    "outlook_posture": "configured_draft_only",
+    "send_gate": "DISABLED",
+    "asana_posture": "configured_but_disabled",
+    "graph_mutations": 0,
+    "outlook_sends": 0,
+    "real_asana_executions": 0,
+    "production_activity": 0,
+    "approval_calls": 0,
+    "execution_calls": 0,
+    "execution_attempts_created": 0,
+    "current_drafts_checked": 13,
+    "current_revision_and_case_bindings": "PASS",
+    "captured_canonical_contracts_checked": 21,
+    "canonical_revision_content_context_recipient_approval_bindings": "PASS",
+    "duplicate_active_internal_resolution_actions": 0,
+    "frozen_scenario_and_original_evidence_hashes": "UNCHANGED",
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "scope": "Synthetic @example.test staging cases only; historical recovery records were not targeted. OpenAI generation was authorized and used; no zero-OpenAI-call claim is made."
+  },
+  "remaining_issues": [
+    "1. Technical language remains formal in UAT-004/1 and UAT-012/1; UAT-009/2 still echoes current-process logic, and UAT-010/1 still explains what should not be assumed. Four robotic-phrasing flags remain.",
+    "2. Selection still includes unnecessary known information: UAT-004/2 repeats the music capability, UAT-007/1 appends kitchen rules to a date-check question, and UAT-011/1 adds later supplier requirements and repeated scheduling detail. Three unnecessary-information flags and one policy-dump flag remain.",
+    "3. Seven final drafts remain B under the stricter editorial review, exceeding the limit of two. No C or D drafts were found. Tone is 4.29/5, below the earlier published 4.53/5; the fresh same-program baseline was 4.24/5. Compression did not fully achieve the requested human voice.",
+    "4. A post-generation case-read timeout occurred. The persisted draft was recovered without generation or mutation; the latency cause was not established. The older reconciliation JSON failure was not reproduced, so its underlying cause is not claimed resolved."
+  ],
+  "final_marker": "WNC_CONVERSATIONAL_DRAFTING_REFINEMENT_INCOMPLETE"
+}

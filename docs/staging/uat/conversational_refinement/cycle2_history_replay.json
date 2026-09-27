@@ -1,0 +1,61 @@
+{
+  "source": "Previous program final snapshots; offline only, no provider/database/API calls",
+  "checks": [
+    {
+      "scenario": "UAT-004",
+      "case": 467,
+      "selected_prior_revision": 199,
+      "current_revision": 200,
+      "same_case_revision": true,
+      "result": "PASS"
+    },
+    {
+      "scenario": "UAT-005",
+      "case": 468,
+      "selected_prior_revision": 201,
+      "current_revision": 202,
+      "same_case_revision": true,
+      "result": "PASS"
+    },
+    {
+      "scenario": "UAT-006",
+      "case": 469,
+      "selected_prior_revision": 203,
+      "current_revision": 204,
+      "same_case_revision": false,
+      "result": "PASS"
+    },
+    {
+      "scenario": "UAT-009",
+      "case": 472,
+      "selected_prior_revision": 207,
+      "current_revision": 208,
+      "same_case_revision": true,
+      "result": "PASS"
+    },
+    {
+      "scenario": "UAT-011",
+      "case": 474,
+      "selected_prior_revision": 210,
+      "current_revision": 211,
+      "same_case_revision": true,
+      "result": "PASS"
+    },
+    {
+      "scenario": "UAT-012",
+      "case": 475,
+      "selected_prior_revision": 212,
+      "current_revision": 213,
+      "same_case_revision": false,
+      "result": "PASS"
+    },
+    {
+      "scenario": "UAT-013",
+      "case": 476,
+      "selected_prior_revision": 214,
+      "current_revision": 215,
+      "same_case_revision": true,
+      "result": "PASS"
+    }
+  ]
+}
