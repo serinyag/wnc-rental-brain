@@ -2492,7 +2492,7 @@ limit 1;
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
-            prior_client_draft=self._prior_client_draft(detail, snapshot),
+            prior_client_drafts=self._prior_client_drafts(detail, snapshot),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -2528,7 +2528,7 @@ limit 1;
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
-            prior_client_draft=self._prior_client_draft(detail, snapshot),
+            prior_client_drafts=self._prior_client_drafts(detail, snapshot),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -3782,7 +3782,7 @@ limit 1;
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
-            prior_client_draft=self._prior_client_draft(detail, snapshot),
+            prior_client_drafts=self._prior_client_drafts(detail, snapshot),
             commercial_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.commercial_snapshot),
             feasibility_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.feasibility_snapshot),
             resolution_items=resolution_items,
@@ -3791,16 +3791,32 @@ limit 1;
         return detail, snapshot, contract
 
     @staticmethod
-    def _prior_client_draft(detail: CaseConsoleSnapshot, snapshot: WorkflowOrchestrationCaseSnapshot) -> str | None:
-        # Only earlier case revisions: persisting/regenerating the current draft
-        # must not change its own contract hash. This is not sent-mail evidence.
-        revisions = [revision for thread in getattr(detail, "simulated_outlook_threads", ())
-                     for revision in thread.draft_history
-                     if revision.source_case_revision < snapshot.rental_case.case_revision]
-        if not revisions:
-            return None
-        previous = max(revisions, key=lambda item: (item.source_case_revision, item.created_at))
-        return previous.body_text
+    def _prior_client_drafts(detail: CaseConsoleSnapshot, snapshot: WorkflowOrchestrationCaseSnapshot) -> tuple[str, ...]:
+        # Client turns need not advance governed case truth. Recorded event order
+        # selects the last draft per earlier turn, including operator edits, and
+        # excludes this turn's drafts so regeneration cannot change its own hash.
+        incoming = [bundle.raw_evidence for bundle in detail.evidence_bundles
+                    if bundle.raw_evidence is not None
+                    and bundle.source_record.sender_actor_type == OBSERVATION_ASSERTED_BY_CLIENT]
+        if not incoming:
+            return ()
+        latest_id = incoming[0].workflow_event_id
+        boundaries = sorted({item.workflow_event_id for item in incoming if item.workflow_event_id <= latest_id})
+        revisions = {revision.inquiry_response_draft_revision_id: revision
+                     for thread in getattr(detail, "simulated_outlook_threads", ())
+                     for revision in thread.draft_history}
+        draft_events = [event for event in getattr(snapshot, "workflow_events", ())
+                        if event.event_type_code in {"governed_client_response_draft_generated",
+                                                     "inquiry_response_draft_generated", "inquiry_response_draft_edited"}
+                        and event.structured_payload.get("draft_revision_id") in revisions]
+        history = []
+        for start, end in zip(boundaries, boundaries[1:]):
+            candidates = [event for event in draft_events if start < event.workflow_event_id < end]
+            if candidates:
+                latest = max(candidates, key=lambda event: event.workflow_event_id)
+                history.append(revisions[latest.structured_payload["draft_revision_id"]].body_text)
+        # Writing context only, never authority or evidence of sending/contact.
+        return tuple(history[-3:])
 
     @staticmethod
     def _prior_client_messages(detail: CaseConsoleSnapshot) -> tuple[str, ...]:

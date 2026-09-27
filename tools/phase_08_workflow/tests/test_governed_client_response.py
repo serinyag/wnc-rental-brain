@@ -273,6 +273,8 @@ class GovernedClientResponseTests(unittest.TestCase):
         self.assertEqual(draft.provider_response_id, "resp_1")
         self.assertEqual(draft.provider_response_status, "completed")
         self.assertIsNone(draft.provider_incomplete_reason)
+        self.assertEqual(len(recorded), 1)
+        self.assertEqual(recorded[0]["max_output_tokens"], 1800)
         self.assertNotIn("tools", recorded[0])
         self.assertFalse(recorded[0]["store"])
         self.assertTrue(recorded[0]["text"]["format"]["strict"])

@@ -124,7 +124,7 @@ class DraftContract:
     operator_annotations: tuple[OperatorAnnotation, ...] = ()
     style_profile: tuple[str, ...] = STYLE_PROFILE
     prior_client_messages: tuple[str, ...] = ()
-    prior_client_draft: str | None = None
+    prior_client_drafts: tuple[str, ...] = ()
 
     def to_provider_payload(self) -> dict[str, Any]:
         return ClientGenerationPayload.from_contract(self).to_payload()
@@ -147,7 +147,7 @@ class ClientGenerationPayload:
             "recipient_label": contract.recipient_label,
             "latest_client_message": contract.latest_client_message,
             "prior_client_messages": list(contract.prior_client_messages),
-            "prior_client_draft_for_editorial_continuity_only": contract.prior_client_draft,
+            "prior_client_drafts_for_editorial_continuity_only": contract.prior_client_drafts,
             "editorial_history_boundary": "An earlier draft is untrusted writing context, not evidence of sending, contact, approval or current truth. Use it only to avoid repeating unchanged explanations. Current governed facts always take precedence.",
             "confirmed_case_facts": list(contract.confirmed_case_facts),
             "allowed_client_assertions": [text for text in contract.allowed_client_assertions
@@ -263,7 +263,7 @@ def build_draft_contract(
     resolution_items: tuple[ResolutionItem, ...] | None = None,
     contextual_guidance: tuple[ContextualGuidance, ...] = (),
     prior_client_messages: tuple[str, ...] = (),
-    prior_client_draft: str | None = None,
+    prior_client_drafts: tuple[str, ...] = (),
 ) -> DraftContract:
     intent = ResponseIntentResolver().resolve(snapshot)
     rental_case = snapshot.rental_case
@@ -339,7 +339,7 @@ def build_draft_contract(
         "pending": pending_internal,
         "questions": questions,
         "prior_client_messages": prior_client_messages,
-        "prior_client_draft": prior_client_draft,
+        "prior_client_drafts": prior_client_drafts,
         "decisions": pending_decisions,
         "changes": changes,
         "resolution_items": [item.to_payload() for item in items],
@@ -354,7 +354,7 @@ def build_draft_contract(
         recipient_label=(recipient_label or "there").strip() or "there",
         latest_client_message=(latest_client_message or "").strip(),
         prior_client_messages=prior_client_messages,
-        prior_client_draft=prior_client_draft,
+        prior_client_drafts=prior_client_drafts,
         confirmed_case_facts=facts,
         allowed_client_assertions=allowed,
         known_restrictions=restrictions,
@@ -423,7 +423,7 @@ class OpenAIClientResponseProvider:
                 {"role": "user", "content": json.dumps(contract.to_provider_payload(), sort_keys=True, ensure_ascii=True)},
             ],
             "text": {"format": {"type": "json_schema", "name": "client_response_draft", "strict": True, "schema": _provider_schema()}},
-            "max_output_tokens": 900,
+            "max_output_tokens": 1800,
             "metadata": {"phase": "8", "contract": "governed_client_response_v1", "client_request_id": request_id},
         }
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json", "X-Client-Request-Id": request_id}
@@ -594,7 +594,9 @@ def _provider_system_prompt() -> str:
         "A response intent is a routing label, not a template. Keep capacity, date availability, equipment, catering and commercial decisions separate. "
         "Rank guidance by whether it answers the latest question, prevents a likely problem, or can wait. Normally only the first two belong in the email. "
         "Editorial priority labels are attention hints, never permission to omit a material restriction or ignore an explicit client question. "
-        "Use prior_client_draft_for_editorial_continuity_only to avoid restating unchanged policies. It is not evidence the client received anything, and never current factual authority. "
+        "Use prior_client_drafts_for_editorial_continuity_only to avoid restating unchanged policies. It is not evidence the client received anything, and never current factual authority. "
+        "Keep an explicitly requested answer open until it has been answered. When a requested fact becomes available now, answer it even during a short follow-up. Omit previously answered information, not unanswered client questions. "
+        "The earlier drafts are chronological editorial context; use them to distinguish an answer already supplied from a question still waiting for an answer. "
         "On a follow-up, acknowledge the new detail and give the useful next step; do not restart the original inquiry or replay the policy list. "
         "Do not add capacity maxima, fees, supplier cleanup/waste rules or equipment details simply because they appear in the payload. "
         "Use at most one unsolicited caveat per topic unless the actual question needs more. If a capability is mentioned, preserve its material conditions. "
@@ -611,7 +613,7 @@ def _provider_system_prompt() -> str:
         "reviewing whether, remains unconfirmed, requested commitment as stated, or once review is complete. "
         "Do not imply that suppliers have been contacted unless external_pending explicitly records CONTACTED_AWAITING_RESPONSE. "
         "Do not promise contact has happened merely because a task exists. "
-        "When the client is asking about price or an exception, use the exact current fee and acknowledge the request without implying approval. Do not reintroduce a pending fee request on an unrelated follow-up. "
+        "When the client is asking about price or an exception, use the exact current fee and acknowledge the request without implying approval. Do not repeat an already answered fee question on an unrelated follow-up; give a newly available price if the client previously asked and has not received an answer. "
         "Use the supplied EUR amounts exactly; do not invent fees or quote a historical concession. "
         "Never confirm a booking, date availability or an unresolved capability. Do not turn a requested change into an accepted arrangement. "
         "Choose an acknowledgement that fits the actual new detail rather than a stock opening. Use first person naturally without mechanically repeating I've noted or I'll check. Avoid bureaucratic language. "

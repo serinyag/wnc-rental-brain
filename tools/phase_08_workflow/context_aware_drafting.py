@@ -37,10 +37,14 @@ STYLE_PROFILE = (
     "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
     "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
     "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+    "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
     "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
     "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
     "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
     "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+    "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+    "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
+    "Translate technical status into everyday language about what works or what you can arrange; avoid catalogue labels such as supported or provision. Keep material conditions intact.",
     "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language.",
 )
 

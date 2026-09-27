@@ -36,23 +36,42 @@ def test_prospective_check_never_masks_an_independent_confirmation(body):
 
 def test_prior_draft_changes_editorial_context_never_current_assertions():
     current=contract(commercial_snapshot=(('Booking fee','EUR 75'),))
-    followup=contract(commercial_snapshot=(('Booking fee','EUR 75'),),prior_client_draft='The old fee was EUR 50. We contacted the facilitator.')
+    followup=contract(commercial_snapshot=(('Booking fee','EUR 75'),),prior_client_drafts=('The old fee was EUR 50. We contacted the facilitator.',))
     assert followup.context_hash != current.context_hash
     assert followup.allowed_client_assertions == current.allowed_client_assertions
     assert followup.to_provider_payload()['external_pending'] == []
     assert 'commercial_assertion_not_allowed' in codes(followup, 'The fee is EUR 50.')
 
 
-def test_current_revision_is_excluded_from_editorial_history_and_old_case_revision_selected():
-    def revision(case_rev,body,created):
-        return SimpleNamespace(source_case_revision=case_rev,body_text=body,created_at=created)
-    old=revision(1,'Earlier explanation',1);latest=revision(2,'Latest earlier explanation',2)
-    current=revision(3,'Current draft',3)
-    detail=SimpleNamespace(simulated_outlook_threads=(SimpleNamespace(draft_history=(current,old,latest)),))
-    snap=SimpleNamespace(rental_case=SimpleNamespace(case_revision=3))
-    assert TestConsoleService._prior_client_draft(detail,snap)=='Latest earlier explanation'
-    detail.simulated_outlook_threads[0].draft_history+=(revision(3,'Regenerated current draft',4),)
-    assert TestConsoleService._prior_client_draft(detail,snap)=='Latest earlier explanation'
+def test_editorial_history_tracks_client_turn_even_without_case_revision_change():
+    def revision(rid, body):
+        return SimpleNamespace(inquiry_response_draft_revision_id=rid,source_case_revision=2,body_text=body)
+    def event(eid,rid,kind='governed_client_response_draft_generated'):
+        return SimpleNamespace(workflow_event_id=eid,event_type_code=kind,structured_payload={'draft_revision_id':rid})
+    prior=revision(1,'Earlier explanation');edited=revision(2,'Operator-edited earlier explanation')
+    current=revision(3,'Current turn draft')
+    incoming=SimpleNamespace(raw_evidence=SimpleNamespace(workflow_event_id=20),source_record=SimpleNamespace(sender_actor_type='client'))
+    operator_note=SimpleNamespace(raw_evidence=SimpleNamespace(workflow_event_id=30),source_record=SimpleNamespace(sender_actor_type='operator'))
+    earlier=SimpleNamespace(raw_evidence=SimpleNamespace(workflow_event_id=5),source_record=SimpleNamespace(sender_actor_type='client'))
+    detail=SimpleNamespace(evidence_bundles=(operator_note,incoming,earlier),simulated_outlook_threads=(SimpleNamespace(draft_history=(current,prior,edited)),))
+    snap=SimpleNamespace(rental_case=SimpleNamespace(case_revision=2),workflow_events=(event(10,1),event(12,2,'inquiry_response_draft_edited'),event(25,3)))
+    assert TestConsoleService._prior_client_drafts(detail,snap)==('Operator-edited earlier explanation',)
+    # Regenerating the same turn cannot make a draft its own editorial input.
+    detail.simulated_outlook_threads[0].draft_history+=(revision(4,'Regeneration'),)
+    snap.workflow_events+=(event(35,4),)
+    assert TestConsoleService._prior_client_drafts(detail,snap)==('Operator-edited earlier explanation',)
+    # A subsequent incoming message advances editorial history even though case
+    # truth and the case revision remain unchanged.
+    newer=SimpleNamespace(raw_evidence=SimpleNamespace(workflow_event_id=40),source_record=SimpleNamespace(sender_actor_type='client'))
+    detail.evidence_bundles=(newer,operator_note,incoming,earlier)
+    assert TestConsoleService._prior_client_drafts(detail,snap)==('Operator-edited earlier explanation','Regeneration')
+
+
+def test_no_editorial_history_without_a_prior_recorded_draft_event():
+    incoming=SimpleNamespace(raw_evidence=SimpleNamespace(workflow_event_id=20),source_record=SimpleNamespace(sender_actor_type='client'))
+    revision=SimpleNamespace(inquiry_response_draft_revision_id=1,source_case_revision=1,body_text='Unproven chronology')
+    detail=SimpleNamespace(evidence_bundles=(incoming,),simulated_outlook_threads=(SimpleNamespace(draft_history=(revision,)),))
+    assert TestConsoleService._prior_client_drafts(detail,SimpleNamespace(workflow_events=())) == ()
 
 
 def test_editorial_priority_never_removes_governed_guidance():
@@ -84,3 +103,11 @@ def test_malformed_response_is_an_error_with_diagnostics_but_no_body_content(bod
     assert data['json_error']
     if body:
         assert body not in json.dumps(data)
+
+
+def test_editorial_history_is_bounded_to_three_earlier_client_turns():
+    bundles=tuple(SimpleNamespace(raw_evidence=SimpleNamespace(workflow_event_id=n),source_record=SimpleNamespace(sender_actor_type='client')) for n in (41,31,21,11,1))
+    revisions=tuple(SimpleNamespace(inquiry_response_draft_revision_id=n,body_text=f'Answer {n}') for n in (5,15,25,35,45))
+    events=tuple(SimpleNamespace(workflow_event_id=n,event_type_code='governed_client_response_draft_generated',structured_payload={'draft_revision_id':n}) for n in (5,15,25,35,45))
+    detail=SimpleNamespace(evidence_bundles=bundles,simulated_outlook_threads=(SimpleNamespace(draft_history=revisions),))
+    assert TestConsoleService._prior_client_drafts(detail,SimpleNamespace(workflow_events=events))==('Answer 15','Answer 25','Answer 35')
