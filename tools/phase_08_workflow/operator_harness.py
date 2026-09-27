@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import hashlib
 import os
 import socket
 import ssl
@@ -305,7 +306,11 @@ class OperatorHarnessClient:
         request = self._build_request(method, path, payload)
         try:
             with self.opener(request, timeout=self.config.timeout_seconds, context=self.ssl_context) as response:
-                response_body = response.read().decode("utf-8")
+                response_bytes = response.read()
+                response_body = response_bytes.decode("utf-8")
+                response_headers = getattr(response, "headers", {})
+                response_content_type = response_headers.get("Content-Type")
+                declared_length = response_headers.get("Content-Length")
         except HTTPError as exc:
             response_body = exc.read().decode("utf-8", errors="replace")
             raise OperatorHarnessError(
@@ -320,9 +325,21 @@ class OperatorHarnessClient:
         except URLError as exc:
             raise OperatorHarnessError(f"Operator request failed: {exc.reason}") from exc
         try:
-            return json.loads(response_body) if response_body else {}
+            return json.loads(response_body)
         except json.JSONDecodeError as exc:
-            raise OperatorHarnessError("Operator endpoint returned non-JSON output.") from exc
+            raise OperatorHarnessError(
+                "Operator endpoint returned non-JSON output.",
+                error_payload={"failure_code": "OPERATOR_RESPONSE_INVALID_JSON", "diagnostics": {
+                    "content_type": response_content_type,
+                    "body_length_bytes": len(response_bytes),
+                    "declared_content_length": declared_length,
+                    "body_sha256": hashlib.sha256(response_bytes).hexdigest(),
+                    "json_error": exc.msg,
+                    "json_error_offset": exc.pos,
+                    "json_error_line": exc.lineno,
+                    "json_error_column": exc.colno,
+                }},
+            ) from exc
 
     def _build_request(self, method: str, path: str, payload: dict[str, Any] | None) -> Request:
         headers = {"Accept": "application/json"}

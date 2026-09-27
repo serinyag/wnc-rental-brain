@@ -33,14 +33,35 @@ OPERATOR_ANNOTATION_EXTERNAL_CONTACT = "EXTERNAL_CONTACT"
 CLIENT_SAFE_FACTUAL_DOCUMENT_CODES = frozenset({"CF-003", "CF-005", "SERV-003", "SERV-004"})
 
 STYLE_PROFILE = (
-    "Use a warm, concise, conversational WNC rental voice.",
-    "Open with Hi <first name> when a recipient name is available.",
-    "Acknowledge the specific message naturally and vary the opening.",
-    "Use plain language and practical next steps. Return no signature block or valediction.",
-    "Answer known facts separately from unresolved matters; never make the whole inquiry sound uncertain.",
-    "Avoid applicable fee, requested commitment as stated, awaiting confirmation, and once review is complete.",
-    "Do not use em dashes or bureaucratic workflow language.",
+    "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+    "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+    "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+    "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+    "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+    "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+    "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+    "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+    "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language.",
 )
+
+
+def guidance_editorial_priority(item: ContextualGuidance, latest_message: str) -> str:
+    """Writing attention only: never changes retrieval, authority, or restrictions."""
+    message = latest_message.lower()
+    topic_words = {
+        "capacity": ("capacity", "fit", "accommodat", "enough room", "suitab"),
+        "catering_kitchen": ("cater", "kitchen", "buffet", "food", "lunch", "cook"),
+        "external_supplier_setup": ("supplier", "vendor", "setup", "set up", "access", "load", "arriv", "handover", "florist"),
+        "technical_capabilities": ("technical", "project", "slide", "audio", "music", "microphone", "hologram", "rig"),
+        "facilitator_process": ("facilitat", "host", "opening", "welcome"),
+    }
+    topic = "technical_capabilities" if item.topic.startswith("technical") else item.topic
+    if any(word in message for word in topic_words.get(topic, ())):
+        return "directly_relevant_to_latest_message"
+    if item.topic == "capacity" and "outside the current capacity" in item.client_safe_guidance:
+        return "prevents_likely_problem"
+    return "background_only_unless_needed_to_avoid_misunderstanding"
+
 
 
 @dataclass(frozen=True)

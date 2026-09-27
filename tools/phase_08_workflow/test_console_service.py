@@ -2492,6 +2492,7 @@ limit 1;
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
+            prior_client_draft=self._prior_client_draft(detail, snapshot),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -2527,6 +2528,7 @@ limit 1;
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
+            prior_client_draft=self._prior_client_draft(detail, snapshot),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -3780,12 +3782,25 @@ limit 1;
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
+            prior_client_draft=self._prior_client_draft(detail, snapshot),
             commercial_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.commercial_snapshot),
             feasibility_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.feasibility_snapshot),
             resolution_items=resolution_items,
             contextual_guidance=contextual_guidance,
         )
         return detail, snapshot, contract
+
+    @staticmethod
+    def _prior_client_draft(detail: CaseConsoleSnapshot, snapshot: WorkflowOrchestrationCaseSnapshot) -> str | None:
+        # Only earlier case revisions: persisting/regenerating the current draft
+        # must not change its own contract hash. This is not sent-mail evidence.
+        revisions = [revision for thread in getattr(detail, "simulated_outlook_threads", ())
+                     for revision in thread.draft_history
+                     if revision.source_case_revision < snapshot.rental_case.case_revision]
+        if not revisions:
+            return None
+        previous = max(revisions, key=lambda item: (item.source_case_revision, item.created_at))
+        return previous.body_text
 
     @staticmethod
     def _prior_client_messages(detail: CaseConsoleSnapshot) -> tuple[str, ...]:
