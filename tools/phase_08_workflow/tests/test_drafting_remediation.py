@@ -98,7 +98,8 @@ def test_phase4_capacity_answer_does_not_confirm_date():
     result=service._current_client_policy_guidance(SimpleNamespace(evidence_bundles=()),snapshot())
     assert '65 guests are outside' in result[0].client_safe_guidance
     assert 'maximum is 50' in result[0].client_safe_guidance
-    assert 'does not establish date availability' in result[0].client_safe_guidance
+    assert 'availability' not in result[0].client_safe_guidance
+    assert 'Do not confirm venue availability or booking.' in contract().forbidden_claims
 
 
 def test_generic_facilitator_blocker_uses_persisted_proposition_for_ownership():
@@ -111,3 +112,92 @@ def test_generic_facilitator_blocker_uses_persisted_proposition_for_ownership():
     assert item.resolution_status=='CONTACT_REQUIRED'
     assert item.message.startswith('Contact facilitator')
     assert item.client_visibility=='INTERNAL_ONLY'
+
+
+def test_conditional_projection_retains_current_equipment_conditions():
+    from tools.phase_08_workflow.test_console_service import TestConsoleService
+    service=object.__new__(TestConsoleService)
+    service._build_observed_field_candidates=lambda bundles: ()
+    service._capacity_authority_issue=lambda *args,**kwargs: None
+    service._technical_authority_issue=lambda **kwargs: SimpleNamespace(source_snapshot={'triggered_requirements':[
+        {'semantic_state_code':'known_conditional','observed_requirement':'projection_display','issue_code':'projection_conditional',
+         'source_snapshot':{'support_status':'requires_confirmation','conditions_summary':'A projector exists; compatibility and screenless setup must be checked.'}},
+        {'semantic_state_code':'unknown_internal','observed_requirement':'hologram','issue_code':'hologram_unknown','source_snapshot':{}},
+    ]})
+    result=service._current_client_policy_guidance(SimpleNamespace(evidence_bundles=()),snapshot())
+    assert len(result)==1
+    assert 'projector exists' in result[0].client_safe_guidance
+    assert 'must be checked' in result[0].client_safe_guidance
+    assert 'hologram' not in str(result)
+
+
+def test_followup_topics_retain_current_observed_requests_without_becoming_facts():
+    from tools.phase_08_workflow.context_aware_drafting import detect_guidance_topics
+    fields=(SimpleNamespace(field_code='catering_arrangement',value_payload='external',stale_observation=False),
+            SimpleNamespace(field_code='technical_requirements',value_payload=['projection_display'],stale_observation=False),
+            SimpleNamespace(field_code='facilitator_arrangement',value_payload='wnc_provided',stale_observation=True))
+    topics=detect_guidance_topics(snapshot(),'The date is 21 January.',observed_fields=fields)
+    assert topics==('catering_kitchen','external_supplier_setup','technical_capabilities')
+    assert not any("catering" in fact or "projection" in fact for fact in contract().confirmed_case_facts)
+
+
+def test_current_thread_changes_contract_hash_and_stays_separate_from_authority():
+    from tools.phase_08_workflow.test_console_service import TestConsoleService
+    detail=SimpleNamespace(evidence_bundles=tuple(SimpleNamespace(raw_evidence=SimpleNamespace(body=b),source_record=SimpleNamespace(sender_actor_type='client'))
+        for b in ('Latest timing','Guest update','Original catering question')))
+    detail.evidence_bundles += (SimpleNamespace(raw_evidence=SimpleNamespace(body='Confidential operator note'),source_record=SimpleNamespace(sender_actor_type='operator')), )
+    prior=TestConsoleService._prior_client_messages(detail)
+    assert prior==('Original catering question','Guest update')
+    c=contract(prior_client_messages=prior)
+    assert c.context_hash!=contract().context_hash
+    assert c.to_provider_payload()['prior_client_messages']==list(prior)
+    assert c.allowed_client_assertions==contract().allowed_client_assertions
+
+
+def test_facilitator_request_does_not_retrieve_class_cancellation_fee_as_process():
+    guidance=retrieve_contextual_guidance(search=_Search(({
+        'document_code':'CF-003','authority_classification':'authoritative',
+        'body_text':'Cancellation of a scheduled class: EUR 45.',
+    },)),topics=('facilitator_process',),rental_type_code=None)
+    assert guidance==()
+
+
+def test_rejected_text_audit_is_synthetic_staging_only_and_never_creates_draft():
+    import pytest
+    from tools.phase_08_workflow.test_console_service import TestConsoleService, TestConsoleError
+    for staging,email,retained in ((True,'avery@example.test',True),(True,'avery@example.com',False),(False,'avery@example.test',False)):
+        service=object.__new__(TestConsoleService)
+        service.config=SimpleNamespace(runtime=SimpleNamespace(is_staging=staging))
+        service.now=lambda: '2026-09-27T12:00:00Z'
+        state=snapshot(workflow_actions=())
+        detail=SimpleNamespace(metadata=SimpleNamespace(client_label='Avery',contact_email=email),
+            evidence_bundles=(),orchestration_snapshot=state,
+            working_proposal=SimpleNamespace(commercial_snapshot=(),feasibility_snapshot=()))
+        service.load_case_detail=lambda case_id: detail
+        service._require_case_snapshot=lambda case_id: state
+        service._current_client_policy_guidance=lambda *args: ()
+        service.contextual_guidance_search=_Search(())
+        rejected=ClientResponseDraft('Subject','Hello — unsafe style')
+        service._client_response_provider_for_request=lambda **kwargs: SimpleNamespace(generate_client_response=lambda contract: rejected)
+        events=[]
+        service._create_console_event=lambda **kwargs: events.append(kwargs)
+        with pytest.raises(TestConsoleError,match='no draft was created'):
+            service.generate_governed_client_response_draft(rental_case_id=8)
+        assert len(events)==1 and events[0]['event_type_code']=='governed_client_response_draft_rejected'
+        payload=events[0]['structured_payload']
+        assert ('rejected_body' in payload)==retained
+        if retained:
+            assert payload['rejected_subject']==rejected.subject and payload['rejected_body']==rejected.body
+        assert 'em_dash_not_allowed' in payload['validation_codes']
+
+
+def test_logistics_requests_create_stable_internal_checks_without_contact_claims():
+    fields=(SimpleNamespace(field_code='layout_requirements',value_payload={'notes':'handover, loading-route and supplier arrival guidance'},stale_observation=False),)
+    items=derive_resolution_items(snapshot(),observed_fields=fields)
+    assert len(items)==3
+    assert items==derive_resolution_items(snapshot(),observed_fields=fields)
+    assert all(i.resolution_owner=='WNC_INTERNAL' and i.blocking and i.client_visibility=='INTERNAL_ONLY' for i in items)
+    assert len({i.proposition_key for i in items})==3
+    c=contract(resolution_items=items)
+    assert c.to_provider_payload()['external_pending']==[]
+    assert 'loading route' not in str(c.to_provider_payload())

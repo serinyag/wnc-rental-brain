@@ -122,7 +122,7 @@ class Phase5HybridGuidanceSearch:
         return tuple(rows)
 
 
-def derive_resolution_items(snapshot: Any) -> tuple[ResolutionItem, ...]:
+def derive_resolution_items(snapshot: Any, *, observed_fields: tuple[Any, ...] = ()) -> tuple[ResolutionItem, ...]:
     """Classify only persisted case state; never infer ownership with an LLM."""
     items: list[ResolutionItem] = []
     for question in getattr(snapshot, "open_questions", ()):
@@ -194,6 +194,24 @@ def derive_resolution_items(snapshot: Any) -> tuple[ResolutionItem, ...]:
                 blocking=True,
             )
         )
+    # Event logistics are WNC checks even when recorded as a proposed layout change.
+    # These client requests select work; they never approve a change or provider action.
+    for observed in observed_fields:
+        if observed.field_code != "layout_requirements" or getattr(observed, "stale_observation", False):
+            continue
+        if getattr(observed, "observation_status", "") == "superseded":
+            continue
+        notes = str(observed.value_payload).lower()
+        for token, topic, message in (
+            ("loading", "loading_route", "Confirm the supplier loading route"),
+            ("handover", "venue_handover", "Confirm venue handover requirements"),
+            ("arrival", "supplier_arrival", "Confirm supplier arrival and setup windows"),
+        ):
+            if token in notes:
+                case = getattr(snapshot, "rental_case", None)
+                key = f"logistics:{topic}:{getattr(case, 'active_event_start', None)}:{getattr(case, 'active_event_end', None)}"
+                items.append(ResolutionItem(key, message, RESOLUTION_OWNER_WNC_INTERNAL,
+                    RESOLUTION_STATUS_REQUIRED, CLIENT_VISIBILITY_INTERNAL_ONLY, True))
     case = getattr(snapshot, "rental_case", None)
     start, end = getattr(case, "active_event_start", None), getattr(case, "active_event_end", None)
     if start and end and getattr(case, "lifecycle_state", "") in {"inquiry_active", "proposal_in_progress"}:
@@ -265,8 +283,12 @@ def operator_annotations(items: tuple[ResolutionItem, ...]) -> tuple[OperatorAnn
     return tuple(annotations)
 
 
-def detect_guidance_topics(snapshot: Any, latest_client_message: str | None) -> tuple[str, ...]:
-    facts = {str(getattr(item, "field_code", "")): getattr(item, "value_payload", None) for item in getattr(snapshot, "rental_case_facts", ())}
+def detect_guidance_topics(snapshot: Any, latest_client_message: str | None, *, observed_fields: tuple[Any, ...] = ()) -> tuple[str, ...]:
+    # Client request topics may live in governed observations rather than canonical facts.
+    # They select retrieval topics only; they never become policy or confirmed arrangements.
+    facts = {str(item.field_code): item.value_payload for item in observed_fields
+             if not getattr(item, "stale_observation", False) and getattr(item, "observation_status", "") != "superseded"}
+    facts.update({str(getattr(item, "field_code", "")): getattr(item, "value_payload", None) for item in getattr(snapshot, "rental_case_facts", ())})
     text = (latest_client_message or "").lower()
     topics: list[str] = []
     technical = facts.get("technical_requirements")
@@ -296,6 +318,8 @@ def retrieve_contextual_guidance(
         accepted = 0
         for row in search.search(topic=topic, query_text=_topic_query(topic), rental_type_code=rental_type_code):
             if accepted >= limit_per_topic or not _is_client_safe_current_guidance(row):
+                continue
+            if topic == "facilitator_process" and row.get("document_code") in {"CF-003", "CF-005"}:
                 continue
             text = _client_guidance_text(row)
             source = str(row.get("document_code") or "").strip()

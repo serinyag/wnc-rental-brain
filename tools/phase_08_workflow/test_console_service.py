@@ -2136,7 +2136,7 @@ limit 1;
             )
         row = self._first_row(
             f"""
-select applicability_status, support_status, requires_confirmation
+select applicability_status, support_status, requires_confirmation, conditions_summary, plain_language_explanation
 from api.evaluate_technical_requirement(
   {sql_text(requirement_code)},
   {sql_text(as_of_date)}::date
@@ -2163,6 +2163,7 @@ limit 1;
             {
                 "applicability_status": row.get("applicability_status"),
                 "support_status": row.get("support_status"),
+                "conditions_summary": row.get("conditions_summary") or row.get("plain_language_explanation"),
                 "requires_confirmation": bool(row.get("requires_confirmation")),
             }
         )
@@ -2458,10 +2459,11 @@ limit 1;
         detail = self.load_case_detail(rental_case_id)
         snapshot = detail.orchestration_snapshot
         latest_evidence = next(
-            (bundle.raw_evidence for bundle in detail.evidence_bundles if bundle.raw_evidence is not None),
+            (bundle.raw_evidence for bundle in detail.evidence_bundles
+             if bundle.raw_evidence is not None and bundle.source_record.sender_actor_type == OBSERVATION_ASSERTED_BY_CLIENT),
             None,
         )
-        resolution_items = derive_resolution_items(snapshot)
+        resolution_items = derive_resolution_items(snapshot, observed_fields=self._build_observed_field_candidates(detail.evidence_bundles))
         requires_internal_action = any(
             item.resolution_owner in {RESOLUTION_OWNER_WNC_INTERNAL, RESOLUTION_OWNER_EXTERNAL_PARTY}
             and item.resolution_status in {RESOLUTION_STATUS_REQUIRED, RESOLUTION_STATUS_CONTACT_REQUIRED}
@@ -2470,8 +2472,11 @@ limit 1;
         if requires_internal_action:
             self._ensure_resolution_workflow_actions(snapshot, resolution_items)
             snapshot = self._require_case_snapshot(rental_case_id)
-        resolution_items = with_workflow_actions(derive_resolution_items(snapshot), snapshot.workflow_actions)
-        guidance_topics = detect_guidance_topics(snapshot, None if latest_evidence is None else latest_evidence.body)
+        resolution_items = with_workflow_actions(derive_resolution_items(snapshot, observed_fields=self._build_observed_field_candidates(detail.evidence_bundles)), snapshot.workflow_actions)
+        guidance_topics = detect_guidance_topics(
+            snapshot, None if latest_evidence is None else latest_evidence.body,
+            observed_fields=self._build_observed_field_candidates(detail.evidence_bundles),
+        )
         try:
             contextual_guidance = retrieve_contextual_guidance(
                 search=self.contextual_guidance_search,
@@ -2486,6 +2491,7 @@ limit 1;
             snapshot=snapshot,
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
+            prior_client_messages=self._prior_client_messages(detail),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -2520,6 +2526,7 @@ limit 1;
             snapshot=current_snapshot,
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
+            prior_client_messages=self._prior_client_messages(detail),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -2553,6 +2560,12 @@ limit 1;
                     "response_intent": contract.response_intent.code,
                     "source_case_revision": contract.source_case_revision,
                     "context_hash": contract.context_hash,
+                    **({"rejected_subject": generated.subject, "rejected_body": generated.body,
+                        "rejected_question_ids": list(generated.question_ids),
+                        "rejected_context": {"resolution_items": [item.to_payload() for item in contract.resolution_items],
+                                             "operator_annotations": [item.to_payload() for item in contract.operator_annotations],
+                                             "contextual_guidance": [item.to_payload() for item in contract.contextual_guidance]}}
+                       if self.config.runtime.is_staging and (detail.metadata.contact_email or "").lower().endswith("@example.test") else {}),
                     "validation_result": "rejected",
                     "validation_codes": list(validation.failure_codes),
                     "content_hash": _json_digest(
@@ -3743,11 +3756,15 @@ limit 1;
         detail = self.load_case_detail(rental_case_id)
         snapshot = detail.orchestration_snapshot
         latest_evidence = next(
-            (bundle.raw_evidence for bundle in detail.evidence_bundles if bundle.raw_evidence is not None),
+            (bundle.raw_evidence for bundle in detail.evidence_bundles
+             if bundle.raw_evidence is not None and bundle.source_record.sender_actor_type == OBSERVATION_ASSERTED_BY_CLIENT),
             None,
         )
-        resolution_items = with_workflow_actions(derive_resolution_items(snapshot), snapshot.workflow_actions)
-        guidance_topics = detect_guidance_topics(snapshot, None if latest_evidence is None else latest_evidence.body)
+        resolution_items = with_workflow_actions(derive_resolution_items(snapshot, observed_fields=self._build_observed_field_candidates(detail.evidence_bundles)), snapshot.workflow_actions)
+        guidance_topics = detect_guidance_topics(
+            snapshot, None if latest_evidence is None else latest_evidence.body,
+            observed_fields=self._build_observed_field_candidates(detail.evidence_bundles),
+        )
         try:
             contextual_guidance = retrieve_contextual_guidance(
                 search=self.contextual_guidance_search,
@@ -3762,12 +3779,20 @@ limit 1;
             snapshot=snapshot,
             recipient_label=detail.metadata.client_label,
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
+            prior_client_messages=self._prior_client_messages(detail),
             commercial_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.commercial_snapshot),
             feasibility_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.feasibility_snapshot),
             resolution_items=resolution_items,
             contextual_guidance=contextual_guidance,
         )
         return detail, snapshot, contract
+
+    @staticmethod
+    def _prior_client_messages(detail: CaseConsoleSnapshot) -> tuple[str, ...]:
+        # The current case thread supplies request continuity, never factual authority.
+        messages = [bundle.raw_evidence.body for bundle in detail.evidence_bundles
+                    if bundle.raw_evidence is not None and bundle.source_record.sender_actor_type == OBSERVATION_ASSERTED_BY_CLIENT]
+        return tuple(reversed(messages[1:4]))
 
     def _current_client_policy_guidance(
         self, detail: CaseConsoleSnapshot, snapshot: WorkflowOrchestrationCaseSnapshot,
@@ -3784,8 +3809,7 @@ limit 1;
             guidance.append(ContextualGuidance(
                 "capacity", f"The requested {guests} guests are {outcome} the current capacity rules for {scope}. "
                 + (f"The applicable maximum is {maximum} guests. " if isinstance(maximum, int) else "")
-                +
-                "This capacity assessment does not establish date availability or approve the event.",
+                ,
                 "phase4:" + capacity.issue_code,
             ))
         technical = self._technical_authority_issue(observed_by_field=observed)
@@ -3799,6 +3823,8 @@ limit 1;
                     text = f"{name}: current technical provision is {str(status).replace('_', ' ')}."
                     if source.get("requires_confirmation"):
                         text += " Event-specific arrangements still need an internal check."
+                elif state == "known_conditional" and source.get("conditions_summary"):
+                    text = f"{name}: {source['conditions_summary']}"
                 elif state == "known_no":
                     text = f"{name}: " + ("requires an external supplier." if status == "external_supplier_required"
                                            else "is not available from WNC's standard provision.")
