@@ -1,0 +1,16 @@
+{
+  "reviewed_turns": [
+    "UAT-001/1",
+    "UAT-002/1",
+    "UAT-003/1",
+    "UAT-004/1",
+    "UAT-004/2"
+  ],
+  "findings": [
+    "UAT-002/1 repeats the application term rental scope in a client question.",
+    "UAT-004/1 uses explicit confirmation and recaps the entire event; projection subconditions remain over-detailed.",
+    "UAT-004/2 successfully excludes prior audio capability but repeats adapter/file/screenless details.",
+    "UAT-001/1 and UAT-003/1 retain correct immediate answers without numeric maximum or unsolicited fees."
+  ],
+  "refinement_candidate": "Split primary capability/check semantics from secondary technical conditions; normalize client question wording."
+}

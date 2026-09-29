@@ -1,0 +1,38 @@
+[
+  {
+    "rental_case_id": 539,
+    "response_intent": "COMMUNICATE_RESTRICTION",
+    "validation_codes": [
+      "known_no_contradiction"
+    ],
+    "matching_known_no_rule_spans": [
+      {
+        "match": "available",
+        "offset": 447,
+        "sentence_context": "timing and setup access.\n\nA WNC projector is available, and I\u2019ll check the practical setup for your projection needs. Microphones are "
+      }
+    ],
+    "source_file": "tools/phase_08_workflow/governed_client_response.py",
+    "rule": "Global positive-capability word check under COMMUNICATE_RESTRICTION, without per-topic scope.",
+    "provider_calls": 0,
+    "draft_persisted": false
+  },
+  {
+    "rental_case_id": 539,
+    "response_intent": "COMMUNICATE_RESTRICTION",
+    "validation_codes": [
+      "known_no_contradiction"
+    ],
+    "matching_known_no_rule_spans": [
+      {
+        "match": "available",
+        "offset": 548,
+        "sentence_context": "ge-scale food production. A WNC projector is available, and I\u2019ll check the practical projection setup. Microphones would need to come "
+      }
+    ],
+    "source_file": "tools/phase_08_workflow/governed_client_response.py",
+    "rule": "Global positive-capability word check under COMMUNICATE_RESTRICTION, without per-topic scope.",
+    "provider_calls": 0,
+    "draft_persisted": false
+  }
+]

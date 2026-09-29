@@ -1,0 +1,848 @@
+{
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "results": [
+    {
+      "scenario_id": "UAT-004",
+      "title": "Technical mix",
+      "turns": [
+        {
+          "turn_number": 1,
+          "incoming_message": {
+            "subject": "Product launch technical questions",
+            "body": "Hello WNC,\n\nWe are planning a 24-person product launch in the Studio on 29 October, 16:00-20:00. We would need a screen for slides, some background music, and we are wondering whether a small hologram display could be arranged. Please let us know what is realistic.\n\nElena"
+          },
+          "observations": [
+            {
+              "field_code": "event_type",
+              "value": "product launch",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "guest_count",
+              "value": 24,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2026-10-29T16:00:00Z",
+                "active_event_end": "2026-10-29T20:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "projection_display",
+                "audio_playback",
+                "other_technical"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: PENDING_INTERNAL_CONFIRMATION",
+              "Draft revision id: 316",
+              "Workflow action id: 1327",
+              "Approval request id: 385"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-09-29 15:15:10.652642+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:db4025df432b8dc590b554974dd50f55f7e03e2ed880bc1a510b507a20363424",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:542",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 542,
+              "semantic_subject_hash": "e5dd64013e801d2c09118c2aae0284e2bd060ccbae80b5abdcc72b249816dc80",
+              "source_case_revision": 2,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1327:draft_revision:316",
+                "body": "Hi Elena,\n\nThe visual element for your product launch sounds exciting. Background music can be supported, and I’ll check the practical setup for showing slides with the WNC projector.\n\nI’ll also check whether a small hologram display can be arranged safely and let you know what is feasible.",
+                "body_type": "text",
+                "context_hash": "58ecaceaf67627bbeaced7d26c271f3231a7519637022795e31384ff167ffb27",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:542",
+                "draft_content_hash": "fea15c1cffc40152e18b37808bf9ec916ce1364606b44806a2e4300ac053b474",
+                "draft_origin_workflow_action_id": 1327,
+                "draft_revision_id": 316,
+                "governed_context_hash": "e5dd64013e801d2c09118c2aae0284e2bd060ccbae80b5abdcc72b249816dc80",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:542:a5f0c1be5158f8bf211a019c3e78175cb19a9439d4691488a378deb3a91fecf7",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "elena.vos@example.test",
+                "recipient_identity_hash": "f33b5659764db1f4541ab346e19fd5322ebaf4f3b664da03072f82cffa84580e",
+                "recipient_reference": "inquiry_response_draft:316",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 542,
+                "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+                "source_case_revision": 2,
+                "subject": "Product launch technical setup"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-09-29 15:15:10.893029+00",
+              "workflow_action_id": 1327,
+              "workflow_action_uuid": "1bf3aed2-ef7a-46bb-bd38-acfccea34c7f"
+            },
+            "draft_revision": {
+              "approval_request_id": 385,
+              "approved_at": null,
+              "body_text": "Hi Elena,\n\nThe visual element for your product launch sounds exciting. Background music can be supported, and I’ll check the practical setup for showing slides with the WNC projector.\n\nI’ll also check whether a small hologram display can be arranged safely and let you know what is feasible.",
+              "closing_text": "Warm regards,",
+              "content_hash": "fea15c1cffc40152e18b37808bf9ec916ce1364606b44806a2e4300ac053b474",
+              "context_hash": "58ecaceaf67627bbeaced7d26c271f3231a7519637022795e31384ff167ffb27",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Elena Vos",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+                    "semantic_values": {
+                      "available_equipment": "WNC projector",
+                      "capability": "projection display",
+                      "check_required": [
+                        "compatibility",
+                        "adapters",
+                        "files",
+                        "screenless setup suitability"
+                      ],
+                      "status": "conditional",
+                      "topic": "projection_display"
+                    },
+                    "source_reference": "phase4:technical_projection_display_confirmation",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "audio playback: current technical provision is supported.",
+                    "semantic_values": {
+                      "capability": "audio playback",
+                      "status": "supported",
+                      "topic": "audio_playback"
+                    },
+                    "source_reference": "phase4:technical_audio_playback_supported",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "other technical: A custom technical setup must be reviewed and confirmed explicitly rather than guessed from the standard venue capabilities.",
+                    "semantic_values": {
+                      "capability": "other technical",
+                      "check_required": [
+                        "custom technical feasibility and explicit confirmation"
+                      ],
+                      "status": "conditional",
+                      "topic": "other_technical"
+                    },
+                    "source_reference": "phase4:technical_other_technical_confirmation",
+                    "topic": "technical_capabilities"
+                  }
+                ],
+                "conversation_key": "governed_client_response:542",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 24
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "product launch"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: PENDING_INTERNAL_CONFIRMATION",
+                  "Contract hash: e5dd64013e801d2c09118c2aae0284e2bd060ccbae80b5abdcc72b249816dc80"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm the requested room layout against capacity requirements",
+                    "proposition_key": "blocker:2161",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1324
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2162",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1325
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2026-10-29 16:00:00+00 to 2026-10-29 20:00:00+00",
+                    "proposition_key": "availability:2026-10-29 16:00:00+00:2026-10-29 20:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1326
+                  }
+                ],
+                "recipient_email": "elena.vos@example.test",
+                "recipient_label": "Elena Vos",
+                "rental_case_id": 542,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm the requested room layout against capacity requirements",
+                    "proposition_key": "blocker:2161",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1324
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2162",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1325
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2026-10-29 16:00:00+00 to 2026-10-29 20:00:00+00",
+                    "proposition_key": "availability:2026-10-29 16:00:00+00:2026-10-29 20:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1326
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 2,
+                "workflow_action_id": 1327
+              },
+              "conversation_key": "governed_client_response:542",
+              "created_at": "2026-09-29 15:15:10.749953+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 316,
+              "inquiry_response_draft_revision_uuid": "28b86c9d-e999-4da4-869a-75623729d0ba",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [],
+              "recipient_email": "elena.vos@example.test",
+              "recipient_label": "Elena Vos",
+              "rejected_at": null,
+              "rental_case_id": 542,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 2,
+              "subject": "Product launch technical setup",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-09-29 15:15:11.09663+00",
+              "workflow_action_id": 1327
+            },
+            "approval_request": {
+              "approval_request_id": 385,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-09-29 15:15:11.091515+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1327",
+                "inquiry_response_draft:316"
+              ],
+              "reason_text": "Approve inquiry response draft revision 316 before simulated send.",
+              "rental_case_id": 542,
+              "required_approver_reference": "semantic:approval:workflow_action:1327:draft_revision:316",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1327,
+              "target_entity_reference": "workflow_action:1327:draft_revision:316",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-09-29 15:15:11.091515+00"
+            },
+            "response_intent": "PENDING_INTERNAL_CONFIRMATION"
+          },
+          "before_generation": {
+            "case_revision": 2,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 0
+          },
+          "after_generation": {
+            "case_revision": 2,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          }
+        },
+        {
+          "turn_number": 2,
+          "incoming_message": {
+            "subject": "Re: Product launch technical questions",
+            "body": "Hi again,\n\nThe hologram is optional, so please do not hold up the rest of the planning for it. A normal projection setup and light music would cover the essentials.\n\nElena"
+          },
+          "observations": [
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "projection_display",
+                "audio_playback"
+              ],
+              "observation_type": "change_candidate",
+              "claim_kind": "change_request"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: PENDING_INTERNAL_CONFIRMATION",
+              "Draft revision id: 317",
+              "Workflow action id: 1330",
+              "Approval request id: 386"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-09-29 15:15:26.660094+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:b9d35104b8818409086fd7fc687ad122adeda7d4838a184fc2e7b58b2386ac7b",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:542",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 542,
+              "semantic_subject_hash": "64cb94a352d4cab11e1a51ee7ec82464d7ac8d3a595e97119a1aba5b323bc22d",
+              "source_case_revision": 2,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1330:draft_revision:317",
+                "body": "Hi Elena,\n\nI understand the hologram is optional, so I’ll keep the projection planning moving without making it a dependency. We have a WNC projector, and I’ll check the practical setup for the space before confirming the projection arrangement.",
+                "body_type": "text",
+                "context_hash": "4b27002a06adb111ec93953bde2d05868ee41ba04ccf92437f8550f843d3191b",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:542",
+                "draft_content_hash": "8aece51610e6e08537e914f1d96fce6b24731007b9fda2e7c49e5058bbcceadc",
+                "draft_origin_workflow_action_id": 1330,
+                "draft_revision_id": 317,
+                "governed_context_hash": "64cb94a352d4cab11e1a51ee7ec82464d7ac8d3a595e97119a1aba5b323bc22d",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:542:8f7b49228880bb1c18deef7865b766445dee70e86c2974287d3eacb0bc5d564b",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "elena.vos@example.test",
+                "recipient_identity_hash": "f33b5659764db1f4541ab346e19fd5322ebaf4f3b664da03072f82cffa84580e",
+                "recipient_reference": "inquiry_response_draft:317",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 542,
+                "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+                "source_case_revision": 2,
+                "subject": "Projection setup"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-09-29 15:15:26.800111+00",
+              "workflow_action_id": 1330,
+              "workflow_action_uuid": "80bc6f82-2876-41af-a915-42793fd361e0"
+            },
+            "draft_revision": {
+              "approval_request_id": 386,
+              "approved_at": null,
+              "body_text": "Hi Elena,\n\nI understand the hologram is optional, so I’ll keep the projection planning moving without making it a dependency. We have a WNC projector, and I’ll check the practical setup for the space before confirming the projection arrangement.",
+              "closing_text": "Warm regards,",
+              "content_hash": "8aece51610e6e08537e914f1d96fce6b24731007b9fda2e7c49e5058bbcceadc",
+              "context_hash": "4b27002a06adb111ec93953bde2d05868ee41ba04ccf92437f8550f843d3191b",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Elena Vos",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+                    "semantic_values": {
+                      "available_equipment": "WNC projector",
+                      "capability": "projection display",
+                      "check_required": [
+                        "compatibility",
+                        "adapters",
+                        "files",
+                        "screenless setup suitability"
+                      ],
+                      "status": "conditional",
+                      "topic": "projection_display"
+                    },
+                    "source_reference": "phase4:technical_projection_display_confirmation",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "audio playback: current technical provision is supported.",
+                    "semantic_values": {
+                      "capability": "audio playback",
+                      "status": "supported",
+                      "topic": "audio_playback"
+                    },
+                    "source_reference": "phase4:technical_audio_playback_supported",
+                    "topic": "technical_capabilities"
+                  }
+                ],
+                "conversation_key": "governed_client_response:542",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 24
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "product launch"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: PENDING_INTERNAL_CONFIRMATION",
+                  "Contract hash: 64cb94a352d4cab11e1a51ee7ec82464d7ac8d3a595e97119a1aba5b323bc22d"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm the requested room layout against capacity requirements",
+                    "proposition_key": "blocker:2161",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2162",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2163",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1329
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2026-10-29 16:00:00+00 to 2026-10-29 20:00:00+00",
+                    "proposition_key": "availability:2026-10-29 16:00:00+00:2026-10-29 20:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": null
+                  }
+                ],
+                "recipient_email": "elena.vos@example.test",
+                "recipient_label": "Elena Vos",
+                "rental_case_id": 542,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm the requested room layout against capacity requirements",
+                    "proposition_key": "blocker:2161",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2162",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2163",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1329
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2026-10-29 16:00:00+00 to 2026-10-29 20:00:00+00",
+                    "proposition_key": "availability:2026-10-29 16:00:00+00:2026-10-29 20:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 2,
+                "workflow_action_id": 1330
+              },
+              "conversation_key": "governed_client_response:542",
+              "created_at": "2026-09-29 15:15:26.689345+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "regenerated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 317,
+              "inquiry_response_draft_revision_uuid": "f75e0262-3ebb-4d6b-97fa-3443438e0eed",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [],
+              "recipient_email": "elena.vos@example.test",
+              "recipient_label": "Elena Vos",
+              "rejected_at": null,
+              "rental_case_id": 542,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 2,
+              "subject": "Projection setup",
+              "supersedes_draft_revision_id": 316,
+              "updated_at": "2026-09-29 15:15:27.171699+00",
+              "workflow_action_id": 1330
+            },
+            "approval_request": {
+              "approval_request_id": 386,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-09-29 15:15:27.167626+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1330",
+                "inquiry_response_draft:317"
+              ],
+              "reason_text": "Approve inquiry response draft revision 317 before simulated send.",
+              "rental_case_id": 542,
+              "required_approver_reference": "semantic:approval:workflow_action:1330:draft_revision:317",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1330,
+              "target_entity_reference": "workflow_action:1330:draft_revision:317",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-09-29 15:15:27.167626+00"
+            },
+            "response_intent": "PENDING_INTERNAL_CONFIRMATION"
+          },
+          "before_generation": {
+            "case_revision": 2,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          },
+          "after_generation": {
+            "case_revision": 2,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          }
+        }
+      ],
+      "failures": [],
+      "rental_case_id": 542,
+      "case_reference_code": "RC-20260929151408882",
+      "final_state": {
+        "case_revision": 2,
+        "open_question_ids": [],
+        "execution_attempt_count": 0,
+        "open_approval_count": 1
+      },
+      "final_execution_attempts": [],
+      "final_approvals": [
+        {
+          "approval_request_id": 385,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-09-29 15:15:11.091515+00",
+          "decided_at": "2026-09-29 15:15:26.989644+00",
+          "decided_by_reference": null,
+          "decision_notes": "Superseded by a newer inquiry response draft revision.",
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1327",
+            "inquiry_response_draft:316"
+          ],
+          "reason_text": "Approve inquiry response draft revision 316 before simulated send.",
+          "rental_case_id": 542,
+          "required_approver_reference": "semantic:approval:workflow_action:1327:draft_revision:316",
+          "required_approver_role": "client_communication_review",
+          "status": "cancelled",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1327,
+          "target_entity_reference": "workflow_action:1327:draft_revision:316",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-09-29 15:15:27.06724+00"
+        },
+        {
+          "approval_request_id": 386,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-09-29 15:15:27.167626+00",
+          "decided_at": null,
+          "decided_by_reference": null,
+          "decision_notes": null,
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1330",
+            "inquiry_response_draft:317"
+          ],
+          "reason_text": "Approve inquiry response draft revision 317 before simulated send.",
+          "rental_case_id": 542,
+          "required_approver_reference": "semantic:approval:workflow_action:1330:draft_revision:317",
+          "required_approver_role": "client_communication_review",
+          "status": "open",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1330,
+          "target_entity_reference": "workflow_action:1330:draft_revision:317",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-09-29 15:15:27.167626+00"
+        }
+      ]
+    }
+  ],
+  "request_log": [
+    {
+      "method": "GET",
+      "path": "/healthz",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/inquiry-intake",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/inquiry-waiting",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/raw-evidence",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/structured-observations",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/structured-observations",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/structured-observations",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/structured-observations",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/structured-observations",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/inquiry-intake",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/inquiry-waiting",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/542",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/mailbox/generate",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/542",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/raw-evidence",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/structured-observations",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/inquiry-intake",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/inquiry-waiting",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/542",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/542/mailbox/generate",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/542",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/542",
+      "transport_recovery": true
+    }
+  ]
+}

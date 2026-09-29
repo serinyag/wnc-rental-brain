@@ -1,0 +1,233 @@
+{
+  "status": "two_passes_complete",
+  "maximum_passes": 2,
+  "passes": [
+    {
+      "number": 1,
+      "commit": "808192d69733aa3363d61c33c9d4a29cb6e4b7c5",
+      "changes": [
+        "Typed deterministic roles and information budget before ClientGenerationPayload",
+        "Stable source/value fingerprints and realized prior-draft metadata",
+        "Structured current capability, kitchen and access projections; deferred/internal text excluded",
+        "Every generated event captures plan, exact client payload and realized item identities"
+      ],
+      "tests": {
+        "focused": 78,
+        "focused_subtests": 13,
+        "full": 615,
+        "phase8": 398,
+        "full_subtests": 160,
+        "failures": 0
+      },
+      "deploy_id": "dep-datsnj7avr4c73eqmo4g",
+      "deployment": "live",
+      "accepted_drafts": 21,
+      "planner_boundary_checks": 21,
+      "diagnosis": "Primary/secondary technical conditions bundled; generic logistics topic expands to unrequested checks; fee question hides overall-pricing request; internal decision labels leak; acknowledged restriction returns on later turns.",
+      "review_metrics": {
+        "grades": {
+          "A": 6,
+          "B": 14,
+          "C": 1
+        },
+        "unnecessary_fact": 9,
+        "repetition": 2,
+        "policy_copy": 2,
+        "system_language": 10,
+        "unanswered_request": 1,
+        "missing_client_question": 0,
+        "materially_shorter": 10,
+        "policy_dump": 2,
+        "repeated_policy_block": 2
+      }
+    },
+    {
+      "number": 2,
+      "commit": "7ed2ab8d4bc67a861b28807a19f523f0ab06f076",
+      "changes": [
+        "Primary projection check separated from secondary conditions, which stay auditable as DEFER unless explicitly requested",
+        "Specific logistics components replace category-wide next steps",
+        "Overall-pricing question retained independently of booking fee and fee adjustment",
+        "Normalize client question and fee decision labels; narrow acknowledgement scope",
+        "Client-acknowledged restrictions remain deferred on follow-ups unless asked again; statement can is not treated as a repeat question"
+      ],
+      "tests": {
+        "focused": 84,
+        "focused_subtests": 13,
+        "full": 621,
+        "phase8": 404,
+        "full_subtests": 160,
+        "failures": 0
+      },
+      "deploy_id": "dep-datt2a942hec73d1cv4g",
+      "deployment": "live",
+      "review_metrics": {
+        "grades": {
+          "A": 14,
+          "B": 5,
+          "REJECTED": 2
+        },
+        "unnecessary_fact": 2,
+        "repetition": 0,
+        "policy_copy": 2,
+        "system_language": 3,
+        "unanswered_request": 2,
+        "missing_client_question": 0,
+        "materially_shorter": 3,
+        "policy_dump": 0,
+        "repeated_policy_block": 0
+      }
+    }
+  ],
+  "regression_targets": [
+    {
+      "turn": "UAT-004/1",
+      "previous_defect": "Technical response sounded like policy copy.",
+      "planner_decision": "Select music, practical projection check and custom feasibility; defer detailed projection subconditions.",
+      "result": "FAIL",
+      "assessment": "Selection improves, but can be supported remains status-like wording."
+    },
+    {
+      "turn": "UAT-004/2",
+      "previous_defect": "Repeated unchanged music capability and technical details.",
+      "planner_decision": "Music is ALREADY_COMMUNICATED; adapter/file/screenless conditions are DEFER; only the practical projection check remains.",
+      "result": "FAIL",
+      "assessment": "Repetition target passes, but making it a dependency introduces process jargon, so human acceptance fails."
+    },
+    {
+      "turn": "UAT-007/1",
+      "previous_defect": "Kitchen policy appended to a missing-timing question.",
+      "planner_decision": "MUST_ASK date/year/start/finish; DEFER kitchen and supplier rules.",
+      "result": "PASS",
+      "assessment": "No kitchen or equipment-policy paragraph; client questions are preserved."
+    },
+    {
+      "turn": "UAT-009/2",
+      "previous_defect": "Current-process and historical-authority reasoning leaked into prose.",
+      "planner_decision": "Keep the pending fee-adjustment next step; keep prior current fee ALREADY_COMMUNICATED and internal decision mechanics local.",
+      "result": "PASS",
+      "assessment": "No current-process explanation, override label or repeated price."
+    },
+    {
+      "turn": "UAT-010/1",
+      "previous_defect": "Explained what must not be assumed about the venue setup.",
+      "planner_decision": "Only a safe technical feasibility check, with secondary authority caution excluded.",
+      "result": "FAIL",
+      "assessment": "Original assumption explanation and booking disclaimer are gone; once its technical feasibility has been assessed remains formal system-like phrasing."
+    },
+    {
+      "turn": "UAT-011/1",
+      "previous_defect": "Compound supplier reply included secondary policy requirements.",
+      "planner_decision": "Select kitchen suitability, access constraint, projection and microphones; defer packaging/acknowledgement and projection subdetails.",
+      "result": "FAIL",
+      "assessment": "Candidate retains primary topics, but the preserved global known-no check rejects available in the projector sentence. No draft was persisted."
+    },
+    {
+      "turn": "UAT-012/1",
+      "previous_defect": "Compound opening read as a capability catalogue.",
+      "planner_decision": "Retain current answers, outstanding questions and pending checks; attempt to defer client-acknowledged DJ restriction.",
+      "result": "FAIL",
+      "assessment": "Substring dj in adjust incorrectly activates the repeat-question exception. The unneeded DJ restriction enters the payload and email."
+    }
+  ],
+  "remaining_issues": [
+    "Coverage is 19/21 persisted drafts and continuity is 6/7. UAT-011 turns 1 and 2 were rejected by the unchanged known_no_contradiction validator: its global positive-capability word check matches available in the projector sentence under a microphone-restriction response intent. No rejected text was forced into a draft and no failed generation was rerun.",
+    "Two deterministic selection defects remain: UAT-002/1 adds a budget-fit component although the client supplied no budget; UAT-012/1 reselects the already-acknowledged DJ restriction because the topic matcher finds dj inside adjust. The same broad topic adapter marks audio in the UAT-008 primary-need audit because of sound realistic, although no audio fact enters that email.",
+    "Residual voice defects remain in UAT-004/1 (can be supported), UAT-004/2 (making it a dependency) and UAT-010/1 (once its technical feasibility has been assessed). Human acceptance fails for these turns despite improved fact selection.",
+    "A Render HTTP 502 interrupted UAT-004 case creation before any turn or model generation. The original response/error and results are preserved in pass2_results_raw.json. Only that unrun frozen case was retried after a healthy staging check. The original create outcome is unknown, so an empty setup case may remain; no records were deleted. No accepted or rejected generation was repeated.",
+    "The planner is deterministic and auditable, but the finite request-topic adapters and conservative realization witnesses are not a semantic-understanding guarantee. This frozen suite demonstrates the remaining failures; two passes do not establish universal generalization. Reviews are direct assistant assessments, not independent human acceptance or an external LLM judge."
+  ],
+  "metrics": {
+    "persisted_drafts": 19,
+    "attempted_turns": 21,
+    "continuity": "6/7",
+    "grades": {
+      "A": 14,
+      "B": 5,
+      "C": 0,
+      "D": 0
+    },
+    "human_operator_failures": 5,
+    "editorial_flags": {
+      "unnecessary_fact": 2,
+      "repetition": 0,
+      "policy_copy": 2,
+      "system_language": 3,
+      "unanswered_request": 2,
+      "missing_client_question": 0,
+      "materially_shorter": 3,
+      "policy_dump": 0,
+      "repeated_policy_block": 0
+    },
+    "em_dashes": 0,
+    "critical_safety_flags": {},
+    "wrong_commercial_claims": 0,
+    "false_confirmations": 0,
+    "known_no_contradictions": 0,
+    "false_external_contact": 0,
+    "confidentiality_failures": 0,
+    "stale_current_drafts": 0,
+    "mean_body_words": 47.1,
+    "rejected_candidates": 2,
+    "rejection_codes": {
+      "known_no_contradiction": 2
+    },
+    "captured_plans": 21,
+    "canonical_binding_checks": 19,
+    "current_revision_checks": 12,
+    "safety_metric_scope": "Persisted drafts only; known-no validator rejections are reported separately and prevent the 21/21 gate from passing.",
+    "unanswered_request_scope": "Two turns have no persisted answer because generation was rejected; no separate omission was found in the accepted replies."
+  },
+  "tests": {
+    "pass1": {
+      "focused": 78,
+      "focused_subtests": 13,
+      "full": 615,
+      "phase8": 398,
+      "full_subtests": 160,
+      "failures": 0
+    },
+    "pass2": {
+      "focused": 84,
+      "focused_subtests": 13,
+      "full": 621,
+      "phase8": 404,
+      "full_subtests": 160,
+      "failures": 0
+    }
+  },
+  "deployment": [
+    {
+      "pass": 1,
+      "commit": "808192d69733aa3363d61c33c9d4a29cb6e4b7c5",
+      "deploy_id": "dep-datsnj7avr4c73eqmo4g",
+      "status": "live"
+    },
+    {
+      "pass": 2,
+      "commit": "7ed2ab8d4bc67a861b28807a19f523f0ab06f076",
+      "deploy_id": "dep-datt2a942hec73d1cv4g",
+      "status": "live"
+    }
+  ],
+  "safety": {
+    "environment": "staging",
+    "health": "ok",
+    "outlook": "configured_draft_only",
+    "send_gate": "DISABLED",
+    "asana": "configured_but_disabled",
+    "Graph mutations": 0,
+    "Outlook sends": 0,
+    "real Asana executions": 0,
+    "production activity": 0,
+    "approval calls": 0,
+    "external execution calls": 0,
+    "ExecutionAttempts created": 0,
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "synthetic_UAT_generation_requests": 42,
+    "scope": "Only frozen synthetic @example.test cases; no model/provider, permissions, environment settings or production changes."
+  },
+  "final_marker": "EDITORIAL_CONTENT_PLANNER_REFINEMENT_REQUIRED",
+  "outcome": "Two implementation passes completed: 19/21 drafts persisted; continuity 6/7; accepted grades 14 A / 5 B / 0 C / 0 D. 2 candidates were rejected, not counted as accepted drafts. The implementation is complete within the authorized two-pass limit, but demonstrated editorial defects remain; see the exact reviews below."
+}

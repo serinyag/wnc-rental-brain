@@ -1,0 +1,8 @@
+{
+  "input": "Could you also explain the booking fee and whether there is any room to adjust it?",
+  "unexpected_topic": "dj_sound_booth",
+  "cause": "substring dj in adjust",
+  "effect": "client-acknowledged restriction treated as explicitly asked again",
+  "provider_calls": 0,
+  "production_code_changed_after_pass2": false
+}

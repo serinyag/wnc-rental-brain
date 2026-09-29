@@ -1,0 +1,261 @@
+{
+  "provider_calls": 0,
+  "results": [
+    {
+      "scenario_id": "UAT-001",
+      "turn": 1,
+      "revision_id": 299,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3776,
+      "candidate_count": 10,
+      "included_item_count": 3
+    },
+    {
+      "scenario_id": "UAT-002",
+      "turn": 1,
+      "revision_id": 300,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 4135,
+      "candidate_count": 14,
+      "included_item_count": 7
+    },
+    {
+      "scenario_id": "UAT-003",
+      "turn": 1,
+      "revision_id": 301,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3802,
+      "candidate_count": 12,
+      "included_item_count": 3
+    },
+    {
+      "scenario_id": "UAT-004",
+      "turn": 1,
+      "revision_id": 316,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3949,
+      "candidate_count": 20,
+      "included_item_count": 4
+    },
+    {
+      "scenario_id": "UAT-004",
+      "turn": 2,
+      "revision_id": 317,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3683,
+      "candidate_count": 20,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-005",
+      "turn": 1,
+      "revision_id": 302,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3786,
+      "candidate_count": 18,
+      "included_item_count": 3
+    },
+    {
+      "scenario_id": "UAT-005",
+      "turn": 2,
+      "revision_id": 303,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3665,
+      "candidate_count": 18,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 1,
+      "revision_id": 304,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3619,
+      "candidate_count": 10,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 2,
+      "revision_id": 305,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3945,
+      "candidate_count": 14,
+      "included_item_count": 4
+    },
+    {
+      "scenario_id": "UAT-007",
+      "turn": 1,
+      "revision_id": 306,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3585,
+      "candidate_count": 15,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-008",
+      "turn": 1,
+      "revision_id": 307,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3863,
+      "candidate_count": 12,
+      "included_item_count": 4
+    },
+    {
+      "scenario_id": "UAT-009",
+      "turn": 1,
+      "revision_id": 308,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3684,
+      "candidate_count": 12,
+      "included_item_count": 3
+    },
+    {
+      "scenario_id": "UAT-009",
+      "turn": 2,
+      "revision_id": 309,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3580,
+      "candidate_count": 12,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-010",
+      "turn": 1,
+      "revision_id": 310,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3595,
+      "candidate_count": 16,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-011",
+      "turn": 1,
+      "revision_id": null,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "REJECTED",
+      "validation_codes": [
+        "known_no_contradiction"
+      ],
+      "payload_bytes": 4374,
+      "candidate_count": 25,
+      "included_item_count": 6
+    },
+    {
+      "scenario_id": "UAT-011",
+      "turn": 2,
+      "revision_id": null,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "REJECTED",
+      "validation_codes": [
+        "known_no_contradiction"
+      ],
+      "payload_bytes": 4266,
+      "candidate_count": 27,
+      "included_item_count": 6
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 1,
+      "revision_id": 311,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 4851,
+      "candidate_count": 27,
+      "included_item_count": 10
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 2,
+      "revision_id": 312,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 4035,
+      "candidate_count": 26,
+      "included_item_count": 5
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 3,
+      "revision_id": 313,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3713,
+      "candidate_count": 27,
+      "included_item_count": 4
+    },
+    {
+      "scenario_id": "UAT-013",
+      "turn": 1,
+      "revision_id": 314,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3618,
+      "candidate_count": 10,
+      "included_item_count": 2
+    },
+    {
+      "scenario_id": "UAT-013",
+      "turn": 2,
+      "revision_id": 315,
+      "plan_payload_boundary": "PASS",
+      "novelty_override": "PASS",
+      "validation": "PASS",
+      "validation_codes": [],
+      "payload_bytes": 3587,
+      "candidate_count": 10,
+      "included_item_count": 2
+    }
+  ]
+}

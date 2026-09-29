@@ -1,0 +1,1988 @@
+{
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "current_drafts": [
+    {
+      "scenario_id": "UAT-001",
+      "case_id": 529,
+      "revision_id": 299,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-002",
+      "case_id": 530,
+      "revision_id": 300,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": false,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-003",
+      "case_id": 531,
+      "revision_id": 301,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-004",
+      "case_id": 542,
+      "revision_id": 317,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-005",
+      "case_id": 533,
+      "revision_id": 303,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-006",
+      "case_id": 534,
+      "revision_id": 305,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-007",
+      "case_id": 535,
+      "revision_id": 306,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": false,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-008",
+      "case_id": 536,
+      "revision_id": 307,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-009",
+      "case_id": 537,
+      "revision_id": 309,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-010",
+      "case_id": 538,
+      "revision_id": 310,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-012",
+      "case_id": 540,
+      "revision_id": 313,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-013",
+      "case_id": 541,
+      "revision_id": 315,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "actor_reference": "test_console:operator",
+      "actor_type": "operator",
+      "event_identity_key": "governed_client_response_draft_rejected:539:df539136e4089de1c5aea7c15ddcf1ea11477b6c5dbe50f26c8ed9c6c812a8c7",
+      "event_type_code": "governed_client_response_draft_rejected",
+      "occurred_at": "2026-09-29 15:08:25.839715+00",
+      "origin_metadata": {
+        "phase": "8.8a",
+        "surface": "test_console"
+      },
+      "recorded_at": "2026-09-29 15:08:25.839715+00",
+      "rental_case_id": 539,
+      "source_reference": "governed_client_response_rejected:fbb8ee1c59615462c27b3bae849a7673b8773a9a53a12e5c6e9113e3c8ac5498",
+      "source_type": "test_console",
+      "structured_payload": {
+        "client_generation_payload": {
+          "acknowledgements": [
+            {
+              "about": "panel discussion",
+              "kind": "new_enquiry",
+              "topic": "latest_client_detail"
+            }
+          ],
+          "do_not_repeat_topics": [],
+          "external_pending": [],
+          "forbidden_claims": [
+            "Do not confirm venue availability or booking.",
+            "Do not describe a pending internal confirmation as completed.",
+            "Do not describe a pending decision or fee adjustment as approved.",
+            "Do not use historical precedent as current policy.",
+            "Do not use an em dash in the subject or body.",
+            "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it.",
+            "Do not represent a known restriction as supported."
+          ],
+          "latest_client_message": "Hi,\n\nWe are planning a 32-person panel discussion in the entire venue on 15 December, 14:00-19:00. A florist and an external caterer would arrive during setup, and we would need projection plus two microphones. Can you advise on the practical requirements?\n\nThanks,\nNora",
+          "must_say": [
+            {
+              "limitation": "not large-scale food production",
+              "suitable_for": [
+                "ready-made food",
+                "warming",
+                "plating",
+                "simple assembly"
+              ],
+              "topic": "catering_kitchen"
+            },
+            {
+              "activities": [
+                "deliveries",
+                "unloading",
+                "setup"
+              ],
+              "exception": "prior written agreement",
+              "topic": "supplier_access",
+              "within": "confirmed rental period"
+            },
+            {
+              "available_equipment": "WNC projector",
+              "capability": "projection display",
+              "check_required": [
+                "practical projection setup"
+              ],
+              "status": "conditional",
+              "topic": "projection_display"
+            },
+            {
+              "capability": "microphones",
+              "status": "not_supported",
+              "supplier_requirement": "external supplier",
+              "topic": "microphones"
+            },
+            {
+              "action": "check",
+              "status": "check_required",
+              "subjects": [
+                "supplier arrival timing",
+                "supplier setup access"
+              ],
+              "topic": "next_step"
+            }
+          ],
+          "open_client_questions": [],
+          "optional_helpful_now": [],
+          "primary_client_need": [
+            "catering_kitchen",
+            "microphones",
+            "projection_display",
+            "supplier_access"
+          ],
+          "recipient_label": "Nora Smit",
+          "response_intent": "COMMUNICATE_RESTRICTION",
+          "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+          "style_profile": [
+            "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+            "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+            "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+            "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+            "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+            "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+            "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+            "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+            "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+            "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+            "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client\u2019s budget or plans plainly.",
+            "Translate technical status into everyday language about what works or what you can arrange; avoid catalogue labels such as supported or provision. Keep material conditions intact.",
+            "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+          ]
+        },
+        "content_hash": "eee51aaf06afcac1705c0e1b512b7d39ed1b39f199dfaf88e78333094403aa38",
+        "context_hash": "fbb8ee1c59615462c27b3bae849a7673b8773a9a53a12e5c6e9113e3c8ac5498",
+        "editorial_content_plan": {
+          "acknowledge": [
+            {
+              "authority_class": "client_request",
+              "fingerprint": "6c83b314a98ced5e282b35b04d84b89f7bd231f7e644f5e8b2391b34df1021a1",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 3,
+              "proposition_key": "latest_client_detail",
+              "reason": "current_turn_delta",
+              "role": "ACKNOWLEDGE",
+              "semantic_key": "latest_client_detail",
+              "source_reference": "current_client_message",
+              "topic": "latest_client_detail",
+              "value": {
+                "about": "panel discussion",
+                "kind": "new_enquiry"
+              }
+            }
+          ],
+          "already_communicated": [],
+          "client_visible_pending_state": [
+            {
+              "available_equipment": "WNC projector",
+              "capability": "projection display",
+              "check_required": [
+                "practical projection setup"
+              ],
+              "status": "conditional",
+              "topic": "projection_display"
+            },
+            {
+              "action": "check",
+              "status": "check_required",
+              "subjects": [
+                "supplier arrival timing",
+                "supplier setup access"
+              ],
+              "topic": "next_step"
+            }
+          ],
+          "defer": [
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "24727a7a2ecf805c2767687ac37de1f6072034f1bf7a4d1c7be070e3f621b755",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 1,
+              "proposition_key": "commercial.current",
+              "reason": "not_needed_for_current_question",
+              "role": "DEFER",
+              "semantic_key": "commercial.current",
+              "source_reference": "governed_case",
+              "topic": "commercial",
+              "value": {
+                "booking_fee": "EUR 250 excl. VAT",
+                "vat": "21%"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:74b98767a0208fcb",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:74b98767a0208fcb",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen",
+              "value": {
+                "source_text": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:c860c453d6ac37bf",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:c860c453d6ac37bf",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup",
+              "value": {
+                "source_text": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:f3bb9a44431341d3",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:f3bb9a44431341d3",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup",
+              "value": {
+                "source_text": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "80b3f63de7932486a0adc203d3da5afb0d0af7abfced21fbddac1dd37440ccee",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:0385ebf31967963a",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:0385ebf31967963a",
+              "source_reference": "CF-005",
+              "topic": "capacity",
+              "value": {
+                "source_text": "To ensure smooth operations and respect ongoing bookings, drop-ins to the venue are strictly by confirmed appointment only.\nBecause the space may be rented for private events, used for wellness classes, or our team may not have capacity to receive visitors, the Client and all associated vendors must communicate with their designated point of contact before coming into the space.\nUnannounced visits may not be accommodated, and access is not guaranteed without prior confirmation."
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "8335d1f89a919a1ec7e50b783771222caccd9a885ae3279efa0d7c08aa683108",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "fact:capacity",
+              "reason": "not_needed_in_current_turn",
+              "role": "DEFER",
+              "semantic_key": "fact:capacity",
+              "source_reference": "phase4:capacity_entire_venue_within_capacity",
+              "topic": "capacity",
+              "value": {
+                "near_limit": false,
+                "requested_guests": 32,
+                "scope": "entire venue",
+                "status": "within_limits"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:compatibility",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:compatibility",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "compatibility",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:adapters",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:adapters",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "adapters",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:files",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:files",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "files",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:screenless setup suitability",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:screenless setup suitability",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "screenless setup suitability",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "24d28ccab32948952380e3c189c758fec8057239ed33154b26604337f2de35e8",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:guest_count",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:guest_count",
+              "source_reference": "governed_case",
+              "topic": "guest_count",
+              "value": {
+                "fact": "guest_count: 32"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "7c3eedc84636c3f9be34286910bdf4a0c5627584eea41dcc73b7cf865b7417cc",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:event_type",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:event_type",
+              "source_reference": "governed_case",
+              "topic": "event_type",
+              "value": {
+                "fact": "event_type: panel discussion"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "d370e3ce4887100fe10395e7cd3ddb34f6987ace8bd19a9c5e72161845a1b0fb",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:Requested rental type code",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:Requested rental type code",
+              "source_reference": "governed_case",
+              "topic": "Requested rental type code",
+              "value": {
+                "fact": "Requested rental type code: entire_venue"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "3ed4e971a0609c7c8bd316c957b931d5d8f9490fcbf2a5a0899fa6cf7d913a69",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:Requested active event start",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:Requested active event start",
+              "source_reference": "governed_case",
+              "topic": "Requested active event start",
+              "value": {
+                "fact": "Requested active event start: 2026-12-15 14:00:00+00"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "af27304825301255e528224cee0ce5a080cfa671ffca5d7e537b4bc428a2cff0",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:Requested active event end",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:Requested active event end",
+              "source_reference": "governed_case",
+              "topic": "Requested active event end",
+              "value": {
+                "fact": "Requested active event end: 2026-12-15 19:00:00+00"
+              }
+            }
+          ],
+          "do_not_repeat": [],
+          "editorial_rationale": "compound_material_answers_and_client_questions",
+          "helpful_now": [],
+          "internal_only": [
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "580e9c78519975eff5f412f177a9d642e378e5f055057fc96f686bbf272aec88",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 0,
+              "proposition_key": "restriction:Hard constraint",
+              "reason": "internal_feasibility_summary",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "restriction:Hard constraint",
+              "source_reference": "governed_case",
+              "topic": "restriction",
+              "value": {
+                "text": "Hard constraint: Current governed policy does not support the requested commitment as stated."
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "8e5ccb12b280524e8169f9c5b8762a95558ef61d4540f24d1ae867a52dd74457",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:blocker:2141",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:blocker:2141",
+              "source_reference": "blocker:2141",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm event-specific technical setup",
+                "owner": "WNC_INTERNAL",
+                "status": "ACTION_CREATED"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "63a360e83db961df6ad0ed37ab49bfb49cc83d7a68afdfe1eb6af0e0ce520216",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm supplier arrival and setup windows",
+                "owner": "WNC_INTERNAL",
+                "status": "ACTION_CREATED"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "09770a6d82e523071e05d47f5a355f7f3db0a192ebf0162ef017e80190b748ba",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm entire venue availability for 2026-12-15 14:00:00+00 to 2026-12-15 19:00:00+00",
+                "owner": "WNC_INTERNAL",
+                "status": "ACTION_CREATED"
+              }
+            }
+          ],
+          "must_ask": [],
+          "must_communicate": [
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 1,
+              "proposition_key": "fact:catering_kitchen",
+              "reason": "current_catering_suitability_question",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:catering_kitchen",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen",
+              "value": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "c44c4347be161b1f3a56fc6ea168b9b0dfb1dffe8f1dd36b6dcf4af26ca0f9c8",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 5,
+              "proposition_key": "fact:supplier_access",
+              "reason": "one_immediate_access_constraint",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:supplier_access",
+              "source_reference": "CF-005",
+              "topic": "supplier_access",
+              "value": {
+                "activities": [
+                  "deliveries",
+                  "unloading",
+                  "setup"
+                ],
+                "exception": "prior written agreement",
+                "within": "confirmed rental period"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 1,
+              "proposition_key": "fact:projection_display",
+              "reason": "requested_technical_capability",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:projection_display",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_display",
+              "value": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "09129378b9d949ef75a76b88fb1e5d7d3d6fa5f3166dd83ac83d01657a8a38d4",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 0,
+              "proposition_key": "fact:microphones",
+              "reason": "material_known_restriction",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:microphones",
+              "source_reference": "phase4:technical_microphones_restriction",
+              "topic": "microphones",
+              "value": {
+                "capability": "microphones",
+                "status": "not_supported",
+                "supplier_requirement": "external supplier"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "b320d8baf1f3da0c554feb37e3a541018738575bda80c7239eccebd8ec4ff0fa",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 4,
+              "proposition_key": "next_step",
+              "reason": "immediate_wnc_owned_next_step",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "next_step",
+              "source_reference": "governed_case",
+              "topic": "next_step",
+              "value": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "supplier arrival timing",
+                  "supplier setup access"
+                ]
+              }
+            }
+          ],
+          "primary_client_need": [
+            "catering_kitchen",
+            "microphones",
+            "projection_display",
+            "supplier_access"
+          ],
+          "response_intent": "COMMUNICATE_RESTRICTION",
+          "source_bindings": [
+            {
+              "fingerprint": "6c83b314a98ced5e282b35b04d84b89f7bd231f7e644f5e8b2391b34df1021a1",
+              "semantic_key": "latest_client_detail",
+              "source_reference": "current_client_message"
+            },
+            {
+              "fingerprint": "24727a7a2ecf805c2767687ac37de1f6072034f1bf7a4d1c7be070e3f621b755",
+              "semantic_key": "commercial.current",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "semantic_key": "fact:catering_kitchen",
+              "source_reference": "SERV-003"
+            },
+            {
+              "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+              "semantic_key": "guidance:74b98767a0208fcb",
+              "source_reference": "SERV-003"
+            },
+            {
+              "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+              "semantic_key": "guidance:c860c453d6ac37bf",
+              "source_reference": "SERV-004"
+            },
+            {
+              "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+              "semantic_key": "guidance:f3bb9a44431341d3",
+              "source_reference": "SERV-004"
+            },
+            {
+              "fingerprint": "c44c4347be161b1f3a56fc6ea168b9b0dfb1dffe8f1dd36b6dcf4af26ca0f9c8",
+              "semantic_key": "fact:supplier_access",
+              "source_reference": "CF-005"
+            },
+            {
+              "fingerprint": "80b3f63de7932486a0adc203d3da5afb0d0af7abfced21fbddac1dd37440ccee",
+              "semantic_key": "guidance:0385ebf31967963a",
+              "source_reference": "CF-005"
+            },
+            {
+              "fingerprint": "8335d1f89a919a1ec7e50b783771222caccd9a885ae3279efa0d7c08aa683108",
+              "semantic_key": "fact:capacity",
+              "source_reference": "phase4:capacity_entire_venue_within_capacity"
+            },
+            {
+              "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+              "semantic_key": "condition:projection:compatibility",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+              "semantic_key": "condition:projection:adapters",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+              "semantic_key": "condition:projection:files",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+              "semantic_key": "condition:projection:screenless setup suitability",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "semantic_key": "fact:projection_display",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "09129378b9d949ef75a76b88fb1e5d7d3d6fa5f3166dd83ac83d01657a8a38d4",
+              "semantic_key": "fact:microphones",
+              "source_reference": "phase4:technical_microphones_restriction"
+            },
+            {
+              "fingerprint": "580e9c78519975eff5f412f177a9d642e378e5f055057fc96f686bbf272aec88",
+              "semantic_key": "restriction:Hard constraint",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "24d28ccab32948952380e3c189c758fec8057239ed33154b26604337f2de35e8",
+              "semantic_key": "case_fact:guest_count",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "7c3eedc84636c3f9be34286910bdf4a0c5627584eea41dcc73b7cf865b7417cc",
+              "semantic_key": "case_fact:event_type",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "d370e3ce4887100fe10395e7cd3ddb34f6987ace8bd19a9c5e72161845a1b0fb",
+              "semantic_key": "case_fact:Requested rental type code",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "3ed4e971a0609c7c8bd316c957b931d5d8f9490fcbf2a5a0899fa6cf7d913a69",
+              "semantic_key": "case_fact:Requested active event start",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "af27304825301255e528224cee0ce5a080cfa671ffca5d7e537b4bc428a2cff0",
+              "semantic_key": "case_fact:Requested active event end",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "8e5ccb12b280524e8169f9c5b8762a95558ef61d4540f24d1ae867a52dd74457",
+              "semantic_key": "internal:blocker:2141",
+              "source_reference": "blocker:2141"
+            },
+            {
+              "fingerprint": "63a360e83db961df6ad0ed37ab49bfb49cc83d7a68afdfe1eb6af0e0ce520216",
+              "semantic_key": "internal:logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00"
+            },
+            {
+              "fingerprint": "09770a6d82e523071e05d47f5a355f7f3db0a192ebf0162ef017e80190b748ba",
+              "semantic_key": "internal:availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00"
+            },
+            {
+              "fingerprint": "b320d8baf1f3da0c554feb37e3a541018738575bda80c7239eccebd8ec4ff0fa",
+              "semantic_key": "next_step",
+              "source_reference": "governed_case"
+            }
+          ],
+          "substantive_budget": 5,
+          "version": "editorial_content_plan_v2"
+        },
+        "model": "gpt-5.6-sol",
+        "provider": "openai",
+        "provider_incomplete_reason": null,
+        "provider_request_id": "req_daf07e0065524c8193f44adb1de010b6",
+        "provider_response_id": "resp_01c374a6883f4655016abbd4641dac87d2a04a3731ebdaa05c",
+        "provider_response_status": "completed",
+        "rejected_body": "Hi Nora,\n\nA panel discussion with catering and floral setup sounds like a great use of the space. The kitchen is suitable for ready-made food, warming, plating and simple assembly, but not large-scale food production.\n\nSupplier deliveries, unloading and setup need to take place within the confirmed rental period unless agreed otherwise in writing beforehand. I\u2019ll check the proposed supplier arrival timing and setup access.\n\nA WNC projector is available, and I\u2019ll check the practical setup for your projection needs. Microphones are not provided, so these would need to come from an external supplier.",
+        "rejected_context": {
+          "contextual_guidance": [
+            {
+              "client_safe_guidance": "WNC can support catering, but the kitchen is best suited to ready-made food, warming, plating and easy on-site assembly rather than large-scale food production. Share the catering format and equipment needs before the event.",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen"
+            },
+            {
+              "client_safe_guidance": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning.",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen"
+            },
+            {
+              "client_safe_guidance": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup"
+            },
+            {
+              "client_safe_guidance": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup"
+            },
+            {
+              "client_safe_guidance": "To ensure smooth transitions between classes, private events, and daily operations, access to the Venue is strictly limited to the confirmed rental period.\nNo early access: The Client, guests, and vendors may not enter the Venue before the official rental start time. This includes setup, deliveries, walkthroughs, or equipment drop-off.\n30-minute arrival window: The Client and their vendors may arrive up to 30 minutes before the official start time for arrival only, for example to account for traffic or to check in with the Venue coordinator. This does not permit setup, unloading, or use of the space.\nSetup may only begin at the official rental start time: All setup, staging, unloading, technical build, and vendor work must begin no earlier than the confirmed rental start.\nOvertime fees apply for any unauthorized early setup: If setup begins early without prior written approval, the Venue will charge overtime at the applicable rate.\nDeliveries: All deliveries must take place during the confirmed rental window unless otherwise approved in writing.",
+              "source_reference": "CF-005",
+              "topic": "capacity"
+            },
+            {
+              "client_safe_guidance": "To ensure smooth operations and respect ongoing bookings, drop-ins to the venue are strictly by confirmed appointment only.\nBecause the space may be rented for private events, used for wellness classes, or our team may not have capacity to receive visitors, the Client and all associated vendors must communicate with their designated point of contact before coming into the space.\nUnannounced visits may not be accommodated, and access is not guaranteed without prior confirmation.",
+              "source_reference": "CF-005",
+              "topic": "capacity"
+            },
+            {
+              "client_safe_guidance": "The requested 32 guests are within the current capacity rules for entire venue. The applicable maximum is 110 guests. ",
+              "semantic_values": {
+                "near_limit": false,
+                "requested_guests": 32,
+                "scope": "entire venue",
+                "status": "within_limits",
+                "topic": "capacity"
+              },
+              "source_reference": "phase4:capacity_entire_venue_within_capacity",
+              "topic": "capacity"
+            },
+            {
+              "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+              "semantic_values": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "compatibility",
+                  "adapters",
+                  "files",
+                  "screenless setup suitability"
+                ],
+                "status": "conditional",
+                "topic": "projection_display"
+              },
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "technical_capabilities"
+            },
+            {
+              "client_safe_guidance": "microphones: requires an external supplier.",
+              "semantic_values": {
+                "capability": "microphones",
+                "status": "not_supported",
+                "supplier_requirement": "external supplier",
+                "topic": "microphones"
+              },
+              "source_reference": "phase4:technical_microphones_restriction",
+              "topic": "technical_capabilities"
+            }
+          ],
+          "operator_annotations": [
+            {
+              "blocking": true,
+              "message": "Confirm event-specific technical setup",
+              "proposition_key": "blocker:2141",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": 1290
+            },
+            {
+              "blocking": true,
+              "message": "Confirm supplier arrival and setup windows",
+              "proposition_key": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": 1291
+            },
+            {
+              "blocking": true,
+              "message": "Confirm entire venue availability for 2026-12-15 14:00:00+00 to 2026-12-15 19:00:00+00",
+              "proposition_key": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": 1292
+            }
+          ],
+          "resolution_items": [
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm event-specific technical setup",
+              "proposition_key": "blocker:2141",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "ACTION_CREATED",
+              "workflow_action_id": 1290
+            },
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm supplier arrival and setup windows",
+              "proposition_key": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "ACTION_CREATED",
+              "workflow_action_id": 1291
+            },
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm entire venue availability for 2026-12-15 14:00:00+00 to 2026-12-15 19:00:00+00",
+              "proposition_key": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "ACTION_CREATED",
+              "workflow_action_id": 1292
+            }
+          ]
+        },
+        "rejected_question_ids": [],
+        "rejected_subject": "Practical requirements for your panel discussion",
+        "response_intent": "COMMUNICATE_RESTRICTION",
+        "source_case_revision": 2,
+        "validation_codes": [
+          "known_no_contradiction"
+        ],
+        "validation_result": "rejected"
+      },
+      "workflow_event_id": 15292,
+      "workflow_event_uuid": "5772943f-a517-48f8-8b26-06d617f31188"
+    },
+    {
+      "actor_reference": "test_console:operator",
+      "actor_type": "operator",
+      "event_identity_key": "governed_client_response_draft_rejected:539:9c4ef5c3eb31b336e791f998e8d56a7f5892e3c40eb76a7a4b67f1e6d00b156e",
+      "event_type_code": "governed_client_response_draft_rejected",
+      "occurred_at": "2026-09-29 15:08:41.15939+00",
+      "origin_metadata": {
+        "phase": "8.8a",
+        "surface": "test_console"
+      },
+      "recorded_at": "2026-09-29 15:08:41.15939+00",
+      "rental_case_id": 539,
+      "source_reference": "governed_client_response_rejected:b08e85000cbd6aa2ebc2d612984ba93f9f543f4681fd8f8e54eb4ed947cf9ef0",
+      "source_type": "test_console",
+      "structured_payload": {
+        "client_generation_payload": {
+          "acknowledgements": [
+            {
+              "focus": "the change or clarification in the latest message",
+              "kind": "new_client_detail",
+              "topic": "latest_client_detail"
+            }
+          ],
+          "do_not_repeat_topics": [],
+          "external_pending": [],
+          "forbidden_claims": [
+            "Do not confirm venue availability or booking.",
+            "Do not describe a pending internal confirmation as completed.",
+            "Do not describe a pending decision or fee adjustment as approved.",
+            "Do not use historical precedent as current policy.",
+            "Do not use an em dash in the subject or body.",
+            "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it.",
+            "Do not represent a known restriction as supported."
+          ],
+          "latest_client_message": "The florist can arrive only after any venue handover requirements are confirmed. The caterer needs a loading route and an estimated arrival window.\n\nNora",
+          "must_say": [
+            {
+              "limitation": "not large-scale food production",
+              "suitable_for": [
+                "ready-made food",
+                "warming",
+                "plating",
+                "simple assembly"
+              ],
+              "topic": "catering_kitchen"
+            },
+            {
+              "activities": [
+                "deliveries",
+                "unloading",
+                "setup"
+              ],
+              "exception": "prior written agreement",
+              "topic": "supplier_access",
+              "within": "confirmed rental period"
+            },
+            {
+              "available_equipment": "WNC projector",
+              "capability": "projection display",
+              "check_required": [
+                "practical projection setup"
+              ],
+              "status": "conditional",
+              "topic": "projection_display"
+            },
+            {
+              "capability": "microphones",
+              "status": "not_supported",
+              "supplier_requirement": "external supplier",
+              "topic": "microphones"
+            },
+            {
+              "action": "check",
+              "status": "check_required",
+              "subjects": [
+                "venue handover",
+                "supplier arrival timing",
+                "loading route"
+              ],
+              "topic": "next_step"
+            }
+          ],
+          "open_client_questions": [],
+          "optional_helpful_now": [],
+          "primary_client_need": [
+            "catering_kitchen",
+            "supplier_access"
+          ],
+          "recipient_label": "Nora Smit",
+          "response_intent": "COMMUNICATE_RESTRICTION",
+          "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+          "style_profile": [
+            "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+            "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+            "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+            "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+            "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+            "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+            "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+            "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+            "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+            "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+            "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client\u2019s budget or plans plainly.",
+            "Translate technical status into everyday language about what works or what you can arrange; avoid catalogue labels such as supported or provision. Keep material conditions intact.",
+            "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+          ]
+        },
+        "content_hash": "7a574b64a9fd15bcc387a42089b9413a33a7b7533637441918cde1e1633b328c",
+        "context_hash": "b08e85000cbd6aa2ebc2d612984ba93f9f543f4681fd8f8e54eb4ed947cf9ef0",
+        "editorial_content_plan": {
+          "acknowledge": [
+            {
+              "authority_class": "client_request",
+              "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 3,
+              "proposition_key": "latest_client_detail",
+              "reason": "current_turn_delta",
+              "role": "ACKNOWLEDGE",
+              "semantic_key": "latest_client_detail",
+              "source_reference": "current_client_message",
+              "topic": "latest_client_detail",
+              "value": {
+                "focus": "the change or clarification in the latest message",
+                "kind": "new_client_detail"
+              }
+            }
+          ],
+          "already_communicated": [],
+          "client_visible_pending_state": [
+            {
+              "available_equipment": "WNC projector",
+              "capability": "projection display",
+              "check_required": [
+                "practical projection setup"
+              ],
+              "status": "conditional",
+              "topic": "projection_display"
+            },
+            {
+              "action": "check",
+              "status": "check_required",
+              "subjects": [
+                "venue handover",
+                "supplier arrival timing",
+                "loading route"
+              ],
+              "topic": "next_step"
+            }
+          ],
+          "defer": [
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "24727a7a2ecf805c2767687ac37de1f6072034f1bf7a4d1c7be070e3f621b755",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 1,
+              "proposition_key": "commercial.current",
+              "reason": "not_needed_for_current_question",
+              "role": "DEFER",
+              "semantic_key": "commercial.current",
+              "source_reference": "governed_case",
+              "topic": "commercial",
+              "value": {
+                "booking_fee": "EUR 250 excl. VAT",
+                "vat": "21%"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:74b98767a0208fcb",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:74b98767a0208fcb",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen",
+              "value": {
+                "source_text": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:c860c453d6ac37bf",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:c860c453d6ac37bf",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup",
+              "value": {
+                "source_text": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:f3bb9a44431341d3",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:f3bb9a44431341d3",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup",
+              "value": {
+                "source_text": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "80b3f63de7932486a0adc203d3da5afb0d0af7abfced21fbddac1dd37440ccee",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "guidance:0385ebf31967963a",
+              "reason": "secondary_or_unstructured_guidance_not_needed_now",
+              "role": "DEFER",
+              "semantic_key": "guidance:0385ebf31967963a",
+              "source_reference": "CF-005",
+              "topic": "capacity",
+              "value": {
+                "source_text": "To ensure smooth operations and respect ongoing bookings, drop-ins to the venue are strictly by confirmed appointment only.\nBecause the space may be rented for private events, used for wellness classes, or our team may not have capacity to receive visitors, the Client and all associated vendors must communicate with their designated point of contact before coming into the space.\nUnannounced visits may not be accommodated, and access is not guaranteed without prior confirmation."
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "8335d1f89a919a1ec7e50b783771222caccd9a885ae3279efa0d7c08aa683108",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "fact:capacity",
+              "reason": "not_needed_in_current_turn",
+              "role": "DEFER",
+              "semantic_key": "fact:capacity",
+              "source_reference": "phase4:capacity_entire_venue_within_capacity",
+              "topic": "capacity",
+              "value": {
+                "near_limit": false,
+                "requested_guests": 32,
+                "scope": "entire venue",
+                "status": "within_limits"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:compatibility",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:compatibility",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "compatibility",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:adapters",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:adapters",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "adapters",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:files",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:files",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "files",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 2,
+              "proposition_key": "condition:projection:screenless setup suitability",
+              "reason": "secondary_condition_covered_by_practical_setup_check",
+              "role": "DEFER",
+              "semantic_key": "condition:projection:screenless setup suitability",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_detail",
+              "value": {
+                "check_required": "screenless setup suitability",
+                "status": "check_required"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "24d28ccab32948952380e3c189c758fec8057239ed33154b26604337f2de35e8",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:guest_count",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:guest_count",
+              "source_reference": "governed_case",
+              "topic": "guest_count",
+              "value": {
+                "fact": "guest_count: 32"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "7c3eedc84636c3f9be34286910bdf4a0c5627584eea41dcc73b7cf865b7417cc",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:event_type",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:event_type",
+              "source_reference": "governed_case",
+              "topic": "event_type",
+              "value": {
+                "fact": "event_type: panel discussion"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "d370e3ce4887100fe10395e7cd3ddb34f6987ace8bd19a9c5e72161845a1b0fb",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:Requested rental type code",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:Requested rental type code",
+              "source_reference": "governed_case",
+              "topic": "Requested rental type code",
+              "value": {
+                "fact": "Requested rental type code: entire_venue"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "3ed4e971a0609c7c8bd316c957b931d5d8f9490fcbf2a5a0899fa6cf7d913a69",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:Requested active event start",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:Requested active event start",
+              "source_reference": "governed_case",
+              "topic": "Requested active event start",
+              "value": {
+                "fact": "Requested active event start: 2026-12-15 14:00:00+00"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "af27304825301255e528224cee0ce5a080cfa671ffca5d7e537b4bc428a2cff0",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "case_fact:Requested active event end",
+              "reason": "case_summary_not_needed_for_this_reply",
+              "role": "DEFER",
+              "semantic_key": "case_fact:Requested active event end",
+              "source_reference": "governed_case",
+              "topic": "Requested active event end",
+              "value": {
+                "fact": "Requested active event end: 2026-12-15 19:00:00+00"
+              }
+            }
+          ],
+          "do_not_repeat": [],
+          "editorial_rationale": "compound_material_answers_and_client_questions",
+          "helpful_now": [],
+          "internal_only": [
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "580e9c78519975eff5f412f177a9d642e378e5f055057fc96f686bbf272aec88",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 0,
+              "proposition_key": "restriction:Hard constraint",
+              "reason": "internal_feasibility_summary",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "restriction:Hard constraint",
+              "source_reference": "governed_case",
+              "topic": "restriction",
+              "value": {
+                "text": "Hard constraint: Current governed policy does not support the requested commitment as stated."
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "e61513c7948ccf2f97b9b5ffdb2c763a4b098cfce171f542a2c855f3aa183146",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:blocker:2141",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:blocker:2141",
+              "source_reference": "blocker:2141",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm event-specific technical setup",
+                "owner": "WNC_INTERNAL",
+                "status": "REQUIRED"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "0d66976c3b73ae4e8a08c82a95b5a95a435c771a2242a0b61b77bb2e9a6d3ea5",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm the supplier loading route",
+                "owner": "WNC_INTERNAL",
+                "status": "ACTION_CREATED"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "ad9bddf446bce99303f00b1b9151fdb2874401e25e9605811d2189211e1f62e4",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm venue handover requirements",
+                "owner": "WNC_INTERNAL",
+                "status": "ACTION_CREATED"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "219eb72ec3185c74c3902eba2ba4d19e1cc630e1fd6157f4b3893d526549df4d",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm supplier arrival and setup windows",
+                "owner": "WNC_INTERNAL",
+                "status": "REQUIRED"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "a1641dc077868106bd60cc675d91929defa52768dbbcfbc6eafab5a6cb959304",
+              "included_in_model_payload": false,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 50,
+              "proposition_key": "internal:availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "reason": "ownership_and_workflow_mechanics_stay_local",
+              "role": "INTERNAL_ONLY",
+              "semantic_key": "internal:availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "topic": "resolution",
+              "value": {
+                "message": "Confirm entire venue availability for 2026-12-15 14:00:00+00 to 2026-12-15 19:00:00+00",
+                "owner": "WNC_INTERNAL",
+                "status": "REQUIRED"
+              }
+            }
+          ],
+          "must_ask": [],
+          "must_communicate": [
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 1,
+              "proposition_key": "fact:catering_kitchen",
+              "reason": "current_catering_suitability_question",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:catering_kitchen",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen",
+              "value": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "c44c4347be161b1f3a56fc6ea168b9b0dfb1dffe8f1dd36b6dcf4af26ca0f9c8",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 5,
+              "proposition_key": "fact:supplier_access",
+              "reason": "one_immediate_access_constraint",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:supplier_access",
+              "source_reference": "CF-005",
+              "topic": "supplier_access",
+              "value": {
+                "activities": [
+                  "deliveries",
+                  "unloading",
+                  "setup"
+                ],
+                "exception": "prior written agreement",
+                "within": "confirmed rental period"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 1,
+              "proposition_key": "fact:projection_display",
+              "reason": "requested_technical_capability",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:projection_display",
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "projection_display",
+              "value": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "09129378b9d949ef75a76b88fb1e5d7d3d6fa5f3166dd83ac83d01657a8a38d4",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 0,
+              "proposition_key": "fact:microphones",
+              "reason": "material_known_restriction",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "fact:microphones",
+              "source_reference": "phase4:technical_microphones_restriction",
+              "topic": "microphones",
+              "value": {
+                "capability": "microphones",
+                "status": "not_supported",
+                "supplier_requirement": "external supplier"
+              }
+            },
+            {
+              "authority_class": "current_governed",
+              "fingerprint": "edff3d559b1e85048a79b7be96b271ad732bc96a40ed9983de29a4f03481918a",
+              "included_in_model_payload": true,
+              "prior_turn_status": "not_previously_communicated",
+              "priority": 4,
+              "proposition_key": "next_step",
+              "reason": "immediate_wnc_owned_next_step",
+              "role": "MUST_COMMUNICATE",
+              "semantic_key": "next_step",
+              "source_reference": "governed_case",
+              "topic": "next_step",
+              "value": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "venue handover",
+                  "supplier arrival timing",
+                  "loading route"
+                ]
+              }
+            }
+          ],
+          "primary_client_need": [
+            "catering_kitchen",
+            "supplier_access"
+          ],
+          "response_intent": "COMMUNICATE_RESTRICTION",
+          "source_bindings": [
+            {
+              "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+              "semantic_key": "latest_client_detail",
+              "source_reference": "current_client_message"
+            },
+            {
+              "fingerprint": "24727a7a2ecf805c2767687ac37de1f6072034f1bf7a4d1c7be070e3f621b755",
+              "semantic_key": "commercial.current",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "semantic_key": "fact:catering_kitchen",
+              "source_reference": "SERV-003"
+            },
+            {
+              "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+              "semantic_key": "guidance:74b98767a0208fcb",
+              "source_reference": "SERV-003"
+            },
+            {
+              "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+              "semantic_key": "guidance:c860c453d6ac37bf",
+              "source_reference": "SERV-004"
+            },
+            {
+              "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+              "semantic_key": "guidance:f3bb9a44431341d3",
+              "source_reference": "SERV-004"
+            },
+            {
+              "fingerprint": "c44c4347be161b1f3a56fc6ea168b9b0dfb1dffe8f1dd36b6dcf4af26ca0f9c8",
+              "semantic_key": "fact:supplier_access",
+              "source_reference": "CF-005"
+            },
+            {
+              "fingerprint": "80b3f63de7932486a0adc203d3da5afb0d0af7abfced21fbddac1dd37440ccee",
+              "semantic_key": "guidance:0385ebf31967963a",
+              "source_reference": "CF-005"
+            },
+            {
+              "fingerprint": "8335d1f89a919a1ec7e50b783771222caccd9a885ae3279efa0d7c08aa683108",
+              "semantic_key": "fact:capacity",
+              "source_reference": "phase4:capacity_entire_venue_within_capacity"
+            },
+            {
+              "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+              "semantic_key": "condition:projection:compatibility",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+              "semantic_key": "condition:projection:adapters",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+              "semantic_key": "condition:projection:files",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+              "semantic_key": "condition:projection:screenless setup suitability",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "semantic_key": "fact:projection_display",
+              "source_reference": "phase4:technical_projection_display_confirmation"
+            },
+            {
+              "fingerprint": "09129378b9d949ef75a76b88fb1e5d7d3d6fa5f3166dd83ac83d01657a8a38d4",
+              "semantic_key": "fact:microphones",
+              "source_reference": "phase4:technical_microphones_restriction"
+            },
+            {
+              "fingerprint": "580e9c78519975eff5f412f177a9d642e378e5f055057fc96f686bbf272aec88",
+              "semantic_key": "restriction:Hard constraint",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "24d28ccab32948952380e3c189c758fec8057239ed33154b26604337f2de35e8",
+              "semantic_key": "case_fact:guest_count",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "7c3eedc84636c3f9be34286910bdf4a0c5627584eea41dcc73b7cf865b7417cc",
+              "semantic_key": "case_fact:event_type",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "d370e3ce4887100fe10395e7cd3ddb34f6987ace8bd19a9c5e72161845a1b0fb",
+              "semantic_key": "case_fact:Requested rental type code",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "3ed4e971a0609c7c8bd316c957b931d5d8f9490fcbf2a5a0899fa6cf7d913a69",
+              "semantic_key": "case_fact:Requested active event start",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "af27304825301255e528224cee0ce5a080cfa671ffca5d7e537b4bc428a2cff0",
+              "semantic_key": "case_fact:Requested active event end",
+              "source_reference": "governed_case"
+            },
+            {
+              "fingerprint": "e61513c7948ccf2f97b9b5ffdb2c763a4b098cfce171f542a2c855f3aa183146",
+              "semantic_key": "internal:blocker:2141",
+              "source_reference": "blocker:2141"
+            },
+            {
+              "fingerprint": "0d66976c3b73ae4e8a08c82a95b5a95a435c771a2242a0b61b77bb2e9a6d3ea5",
+              "semantic_key": "internal:logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00"
+            },
+            {
+              "fingerprint": "ad9bddf446bce99303f00b1b9151fdb2874401e25e9605811d2189211e1f62e4",
+              "semantic_key": "internal:logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00"
+            },
+            {
+              "fingerprint": "219eb72ec3185c74c3902eba2ba4d19e1cc630e1fd6157f4b3893d526549df4d",
+              "semantic_key": "internal:logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00"
+            },
+            {
+              "fingerprint": "a1641dc077868106bd60cc675d91929defa52768dbbcfbc6eafab5a6cb959304",
+              "semantic_key": "internal:availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "source_reference": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00"
+            },
+            {
+              "fingerprint": "edff3d559b1e85048a79b7be96b271ad732bc96a40ed9983de29a4f03481918a",
+              "semantic_key": "next_step",
+              "source_reference": "governed_case"
+            }
+          ],
+          "substantive_budget": 5,
+          "version": "editorial_content_plan_v2"
+        },
+        "model": "gpt-5.6-sol",
+        "provider": "openai",
+        "provider_incomplete_reason": null,
+        "provider_request_id": "req_4d8328cb54ce4e4a83ebf7a7670eeb86",
+        "provider_response_id": "resp_07815d822cb67a62016abbd473e65487d2a5fcea65423eff13",
+        "provider_response_status": "completed",
+        "rejected_body": "Hi Nora,\n\nUnderstood. The florist will wait for the venue handover requirements to be confirmed, and the caterer needs both a loading route and an estimated arrival window.\n\nDeliveries, unloading and setup must take place within the confirmed rental period unless agreed otherwise in writing. I\u2019ll check the venue handover, supplier arrival timing and loading route before confirming those details.\n\nThe catering kitchen is suitable for ready-made food, warming, plating and simple assembly, but not large-scale food production. A WNC projector is available, and I\u2019ll check the practical projection setup. Microphones would need to come from an external supplier.",
+        "rejected_context": {
+          "contextual_guidance": [
+            {
+              "client_safe_guidance": "WNC can support catering, but the kitchen is best suited to ready-made food, warming, plating and easy on-site assembly rather than large-scale food production. Share the catering format and equipment needs before the event.",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen"
+            },
+            {
+              "client_safe_guidance": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning.",
+              "source_reference": "SERV-003",
+              "topic": "catering_kitchen"
+            },
+            {
+              "client_safe_guidance": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup"
+            },
+            {
+              "client_safe_guidance": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in",
+              "source_reference": "SERV-004",
+              "topic": "external_supplier_setup"
+            },
+            {
+              "client_safe_guidance": "To ensure smooth transitions between classes, private events, and daily operations, access to the Venue is strictly limited to the confirmed rental period.\nNo early access: The Client, guests, and vendors may not enter the Venue before the official rental start time. This includes setup, deliveries, walkthroughs, or equipment drop-off.\n30-minute arrival window: The Client and their vendors may arrive up to 30 minutes before the official start time for arrival only, for example to account for traffic or to check in with the Venue coordinator. This does not permit setup, unloading, or use of the space.\nSetup may only begin at the official rental start time: All setup, staging, unloading, technical build, and vendor work must begin no earlier than the confirmed rental start.\nOvertime fees apply for any unauthorized early setup: If setup begins early without prior written approval, the Venue will charge overtime at the applicable rate.\nDeliveries: All deliveries must take place during the confirmed rental window unless otherwise approved in writing.",
+              "source_reference": "CF-005",
+              "topic": "capacity"
+            },
+            {
+              "client_safe_guidance": "To ensure smooth operations and respect ongoing bookings, drop-ins to the venue are strictly by confirmed appointment only.\nBecause the space may be rented for private events, used for wellness classes, or our team may not have capacity to receive visitors, the Client and all associated vendors must communicate with their designated point of contact before coming into the space.\nUnannounced visits may not be accommodated, and access is not guaranteed without prior confirmation.",
+              "source_reference": "CF-005",
+              "topic": "capacity"
+            },
+            {
+              "client_safe_guidance": "The requested 32 guests are within the current capacity rules for entire venue. The applicable maximum is 110 guests. ",
+              "semantic_values": {
+                "near_limit": false,
+                "requested_guests": 32,
+                "scope": "entire venue",
+                "status": "within_limits",
+                "topic": "capacity"
+              },
+              "source_reference": "phase4:capacity_entire_venue_within_capacity",
+              "topic": "capacity"
+            },
+            {
+              "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+              "semantic_values": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "compatibility",
+                  "adapters",
+                  "files",
+                  "screenless setup suitability"
+                ],
+                "status": "conditional",
+                "topic": "projection_display"
+              },
+              "source_reference": "phase4:technical_projection_display_confirmation",
+              "topic": "technical_capabilities"
+            },
+            {
+              "client_safe_guidance": "microphones: requires an external supplier.",
+              "semantic_values": {
+                "capability": "microphones",
+                "status": "not_supported",
+                "supplier_requirement": "external supplier",
+                "topic": "microphones"
+              },
+              "source_reference": "phase4:technical_microphones_restriction",
+              "topic": "technical_capabilities"
+            }
+          ],
+          "operator_annotations": [
+            {
+              "blocking": true,
+              "message": "Confirm event-specific technical setup",
+              "proposition_key": "blocker:2141",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": null
+            },
+            {
+              "blocking": true,
+              "message": "Confirm the supplier loading route",
+              "proposition_key": "logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": 1293
+            },
+            {
+              "blocking": true,
+              "message": "Confirm venue handover requirements",
+              "proposition_key": "logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": 1294
+            },
+            {
+              "blocking": true,
+              "message": "Confirm supplier arrival and setup windows",
+              "proposition_key": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": null
+            },
+            {
+              "blocking": true,
+              "message": "Confirm entire venue availability for 2026-12-15 14:00:00+00 to 2026-12-15 19:00:00+00",
+              "proposition_key": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "type": "INTERNAL_CONFIRMATION",
+              "workflow_action_id": null
+            }
+          ],
+          "resolution_items": [
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm event-specific technical setup",
+              "proposition_key": "blocker:2141",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "REQUIRED",
+              "workflow_action_id": null
+            },
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm the supplier loading route",
+              "proposition_key": "logistics:loading_route:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "ACTION_CREATED",
+              "workflow_action_id": 1293
+            },
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm venue handover requirements",
+              "proposition_key": "logistics:venue_handover:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "ACTION_CREATED",
+              "workflow_action_id": 1294
+            },
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm supplier arrival and setup windows",
+              "proposition_key": "logistics:supplier_arrival:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "REQUIRED",
+              "workflow_action_id": null
+            },
+            {
+              "blocking": true,
+              "client_visibility": "INTERNAL_ONLY",
+              "message": "Confirm entire venue availability for 2026-12-15 14:00:00+00 to 2026-12-15 19:00:00+00",
+              "proposition_key": "availability:2026-12-15 14:00:00+00:2026-12-15 19:00:00+00",
+              "resolution_owner": "WNC_INTERNAL",
+              "resolution_status": "REQUIRED",
+              "workflow_action_id": null
+            }
+          ]
+        },
+        "rejected_question_ids": [],
+        "rejected_subject": "Supplier access and setup",
+        "response_intent": "COMMUNICATE_RESTRICTION",
+        "source_case_revision": 2,
+        "validation_codes": [
+          "known_no_contradiction"
+        ],
+        "validation_result": "rejected"
+      },
+      "workflow_event_id": 15298,
+      "workflow_event_uuid": "7fd2f596-4239-4c02-bd0a-405eeaa597da"
+    }
+  ],
+  "approval_and_execution_routes_called": 0
+}

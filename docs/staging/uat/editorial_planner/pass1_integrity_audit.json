@@ -1,0 +1,191 @@
+{
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "current_drafts": [
+    {
+      "scenario_id": "UAT-001",
+      "case_id": 516,
+      "revision_id": 278,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-002",
+      "case_id": 517,
+      "revision_id": 279,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": false,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-003",
+      "case_id": 518,
+      "revision_id": 280,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-004",
+      "case_id": 519,
+      "revision_id": 282,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-005",
+      "case_id": 520,
+      "revision_id": 284,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-006",
+      "case_id": 521,
+      "revision_id": 286,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-007",
+      "case_id": 522,
+      "revision_id": 287,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": false,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-008",
+      "case_id": 523,
+      "revision_id": 288,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-009",
+      "case_id": 524,
+      "revision_id": 290,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-010",
+      "case_id": 525,
+      "revision_id": 291,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-011",
+      "case_id": 526,
+      "revision_id": 293,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-012",
+      "case_id": 527,
+      "revision_id": 296,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    },
+    {
+      "scenario_id": "UAT-013",
+      "case_id": 528,
+      "revision_id": 298,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    }
+  ],
+  "rejected_candidates": [],
+  "approval_and_execution_routes_called": 0
+}
