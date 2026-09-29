@@ -68,7 +68,7 @@ class EditorialContentPlan:
     items: tuple[EditorialContentItem, ...]
     substantive_budget: int
     budget_reason: str
-    version: str = 'editorial_content_plan_v1'
+    version: str = 'editorial_content_plan_v2'
 
     def role_items(self, role: EditorialRole) -> tuple[EditorialContentItem, ...]:
         return tuple(item for item in self.items if item.role == role)
@@ -109,8 +109,34 @@ def mentioned(topic: str, text: str) -> bool:
 
 
 def asked_again(topic: str, text: str) -> bool:
-    return any(mentioned(topic, part) and re.search(r'\?|\b(?:can|could|whether|what|is|are|does)\b', part, re.I)
-               for part in re.split(r'[.!\n]', text))
+    # "The florist can arrive" is a new detail, not an explicit repeat question.
+    return any(mentioned(topic, part) and ("?" in part or re.search(
+        r'^\s*(?:can|could|would|what|how|is|are|does|please (?:confirm|explain|tell))\b', part, re.I))
+        for part in re.split(r'[.!\n]', text))
+
+
+def logistics_needs(text: str) -> tuple[str, ...]:
+    """Specific request components, not the entire logistics policy category."""
+    needs = []
+    for part in re.split(r'[.!?\n]', text.lower()):
+        for tokens, label in [(('loading', 'unload'), 'loading route'), (('handover',), 'venue handover'),
+                              (('arrival', 'arrive'), 'supplier arrival timing'), (('deliver',), 'delivery access')]:
+            if any(token in part for token in tokens):needs.append(label)
+        if re.search(r'setup|set up', part) and re.search(r'cater|supplier|florist|\d+\s*(?:minutes?|min)', part):
+            needs.append('supplier setup access')
+    return tuple(dict.fromkeys(needs))
+
+
+def client_acknowledges_restriction(topic: str, text: str) -> bool:
+    return any(mentioned(topic, part) and re.search(r'\b(?:know|understand|fine)\b', part, re.I)
+               and re.search(r'not available|not supported|unavailable', part, re.I)
+               for part in re.split(r'[.!?\n]', text))
+
+
+def client_question_value(question: str) -> str:
+    # Exact existing application question semantics, with the internal label
+    # removed. IDs and every required component remain in the local contract.
+    return question.replace('space or rental scope', 'space').replace('is the client requesting', 'would you like').replace('is the client planning', 'are you planning')
 
 
 def normalized_guidance(guide: Any) -> tuple[tuple[str, str, dict[str, Any]], ...]:
@@ -165,7 +191,8 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
     latest = contract.latest_client_message
     earlier = '\n'.join(contract.prior_client_messages)
     current_topics = {topic for topic in TOPIC_TERMS if mentioned(topic, latest)}
-    if 'supplier_access' in current_topics and not re.search(r'supplier|cater|florist|load|deliver|arriv|handover|access|\d+\s*(?:minutes?|min)', latest, re.I):
+    logistics = logistics_needs(latest)
+    if 'supplier_access' in current_topics and not logistics:
         current_topics.discard('supplier_access')
     requested_topics = current_topics | {topic for topic in TOPIC_TERMS if mentioned(topic, earlier)}
     prior = {x['semantic_key']: x['fingerprint'] for x in getattr(contract, 'prior_editorial_items', ())}
@@ -187,14 +214,17 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
     # Every client-owned open question is mandatory, including multi-component
     # questions. No budget may drop it or move internal ownership to the client.
     for qid, question in contract.open_client_questions:
-        add(f'question:{qid}', 'client_information', {'open_question_id': qid, 'question': question},
+        add(f'question:{qid}', 'client_information', {'open_question_id': qid, 'question': client_question_value(question)},
             EditorialRole.MUST_ASK, 'open_client_owned_question', priority=2)
 
-    add('latest_client_detail', 'latest_client_detail', {'instruction': 'Acknowledge the material new detail in the current message briefly; treat it as a request, not a confirmed arrangement.'},
+    event_type = next((x.split(': ', 1)[1] for x in contract.confirmed_case_facts if x.startswith('event_type: ')), None)
+    acknowledgement = ({'kind': 'new_enquiry', 'about': event_type or 'the enquiry'} if not contract.prior_client_messages
+                       else {'kind': 'new_client_detail', 'focus': 'the change or clarification in the latest message'})
+    add('latest_client_detail', 'latest_client_detail', acknowledgement,
         EditorialRole.ACKNOWLEDGE, 'current_turn_delta', source='current_client_message', authority='client_request', priority=3)
 
     for state in contract.change_or_reschedule_state:
-        add('change:' + digest(state)[:12], 'requested_change', {'requested_change': state, 'status': 'pending'},
+        add('change:' + digest(state)[:12], 'requested_change', {'requested_change': state, 'status': 'check_required', 'action': 'check the requested change and come back to the client'},
             EditorialRole.MUST_COMMUNICATE, 'prevent_requested_change_becoming_confirmation', priority=1)
 
     # A fee answer can become available several turns after its question. Stable
@@ -210,8 +240,11 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
     if 'commercial' in requested_topics and not commercial:
         add('commercial.check', 'commercial_next_step', {'action': 'check requested booking fee or pricing', 'status': 'check_required'},
             EditorialRole.MUST_COMMUNICATE, 'requested_answer_not_yet_available', priority=4)
+    if re.search(r'\b(?:pricing|costs?|budget)\b', latest, re.I) and re.search(r'\b(?:what|how|does|can|could|realistic|fit)\b', latest, re.I):
+        add('commercial.overall_pricing', 'overall_pricing', {'action': 'check overall rental pricing against the client request and budget', 'status': 'check_required'},
+            EditorialRole.MUST_COMMUNICATE, 'overall_pricing_question_is_distinct_from_booking_fee', priority=1)
     for index, decision in enumerate(contract.pending_decisions):
-        add('decision:' + decision, 'commercial_next_step', {'request': decision, 'status': 'pending', 'action': 'check what can be arranged'},
+        add('decision:' + decision, 'commercial_next_step', {'request': 'booking fee adjustment' if decision == 'booking fee override' else decision, 'status': 'check_required', 'action': 'check what can be arranged'},
             EditorialRole.MUST_COMMUNICATE, 'pending_governed_decision_in_current_conversation', priority=4)
 
     projected_keys: set[str] = set()
@@ -227,7 +260,7 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
                 continue
             projected_keys.add(key)
             role, reason, priority = EditorialRole.DEFER, 'not_needed_in_current_turn', 50
-            if topic == 'dj_sound_booth' and re.search(r'DJ.*not available', latest, re.I):
+            if value.get('status') == 'not_supported' and client_acknowledges_restriction(topic, earlier + '\n' + latest) and not asked_again(topic, latest):
                 add('fact:' + key, topic, value, EditorialRole.DEFER, 'client_already_acknowledges_restriction', guide.source_reference)
                 continue
             if topic in {'audio_playback', 'projection_display', 'microphones', 'other_technical', 'dj_sound_booth'}:
@@ -250,6 +283,16 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
             elif topic == 'supplier_access':
                 if topic in current_topics:
                     role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'one_immediate_access_constraint', 5
+            if topic == 'projection_display' and value.get('status') == 'conditional':
+                checks = value.get('check_required', [])
+                for condition in checks:
+                    direct = any(token in latest.lower() for token in {'compatibility': ('compatib',), 'adapters': ('adapter',), 'files': ('file',), 'screenless setup suitability': ('screenless', 'without a screen')}.get(condition, (condition,)))
+                    add('condition:projection:' + condition, 'projection_detail', {'check_required': condition, 'status': 'check_required'},
+                        EditorialRole.MUST_COMMUNICATE if direct else EditorialRole.DEFER,
+                        'explicit_technical_detail_question' if direct else 'secondary_condition_covered_by_practical_setup_check', guide.source_reference, priority=2)
+                value = {**value, 'check_required': ['practical projection setup']}
+            elif topic == 'other_technical' and value.get('status') == 'conditional':
+                value = {**value, 'check_required': ['safe technical feasibility']}
             add('fact:' + key, topic, value, role, reason, guide.source_reference, priority=priority, novelty=True)
 
     # Known restrictions remain mandatory. Internal feasibility summary labels
@@ -278,7 +321,7 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
     # are derived from existing topic/owner semantics, not copied blocker prose.
     next_topics: list[str] = []
     if 'supplier_access' in current_topics:
-        next_topics.append('requested supplier access, loading or handover details')
+        next_topics.extend(logistics)
     if 'facilitator' in current_topics or ('facilitator' in requested_topics and not contract.open_client_questions):
         next_topics.append('requested facilitator availability and format')
     if not contract.open_client_questions and not next_topics and not any(i.included and i.value.get('status') in {'conditional','check_required','pending'} for i in items):

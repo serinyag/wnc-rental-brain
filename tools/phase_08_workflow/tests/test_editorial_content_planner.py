@@ -132,3 +132,52 @@ def test_no_em_dash_and_other_existing_validators_still_apply():
     v=validate_client_response_draft(contract=c,draft=ClientResponseDraft('Confirmed','Your booking is confirmed — thanks.'),current_case_revision=c.source_case_revision,current_context_hash=c.context_hash)
     assert 'em_dash_not_allowed' in v.failure_codes
     assert 'unsupported_availability_or_confirmation' in v.failure_codes
+
+
+def test_secondary_projection_conditions_are_deferred_unless_specifically_requested():
+    g=guide('projection_display',status='conditional',available_equipment='WNC projector',check_required=['compatibility','adapters','files','screenless setup suitability'])
+    c=contract('Normal projection is enough.',contextual_guidance=(g,))
+    assert selected(c)['fact:projection_display'].value['check_required']==['practical projection setup']
+    assert not any(i.topic=='projection_detail' for i in selected(c).values())
+    assert 'screenless' not in json.dumps(c.to_provider_payload())
+    specific=replace(c,latest_client_message='Which adapters and file formats are needed for projection?')
+    assert selected(specific)['condition:projection:adapters'].role==Role.MUST_COMMUNICATE
+    assert selected(specific)['condition:projection:files'].role==Role.MUST_COMMUNICATE
+
+
+def test_setup_request_does_not_bundle_loading_or_handover_and_dj_setup_is_not_logistics():
+    c=contract('Our caterer needs 45 minutes for setup.')
+    assert selected(c)['next_step'].value['subjects']==['supplier setup access']
+    dj=contract('We will bring a caterer. We know a DJ setup is not available, which is fine.')
+    assert not any('supplier' in str(i.value) for i in selected(dj).values())
+
+
+def test_overall_price_question_is_retained_independently_of_fee_and_adjustment():
+    c=contract('What is the fee, and does the overall pricing fit our budget?',commercial_snapshot=(('Booking fee','EUR 75'),),
+       snapshot=make_snapshot(case_decisions=(SimpleNamespace(status='proposed',decision_type='booking_fee_override'),)))
+    assert 'commercial.current' in selected(c)
+    assert 'commercial.overall_pricing' in selected(c)
+    assert selected(c)['decision:booking fee override'].value['request']=='booking fee adjustment'
+    assert 'override' not in json.dumps(c.to_provider_payload())
+
+
+def test_client_acknowledged_restriction_stays_deferred_on_later_turn():
+    c=contract('Timing is now known.',prior_client_messages=('We know a DJ setup is not available, which is fine.',),
+        contextual_guidance=(guide('dj_sound_booth',status='not_supported',supplier_requirement='external supplier'),))
+    assert 'fact:dj_sound_booth' not in selected(c)
+    assert any(i.reason=='client_already_acknowledges_restriction' for i in c.editorial_plan.items)
+    new_question=replace(c,latest_client_message='Can a DJ setup be provided now?')
+    assert selected(new_question)['fact:dj_sound_booth'].value['status']=='not_supported'
+
+
+def test_can_in_a_statement_is_not_a_new_explicit_question():
+    from tools.phase_08_workflow.editorial_content_planner import asked_again
+    assert not asked_again('supplier_access','The florist can arrive after handover.')
+    assert asked_again('supplier_access','Can the florist arrive before handover?')
+
+
+def test_client_question_normalization_retains_identity_and_information_need():
+    q=client_question();q.human_question_text='Which space or rental scope is the client requesting?'
+    c=contract('An offsite',snapshot=make_snapshot(open_questions=(q,)))
+    assert c.to_provider_payload()['open_client_questions']==[{'topic':'client_information','open_question_id':9,'question':'Which space would you like?'}]
+    assert c.open_client_questions[0][1]==q.human_question_text
