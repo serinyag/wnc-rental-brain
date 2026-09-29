@@ -150,7 +150,9 @@ def test_current_thread_changes_contract_hash_and_stays_separate_from_authority(
     assert prior==('Original catering question','Guest update')
     c=contract(prior_client_messages=prior)
     assert c.context_hash!=contract().context_hash
-    assert c.to_provider_payload()['prior_client_messages']==list(prior)
+    assert c.prior_client_messages==prior
+    assert 'prior_client_messages' not in c.to_provider_payload()
+    assert 'Original catering question' not in str(c.to_provider_payload())
     assert c.allowed_client_assertions==contract().allowed_client_assertions
 
 

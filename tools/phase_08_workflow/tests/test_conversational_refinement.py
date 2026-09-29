@@ -74,15 +74,15 @@ def test_no_editorial_history_without_a_prior_recorded_draft_event():
     assert TestConsoleService._prior_client_drafts(detail,SimpleNamespace(workflow_events=())) == ()
 
 
-def test_editorial_priority_never_removes_governed_guidance():
+def test_editorial_planner_keeps_deferred_guidance_local_for_validation():
     from dataclasses import replace
     guide=ContextualGuidance('capacity','The requested guests are outside the current capacity rules.','phase4:test')
     assert guidance_editorial_priority(guide,'The date changed.')=='prevents_likely_problem'
     kitchen=ContextualGuidance('catering_kitchen','Governed kitchen constraint.','SERV-003')
     c=replace(contract(),latest_client_message='What time can the supplier unload?',contextual_guidance=(kitchen,))
-    projected=c.to_provider_payload()['contextual_guidance'][0]
-    assert projected['client_safe_guidance']==kitchen.client_safe_guidance
-    assert projected['editorial_priority'].startswith('background_only')
+    assert kitchen in c.contextual_guidance
+    assert kitchen.client_safe_guidance not in str(c.to_provider_payload())
+    assert any(i.role == 'DEFER' and i.source_reference == 'SERV-003' for i in c.editorial_plan.items)
     assert guidance_editorial_priority(kitchen,'We are bringing a buffet.')=='directly_relevant_to_latest_message'
 
 

@@ -112,6 +112,7 @@ from .inquiry_intake import (
     INQUIRY_INTAKE_OUTCOME_PROMOTED,
     apply_inquiry_intake,
 )
+from .editorial_content_planner import communicated_items
 from .governed_client_response import (
     ClientResponseDraft,
     ClientResponseProviderError,
@@ -2493,6 +2494,7 @@ limit 1;
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
             prior_client_drafts=self._prior_client_drafts(detail, snapshot),
+            prior_editorial_items=self._prior_editorial_items(detail, snapshot),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -2529,6 +2531,7 @@ limit 1;
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
             prior_client_drafts=self._prior_client_drafts(detail, snapshot),
+            prior_editorial_items=self._prior_editorial_items(detail, snapshot),
             commercial_snapshot=tuple(
                 (item.label, item.value)
                 for item in detail.working_proposal.commercial_snapshot
@@ -2564,6 +2567,8 @@ limit 1;
                     "context_hash": contract.context_hash,
                     **({"rejected_subject": generated.subject, "rejected_body": generated.body,
                         "rejected_question_ids": list(generated.question_ids),
+                        "editorial_content_plan": contract.editorial_plan.to_payload(),
+                        "client_generation_payload": contract.to_provider_payload(),
                         "rejected_context": {"resolution_items": [item.to_payload() for item in contract.resolution_items],
                                              "operator_annotations": [item.to_payload() for item in contract.operator_annotations],
                                              "contextual_guidance": [item.to_payload() for item in contract.contextual_guidance]}}
@@ -2667,6 +2672,9 @@ limit 1;
                 "resolution_items": [item.to_payload() for item in contract.resolution_items],
                 "operator_annotations": [item.to_payload() for item in contract.operator_annotations],
                 "contextual_guidance_topics": [item.topic for item in contract.contextual_guidance],
+                "editorial_content_plan": contract.editorial_plan.to_payload(),
+                "client_generation_payload": contract.to_provider_payload(),
+                "communicated_editorial_items": communicated_items(contract.editorial_plan, generated.body),
             },
             actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
@@ -3783,6 +3791,7 @@ limit 1;
             latest_client_message=None if latest_evidence is None else latest_evidence.body,
             prior_client_messages=self._prior_client_messages(detail),
             prior_client_drafts=self._prior_client_drafts(detail, snapshot),
+            prior_editorial_items=self._prior_editorial_items(detail, snapshot),
             commercial_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.commercial_snapshot),
             feasibility_snapshot=tuple((item.label, item.value) for item in detail.working_proposal.feasibility_snapshot),
             resolution_items=resolution_items,
@@ -3819,6 +3828,33 @@ limit 1;
         return tuple(history[-3:])
 
     @staticmethod
+    def _prior_editorial_items(detail: CaseConsoleSnapshot, snapshot: WorkflowOrchestrationCaseSnapshot) -> tuple[dict[str, str], ...]:
+        """Metadata from the last accepted draft per earlier client turn only.
+
+        Operator-edited drafts without a fresh realization audit invalidate that
+        turn's metadata. A planned but omitted fact is never marked communicated.
+        No current-turn regeneration can feed itself or change its own hash.
+        """
+        incoming = [bundle.raw_evidence for bundle in detail.evidence_bundles
+                    if bundle.raw_evidence is not None
+                    and bundle.source_record.sender_actor_type == OBSERVATION_ASSERTED_BY_CLIENT]
+        if not incoming:
+            return ()
+        boundaries = sorted({item.workflow_event_id for item in incoming
+                             if item.workflow_event_id <= incoming[0].workflow_event_id})
+        events = [event for event in snapshot.workflow_events
+                  if event.event_type_code in {"governed_client_response_draft_generated",
+                                               "inquiry_response_draft_generated", "inquiry_response_draft_edited"}]
+        metadata = {}
+        for start, end in list(zip(boundaries, boundaries[1:]))[-3:]:
+            candidates = [event for event in events if start < event.workflow_event_id < end]
+            if candidates:
+                latest = max(candidates, key=lambda event: event.workflow_event_id)
+                for item in latest.structured_payload.get("communicated_editorial_items", ()):
+                    metadata[item["semantic_key"]] = item
+        return tuple(metadata[key] for key in sorted(metadata))
+
+    @staticmethod
     def _prior_client_messages(detail: CaseConsoleSnapshot) -> tuple[str, ...]:
         # The current case thread supplies request continuity, never factual authority.
         messages = [bundle.raw_evidence.body for bundle in detail.evidence_bundles
@@ -3842,6 +3878,10 @@ limit 1;
                 + (f"The applicable maximum is {maximum} guests. " if isinstance(maximum, int) else "")
                 ,
                 "phase4:" + capacity.issue_code,
+                {"topic": "capacity", "requested_guests": guests, "scope": scope,
+                 "status": "within_limits" if outcome == "within" else "outside_limits",
+                 "near_limit": isinstance(maximum, int) and isinstance(guests, int) and guests >= maximum * 0.9,
+                 **({"maximum": maximum} if outcome == "outside" or (isinstance(maximum, int) and isinstance(guests, int) and guests >= maximum * 0.9) else {})},
             ))
         technical = self._technical_authority_issue(observed_by_field=observed)
         if technical is not None:
@@ -3862,7 +3902,20 @@ limit 1;
                 else:
                     # No capability assertion can be derived from an unresolved result.
                     continue
-                guidance.append(ContextualGuidance("technical_capabilities", text, "phase4:" + item["issue_code"]))
+                semantic = {"topic": str(item["observed_requirement"]),
+                            "capability": name,
+                            "status": "supported" if state == "known_yes" else "conditional" if state == "known_conditional" else "not_supported"}
+                if state == "known_yes" and source.get("requires_confirmation"):
+                    semantic["status"] = "conditional"
+                    semantic["check_required"] = ["event-specific arrangements"]
+                elif state == "known_conditional":
+                    if item["observed_requirement"] == "projection_display" and "WNC projector" in str(source.get("conditions_summary")):
+                        semantic.update(available_equipment="WNC projector", check_required=["compatibility", "adapters", "files", "screenless setup suitability"])
+                    else:
+                        semantic["check_required"] = ["custom technical feasibility and explicit confirmation"]
+                elif state == "known_no":
+                    semantic["supplier_requirement"] = "external supplier" if status == "external_supplier_required" else "not available from WNC standard equipment"
+                guidance.append(ContextualGuidance("technical_capabilities", text, "phase4:" + item["issue_code"], semantic))
         return tuple(guidance)
 
     def edit_inquiry_response_draft(

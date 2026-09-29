@@ -113,12 +113,14 @@ class ContextualGuidance:
     topic: str
     client_safe_guidance: str
     source_reference: str
+    semantic_values: dict[str, Any] | None = None
 
-    def to_payload(self) -> dict[str, str]:
+    def to_payload(self) -> dict[str, Any]:
         return {
             "topic": self.topic,
             "client_safe_guidance": self.client_safe_guidance,
             "source_reference": self.source_reference,
+            **({"semantic_values": self.semantic_values} if self.semantic_values else {}),
         }
 
 
