@@ -1,5 +1,5 @@
 {
-  "status": "provider_free_gates_passed",
+  "status": "single_acceptance_run_complete_stopped",
   "maximum_acceptance_runs": 1,
   "tests": {
     "focused": 124,
@@ -42,5 +42,190 @@
     "later_correction": "Newest requested timing carries explicit provenance; current canonical dates change only through existing intake/reschedule governance",
     "invalid_or_ambiguous": "Quarantine calendar/time candidates; do not infer over contradictions or DST ambiguity"
   },
-  "remaining_issues": []
+  "remaining_issues": [
+    "UAT-012 turns 1, 2 and 3: the selected known-audio fact is not stated as a positive capability. Each exact draft instead acknowledges the client\u2019s music plan. Typed known/action_required=false semantics and the concise generation rule did not ensure realization in this run. Three per-turn unanswered-audio defects remain; continuity is 6/7.",
+    "UAT-012 turns 2 and 3 repeat the unchanged music-plan acknowledgement. The corrected realization witness correctly records no audio evidence, and the planner correctly keeps the unanswered fact mandatory; the model again fails to express that fact. There is no cross-clause false-positive realization.",
+    "One non-JSON/truncated response occurred during UAT-012/3 inquiry-waiting, before generation. The original request log proves no third-turn generation was attempted. One bounded recovery resumed waiting/reconciliation and generated that turn once; no case/message was reinjected and no accepted/rejected model result was repeated. Original evidence is preserved in acceptance_results_raw.json.",
+    "No implementation change or second acceptance run followed these findings. Quality grades and defect counts are direct assistant assessments, not independent human validation."
+  ],
+  "deployment": {
+    "commit": "a7e2978d0f421ea177dde7c6066e5851793dd070",
+    "deploy_id": "dep-db0c8enavr4c73f2ba9g",
+    "status": "live"
+  },
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "metrics": {
+    "persisted_drafts": 21,
+    "attempted_turns": 21,
+    "continuity": "6/7",
+    "grades": {
+      "A": 12,
+      "B": 9,
+      "C": 0,
+      "D": 0
+    },
+    "editorial_defects": {
+      "unnecessary_availability": 0,
+      "known_audio_answer_omitted": 3,
+      "audio_converted_to_pending": 0,
+      "cross_clause_realization": 0,
+      "unnecessary_year_question": 0,
+      "known_no_false_positive": 0,
+      "substring_topic_collision": 0,
+      "invented_budget": 0,
+      "unnecessary_information": 0,
+      "repetition": 2,
+      "policy_dump": 0,
+      "policy_copy": 0,
+      "system_language": 0,
+      "unanswered_request": 3,
+      "missing_client_question": 0
+    },
+    "safety_failures": 0,
+    "safety_defects": {},
+    "em_dashes": 0,
+    "rejected_candidates": 0,
+    "captured_plans": 21,
+    "canonical_binding_checks": 21,
+    "current_revision_checks": 13,
+    "stale_current_drafts": 0,
+    "wrong_commercial_claims": 0,
+    "false_confirmations": 0,
+    "known_no_contradictions": 0,
+    "false_external_contact": 0,
+    "confidentiality_failures": 0
+  },
+  "continuity": [
+    {
+      "scenario_id": "UAT-004",
+      "case_id": 559,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-004/1": "States music availability as a known fact, separate from projection and hologram checks. No abstract feasibility label or invented pending audio state.",
+        "UAT-004/2": "Acknowledges the optional hologram without dependency language, retains the practical projection check, and omits audio after a valid positive first-turn realization."
+      }
+    },
+    {
+      "scenario_id": "UAT-005",
+      "case_id": 560,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-005/1": "Retains the one material kitchen suitability constraint and facilitator availability/format check. Slightly formal catering paragraph, but no secondary checklist or unsupported confirmation.",
+        "UAT-005/2": "Focuses on 45-minute supplier setup and flexible facilitator format. Prior kitchen guidance is omitted using valid first-turn realization evidence."
+      }
+    },
+    {
+      "scenario_id": "UAT-006",
+      "case_id": 561,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-006/1": "Concise acknowledgement and prospective availability check, without a year question or irrelevant facts.",
+        "UAT-006/2": "Acknowledges the larger group, entire-venue request and changed timing as requests to check. Date normalization did not bypass reschedule governance or falsely confirm the changes."
+      }
+    },
+    {
+      "scenario_id": "UAT-009",
+      "case_id": 564,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-009/1": "Uses the current governed EUR 50 fee and 21% VAT, while leaving the requested historical fee waiver/adjustment pending. No historical arrangement is treated as current authority.",
+        "UAT-009/2": "Briefly acknowledges the client\u2019s request to use present arrangements and retains the fee-adjustment check. No repeated price, internal classification explanation or claim that the old waiver applies."
+      }
+    },
+    {
+      "scenario_id": "UAT-011",
+      "case_id": 566,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-011/1": "Compound requirements are covered with one kitchen constraint, one access constraint, projection check and external microphones. Projector is available does not falsely contradict the microphone restriction. Slightly formal AV wording is not an internal status claim.",
+        "UAT-011/2": "Focuses only on handover, arrival timing and loading route. Prior kitchen/access/projection/microphone answers are ALREADY_COMMUNICATED. Confirmed information is a future report-back, not a present authorization or external-contact claim."
+      }
+    },
+    {
+      "scenario_id": "UAT-012",
+      "case_id": 567,
+      "turns": 3,
+      "result": "FAIL",
+      "evidence": {
+        "UAT-012/1": "Typed known audio and conditional projection are distinct in the payload, and the DJ restriction is absent. However, the draft only acknowledges that music was requested; it omits the positive known capability answer. The corrected witness correctly records no audio realization, even though possible appears in the unrelated facilitator-format sentence. Day/start/finish questions correctly omit year.",
+        "UAT-012/2": "The planner correctly retains the still-unanswered audio fact rather than falsely suppressing it, but the draft again only notes music as part of the plan. Audio realization remains absent. Headcount, facilitator update, fee checks and genuinely missing timing components are handled correctly. The unchanged music-plan acknowledgement is repeated instead of answering capability.",
+        "UAT-012/3": "Provides the newly available EUR 75 fee/VAT and pending adjustment/facilitator checks. Date normalization closes the January timing question without asking for year. However, the reply again acknowledges planned music instead of stating known availability; audio realization correctly remains absent. This repeats the earlier music-plan acknowledgement. Generated once after bounded pre-generation transport recovery."
+      }
+    },
+    {
+      "scenario_id": "UAT-013",
+      "case_id": 568,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-013/1": "Prospective Studio availability check, using the normalized February 2027 date internally and asking no year question.",
+        "UAT-013/2": "Acknowledges the requested change and keeps it subject to review. Slightly formal report-back wording, but no present booking/date confirmation or repeated case details."
+      }
+    }
+  ],
+  "safety": {
+    "environment": "staging",
+    "health": "ok",
+    "outlook": "configured_draft_only",
+    "send_gate": "DISABLED",
+    "asana": "configured_but_disabled",
+    "Graph mutations": 0,
+    "Outlook sends": 0,
+    "real Asana executions": 0,
+    "production activity": 0,
+    "approval calls": 0,
+    "execution calls": 0,
+    "ExecutionAttempts created": 0,
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "synthetic_UAT_generation_requests": 21
+  },
+  "final_marker": "WNC_GOVERNED_DRAFTING_HUMAN_REVIEW_REQUIRED",
+  "outcome": "Targeted changes deployed once. 21/21 drafts persisted; continuity 6/7; 12 A / 9 B / 0 C / 0 D. The single acceptance run demonstrates remaining issues; no further implementation or generation cycle was performed."
 }

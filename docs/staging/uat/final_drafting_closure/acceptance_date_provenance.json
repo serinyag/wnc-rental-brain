@@ -1,0 +1,536 @@
+{
+  "provider_calls": 0,
+  "observations": [
+    {
+      "scenario_id": "UAT-001",
+      "observation_id": 2562,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-10-14T12:00:00+00:00",
+        "active_event_start": "2026-10-14T08:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 14,
+            "finish_time": "14:00",
+            "month": 10,
+            "start_time": "10:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:04:15.013092+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2932",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 14,
+        "finish_time": "14:00",
+        "month": 10,
+        "resolved_date": "2026-10-14",
+        "start_time": "10:00"
+      },
+      "source_received_at": "2026-10-03 09:04:15.013092+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-003",
+      "observation_id": 2566,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-10-22T21:00:00+00:00",
+        "active_event_start": "2026-10-22T16:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 22,
+            "finish_time": "23:00",
+            "month": 10,
+            "start_time": "18:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:06:42.720005+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2937",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 22,
+        "finish_time": "23:00",
+        "month": 10,
+        "resolved_date": "2026-10-22",
+        "start_time": "18:00"
+      },
+      "source_received_at": "2026-10-03 09:06:42.720005+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-004",
+      "observation_id": 2570,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-10-29T19:00:00+00:00",
+        "active_event_start": "2026-10-29T15:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 29,
+            "finish_time": "20:00",
+            "month": 10,
+            "start_time": "16:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:08:00.262424+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2941",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 29,
+        "finish_time": "20:00",
+        "month": 10,
+        "resolved_date": "2026-10-29",
+        "start_time": "16:00"
+      },
+      "source_received_at": "2026-10-03 09:08:00.262424+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-005",
+      "observation_id": 2576,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-11-05T16:00:00+00:00",
+        "active_event_start": "2026-11-05T08:30:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 5,
+            "finish_time": "17:00",
+            "month": 11,
+            "start_time": "09:30"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:09:45.428408+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2948",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 5,
+        "finish_time": "17:00",
+        "month": 11,
+        "resolved_date": "2026-11-05",
+        "start_time": "09:30"
+      },
+      "source_received_at": "2026-10-03 09:09:45.428408+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-006",
+      "observation_id": 2587,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-11-13T19:00:00+00:00",
+        "active_event_start": "2026-11-13T14:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 13,
+            "finish_time": "20:00",
+            "month": 11,
+            "start_time": "15:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:11:48.716848+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2960",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 13,
+        "finish_time": "20:00",
+        "month": 11,
+        "resolved_date": "2026-11-13",
+        "start_time": "15:00"
+      },
+      "source_received_at": "2026-10-03 09:11:48.716848+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-006",
+      "observation_id": 2583,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-11-12T15:00:00+00:00",
+        "active_event_start": "2026-11-12T12:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 12,
+            "finish_time": "16:00",
+            "month": 11,
+            "start_time": "13:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:11:33.486456+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2956",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 12,
+        "finish_time": "16:00",
+        "month": 11,
+        "resolved_date": "2026-11-12",
+        "start_time": "13:00"
+      },
+      "source_received_at": "2026-10-03 09:11:33.486456+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-007",
+      "observation_id": 2590,
+      "status": "validated",
+      "value": {
+        "date_provenance": {
+          "client_components": {
+            "day": 19,
+            "month": 11
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:13:16.068199+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2963",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 19,
+        "month": 11,
+        "resolved_date": "2026-11-19"
+      },
+      "source_received_at": "2026-10-03 09:13:16.068199+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-008",
+      "observation_id": 2595,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-11-26T14:00:00+00:00",
+        "active_event_start": "2026-11-26T09:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 26,
+            "finish_time": "15:00",
+            "month": 11,
+            "start_time": "10:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:14:39.015647+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2968",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 26,
+        "finish_time": "15:00",
+        "month": 11,
+        "resolved_date": "2026-11-26",
+        "start_time": "10:00"
+      },
+      "source_received_at": "2026-10-03 09:14:39.015647+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-009",
+      "observation_id": 2600,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-12-03T20:00:00+00:00",
+        "active_event_start": "2026-12-03T17:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 3,
+            "finish_time": "21:00",
+            "month": 12,
+            "start_time": "18:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:16:02.338437+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2973",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 3,
+        "finish_time": "21:00",
+        "month": 12,
+        "resolved_date": "2026-12-03",
+        "start_time": "18:00"
+      },
+      "source_received_at": "2026-10-03 09:16:02.338437+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-010",
+      "observation_id": 2605,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-12-10T22:00:00+00:00",
+        "active_event_start": "2026-12-10T16:30:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 10,
+            "finish_time": "23:00",
+            "month": 12,
+            "start_time": "17:30"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:17:43.603808+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2979",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 10,
+        "finish_time": "23:00",
+        "month": 12,
+        "resolved_date": "2026-12-10",
+        "start_time": "17:30"
+      },
+      "source_received_at": "2026-10-03 09:17:43.603808+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-011",
+      "observation_id": 2610,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-12-15T18:00:00+00:00",
+        "active_event_start": "2026-12-15T13:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 15,
+            "finish_time": "19:00",
+            "month": 12,
+            "start_time": "14:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:18:54.226721+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:2984",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 15,
+        "finish_time": "19:00",
+        "month": 12,
+        "resolved_date": "2026-12-15",
+        "start_time": "14:00"
+      },
+      "source_received_at": "2026-10-03 09:18:54.226721+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-012",
+      "observation_id": 2627,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2027-01-21T20:00:00+00:00",
+        "active_event_start": "2027-01-21T16:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 21,
+            "finish_time": "21:00",
+            "month": 1,
+            "start_time": "17:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:21:14.26621+00",
+          "resolved_year": 2027,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:3003",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 21,
+        "finish_time": "21:00",
+        "month": 1,
+        "resolved_date": "2027-01-21",
+        "start_time": "17:00"
+      },
+      "source_received_at": "2026-10-03 09:21:14.26621+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-012",
+      "observation_id": 2618,
+      "status": "validated",
+      "value": {
+        "date_provenance": {
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:20:26.245766+00",
+          "source_reference": "inbound_source_record:2993",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "unresolved"
+        },
+        "month": 1
+      },
+      "source_received_at": "2026-10-03 09:20:26.245766+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-013",
+      "observation_id": 2632,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2027-02-08T16:00:00+00:00",
+        "active_event_start": "2027-02-08T13:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 8,
+            "finish_time": "17:00",
+            "month": 2,
+            "start_time": "14:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:22:32.348089+00",
+          "resolved_year": 2027,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:3008",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 8,
+        "finish_time": "17:00",
+        "month": 2,
+        "resolved_date": "2027-02-08",
+        "start_time": "14:00"
+      },
+      "source_received_at": "2026-10-03 09:22:32.348089+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-013",
+      "observation_id": 2628,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2027-02-07T12:00:00+00:00",
+        "active_event_start": "2027-02-07T09:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 7,
+            "finish_time": "13:00",
+            "month": 2,
+            "start_time": "10:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 09:22:15.80702+00",
+          "resolved_year": 2027,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:3004",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 7,
+        "finish_time": "13:00",
+        "month": 2,
+        "resolved_date": "2027-02-07",
+        "start_time": "10:00"
+      },
+      "source_received_at": "2026-10-03 09:22:15.80702+00",
+      "provenance_validation": "PASS"
+    }
+  ],
+  "draft_question_checks": [
+    {
+      "turn": "UAT-001/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-002/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-003/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-004/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-004/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-005/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-005/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-006/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-006/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-007/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-008/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-009/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-009/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-010/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-011/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-011/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-012/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-012/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-012/3",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-013/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-013/2",
+      "asks_client_for_year": false
+    }
+  ]
+}

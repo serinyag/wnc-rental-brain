@@ -1,0 +1,85 @@
+{
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "request_log": [
+    {
+      "method": "GET",
+      "path": "/healthz",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/567",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/567/inquiry-waiting",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/567/reconcile",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/567",
+      "transport_recovery": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/567/mailbox/generate",
+      "transport_recovery": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/567",
+      "transport_recovery": true
+    }
+  ],
+  "original_result_sha256": "a10399c2a732ac34cc2629defdf8d354888b7a523bdc122a2c1185dd36482516",
+  "generation_repeated": false,
+  "stage": "completed",
+  "recovered_revision": 359
+}
