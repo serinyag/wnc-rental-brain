@@ -80,7 +80,7 @@ def audio_fact_realized(body: str) -> bool:
         if re.search(r'\b' + audio + r'\s+(?:is|works|can be played)\b(?:\s+(?:also |already )?(?:available|supported|possible|fine|no problem))?', clause):
             if re.search(r'\b' + audio + r'\s+(?:works|can be played)\b|\b' + audio + r'\s+is\s+(?:also |already )?(?:available|supported|possible|fine|no problem)\b', clause):
                 return True
-        if re.search(r'\b(?:you|we) can (?:play|provide)\s+' + audio + r'\b', clause):
+        if re.search(r'\b(?:you|we|wnc) can (?:play|provide|accommodate|support)\s+' + audio + r'\b', clause):
             return True
     return False
 

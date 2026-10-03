@@ -12,7 +12,7 @@ import os
 import re
 import uuid
 from decimal import Decimal
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Protocol
 
 from tools.phase_07_reasoning.openai_answer_generator import (
@@ -23,7 +23,8 @@ from tools.phase_07_reasoning.openai_answer_generator import (
     call_openai_responses,
 )
 
-from .editorial_content_planner import EditorialRole, build_editorial_content_plan
+from .editorial_content_planner import EditorialRole, build_editorial_content_plan, digest
+from .required_realization import validate_required_realization
 
 from .context_aware_drafting import (
     CLIENT_VISIBILITY_EXTERNAL_PENDING_VISIBLE,
@@ -197,6 +198,79 @@ class DraftValidationResult:
 
 class GovernedClientResponseProvider(Protocol):
     def generate_client_response(self, contract: DraftContract) -> ClientResponseDraft: ...
+    def correct_client_response(self, contract: DraftContract, correction: DraftCorrection) -> ClientResponseDraft: ...
+
+
+@dataclass(frozen=True)
+class DraftCorrection:
+    candidate: ClientResponseDraft
+    unmet_items: tuple[dict[str, Any], ...]
+    contract_identity: str
+
+    def to_payload(self):
+        return {
+            "correction_reason": "required_semantic_items_not_realized",
+            "unmet_items": [{k: item[k] for k in ('semantic_key', 'topic', 'kind', 'required_meaning')}
+                            for item in self.unmet_items],
+            "candidate": {"subject": self.candidate.subject, "body": self.candidate.body,
+                          "question_ids": self.candidate.question_ids},
+            "instruction": "Rewrite the candidate preserving its useful structure and all governed constraints. "
+                           "Communicate each missing required meaning directly: state known facts as known, "
+                           "restrictions as restrictions, pending actions prospectively, and ask required questions. "
+                           "Merely noting a request does not answer it. Do not add facts or repeat already communicated topics.",
+        }
+
+
+@dataclass(frozen=True)
+class BoundedDraftResult:
+    draft: ClientResponseDraft
+    validation: DraftValidationResult
+    audit: dict[str, Any]
+
+
+def generate_with_required_realization(*, provider, contract, safety_validator):
+    """At most two candidates, no persistence or retrieval, safety before quality.
+
+    safety_validator must re-read authoritative state after every provider call.
+    The original contract is never rebuilt for the provider's corrective call.
+    """
+    identity = digest(asdict(contract))
+    plan = contract.editorial_plan
+    audit = {"policy": "required_realization_single_correction_v1", "contract_identity": identity,
+             "context_hash": contract.context_hash, "source_case_revision": contract.source_case_revision,
+             "plan_identity": digest(plan.to_payload()), "attempts": [], "corrective_retry_count": 0}
+    correction = None
+    for number in (1, 2):
+        try:
+            draft = (provider.generate_client_response(contract) if number == 1 else
+                     provider.correct_client_response(contract, correction))
+        except (ClientResponseProviderError, TimeoutError) as exc:
+            audit['failed_provider_attempt'] = number
+            raise ClientResponseProviderError(
+                "Client drafting provider did not complete; no candidate is accepted.",
+                failure_category=getattr(exc, 'failure_category', 'OPENAI_TIMEOUT'),
+                diagnostics={**getattr(exc, 'diagnostics', {}), 'generation_audit': audit},
+            ) from exc
+        safety = safety_validator(draft)
+        if digest(asdict(contract)) != identity:
+            safety = DraftValidationResult(False, (*safety.failure_codes, "draft_contract_mutated"))
+        results = validate_required_realization(plan, draft.body) if safety.is_valid else ()
+        unmet = tuple(item for item in results if not item['realized'])
+        candidate_hash = digest({'subject': draft.subject, 'body': draft.body, 'question_ids': list(draft.question_ids)})
+        audit['attempts'].append({"generation_attempt": number, "candidate_hash": candidate_hash,
+            "provider_request_id": draft.provider_request_id, "provider_response_id": draft.provider_response_id,
+            "safety_failure_codes": list(safety.failure_codes), "realization_results": list(results),
+            "failed_realization_item_ids": [item['semantic_key'] for item in unmet]})
+        audit['initial_candidate_hash' if number == 1 else 'corrected_candidate_hash'] = candidate_hash
+        audit['final_realization_results'] = list(results)
+        if not safety.is_valid or not unmet:
+            return BoundedDraftResult(draft, safety, audit)
+        audit['correction_reason'] = 'required_semantic_items_not_realized'
+        if number == 2 or not callable(getattr(provider, 'correct_client_response', None)):
+            return BoundedDraftResult(draft, DraftValidationResult(False, ('required_semantic_items_not_realized',)), audit)
+        correction = DraftCorrection(draft, unmet, identity)
+        audit['corrective_retry_count'] = 1
+    raise AssertionError('bounded generation exhausted')
 
 
 class ResponseIntentResolver:
@@ -340,6 +414,7 @@ def build_draft_contract(
         "latest_client_message": latest_client_message or "",
         "editorial_planner_version": "editorial_content_plan_v3",
         "normalization_revision": "known_fact_actions_and_next_occurrence_v1",
+        "required_realization_policy": "single_correction_v1",
         "decisions": pending_decisions,
         "changes": changes,
         "resolution_items": [item.to_payload() for item in items],
@@ -415,6 +490,14 @@ class OpenAIClientResponseProvider:
         self.transport = transport
 
     def generate_client_response(self, contract: DraftContract) -> ClientResponseDraft:
+        return self._generate(contract)
+
+    def correct_client_response(self, contract: DraftContract, correction: DraftCorrection) -> ClientResponseDraft:
+        if digest(asdict(contract)) != correction.contract_identity:
+            raise ClientResponseProviderError("Corrective contract changed.", failure_category="DRAFT_CONTRACT_MUTATED")
+        return self._generate(contract, correction)
+
+    def _generate(self, contract: DraftContract, correction: DraftCorrection | None = None) -> ClientResponseDraft:
         request_id = f"phase8-client-draft-{uuid.uuid4().hex}"
         payload = {
             "model": self.model_code,
@@ -427,6 +510,8 @@ class OpenAIClientResponseProvider:
             "max_output_tokens": 1800,
             "metadata": {"phase": "8", "contract": "governed_client_response_v1", "client_request_id": request_id},
         }
+        if correction is not None:
+            payload["input"].append({"role": "user", "content": json.dumps(correction.to_payload(), sort_keys=True, ensure_ascii=True)})
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json", "X-Client-Request-Id": request_id}
         request_diagnostics = _provider_request_diagnostics(payload, request_id=request_id)
         try:

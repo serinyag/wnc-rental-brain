@@ -121,6 +121,8 @@ from .governed_client_response import (
     build_client_response_provider_from_env,
     build_draft_contract,
     validate_client_response_draft,
+    generate_with_required_realization,
+    DraftValidationResult,
 )
 from .context_aware_drafting import (
     ContextualGuidance,
@@ -2521,9 +2523,64 @@ limit 1;
             contextual_guidance=contextual_guidance,
         )
         provider = self._client_response_provider_for_request(use_deterministic_fixture=use_deterministic_fixture)
+        # No provider sees recipient routing. Bind it locally for the whole operation.
+        recipient_email = self._simulated_recipient_email(rental_case_id, detail.metadata)
+        initial_events = repr(getattr(snapshot, "workflow_events", ()))
+        initial_facts = repr(getattr(snapshot, "rental_case_facts", ()))
+        current_snapshot = snapshot
+        current_contract = contract
+        def safety_validator(candidate):
+            nonlocal current_snapshot, current_contract
+            current_snapshot = self._require_case_snapshot(rental_case_id)
+            current_contract = build_draft_contract(
+                snapshot=current_snapshot,
+                recipient_label=detail.metadata.client_label,
+                latest_client_message=None if latest_evidence is None else latest_evidence.body,
+                prior_client_messages=self._prior_client_messages(detail),
+                prior_client_drafts=self._prior_client_drafts(detail, snapshot),
+                prior_editorial_items=self._prior_editorial_items(detail, snapshot),
+                commercial_snapshot=tuple(
+                    (item.label, item.value)
+                    for item in detail.working_proposal.commercial_snapshot
+                ),
+                feasibility_snapshot=tuple(
+                    (item.label, item.value)
+                    for item in detail.working_proposal.feasibility_snapshot
+                ),
+                resolution_items=resolution_items,
+                contextual_guidance=contextual_guidance,
+            )
+            checked = validate_client_response_draft(
+                contract=contract,
+                draft=candidate,
+                current_case_revision=current_snapshot.rental_case.case_revision,
+                current_context_hash=current_contract.context_hash,
+            )
+            if checked.is_valid:
+                metadata = self._load_test_case_metadata(rental_case_id)
+                changed = (metadata.client_label != detail.metadata.client_label or
+                           self._simulated_recipient_email(rental_case_id, metadata) != recipient_email or
+                           repr(getattr(current_snapshot, "workflow_events", ())) != initial_events or
+                           repr(getattr(current_snapshot, "rental_case_facts", ())) != initial_facts)
+                if changed:
+                    return DraftValidationResult(False, ("stale_draft_contract",))
+            return checked
+
         try:
-            generated = provider.generate_client_response(contract)
+            result = generate_with_required_realization(provider=provider, contract=contract, safety_validator=safety_validator)
+            generated, validation = result.draft, result.validation
         except ClientResponseProviderError as exc:
+            if exc.diagnostics.get("generation_audit", {}).get("attempts"):
+                self._create_console_event(
+                    rental_case_id=rental_case_id,
+                    event_type_code="governed_client_response_generation_failed",
+                    source_reference=f"governed_client_response_failed:{contract.context_hash}",
+                    occurred_at=self.now(),
+                    structured_payload={"generation_audit": exc.diagnostics["generation_audit"],
+                                        "failure_category": exc.failure_category},
+                    actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                    actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+                )
             raise TestConsoleError(
                 "Client response generation did not complete; no draft was created.",
                 failure_code="CLIENT_RESPONSE_PROVIDER_FAILURE",
@@ -2538,31 +2595,6 @@ limit 1;
                 diagnostics={"failure_category": "OPENAI_TIMEOUT"},
             ) from exc
 
-        current_snapshot = self._require_case_snapshot(rental_case_id)
-        current_contract = build_draft_contract(
-            snapshot=current_snapshot,
-            recipient_label=detail.metadata.client_label,
-            latest_client_message=None if latest_evidence is None else latest_evidence.body,
-            prior_client_messages=self._prior_client_messages(detail),
-            prior_client_drafts=self._prior_client_drafts(detail, snapshot),
-            prior_editorial_items=self._prior_editorial_items(detail, snapshot),
-            commercial_snapshot=tuple(
-                (item.label, item.value)
-                for item in detail.working_proposal.commercial_snapshot
-            ),
-            feasibility_snapshot=tuple(
-                (item.label, item.value)
-                for item in detail.working_proposal.feasibility_snapshot
-            ),
-            resolution_items=resolution_items,
-            contextual_guidance=contextual_guidance,
-        )
-        validation = validate_client_response_draft(
-            contract=contract,
-            draft=generated,
-            current_case_revision=current_snapshot.rental_case.case_revision,
-            current_context_hash=current_contract.context_hash,
-        )
         if not validation.is_valid:
             self._create_console_event(
                 rental_case_id=rental_case_id,
@@ -2571,6 +2603,7 @@ limit 1;
                 occurred_at=self.now(),
                 structured_payload={
                     "provider": generated.provider_code,
+                    "generation_audit": result.audit,
                     "model": generated.model_code,
                     "provider_request_id": generated.provider_request_id,
                     "provider_response_id": generated.provider_response_id,
@@ -2616,10 +2649,21 @@ limit 1;
             response_intent=current_contract.response_intent.code,
             context_hash=current_contract.context_hash,
             draft_content_hash=self._draft_action_content_hash(content),
-            recipient_email=self._simulated_recipient_email(rental_case_id, detail.metadata),
+            recipient_email=recipient_email,
             provenance="deterministic_fixture" if use_deterministic_fixture else "governed_model",
         )
         if action.structured_payload.get("contract_version") == CONTRACT_VERSION:
+            self._create_console_event(
+                rental_case_id=rental_case_id,
+                event_type_code="governed_client_response_draft_reused",
+                source_reference=f"inquiry_response_draft:{action.structured_payload['draft_revision_id']}",
+                occurred_at=self.now(),
+                structured_payload={"generation_audit": result.audit,
+                                    "draft_revision_id": action.structured_payload['draft_revision_id'],
+                                    "context_hash": contract.context_hash},
+                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_type=TEST_CONSOLE_OPERATOR_TYPE,
+            )
             return OperationReport(title="Governed Client Response Draft Exists", success=True,
                                    lines=(f"Workflow action id: {action.workflow_action_id}",
                                           f"Draft revision id: {action.structured_payload['draft_revision_id']}",
@@ -2677,6 +2721,7 @@ limit 1;
                 "response_intent": contract.response_intent.code,
                 "context_hash": contract.context_hash,
                 "provider": generated.provider_code,
+                    "generation_audit": result.audit,
                 "model": generated.model_code,
                 "provider_request_id": generated.provider_request_id,
                 "provider_response_id": generated.provider_response_id,
