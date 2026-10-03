@@ -1,0 +1,1916 @@
+{
+  "provider_calls": 0,
+  "results": [
+    {
+      "turn": "UAT-001/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "143815d689d11abbf0b7916d95aa4235ae5690663ba47d713550f49b800b3665",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_5c2f2acb69fe441c96d7f62de82a3eea",
+          "provider_response_id": "resp_05c68a59dbcb474d016ac0d99a005887d28c6cc6b8ad07e6d7",
+          "realization_results": [
+            {
+              "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+              "kind": "commercial",
+              "realized": true,
+              "required_meaning": {
+                "booking_fee": "EUR 75 excl. VAT",
+                "vat": "21%"
+              },
+              "semantic_key": "commercial.current",
+              "topic": "commercial"
+            },
+            {
+              "fingerprint": "874342cc19d5e7a2dfaa6763be5ce2b7455372b59fb16e7964d3e7067bdfa217",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "requested_event_window": [
+                  "Requested active event start: 2026-10-14 08:00:00+00",
+                  "Requested active event end: 2026-10-14 12:00:00+00"
+                ],
+                "status": "check_required",
+                "subjects": [
+                  "requested date and venue availability"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "kind": "commercial",
+          "realized": true,
+          "required_meaning": {
+            "booking_fee": "EUR 75 excl. VAT",
+            "vat": "21%"
+          },
+          "semantic_key": "commercial.current",
+          "topic": "commercial"
+        },
+        {
+          "fingerprint": "874342cc19d5e7a2dfaa6763be5ce2b7455372b59fb16e7964d3e7067bdfa217",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2026-10-14 08:00:00+00",
+              "Requested active event end: 2026-10-14 12:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-002/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "1142a6b9bdf02f7255b5f19687e694e74a3bfaa4ce60f446580eda3256e2eb6e",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_b7a515c654d74b89ac34da35cb43bb3c",
+          "provider_response_id": "resp_0013bcc052cf47e0016ac0d9e5978887d2bc3748f2f4080912",
+          "realization_results": [
+            {
+              "fingerprint": "ae65c11bc97beff0b7c634a3c217194b085e0238ba478a19f5909c6c33f2bdea",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2204,
+                "question": "What date, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2204",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "4e274eda001a234c94988d1ba300a92db5bc4f0770a814cc37c6d5c8faabec9d",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2205,
+                "question": "How many guests are expected?"
+              },
+              "semantic_key": "question:2205",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "2415b5849e577dd242636d46ae0381880e5ef12fd10911c8a4948741a33e8012",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2206,
+                "question": "Which space would you like?"
+              },
+              "semantic_key": "question:2206",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "1cafc8607232b6e2436056eab7fbf50fca7a6812fd422adde389ab3065860d8c",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2207,
+                "question": "What type of event are you planning?"
+              },
+              "semantic_key": "question:2207",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "3be26634bf7d5ab561eeba63ed096d3b5b082ad07e57dab90883c03d157d5df3",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check overall rental pricing for the requested event/options",
+                "budget_context": "absent",
+                "overall_pricing_requested": true,
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.overall_pricing",
+              "topic": "overall_pricing"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "ae65c11bc97beff0b7c634a3c217194b085e0238ba478a19f5909c6c33f2bdea",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2204,
+            "question": "What date, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2204",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "4e274eda001a234c94988d1ba300a92db5bc4f0770a814cc37c6d5c8faabec9d",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2205,
+            "question": "How many guests are expected?"
+          },
+          "semantic_key": "question:2205",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "2415b5849e577dd242636d46ae0381880e5ef12fd10911c8a4948741a33e8012",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2206,
+            "question": "Which space would you like?"
+          },
+          "semantic_key": "question:2206",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "1cafc8607232b6e2436056eab7fbf50fca7a6812fd422adde389ab3065860d8c",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2207,
+            "question": "What type of event are you planning?"
+          },
+          "semantic_key": "question:2207",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "3be26634bf7d5ab561eeba63ed096d3b5b082ad07e57dab90883c03d157d5df3",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check overall rental pricing for the requested event/options",
+            "budget_context": "absent",
+            "overall_pricing_requested": true,
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.overall_pricing",
+          "topic": "overall_pricing"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-003/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "77ea7faa87874625f8a0e3a7c5111da8bb31aa51134bd097a25040cce2c48435",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_931d6cf6d6184fa8a02c826c43387312",
+          "provider_response_id": "resp_03809571cd0a0061016ac0da33265887d29227bf78ed2fe527",
+          "realization_results": [
+            {
+              "fingerprint": "a0b22b6100caa08ce1d5cdb049db28ae5cc26d43821c1327b1056975edfb8033",
+              "kind": "known_fact",
+              "realized": true,
+              "required_meaning": {
+                "near_limit": false,
+                "requested_guests": 65,
+                "scope": "entire venue",
+                "status": "within_limits"
+              },
+              "semantic_key": "fact:capacity",
+              "topic": "capacity"
+            },
+            {
+              "fingerprint": "99f78cc1eb7e64873f61348b0ad17238c039f8679e8868b24a2f359fd828827b",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "requested_event_window": [
+                  "Requested active event start: 2026-10-22 16:00:00+00",
+                  "Requested active event end: 2026-10-22 21:00:00+00"
+                ],
+                "status": "check_required",
+                "subjects": [
+                  "requested date and venue availability"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "a0b22b6100caa08ce1d5cdb049db28ae5cc26d43821c1327b1056975edfb8033",
+          "kind": "known_fact",
+          "realized": true,
+          "required_meaning": {
+            "near_limit": false,
+            "requested_guests": 65,
+            "scope": "entire venue",
+            "status": "within_limits"
+          },
+          "semantic_key": "fact:capacity",
+          "topic": "capacity"
+        },
+        {
+          "fingerprint": "99f78cc1eb7e64873f61348b0ad17238c039f8679e8868b24a2f359fd828827b",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2026-10-22 16:00:00+00",
+              "Requested active event end: 2026-10-22 21:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-004/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "f1cb43284a73925a8941b21e4c8e31ceb62b060f35d56d4d9706a62aad3f12c1",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_656e907bd8e847a2a49159309c994175",
+          "provider_response_id": "resp_0dfdc4aebbb32c9d016ac0da83221c87d2a8cbdaf58186b9ec",
+          "realization_results": [
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "kind": "conditional_capability",
+              "realized": true,
+              "required_meaning": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              },
+              "semantic_key": "fact:projection_display",
+              "topic": "projection_display"
+            },
+            {
+              "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+              "kind": "known_fact",
+              "realized": true,
+              "required_meaning": {
+                "action_required": false,
+                "client_fact": {
+                  "background_music_playback": true
+                },
+                "fact_state": "known"
+              },
+              "semantic_key": "fact:audio_playback",
+              "topic": "audio_playback"
+            },
+            {
+              "fingerprint": "1e6ee4050b7e8172dbddd436669d38b8ef634bf790b07dd08c6703662b6d9126",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "questions": [
+                  "can it be installed safely",
+                  "can it be operated safely"
+                ],
+                "report_back": true,
+                "subject": "requested custom equipment"
+              },
+              "semantic_key": "fact:other_technical",
+              "topic": "other_technical"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "kind": "conditional_capability",
+          "realized": true,
+          "required_meaning": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          },
+          "semantic_key": "fact:projection_display",
+          "topic": "projection_display"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "kind": "known_fact",
+          "realized": true,
+          "required_meaning": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          },
+          "semantic_key": "fact:audio_playback",
+          "topic": "audio_playback"
+        },
+        {
+          "fingerprint": "1e6ee4050b7e8172dbddd436669d38b8ef634bf790b07dd08c6703662b6d9126",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "questions": [
+              "can it be installed safely",
+              "can it be operated safely"
+            ],
+            "report_back": true,
+            "subject": "requested custom equipment"
+          },
+          "semantic_key": "fact:other_technical",
+          "topic": "other_technical"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-004/2",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "5fa3ee5d90581fb6d65d70ac322af1681af8b0974007fb8a642b5cdb272354a2",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_3a9db7041b7c47f7a8853b5ce79c1798",
+          "provider_response_id": "resp_094a169496eb5774016ac0da9393ec87d2acdbdf69f3199cc0",
+          "realization_results": [
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "kind": "conditional_capability",
+              "realized": true,
+              "required_meaning": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              },
+              "semantic_key": "fact:projection_display",
+              "topic": "projection_display"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "kind": "conditional_capability",
+          "realized": true,
+          "required_meaning": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          },
+          "semantic_key": "fact:projection_display",
+          "topic": "projection_display"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-005/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "efe382309e6e32fac0250278d86269bafb9d9179d44aea310d17becf2add6242",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_4dc3e24cbf5e40d0b3be838a90a00c53",
+          "provider_response_id": "resp_0d810197838bdee8016ac0dae6036487d2aba2d364ff60e55f",
+          "realization_results": [
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "kind": "guidance",
+              "realized": true,
+              "required_meaning": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              },
+              "semantic_key": "fact:catering_kitchen",
+              "topic": "catering_kitchen"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "kind": "guidance",
+          "realized": true,
+          "required_meaning": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          },
+          "semantic_key": "fact:catering_kitchen",
+          "topic": "catering_kitchen"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-005/2",
+      "persisted": true,
+      "retry_count": 1,
+      "attempts": [
+        {
+          "candidate_hash": "e015a314444d7ac67d0890da40aefef88b2852d0b23e6490da9643d6235cad70",
+          "failed_realization_item_ids": [
+            "next_step"
+          ],
+          "generation_attempt": 1,
+          "provider_request_id": "req_91339bd2b0c3439c8c8ee536fa7e4508",
+          "provider_response_id": "resp_0635509bfeeaa1a0016ac0daf2122c87d2b45c014ef468e789",
+          "realization_results": [
+            {
+              "fingerprint": "062ef4b6ac1dae1a9c3cd022ec1621e48cb2a2300bb3cb0b037c1c839cef6e53",
+              "kind": "pending_action",
+              "realized": false,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "supplier setup access",
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        },
+        {
+          "candidate_hash": "e793f4f344a71db5510e08bb2539e588055998485aa47cb13d5a5cf3d1f6e18a",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 2,
+          "provider_request_id": "req_2b226ffc759a4b44b6b4f757c1ca079b",
+          "provider_response_id": "resp_02775122d80eae3b016ac0daf4c95487d2b3ac9d9d8724dab3",
+          "realization_results": [
+            {
+              "fingerprint": "062ef4b6ac1dae1a9c3cd022ec1621e48cb2a2300bb3cb0b037c1c839cef6e53",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "supplier setup access",
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "062ef4b6ac1dae1a9c3cd022ec1621e48cb2a2300bb3cb0b037c1c839cef6e53",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "supplier setup access",
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-006/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "ee52f8e69d650954e5507cb59d1a69e7d106cf5035ab7621d5bb57ed4d64b1c6",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_2a3abb55c0d540568c295b341c7c9dff",
+          "provider_response_id": "resp_00838e722b9cb7db016ac0db47494c87d2ae039b50187fe3ea",
+          "realization_results": [
+            {
+              "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "requested_event_window": [
+                  "Requested active event start: 2026-11-12 12:00:00+00",
+                  "Requested active event end: 2026-11-12 15:00:00+00"
+                ],
+                "status": "check_required",
+                "subjects": [
+                  "requested date and venue availability"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2026-11-12 12:00:00+00",
+              "Requested active event end: 2026-11-12 15:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-006/2",
+      "persisted": true,
+      "retry_count": 1,
+      "attempts": [
+        {
+          "candidate_hash": "ca8798f279f1f0b9f9c3947cca0f0125970fe0d20ca119b67e046d8dd6a89a23",
+          "failed_realization_item_ids": [
+            "change:1cc4cfa2252d",
+            "change:511fc7dc85f1",
+            "change:1ee0a6f6bb73"
+          ],
+          "generation_attempt": 1,
+          "provider_request_id": "req_948c5d5a793e4b12897a61e22dc525de",
+          "provider_response_id": "resp_00c03a511ffa1152016ac0db54777887d29b96af2072344dd1",
+          "realization_results": [
+            {
+              "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+              "kind": "pending_action",
+              "realized": false,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "guest count",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1cc4cfa2252d",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+              "kind": "pending_action",
+              "realized": false,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested rental scope",
+                "status": "check_required"
+              },
+              "semantic_key": "change:511fc7dc85f1",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+              "kind": "pending_action",
+              "realized": false,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested reschedule is awaiting review",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1ee0a6f6bb73",
+              "topic": "requested_change"
+            }
+          ],
+          "safety_failure_codes": []
+        },
+        {
+          "candidate_hash": "866c8325775b28959b964a57e231534781185943079c2f2f4d64327dc69aecbd",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 2,
+          "provider_request_id": "req_5d8df55d84cf4958a0adb373b0670e42",
+          "provider_response_id": "resp_0d96ddabd0e7252f016ac0db59ca1887d2b865b92e299c6ab6",
+          "realization_results": [
+            {
+              "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "guest count",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1cc4cfa2252d",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested rental scope",
+                "status": "check_required"
+              },
+              "semantic_key": "change:511fc7dc85f1",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested reschedule is awaiting review",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1ee0a6f6bb73",
+              "topic": "requested_change"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "guest count",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1cc4cfa2252d",
+          "topic": "requested_change"
+        },
+        {
+          "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested rental scope",
+            "status": "check_required"
+          },
+          "semantic_key": "change:511fc7dc85f1",
+          "topic": "requested_change"
+        },
+        {
+          "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested reschedule is awaiting review",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1ee0a6f6bb73",
+          "topic": "requested_change"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-007/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "17d834cffadadd6357ef481b7d05cb61d1ba7430a96b710b61c2b1df4a8ec0e9",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_61700809cc104454848a75eb409565e9",
+          "provider_response_id": "resp_0028b094111c8760016ac0dbb6851087d2bfe179a958d373ea",
+          "realization_results": [
+            {
+              "fingerprint": "7d5b4f31638ea55102f9dd936dcca7c8589b0529c4dfa479bc5ca47837e125b6",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2224,
+                "question": "What start time and finish time would you like?"
+              },
+              "semantic_key": "question:2224",
+              "topic": "client_information"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "7d5b4f31638ea55102f9dd936dcca7c8589b0529c4dfa479bc5ca47837e125b6",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2224,
+            "question": "What start time and finish time would you like?"
+          },
+          "semantic_key": "question:2224",
+          "topic": "client_information"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-008/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "3bab57cd400dbee22be31315ea5da496a214d9f7f1b795ae460ad6d93450b601",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_7be0c8baa02647afb9e895278a82ee03",
+          "provider_response_id": "resp_02d6973ac027b69f016ac0dc12818887d288132224c13a00ec",
+          "realization_results": [
+            {
+              "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+              "kind": "commercial",
+              "realized": true,
+              "required_meaning": {
+                "booking_fee": "EUR 75 excl. VAT",
+                "vat": "21%"
+              },
+              "semantic_key": "commercial.current",
+              "topic": "commercial"
+            },
+            {
+              "fingerprint": "210e2f17ccf3525f54e7fff546ae6c561369c034a7199eb823f91e3eadce62a6",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check overall rental pricing for the requested event/options taking the stated budget into account",
+                "budget_context": "general_constraint",
+                "overall_pricing_requested": true,
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.overall_pricing",
+              "topic": "overall_pricing"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "kind": "commercial",
+          "realized": true,
+          "required_meaning": {
+            "booking_fee": "EUR 75 excl. VAT",
+            "vat": "21%"
+          },
+          "semantic_key": "commercial.current",
+          "topic": "commercial"
+        },
+        {
+          "fingerprint": "210e2f17ccf3525f54e7fff546ae6c561369c034a7199eb823f91e3eadce62a6",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check overall rental pricing for the requested event/options taking the stated budget into account",
+            "budget_context": "general_constraint",
+            "overall_pricing_requested": true,
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.overall_pricing",
+          "topic": "overall_pricing"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-009/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "19f7423593f5d737af7c57afbcc3b54fc056b8b2108bcc83ccbe8ac08cde0566",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_97c98e9269ff40638118522f1fc46838",
+          "provider_response_id": "resp_0897d5bd9708d7ea016ac0dc65e0dc87d29f5cac9b440086e2",
+          "realization_results": [
+            {
+              "fingerprint": "8a576100427e33cc3ab09a472aa14164bdbec24a22d1d25d5abc78543b8b4e1c",
+              "kind": "commercial",
+              "realized": true,
+              "required_meaning": {
+                "booking_fee": "EUR 50 excl. VAT",
+                "vat": "21%"
+              },
+              "semantic_key": "commercial.current",
+              "topic": "commercial"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "8a576100427e33cc3ab09a472aa14164bdbec24a22d1d25d5abc78543b8b4e1c",
+          "kind": "commercial",
+          "realized": true,
+          "required_meaning": {
+            "booking_fee": "EUR 50 excl. VAT",
+            "vat": "21%"
+          },
+          "semantic_key": "commercial.current",
+          "topic": "commercial"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-009/2",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "07ed992c6cc5fb3f72228769b744b1b55e3f90cfe1b10fce4615a08727348061",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_244be2b7174241a3aa11192162bfcd54",
+          "provider_response_id": "resp_042d8c5169e1fc37016ac0dc70fb1c87d2a01f9bcad5aff59b",
+          "realization_results": [
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-010/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "b9435819cbf8c3de46a35628b2050e0922b8f9308947001db5bef5afca57859c",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_ff61268531834352b682ebc68bebd73c",
+          "provider_response_id": "resp_05bff9d122a14c23016ac0dcca32bc87d280afc9b2c315d36f",
+          "realization_results": [
+            {
+              "fingerprint": "17c6b1201c328b878f3a7333a74be03fa7730aea9fee0a43d374982b546203e1",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "questions": [
+                  "can it be installed safely",
+                  "can it be operated safely"
+                ],
+                "report_back": true,
+                "subject": "custom aerial rig"
+              },
+              "semantic_key": "fact:other_technical",
+              "topic": "other_technical"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "17c6b1201c328b878f3a7333a74be03fa7730aea9fee0a43d374982b546203e1",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "questions": [
+              "can it be installed safely",
+              "can it be operated safely"
+            ],
+            "report_back": true,
+            "subject": "custom aerial rig"
+          },
+          "semantic_key": "fact:other_technical",
+          "topic": "other_technical"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-011/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "91cb2122a97b8013944b5a69bc7fa40e9f1be157024d613d532ec247d838fbd2",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_e74420c4df594e108e9dfaf50069b76f",
+          "provider_response_id": "resp_00d6021fbe1387a8016ac0dd2e1c8c87d29b3e5ae93eae65bc",
+          "realization_results": [
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "kind": "guidance",
+              "realized": true,
+              "required_meaning": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              },
+              "semantic_key": "fact:catering_kitchen",
+              "topic": "catering_kitchen"
+            },
+            {
+              "fingerprint": "c44c4347be161b1f3a56fc6ea168b9b0dfb1dffe8f1dd36b6dcf4af26ca0f9c8",
+              "kind": "guidance",
+              "realized": true,
+              "required_meaning": {
+                "activities": [
+                  "deliveries",
+                  "unloading",
+                  "setup"
+                ],
+                "exception": "prior written agreement",
+                "within": "confirmed rental period"
+              },
+              "semantic_key": "fact:supplier_access",
+              "topic": "supplier_access"
+            },
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "kind": "conditional_capability",
+              "realized": true,
+              "required_meaning": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              },
+              "semantic_key": "fact:projection_display",
+              "topic": "projection_display"
+            },
+            {
+              "fingerprint": "09129378b9d949ef75a76b88fb1e5d7d3d6fa5f3166dd83ac83d01657a8a38d4",
+              "kind": "restriction",
+              "realized": true,
+              "required_meaning": {
+                "capability": "microphones",
+                "status": "not_supported",
+                "supplier_requirement": "external supplier"
+              },
+              "semantic_key": "fact:microphones",
+              "topic": "microphones"
+            },
+            {
+              "fingerprint": "b320d8baf1f3da0c554feb37e3a541018738575bda80c7239eccebd8ec4ff0fa",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "supplier arrival timing",
+                  "supplier setup access"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "kind": "guidance",
+          "realized": true,
+          "required_meaning": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          },
+          "semantic_key": "fact:catering_kitchen",
+          "topic": "catering_kitchen"
+        },
+        {
+          "fingerprint": "c44c4347be161b1f3a56fc6ea168b9b0dfb1dffe8f1dd36b6dcf4af26ca0f9c8",
+          "kind": "guidance",
+          "realized": true,
+          "required_meaning": {
+            "activities": [
+              "deliveries",
+              "unloading",
+              "setup"
+            ],
+            "exception": "prior written agreement",
+            "within": "confirmed rental period"
+          },
+          "semantic_key": "fact:supplier_access",
+          "topic": "supplier_access"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "kind": "conditional_capability",
+          "realized": true,
+          "required_meaning": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          },
+          "semantic_key": "fact:projection_display",
+          "topic": "projection_display"
+        },
+        {
+          "fingerprint": "09129378b9d949ef75a76b88fb1e5d7d3d6fa5f3166dd83ac83d01657a8a38d4",
+          "kind": "restriction",
+          "realized": true,
+          "required_meaning": {
+            "capability": "microphones",
+            "status": "not_supported",
+            "supplier_requirement": "external supplier"
+          },
+          "semantic_key": "fact:microphones",
+          "topic": "microphones"
+        },
+        {
+          "fingerprint": "b320d8baf1f3da0c554feb37e3a541018738575bda80c7239eccebd8ec4ff0fa",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "supplier arrival timing",
+              "supplier setup access"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-011/2",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "c685106315670b1359cde91ba6ae83ec8b6aa967818b968d213fa05b935a6e1a",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_567bb797a17340f6b8ef1b4e11b17583",
+          "provider_response_id": "resp_078f5a2d0b78e4cd016ac0dd404f4c87d2912414abce467364",
+          "realization_results": [
+            {
+              "fingerprint": "edff3d559b1e85048a79b7be96b271ad732bc96a40ed9983de29a4f03481918a",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "venue handover",
+                  "supplier arrival timing",
+                  "loading route"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "edff3d559b1e85048a79b7be96b271ad732bc96a40ed9983de29a4f03481918a",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "venue handover",
+              "supplier arrival timing",
+              "loading route"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-012/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "d0ff026af113461f0e32b06207c7d431255ee060c517f981c8fed4488c08e076",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_53ae57c0b53845e99985e930241c0f05",
+          "provider_response_id": "resp_0d2d01361cf012c4016ac0dda151c887d2a21e47b1fcaa224d",
+          "realization_results": [
+            {
+              "fingerprint": "89ce819db113866f434cec69adb9698f3306a6fb94bbaaacd5f6b8ef42acd70a",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2244,
+                "question": "What day, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2244",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ffd73e1f7bbff750003c3a1a8f0738e74b1f221ab9b7b3f1c8a6ddb0e87db56a",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2245,
+                "question": "How many guests are expected?"
+              },
+              "semantic_key": "question:2245",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "kind": "guidance",
+              "realized": true,
+              "required_meaning": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              },
+              "semantic_key": "fact:catering_kitchen",
+              "topic": "catering_kitchen"
+            },
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "kind": "conditional_capability",
+              "realized": true,
+              "required_meaning": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              },
+              "semantic_key": "fact:projection_display",
+              "topic": "projection_display"
+            },
+            {
+              "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+              "kind": "known_fact",
+              "realized": true,
+              "required_meaning": {
+                "action_required": false,
+                "client_fact": {
+                  "background_music_playback": true
+                },
+                "fact_state": "known"
+              },
+              "semantic_key": "fact:audio_playback",
+              "topic": "audio_playback"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "89ce819db113866f434cec69adb9698f3306a6fb94bbaaacd5f6b8ef42acd70a",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2244,
+            "question": "What day, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2244",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ffd73e1f7bbff750003c3a1a8f0738e74b1f221ab9b7b3f1c8a6ddb0e87db56a",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2245,
+            "question": "How many guests are expected?"
+          },
+          "semantic_key": "question:2245",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "kind": "guidance",
+          "realized": true,
+          "required_meaning": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          },
+          "semantic_key": "fact:catering_kitchen",
+          "topic": "catering_kitchen"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "kind": "conditional_capability",
+          "realized": true,
+          "required_meaning": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          },
+          "semantic_key": "fact:projection_display",
+          "topic": "projection_display"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "kind": "known_fact",
+          "realized": true,
+          "required_meaning": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          },
+          "semantic_key": "fact:audio_playback",
+          "topic": "audio_playback"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-012/2",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "eb78bbc6cc47db4ff801b1be81eae2d36ab37c388eff19c9f632794f2494e14f",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_57f22f92208d41089ef493d9ba1cf064",
+          "provider_response_id": "resp_02832f38510be4c8016ac0ddb5c38087d2b5a26a63edb90b80",
+          "realization_results": [
+            {
+              "fingerprint": "89ce819db113866f434cec69adb9698f3306a6fb94bbaaacd5f6b8ef42acd70a",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2244,
+                "question": "What day, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2244",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "89ce819db113866f434cec69adb9698f3306a6fb94bbaaacd5f6b8ef42acd70a",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2244,
+            "question": "What day, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2244",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-012/3",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "71c40149c659192206ce856b260b6c83af02abfa5f5226ed2cd319e96c7d4e0c",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_99a0e73ebfed4335aa0c378e9ee31210",
+          "provider_response_id": "resp_044bd4de742de890016ac0ddc474f487d2b082a8dde5a93be8",
+          "realization_results": [
+            {
+              "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+              "kind": "commercial",
+              "realized": true,
+              "required_meaning": {
+                "booking_fee": "EUR 75 excl. VAT",
+                "vat": "21%"
+              },
+              "semantic_key": "commercial.current",
+              "topic": "commercial"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "kind": "commercial",
+          "realized": true,
+          "required_meaning": {
+            "booking_fee": "EUR 75 excl. VAT",
+            "vat": "21%"
+          },
+          "semantic_key": "commercial.current",
+          "topic": "commercial"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-013/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "122e0cb41fc826d0ad0e0d21148a14d37a0492762f206837408f10856b34c4d1",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_06352846211a4544852169b741c85fe8",
+          "provider_response_id": "resp_022958e095a16eb8016ac0de2ccbfc87d2adf5f7c96d239787",
+          "realization_results": [
+            {
+              "fingerprint": "17805e2d3cbf2496800c1c3eb33a784773f47d85fe00d66d1a9a3d0376f1d2af",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "requested_event_window": [
+                  "Requested active event start: 2027-02-07 09:00:00+00",
+                  "Requested active event end: 2027-02-07 12:00:00+00"
+                ],
+                "status": "check_required",
+                "subjects": [
+                  "requested date and venue availability"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "17805e2d3cbf2496800c1c3eb33a784773f47d85fe00d66d1a9a3d0376f1d2af",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2027-02-07 09:00:00+00",
+              "Requested active event end: 2027-02-07 12:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-013/2",
+      "persisted": true,
+      "retry_count": 1,
+      "attempts": [
+        {
+          "candidate_hash": "1f51966cffd8858beeecb813d6d36a79efc28d3f3a01a3c23c973959ffeea187",
+          "failed_realization_item_ids": [
+            "change:1ee0a6f6bb73"
+          ],
+          "generation_attempt": 1,
+          "provider_request_id": "req_b80bd21088af4eb7bb4698f59fe48042",
+          "provider_response_id": "resp_0cd342fb7e5f4ed2016ac0de38764c87d29995e53fb0b03b18",
+          "realization_results": [
+            {
+              "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+              "kind": "pending_action",
+              "realized": false,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested reschedule is awaiting review",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1ee0a6f6bb73",
+              "topic": "requested_change"
+            }
+          ],
+          "safety_failure_codes": []
+        },
+        {
+          "candidate_hash": "0d6cdb250630129b77393b50368d775e80e094dfc92f817126daa2bfaf432922",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 2,
+          "provider_request_id": "req_25c314022674487cbffdc8707cd36013",
+          "provider_response_id": "resp_0254475675cba5ce016ac0de3babe887d2a404246e30e5eef1",
+          "realization_results": [
+            {
+              "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested reschedule is awaiting review",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1ee0a6f6bb73",
+              "topic": "requested_change"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested reschedule is awaiting review",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1ee0a6f6bb73",
+          "topic": "requested_change"
+        }
+      ]
+    }
+  ],
+  "generation_operations": 21,
+  "model_candidates": 24
+}

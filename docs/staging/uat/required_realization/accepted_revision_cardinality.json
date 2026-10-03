@@ -1,0 +1,138 @@
+[
+  {
+    "run": "targeted",
+    "scenario": "UAT-012",
+    "case_id": 569,
+    "accepted_revision_ids": [
+      360,
+      361,
+      362
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-001",
+    "case_id": 570,
+    "accepted_revision_ids": [
+      363
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-002",
+    "case_id": 571,
+    "accepted_revision_ids": [
+      364
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-003",
+    "case_id": 572,
+    "accepted_revision_ids": [
+      365
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-004",
+    "case_id": 573,
+    "accepted_revision_ids": [
+      366,
+      367
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-005",
+    "case_id": 574,
+    "accepted_revision_ids": [
+      368,
+      369
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-006",
+    "case_id": 575,
+    "accepted_revision_ids": [
+      370,
+      371
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-007",
+    "case_id": 576,
+    "accepted_revision_ids": [
+      372
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-008",
+    "case_id": 577,
+    "accepted_revision_ids": [
+      373
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-009",
+    "case_id": 578,
+    "accepted_revision_ids": [
+      374,
+      375
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-010",
+    "case_id": 579,
+    "accepted_revision_ids": [
+      376
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-011",
+    "case_id": 580,
+    "accepted_revision_ids": [
+      377,
+      378
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-012",
+    "case_id": 581,
+    "accepted_revision_ids": [
+      379,
+      380,
+      381
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  },
+  {
+    "run": "full",
+    "scenario": "UAT-013",
+    "case_id": 582,
+    "accepted_revision_ids": [
+      382,
+      383
+    ],
+    "only_accepted_candidates_persisted": "PASS"
+  }
+]

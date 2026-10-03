@@ -1,0 +1,383 @@
+{
+  "status": "acceptance_complete_stopped",
+  "implementation_commit": "4b31672ec26ea233208a65d59a365344e94370c9",
+  "tests": {
+    "focused": 170,
+    "focused_subtests": 13,
+    "phase8": 534,
+    "phase8_subtests": 126,
+    "full": 751,
+    "full_subtests": 160,
+    "failures": 0,
+    "skipped": 0,
+    "git_diff_check": "PASS"
+  },
+  "provider_free_regressions": "45 new required-realization tests pass; prior 21 saved outputs fail only on the 3 demonstrated audio omissions.",
+  "date_behavior": "unchanged; source and prior evidence hashes frozen",
+  "full_UAT_authorized_only_after_targeted_pass": true,
+  "deployment": {
+    "commit": "4b31672ec26ea233208a65d59a365344e94370c9",
+    "deploy_id": "dep-db0dg860tbcc73fc117g",
+    "status": "live"
+  },
+  "targeted": {
+    "result": "PASS",
+    "assessment_method": "Direct assistant review of all exact drafts, plan/audit evidence and provider-free case snapshot; no LLM judge",
+    "persisted_drafts": "3/3",
+    "case_id": 569,
+    "retry_count_per_turn": [
+      0,
+      0,
+      0
+    ],
+    "model_candidates": 3,
+    "safety_failures": 0,
+    "unanswered_required_semantic_items": 0,
+    "repetition": 0,
+    "unnecessary_year_questions": 0,
+    "turns": [
+      {
+        "turn": 1,
+        "grade": "B",
+        "assessment": "Directly states light background music playback is available; practical projection setup remains a check. Kitchen constraint, fee and adjustment checks, facilitator availability/format, and day/start/finish/headcount questions are present. Slightly formal opening is harmless. Audio realization is recorded."
+      },
+      {
+        "turn": 2,
+        "grade": "A",
+        "assessment": "Audio is ALREADY_COMMUNICATED and omitted. The 24-person update, flexible 20-minute welcome, fee/adjustment and facilitator checks are covered. Only day/start/finish remain questions."
+      },
+      {
+        "turn": 3,
+        "grade": "A",
+        "assessment": "Audio remains ALREADY_COMMUNICATED and omitted. EUR 75 excl. VAT and 21% VAT are stated. Adjustment and facilitator checks remain prospective. The timestamped January date resolves to 2027; no date/year question remains."
+      }
+    ],
+    "retry_demonstration": "Targeted model candidates were complete on their initial attempt; corrective behavior is demonstrated by provider-free transport/persistence tests, not a live retry in this targeted sample."
+  },
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "safety": {
+    "environment": "staging",
+    "health": "ok",
+    "outlook": "configured_draft_only",
+    "send_gate": "DISABLED",
+    "asana": "configured_but_disabled",
+    "Graph mutations": 0,
+    "Outlook sends": 0,
+    "real Asana executions": 0,
+    "production activity": 0,
+    "actions approved": 0,
+    "actions executed": 0,
+    "ExecutionAttempts created": 0,
+    "generation_operations": 24,
+    "model_candidates": 27,
+    "corrective_retries": 3,
+    "provider": "openai",
+    "model": "gpt-5.6-sol"
+  },
+  "date_audit": {
+    "normalization_and_observation_sources_unchanged": "PASS",
+    "frozen_prior_evidence_hashes": "PASS",
+    "timestamp_provenance_observations_checked": 17,
+    "drafts_without_year_question": 24,
+    "targeted_January_21": "2027-01-21",
+    "targeted_provenance": "system_inferred_next_occurrence"
+  },
+  "full_review": {
+    "result": "FAIL",
+    "assessment_method": "Direct assistant review of all exact final drafts, supported by saved provider-free audits; no external model judge",
+    "coverage": "21/21",
+    "scenario_count": 13,
+    "continuity": "6/7",
+    "required_answer_continuity": "7/7",
+    "continuity_definition": "The historical headline metric includes repetition defects. Required-answer continuity separately tracks answered requests across turns; UAT-006 has complete answers but repeated report-back prose within turn 2.",
+    "continuity_by_scenario": [
+      {
+        "scenario": "UAT-004",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "PASS"
+      },
+      {
+        "scenario": "UAT-005",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "PASS"
+      },
+      {
+        "scenario": "UAT-006",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "FAIL"
+      },
+      {
+        "scenario": "UAT-009",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "PASS"
+      },
+      {
+        "scenario": "UAT-011",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "PASS"
+      },
+      {
+        "scenario": "UAT-012",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "PASS"
+      },
+      {
+        "scenario": "UAT-013",
+        "required_answer_continuity": "PASS",
+        "editorial_continuity": "PASS"
+      }
+    ],
+    "grades": {
+      "A": 17,
+      "B": 4,
+      "C": 0,
+      "D": 0
+    },
+    "editorial_defects": {
+      "unanswered_request": 0,
+      "repetition": 1,
+      "unnecessary_information": 0,
+      "policy_dump": 0,
+      "system_language": 0,
+      "unnecessary_year_question": 0,
+      "unnecessary_availability": 0,
+      "known_audio_answer_omitted": 0,
+      "audio_converted_to_pending": 0,
+      "cross_clause_realization": 0
+    },
+    "unanswered_required_semantic_items": 0,
+    "safety_failures": 0,
+    "wrong_commercial_claims": 0,
+    "false_confirmations": 0,
+    "known_no_contradictions": 0,
+    "confidentiality_failures": 0,
+    "stale_current_drafts": 0,
+    "em_dashes": 0,
+    "corrective_retries": 3,
+    "model_candidates": 24,
+    "accepted_revision_count": 21,
+    "retry_count_by_turn": {
+      "UAT-001/1": 0,
+      "UAT-002/1": 0,
+      "UAT-003/1": 0,
+      "UAT-004/1": 0,
+      "UAT-004/2": 0,
+      "UAT-005/1": 0,
+      "UAT-005/2": 1,
+      "UAT-006/1": 0,
+      "UAT-006/2": 1,
+      "UAT-007/1": 0,
+      "UAT-008/1": 0,
+      "UAT-009/1": 0,
+      "UAT-009/2": 0,
+      "UAT-010/1": 0,
+      "UAT-011/1": 0,
+      "UAT-011/2": 0,
+      "UAT-012/1": 0,
+      "UAT-012/2": 0,
+      "UAT-012/3": 0,
+      "UAT-013/1": 0,
+      "UAT-013/2": 1
+    },
+    "reviews": {
+      "UAT-001/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Concise governed EUR 75 excl. VAT and 21% VAT answer, with prospective date/venue availability check. No extra rules or invented facts.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-002/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Asks all four missing client information needs, including day/start/finish without demanding year. Overall price and booking fee are prospective checks. No invented budget.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-003/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "States governed whole-venue capacity for 65 guests; availability remains prospective. Concise, without price or unrelated guidance.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-004/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Directly states background playback is possible, separate from practical projection and custom hologram safety checks. No unrelated availability fallback.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-004/2": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Keeps optional hologram subordinate to ordinary planning, retains practical projection check, and omits previously realized audio.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-005/1": {
+        "grade": "B",
+        "result": "PASS",
+        "assessment": "Retains kitchen suitability/production limitation and prospective facilitator availability/format. Slightly formal final check wording, with no false confirmation.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-005/2": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Covers the changed simple buffet, 45-minute setup need and flexible facilitator format. Checks supplier access and facilitator availability without repeating kitchen guidance or promising an access window.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-006/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Concise prospective Studio/date availability check, with no year question or unsupported confirmation.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-006/2": {
+        "grade": "B",
+        "result": "FAIL",
+        "assessment": "All three requested changes remain prospective and timing is handled without a year question. However, the reply repeats the check-and-report-back promise three times: come back to you, update you on that too, then come back to you once checked. This redundant process wording fails the zero-repetition acceptance gate.",
+        "editorial_flags": [
+          "repetition"
+        ],
+        "safety_flags": []
+      },
+      "UAT-007/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Asks only start and finish because day/month are already known. Date check remains prospective, with no year demand or kitchen policy dump.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-008/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "States current EUR 75 excl. VAT and 21% VAT, distinguishes overall rental pricing from fee flexibility, and preserves the supplied budget context without confirming a concession.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-009/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Uses current governed EUR 50 fee and 21% VAT, with requested adjustment still pending. Historical fee treatment is not presented as current authority.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-009/2": {
+        "grade": "B",
+        "result": "PASS",
+        "assessment": "Briefly acknowledges the historical-team clarification, retains the fee-adjustment check and avoids repeating the price or asserting that the previous arrangement applies. Slightly formal acknowledgement.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-010/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Only the requested aerial-rig installation/operation safety check is communicated. No unrelated venue-availability fallback.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-011/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Covers kitchen suitability and its limitation, conditional projector setup, external microphones, and the governed rental-period access restriction. Arrival/setup checks remain prospective; no unrelated capability contradiction.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-011/2": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Focuses on new handover, arrival timing and loading-route needs. Prior kitchen, microphone and general access guidance are omitted rather than repeated; no concrete access window or completed arrangement is invented.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-012/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Directly states background music playback availability. Practical projection and facilitator checks stay prospective; kitchen guidance and fee/adjustment checks are present. Asks only missing day/start/finish/headcount.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-012/2": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Omits already answered audio and kitchen guidance. Handles the shorter flexible welcome, facilitator and fee checks; the supplied headcount closes that question while timing questions remain.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-012/3": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Omits audio again, states EUR 75 excl. VAT and 21% VAT, and keeps adjustment/facilitator checks prospective. Timing questions are closed without demanding year.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-013/1": {
+        "grade": "A",
+        "result": "PASS",
+        "assessment": "Prospective Studio/date availability check, using normalized February 2027 timing without asking for year.",
+        "editorial_flags": [],
+        "safety_flags": []
+      },
+      "UAT-013/2": {
+        "grade": "B",
+        "result": "PASS",
+        "assessment": "Acknowledges only the requested date/time change and keeps the reschedule subject to review. Slightly formal wording, but no false confirmation or year question.",
+        "editorial_flags": [],
+        "safety_flags": []
+      }
+    },
+    "remaining_issues": [
+      "UAT-006/2 repeats the check-and-report-back promise three times. All required meanings and safety checks pass, but the zero-repetition editorial acceptance gate fails. No style repair or further generation cycle was performed."
+    ]
+  },
+  "final_marker": "WNC_REQUIRED_REALIZATION_REVIEW_REQUIRED",
+  "remaining_issues": [
+    "UAT-006/2 repeats the check-and-report-back promise three times. All required meanings and safety checks pass, but the zero-repetition editorial acceptance gate fails. No style repair or further generation cycle was performed."
+  ],
+  "evidence_limit": "Direct assistant quality review and bounded deterministic checks; no independent human acceptance or universal language-coverage claim."
+}

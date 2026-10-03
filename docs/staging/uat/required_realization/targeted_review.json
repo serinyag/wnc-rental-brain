@@ -1,0 +1,34 @@
+{
+  "result": "PASS",
+  "assessment_method": "Direct assistant review of all exact drafts, plan/audit evidence and provider-free case snapshot; no LLM judge",
+  "persisted_drafts": "3/3",
+  "case_id": 569,
+  "retry_count_per_turn": [
+    0,
+    0,
+    0
+  ],
+  "model_candidates": 3,
+  "safety_failures": 0,
+  "unanswered_required_semantic_items": 0,
+  "repetition": 0,
+  "unnecessary_year_questions": 0,
+  "turns": [
+    {
+      "turn": 1,
+      "grade": "B",
+      "assessment": "Directly states light background music playback is available; practical projection setup remains a check. Kitchen constraint, fee and adjustment checks, facilitator availability/format, and day/start/finish/headcount questions are present. Slightly formal opening is harmless. Audio realization is recorded."
+    },
+    {
+      "turn": 2,
+      "grade": "A",
+      "assessment": "Audio is ALREADY_COMMUNICATED and omitted. The 24-person update, flexible 20-minute welcome, fee/adjustment and facilitator checks are covered. Only day/start/finish remain questions."
+    },
+    {
+      "turn": 3,
+      "grade": "A",
+      "assessment": "Audio remains ALREADY_COMMUNICATED and omitted. EUR 75 excl. VAT and 21% VAT are stated. Adjustment and facilitator checks remain prospective. The timestamped January date resolves to 2027; no date/year question remains."
+    }
+  ],
+  "retry_demonstration": "Targeted model candidates were complete on their initial attempt; corrective behavior is demonstrated by provider-free transport/persistence tests, not a live retry in this targeted sample."
+}

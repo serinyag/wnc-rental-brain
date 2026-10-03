@@ -1,0 +1,59 @@
+{
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "current_drafts": [
+    {
+      "scenario_id": "UAT-012",
+      "case_id": 569,
+      "revision_id": 362,
+      "source_case_revision_matches": true,
+      "display_status": "needs_approval",
+      "send_available": false,
+      "blocking_operator_annotations": true,
+      "duplicate_active_resolution_actions": 0,
+      "execution_attempts": 0
+    }
+  ],
+  "rejected_candidates": [],
+  "approval_and_execution_routes_called": 0
+}

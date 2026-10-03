@@ -1,0 +1,67 @@
+{
+  "provider_calls": 0,
+  "observations": [
+    {
+      "scenario_id": "UAT-012",
+      "observation_id": 2642,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2027-01-21T20:00:00+00:00",
+        "active_event_start": "2027-01-21T16:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 21,
+            "finish_time": "21:00",
+            "month": 1,
+            "start_time": "17:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 10:29:09.025485+00",
+          "resolved_year": 2027,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:3019",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 21,
+        "finish_time": "21:00",
+        "month": 1,
+        "resolved_date": "2027-01-21",
+        "start_time": "17:00"
+      },
+      "source_received_at": "2026-10-03 10:29:09.025485+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-012",
+      "observation_id": 2633,
+      "status": "validated",
+      "value": {
+        "date_provenance": {
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 10:28:22.393699+00",
+          "source_reference": "inbound_source_record:3009",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "unresolved"
+        },
+        "month": 1
+      },
+      "source_received_at": "2026-10-03 10:28:22.393699+00",
+      "provenance_validation": "PASS"
+    }
+  ],
+  "draft_question_checks": [
+    {
+      "turn": "UAT-012/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-012/2",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-012/3",
+      "asks_client_for_year": false
+    }
+  ]
+}

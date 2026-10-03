@@ -1,0 +1,2909 @@
+[
+  {
+    "rental_case_id": 569,
+    "event_type": "governed_client_response_draft_generated",
+    "approval_request_id": 436,
+    "client_generation_payload": {
+      "acknowledgements": [
+        {
+          "about": "January gathering",
+          "kind": "new_enquiry",
+          "topic": "latest_client_detail"
+        }
+      ],
+      "do_not_repeat_topics": [],
+      "external_pending": [],
+      "forbidden_claims": [
+        "Do not confirm venue availability or booking.",
+        "Do not describe a pending internal confirmation as completed.",
+        "Do not describe a pending decision or fee adjustment as approved.",
+        "Do not use historical precedent as current policy.",
+        "Do not use an em dash in the subject or body.",
+        "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+      ],
+      "latest_client_message": "Hi WNC,\n\nWe are putting together a January gathering in the Studio. We would like slides and light background music, would bring an outside caterer, and may ask WNC for a short facilitator-led opening. We know a DJ setup is not available, which is fine. Could you also explain the booking fee and whether there is any room to adjust it? We are still confirming final numbers and timing.\n\nThank you,\nAri",
+      "must_say": [
+        {
+          "action": "check requested booking fee or pricing",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check what can be arranged",
+          "request": "booking fee adjustment",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "limitation": "not large-scale food production",
+          "suitable_for": [
+            "ready-made food",
+            "warming",
+            "plating",
+            "simple assembly"
+          ],
+          "topic": "catering_kitchen"
+        },
+        {
+          "available_equipment": "WNC projector",
+          "capability": "projection display",
+          "check_required": [
+            "practical projection setup"
+          ],
+          "status": "conditional",
+          "topic": "projection_display"
+        },
+        {
+          "action_required": false,
+          "client_fact": {
+            "background_music_playback": true
+          },
+          "fact_state": "known",
+          "topic": "audio_playback"
+        },
+        {
+          "action": "check",
+          "status": "check_required",
+          "subjects": [
+            "requested facilitator availability and format"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "open_client_questions": [
+        {
+          "open_question_id": 2196,
+          "question": "What day, start time and finish time would you like?",
+          "topic": "client_information"
+        },
+        {
+          "open_question_id": 2197,
+          "question": "How many guests are expected?",
+          "topic": "client_information"
+        }
+      ],
+      "optional_helpful_now": [],
+      "primary_client_need": [
+        "client_owned_missing_information"
+      ],
+      "recipient_label": "Ari Patel",
+      "response_intent": "REQUEST_CLIENT_INFORMATION",
+      "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+      "style_profile": [
+        "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+        "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+        "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+        "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+        "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+        "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+        "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+        "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+        "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+        "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+        "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
+        "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+        "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+      ]
+    },
+    "communicated_editorial_items": [
+      {
+        "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+        "semantic_key": "fact:catering_kitchen",
+        "source_reference": "SERV-003",
+        "topic": "catering_kitchen"
+      },
+      {
+        "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+        "semantic_key": "fact:audio_playback",
+        "source_reference": "phase4:technical_audio_playback_supported",
+        "topic": "audio_playback"
+      }
+    ],
+    "context_hash": "df8411953c09eefb1e4923cf834f5a5318929992d974f2c483041e8779f24d70",
+    "contextual_guidance_topics": [
+      "catering_kitchen",
+      "catering_kitchen",
+      "external_supplier_setup",
+      "external_supplier_setup",
+      "technical_capabilities",
+      "technical_capabilities",
+      "technical_capabilities"
+    ],
+    "draft_revision_id": 360,
+    "editorial_content_plan": {
+      "acknowledge": [
+        {
+          "authority_class": "client_request",
+          "fingerprint": "75b40c4ea32606cc9b53ec24c30927180cddde1d84a4404ffc14ce3d3c21387c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 3,
+          "proposition_key": "latest_client_detail",
+          "reason": "current_turn_delta",
+          "role": "ACKNOWLEDGE",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message",
+          "topic": "latest_client_detail",
+          "value": {
+            "about": "January gathering",
+            "kind": "new_enquiry"
+          }
+        }
+      ],
+      "already_communicated": [],
+      "client_visible_pending_state": [
+        {
+          "action": "check requested booking fee or pricing",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check what can be arranged",
+          "request": "booking fee adjustment",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "available_equipment": "WNC projector",
+          "capability": "projection display",
+          "check_required": [
+            "practical projection setup"
+          ],
+          "status": "conditional",
+          "topic": "projection_display"
+        },
+        {
+          "action": "check",
+          "status": "check_required",
+          "subjects": [
+            "requested facilitator availability and format"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "defer": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:74b98767a0208fcb",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:74b98767a0208fcb",
+          "source_reference": "SERV-003",
+          "topic": "catering_kitchen",
+          "value": {
+            "source_text": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:c860c453d6ac37bf",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:c860c453d6ac37bf",
+          "source_reference": "SERV-004",
+          "topic": "external_supplier_setup",
+          "value": {
+            "source_text": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:f3bb9a44431341d3",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:f3bb9a44431341d3",
+          "source_reference": "SERV-004",
+          "topic": "external_supplier_setup",
+          "value": {
+            "source_text": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:compatibility",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:compatibility",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "compatibility",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:adapters",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:adapters",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "adapters",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:files",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:files",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "files",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:screenless setup suitability",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:screenless setup suitability",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "screenless setup suitability",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "061c04201015b5917cd5a3a988b86ac1a65f368e6c604f8873c2b9e6998138a2",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:dj_sound_booth",
+          "reason": "client_already_acknowledges_restriction",
+          "role": "DEFER",
+          "semantic_key": "fact:dj_sound_booth",
+          "source_reference": "phase4:technical_dj_sound_booth_restriction",
+          "topic": "dj_sound_booth",
+          "value": {
+            "capability": "dj sound booth",
+            "status": "not_supported",
+            "supplier_requirement": "external supplier"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "817fd8b9e509953bbe4fb3746e10a128f733d7fa080be2be2eaa0ed813da73d7",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:event_type",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case",
+          "topic": "event_type",
+          "value": {
+            "fact": "event_type: January gathering"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested rental type code",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case",
+          "topic": "Requested rental type code",
+          "value": {
+            "fact": "Requested rental type code: studio_space"
+          }
+        }
+      ],
+      "do_not_repeat": [],
+      "editorial_rationale": "compound_material_answers_and_client_questions",
+      "helpful_now": [],
+      "internal_only": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e58cd246d69f9a9a9241d352320ae18d8796238ebca0e9217e78e5f7278f2c20",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Feasibility as requested",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Feasibility as requested",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Feasibility as requested: Requires confirmation"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e084eb1ddf7869d97ab6fe0e778af8f41984f4d766b8f01801864ed1864b18b6",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Confirmation still required",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Confirmation still required",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Confirmation still required: Yes"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "f4eb351e309da370605db9881595021fd17ed61a5af4bd047e2b05f793818ef4",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Hard constraint",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Hard constraint: Open question 2196 must be resolved."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5227dd44622fc7c170b4eaf71153971588d0c3ea1bebae820f5afc9d3c9d63bf",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:open_question:2196",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:open_question:2196",
+          "source_reference": "open_question:2196",
+          "topic": "resolution",
+          "value": {
+            "message": "What date and time is the client requesting for the event?",
+            "owner": "CLIENT",
+            "status": "REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e20a9f26281fa9381105f0cea1f2027aac88aa06d2af79c8b735f06edd1d85b4",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:open_question:2197",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:open_question:2197",
+          "source_reference": "open_question:2197",
+          "topic": "resolution",
+          "value": {
+            "message": "How many guests are expected?",
+            "owner": "CLIENT",
+            "status": "REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "67768bef8836f92f35951e1411fe23977d9f12ebfda8bb7bfcedbcb2aff3963d",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:case_decision:83",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:case_decision:83",
+          "source_reference": "case_decision:83",
+          "topic": "resolution",
+          "value": {
+            "message": "booking fee override",
+            "owner": "GOVERNED_DECISION",
+            "status": "REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "c47241ba97cd9690707e09336959613e272181b4948dd408978d6dce2be333cf",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2304",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2304",
+          "source_reference": "blocker:2304",
+          "topic": "resolution",
+          "value": {
+            "message": "Confirm event-specific technical setup",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "f1b3feac84c2e392b1eae09436738014aa847da8ae397730f295a3d30b788f00",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2305",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2305",
+          "source_reference": "blocker:2305",
+          "topic": "resolution",
+          "value": {
+            "message": "Contact facilitator about the requested availability and format",
+            "owner": "EXTERNAL_PARTY",
+            "status": "CONTACT_REQUIRED"
+          }
+        }
+      ],
+      "must_ask": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "question:2196",
+          "reason": "open_client_owned_question",
+          "role": "MUST_ASK",
+          "semantic_key": "question:2196",
+          "source_reference": "governed_case",
+          "topic": "client_information",
+          "value": {
+            "open_question_id": 2196,
+            "question": "What day, start time and finish time would you like?"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "d8e91680d1479430425f9d1136304343050d769f9433385a8dc73ecc9210766b",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "question:2197",
+          "reason": "open_client_owned_question",
+          "role": "MUST_ASK",
+          "semantic_key": "question:2197",
+          "source_reference": "governed_case",
+          "topic": "client_information",
+          "value": {
+            "open_question_id": 2197,
+            "question": "How many guests are expected?"
+          }
+        }
+      ],
+      "must_communicate": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "commercial.check",
+          "reason": "requested_answer_not_yet_available",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "commercial.check",
+          "source_reference": "governed_case",
+          "topic": "commercial_next_step",
+          "value": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "decision:booking fee override",
+          "reason": "pending_governed_decision_in_current_conversation",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "decision:booking fee override",
+          "source_reference": "governed_case",
+          "topic": "commercial_next_step",
+          "value": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "fact:catering_kitchen",
+          "reason": "current_catering_suitability_question",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "fact:catering_kitchen",
+          "source_reference": "SERV-003",
+          "topic": "catering_kitchen",
+          "value": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "fact:projection_display",
+          "reason": "requested_technical_capability",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "fact:projection_display",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_display",
+          "value": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "fact:audio_playback",
+          "reason": "requested_technical_capability",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "fact:audio_playback",
+          "source_reference": "phase4:technical_audio_playback_supported",
+          "topic": "audio_playback",
+          "value": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "next_step",
+          "reason": "immediate_wnc_owned_next_step",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case",
+          "topic": "next_step",
+          "value": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          }
+        }
+      ],
+      "primary_client_need": [
+        "client_owned_missing_information"
+      ],
+      "response_intent": "REQUEST_CLIENT_INFORMATION",
+      "source_bindings": [
+        {
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "semantic_key": "question:2196",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "d8e91680d1479430425f9d1136304343050d769f9433385a8dc73ecc9210766b",
+          "semantic_key": "question:2197",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "75b40c4ea32606cc9b53ec24c30927180cddde1d84a4404ffc14ce3d3c21387c",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "semantic_key": "commercial.check",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "semantic_key": "decision:booking fee override",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "semantic_key": "fact:catering_kitchen",
+          "source_reference": "SERV-003"
+        },
+        {
+          "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+          "semantic_key": "guidance:74b98767a0208fcb",
+          "source_reference": "SERV-003"
+        },
+        {
+          "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+          "semantic_key": "guidance:c860c453d6ac37bf",
+          "source_reference": "SERV-004"
+        },
+        {
+          "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+          "semantic_key": "guidance:f3bb9a44431341d3",
+          "source_reference": "SERV-004"
+        },
+        {
+          "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+          "semantic_key": "condition:projection:compatibility",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+          "semantic_key": "condition:projection:adapters",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+          "semantic_key": "condition:projection:files",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+          "semantic_key": "condition:projection:screenless setup suitability",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "semantic_key": "fact:projection_display",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "semantic_key": "fact:audio_playback",
+          "source_reference": "phase4:technical_audio_playback_supported"
+        },
+        {
+          "fingerprint": "061c04201015b5917cd5a3a988b86ac1a65f368e6c604f8873c2b9e6998138a2",
+          "semantic_key": "fact:dj_sound_booth",
+          "source_reference": "phase4:technical_dj_sound_booth_restriction"
+        },
+        {
+          "fingerprint": "e58cd246d69f9a9a9241d352320ae18d8796238ebca0e9217e78e5f7278f2c20",
+          "semantic_key": "restriction:Feasibility as requested",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "e084eb1ddf7869d97ab6fe0e778af8f41984f4d766b8f01801864ed1864b18b6",
+          "semantic_key": "restriction:Confirmation still required",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "f4eb351e309da370605db9881595021fd17ed61a5af4bd047e2b05f793818ef4",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "817fd8b9e509953bbe4fb3746e10a128f733d7fa080be2be2eaa0ed813da73d7",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "5227dd44622fc7c170b4eaf71153971588d0c3ea1bebae820f5afc9d3c9d63bf",
+          "semantic_key": "internal:open_question:2196",
+          "source_reference": "open_question:2196"
+        },
+        {
+          "fingerprint": "e20a9f26281fa9381105f0cea1f2027aac88aa06d2af79c8b735f06edd1d85b4",
+          "semantic_key": "internal:open_question:2197",
+          "source_reference": "open_question:2197"
+        },
+        {
+          "fingerprint": "67768bef8836f92f35951e1411fe23977d9f12ebfda8bb7bfcedbcb2aff3963d",
+          "semantic_key": "internal:case_decision:83",
+          "source_reference": "case_decision:83"
+        },
+        {
+          "fingerprint": "c47241ba97cd9690707e09336959613e272181b4948dd408978d6dce2be333cf",
+          "semantic_key": "internal:blocker:2304",
+          "source_reference": "blocker:2304"
+        },
+        {
+          "fingerprint": "f1b3feac84c2e392b1eae09436738014aa847da8ae397730f295a3d30b788f00",
+          "semantic_key": "internal:blocker:2305",
+          "source_reference": "blocker:2305"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case"
+        }
+      ],
+      "substantive_budget": 8,
+      "version": "editorial_content_plan_v3"
+    },
+    "generation_audit": {
+      "attempts": [
+        {
+          "candidate_hash": "808527135f11e4f6c01c48f1b4666d97bac8192ce2e5763e3ad1444d0e056752",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_d5f2816203644abe8dbb52ae24d95587",
+          "provider_response_id": "resp_01ecb10adeb8eb7f016ac0d8d8209c87d2b7f293be0243b3a0",
+          "realization_results": [
+            {
+              "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2196,
+                "question": "What day, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2196",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "d8e91680d1479430425f9d1136304343050d769f9433385a8dc73ecc9210766b",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2197,
+                "question": "How many guests are expected?"
+              },
+              "semantic_key": "question:2197",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "kind": "guidance",
+              "realized": true,
+              "required_meaning": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              },
+              "semantic_key": "fact:catering_kitchen",
+              "topic": "catering_kitchen"
+            },
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "kind": "conditional_capability",
+              "realized": true,
+              "required_meaning": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              },
+              "semantic_key": "fact:projection_display",
+              "topic": "projection_display"
+            },
+            {
+              "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+              "kind": "known_fact",
+              "realized": true,
+              "required_meaning": {
+                "action_required": false,
+                "client_fact": {
+                  "background_music_playback": true
+                },
+                "fact_state": "known"
+              },
+              "semantic_key": "fact:audio_playback",
+              "topic": "audio_playback"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "context_hash": "df8411953c09eefb1e4923cf834f5a5318929992d974f2c483041e8779f24d70",
+      "contract_identity": "d37683a448a7be161f64dd4c2f7c4e619d7221b23a44bea01d2fc53255075cea",
+      "corrective_retry_count": 0,
+      "final_realization_results": [
+        {
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2196,
+            "question": "What day, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2196",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "d8e91680d1479430425f9d1136304343050d769f9433385a8dc73ecc9210766b",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2197,
+            "question": "How many guests are expected?"
+          },
+          "semantic_key": "question:2197",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "kind": "guidance",
+          "realized": true,
+          "required_meaning": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          },
+          "semantic_key": "fact:catering_kitchen",
+          "topic": "catering_kitchen"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "kind": "conditional_capability",
+          "realized": true,
+          "required_meaning": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          },
+          "semantic_key": "fact:projection_display",
+          "topic": "projection_display"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "kind": "known_fact",
+          "realized": true,
+          "required_meaning": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          },
+          "semantic_key": "fact:audio_playback",
+          "topic": "audio_playback"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ],
+      "initial_candidate_hash": "808527135f11e4f6c01c48f1b4666d97bac8192ce2e5763e3ad1444d0e056752",
+      "plan_identity": "2ae8ab877c11aa18f77c013f02910ccb3ce4f57f3134d4d096c2601cd5bd31ad",
+      "policy": "required_realization_single_correction_v1",
+      "source_case_revision": 2
+    },
+    "model": "gpt-5.6-sol",
+    "operator_annotations": [
+      {
+        "blocking": true,
+        "message": "Confirm event-specific technical setup",
+        "proposition_key": "blocker:2304",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1508
+      },
+      {
+        "blocking": true,
+        "message": "Contact facilitator about the requested availability and format",
+        "proposition_key": "blocker:2305",
+        "type": "EXTERNAL_CONTACT",
+        "workflow_action_id": 1509
+      }
+    ],
+    "provider": "openai",
+    "provider_incomplete_reason": null,
+    "provider_request_id": "req_d5f2816203644abe8dbb52ae24d95587",
+    "provider_response_id": "resp_01ecb10adeb8eb7f016ac0d8d8209c87d2b7f293be0243b3a0",
+    "provider_response_status": "completed",
+    "resolution_items": [
+      {
+        "blocking": true,
+        "client_visibility": "ASK_CLIENT",
+        "message": "What date and time is the client requesting for the event?",
+        "proposition_key": "open_question:2196",
+        "resolution_owner": "CLIENT",
+        "resolution_status": "REQUIRED",
+        "workflow_action_id": null
+      },
+      {
+        "blocking": true,
+        "client_visibility": "ASK_CLIENT",
+        "message": "How many guests are expected?",
+        "proposition_key": "open_question:2197",
+        "resolution_owner": "CLIENT",
+        "resolution_status": "REQUIRED",
+        "workflow_action_id": null
+      },
+      {
+        "blocking": true,
+        "client_visibility": "DECISION_PENDING_VISIBLE",
+        "message": "booking fee override",
+        "proposition_key": "case_decision:83",
+        "resolution_owner": "GOVERNED_DECISION",
+        "resolution_status": "REQUIRED",
+        "workflow_action_id": null
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Confirm event-specific technical setup",
+        "proposition_key": "blocker:2304",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1508
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Contact facilitator about the requested availability and format",
+        "proposition_key": "blocker:2305",
+        "resolution_owner": "EXTERNAL_PARTY",
+        "resolution_status": "CONTACT_REQUIRED",
+        "workflow_action_id": 1509
+      }
+    ],
+    "response_intent": "REQUEST_CLIENT_INFORMATION",
+    "validation_failure_codes": [],
+    "workflow_action_id": 1510
+  },
+  {
+    "rental_case_id": 569,
+    "event_type": "governed_client_response_draft_generated",
+    "approval_request_id": 437,
+    "client_generation_payload": {
+      "acknowledgements": [
+        {
+          "focus": "the change or clarification in the latest message",
+          "kind": "new_client_detail",
+          "topic": "latest_client_detail"
+        }
+      ],
+      "do_not_repeat_topics": [
+        "catering_kitchen",
+        "audio_playback"
+      ],
+      "external_pending": [],
+      "forbidden_claims": [
+        "Do not confirm venue availability or booking.",
+        "Do not describe a pending internal confirmation as completed.",
+        "Do not describe a pending decision or fee adjustment as approved.",
+        "Do not use historical precedent as current policy.",
+        "Do not use an em dash in the subject or body.",
+        "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+      ],
+      "latest_client_message": "We now expect 24 people. The facilitator would only need to welcome the group for about 20 minutes, and we can work around WNC availability. Timing is still being finalised.\n\nAri",
+      "must_say": [
+        {
+          "action": "check requested booking fee or pricing",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check what can be arranged",
+          "request": "booking fee adjustment",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check",
+          "status": "check_required",
+          "subjects": [
+            "requested facilitator availability and format"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "open_client_questions": [
+        {
+          "open_question_id": 2196,
+          "question": "What day, start time and finish time would you like?",
+          "topic": "client_information"
+        }
+      ],
+      "optional_helpful_now": [],
+      "primary_client_need": [
+        "client_owned_missing_information"
+      ],
+      "recipient_label": "Ari Patel",
+      "response_intent": "REQUEST_CLIENT_INFORMATION",
+      "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+      "style_profile": [
+        "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+        "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+        "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+        "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+        "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+        "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+        "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+        "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+        "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+        "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+        "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
+        "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+        "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+      ]
+    },
+    "communicated_editorial_items": [],
+    "context_hash": "e48755306968a0ea3bf3d1747fb27052eb3a0d6b9c0f58b5550e386e66e600a0",
+    "contextual_guidance_topics": [
+      "catering_kitchen",
+      "catering_kitchen",
+      "external_supplier_setup",
+      "external_supplier_setup",
+      "technical_capabilities",
+      "technical_capabilities",
+      "technical_capabilities"
+    ],
+    "draft_revision_id": 361,
+    "editorial_content_plan": {
+      "acknowledge": [
+        {
+          "authority_class": "client_request",
+          "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 3,
+          "proposition_key": "latest_client_detail",
+          "reason": "current_turn_delta",
+          "role": "ACKNOWLEDGE",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message",
+          "topic": "latest_client_detail",
+          "value": {
+            "focus": "the change or clarification in the latest message",
+            "kind": "new_client_detail"
+          }
+        }
+      ],
+      "already_communicated": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "included_in_model_payload": false,
+          "prior_turn_status": "unchanged_answer_in_prior_draft",
+          "priority": 50,
+          "proposition_key": "fact:catering_kitchen",
+          "reason": "unchanged_answer_already_explained",
+          "role": "ALREADY_COMMUNICATED",
+          "semantic_key": "fact:catering_kitchen",
+          "source_reference": "SERV-003",
+          "topic": "catering_kitchen",
+          "value": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "included_in_model_payload": false,
+          "prior_turn_status": "unchanged_answer_in_prior_draft",
+          "priority": 50,
+          "proposition_key": "fact:audio_playback",
+          "reason": "unchanged_answer_already_explained",
+          "role": "ALREADY_COMMUNICATED",
+          "semantic_key": "fact:audio_playback",
+          "source_reference": "phase4:technical_audio_playback_supported",
+          "topic": "audio_playback",
+          "value": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          }
+        }
+      ],
+      "client_visible_pending_state": [
+        {
+          "action": "check requested booking fee or pricing",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check what can be arranged",
+          "request": "booking fee adjustment",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check",
+          "status": "check_required",
+          "subjects": [
+            "requested facilitator availability and format"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "defer": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:74b98767a0208fcb",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:74b98767a0208fcb",
+          "source_reference": "SERV-003",
+          "topic": "catering_kitchen",
+          "value": {
+            "source_text": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:c860c453d6ac37bf",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:c860c453d6ac37bf",
+          "source_reference": "SERV-004",
+          "topic": "external_supplier_setup",
+          "value": {
+            "source_text": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:f3bb9a44431341d3",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:f3bb9a44431341d3",
+          "source_reference": "SERV-004",
+          "topic": "external_supplier_setup",
+          "value": {
+            "source_text": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:compatibility",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:compatibility",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "compatibility",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:adapters",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:adapters",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "adapters",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:files",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:files",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "files",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:screenless setup suitability",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:screenless setup suitability",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "screenless setup suitability",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:projection_display",
+          "reason": "not_needed_in_current_turn",
+          "role": "DEFER",
+          "semantic_key": "fact:projection_display",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_display",
+          "value": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "061c04201015b5917cd5a3a988b86ac1a65f368e6c604f8873c2b9e6998138a2",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:dj_sound_booth",
+          "reason": "client_already_acknowledges_restriction",
+          "role": "DEFER",
+          "semantic_key": "fact:dj_sound_booth",
+          "source_reference": "phase4:technical_dj_sound_booth_restriction",
+          "topic": "dj_sound_booth",
+          "value": {
+            "capability": "dj sound booth",
+            "status": "not_supported",
+            "supplier_requirement": "external supplier"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "817fd8b9e509953bbe4fb3746e10a128f733d7fa080be2be2eaa0ed813da73d7",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:event_type",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case",
+          "topic": "event_type",
+          "value": {
+            "fact": "event_type: January gathering"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "456e120a424a2fe5c89eb23e5e9000bcf6fda29bad8a4c6194d62bb8442f2b58",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:guest_count",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case",
+          "topic": "guest_count",
+          "value": {
+            "fact": "guest_count: 24"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested rental type code",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case",
+          "topic": "Requested rental type code",
+          "value": {
+            "fact": "Requested rental type code: studio_space"
+          }
+        }
+      ],
+      "do_not_repeat": [
+        "catering_kitchen",
+        "audio_playback"
+      ],
+      "editorial_rationale": "minimal_substantive_items_optional_guidance_ranked_last",
+      "helpful_now": [],
+      "internal_only": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e58cd246d69f9a9a9241d352320ae18d8796238ebca0e9217e78e5f7278f2c20",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Feasibility as requested",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Feasibility as requested",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Feasibility as requested: Requires confirmation"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e084eb1ddf7869d97ab6fe0e778af8f41984f4d766b8f01801864ed1864b18b6",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Confirmation still required",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Confirmation still required",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Confirmation still required: Yes"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "f4eb351e309da370605db9881595021fd17ed61a5af4bd047e2b05f793818ef4",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Hard constraint",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Hard constraint: Open question 2196 must be resolved."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5227dd44622fc7c170b4eaf71153971588d0c3ea1bebae820f5afc9d3c9d63bf",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:open_question:2196",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:open_question:2196",
+          "source_reference": "open_question:2196",
+          "topic": "resolution",
+          "value": {
+            "message": "What date and time is the client requesting for the event?",
+            "owner": "CLIENT",
+            "status": "REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "67768bef8836f92f35951e1411fe23977d9f12ebfda8bb7bfcedbcb2aff3963d",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:case_decision:83",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:case_decision:83",
+          "source_reference": "case_decision:83",
+          "topic": "resolution",
+          "value": {
+            "message": "booking fee override",
+            "owner": "GOVERNED_DECISION",
+            "status": "REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "778cda9cb63bcc4b826221caa02f765f92835892332987784f68598276ba0802",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2307",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2307",
+          "source_reference": "blocker:2307",
+          "topic": "resolution",
+          "value": {
+            "message": "Confirm event-specific technical setup",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e6285bb2afe083ad45ef90036eff2992b5501c463377ba4320c0317f8a30be96",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2308",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2308",
+          "source_reference": "blocker:2308",
+          "topic": "resolution",
+          "value": {
+            "message": "Contact facilitator about the requested availability and format",
+            "owner": "EXTERNAL_PARTY",
+            "status": "CONTACT_REQUIRED"
+          }
+        }
+      ],
+      "must_ask": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "question:2196",
+          "reason": "open_client_owned_question",
+          "role": "MUST_ASK",
+          "semantic_key": "question:2196",
+          "source_reference": "governed_case",
+          "topic": "client_information",
+          "value": {
+            "open_question_id": 2196,
+            "question": "What day, start time and finish time would you like?"
+          }
+        }
+      ],
+      "must_communicate": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "commercial.check",
+          "reason": "requested_answer_not_yet_available",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "commercial.check",
+          "source_reference": "governed_case",
+          "topic": "commercial_next_step",
+          "value": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "decision:booking fee override",
+          "reason": "pending_governed_decision_in_current_conversation",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "decision:booking fee override",
+          "source_reference": "governed_case",
+          "topic": "commercial_next_step",
+          "value": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "next_step",
+          "reason": "immediate_wnc_owned_next_step",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case",
+          "topic": "next_step",
+          "value": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          }
+        }
+      ],
+      "primary_client_need": [
+        "client_owned_missing_information"
+      ],
+      "response_intent": "REQUEST_CLIENT_INFORMATION",
+      "source_bindings": [
+        {
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "semantic_key": "question:2196",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "semantic_key": "commercial.check",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "semantic_key": "decision:booking fee override",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "semantic_key": "fact:catering_kitchen",
+          "source_reference": "SERV-003"
+        },
+        {
+          "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+          "semantic_key": "guidance:74b98767a0208fcb",
+          "source_reference": "SERV-003"
+        },
+        {
+          "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+          "semantic_key": "guidance:c860c453d6ac37bf",
+          "source_reference": "SERV-004"
+        },
+        {
+          "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+          "semantic_key": "guidance:f3bb9a44431341d3",
+          "source_reference": "SERV-004"
+        },
+        {
+          "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+          "semantic_key": "condition:projection:compatibility",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+          "semantic_key": "condition:projection:adapters",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+          "semantic_key": "condition:projection:files",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+          "semantic_key": "condition:projection:screenless setup suitability",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "semantic_key": "fact:projection_display",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "semantic_key": "fact:audio_playback",
+          "source_reference": "phase4:technical_audio_playback_supported"
+        },
+        {
+          "fingerprint": "061c04201015b5917cd5a3a988b86ac1a65f368e6c604f8873c2b9e6998138a2",
+          "semantic_key": "fact:dj_sound_booth",
+          "source_reference": "phase4:technical_dj_sound_booth_restriction"
+        },
+        {
+          "fingerprint": "e58cd246d69f9a9a9241d352320ae18d8796238ebca0e9217e78e5f7278f2c20",
+          "semantic_key": "restriction:Feasibility as requested",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "e084eb1ddf7869d97ab6fe0e778af8f41984f4d766b8f01801864ed1864b18b6",
+          "semantic_key": "restriction:Confirmation still required",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "f4eb351e309da370605db9881595021fd17ed61a5af4bd047e2b05f793818ef4",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "817fd8b9e509953bbe4fb3746e10a128f733d7fa080be2be2eaa0ed813da73d7",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "456e120a424a2fe5c89eb23e5e9000bcf6fda29bad8a4c6194d62bb8442f2b58",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "5227dd44622fc7c170b4eaf71153971588d0c3ea1bebae820f5afc9d3c9d63bf",
+          "semantic_key": "internal:open_question:2196",
+          "source_reference": "open_question:2196"
+        },
+        {
+          "fingerprint": "67768bef8836f92f35951e1411fe23977d9f12ebfda8bb7bfcedbcb2aff3963d",
+          "semantic_key": "internal:case_decision:83",
+          "source_reference": "case_decision:83"
+        },
+        {
+          "fingerprint": "778cda9cb63bcc4b826221caa02f765f92835892332987784f68598276ba0802",
+          "semantic_key": "internal:blocker:2307",
+          "source_reference": "blocker:2307"
+        },
+        {
+          "fingerprint": "e6285bb2afe083ad45ef90036eff2992b5501c463377ba4320c0317f8a30be96",
+          "semantic_key": "internal:blocker:2308",
+          "source_reference": "blocker:2308"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case"
+        }
+      ],
+      "substantive_budget": 4,
+      "version": "editorial_content_plan_v3"
+    },
+    "generation_audit": {
+      "attempts": [
+        {
+          "candidate_hash": "6e872cd7d61b124dfb00a2bd78cb435f91bed0fe501b5cdad3fe18a1431895df",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_741c866d1a6f4391b8427df1aed82b48",
+          "provider_response_id": "resp_0ab3b3d7b6aaa3d7016ac0d8ef978087d2be6be542ed7ea039",
+          "realization_results": [
+            {
+              "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2196,
+                "question": "What day, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2196",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "context_hash": "e48755306968a0ea3bf3d1747fb27052eb3a0d6b9c0f58b5550e386e66e600a0",
+      "contract_identity": "f4ab1194f776a733849dd9233e9ee8bb08662884a1ed3b009094eabebf145880",
+      "corrective_retry_count": 0,
+      "final_realization_results": [
+        {
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2196,
+            "question": "What day, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2196",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ],
+      "initial_candidate_hash": "6e872cd7d61b124dfb00a2bd78cb435f91bed0fe501b5cdad3fe18a1431895df",
+      "plan_identity": "c17c19f2fc38456560983425090e3bef5639441b40fb9ca81e969a51a9f8cd10",
+      "policy": "required_realization_single_correction_v1",
+      "source_case_revision": 3
+    },
+    "model": "gpt-5.6-sol",
+    "operator_annotations": [
+      {
+        "blocking": true,
+        "message": "Confirm event-specific technical setup",
+        "proposition_key": "blocker:2307",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1515
+      },
+      {
+        "blocking": true,
+        "message": "Contact facilitator about the requested availability and format",
+        "proposition_key": "blocker:2308",
+        "type": "EXTERNAL_CONTACT",
+        "workflow_action_id": 1516
+      }
+    ],
+    "provider": "openai",
+    "provider_incomplete_reason": null,
+    "provider_request_id": "req_741c866d1a6f4391b8427df1aed82b48",
+    "provider_response_id": "resp_0ab3b3d7b6aaa3d7016ac0d8ef978087d2be6be542ed7ea039",
+    "provider_response_status": "completed",
+    "resolution_items": [
+      {
+        "blocking": true,
+        "client_visibility": "ASK_CLIENT",
+        "message": "What date and time is the client requesting for the event?",
+        "proposition_key": "open_question:2196",
+        "resolution_owner": "CLIENT",
+        "resolution_status": "REQUIRED",
+        "workflow_action_id": null
+      },
+      {
+        "blocking": true,
+        "client_visibility": "DECISION_PENDING_VISIBLE",
+        "message": "booking fee override",
+        "proposition_key": "case_decision:83",
+        "resolution_owner": "GOVERNED_DECISION",
+        "resolution_status": "REQUIRED",
+        "workflow_action_id": null
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Confirm event-specific technical setup",
+        "proposition_key": "blocker:2307",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1515
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Contact facilitator about the requested availability and format",
+        "proposition_key": "blocker:2308",
+        "resolution_owner": "EXTERNAL_PARTY",
+        "resolution_status": "CONTACT_REQUIRED",
+        "workflow_action_id": 1516
+      }
+    ],
+    "response_intent": "REQUEST_CLIENT_INFORMATION",
+    "validation_failure_codes": [],
+    "workflow_action_id": 1517
+  },
+  {
+    "rental_case_id": 569,
+    "event_type": "governed_client_response_draft_generated",
+    "approval_request_id": 438,
+    "client_generation_payload": {
+      "acknowledgements": [
+        {
+          "focus": "the change or clarification in the latest message",
+          "kind": "new_client_detail",
+          "topic": "latest_client_detail"
+        }
+      ],
+      "do_not_repeat_topics": [
+        "catering_kitchen",
+        "audio_playback"
+      ],
+      "external_pending": [],
+      "forbidden_claims": [
+        "Do not confirm venue availability or booking.",
+        "Do not describe a pending internal confirmation as completed.",
+        "Do not describe a pending decision or fee adjustment as approved.",
+        "Do not use historical precedent as current policy.",
+        "Do not use an em dash in the subject or body.",
+        "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+      ],
+      "latest_client_message": "The gathering would be on 21 January from 17:00 to 21:00.\n\nAri",
+      "must_say": [
+        {
+          "booking_fee": "EUR 75 excl. VAT",
+          "topic": "commercial",
+          "vat": "21%"
+        },
+        {
+          "action": "check what can be arranged",
+          "request": "booking fee adjustment",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check",
+          "status": "check_required",
+          "subjects": [
+            "requested facilitator availability and format"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "open_client_questions": [],
+      "optional_helpful_now": [],
+      "primary_client_need": [
+        "respond_to_current_update"
+      ],
+      "recipient_label": "Ari Patel",
+      "response_intent": "DECISION_PENDING",
+      "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+      "style_profile": [
+        "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+        "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+        "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+        "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+        "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+        "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+        "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+        "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+        "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+        "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+        "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
+        "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+        "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+      ]
+    },
+    "communicated_editorial_items": [
+      {
+        "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+        "semantic_key": "commercial.current",
+        "source_reference": "governed_case",
+        "topic": "commercial"
+      }
+    ],
+    "context_hash": "32656ee4099a8920451ecb71007c2a931806ab57586a84b9128bf03ac284d50f",
+    "contextual_guidance_topics": [
+      "catering_kitchen",
+      "catering_kitchen",
+      "external_supplier_setup",
+      "external_supplier_setup",
+      "technical_capabilities",
+      "technical_capabilities",
+      "technical_capabilities"
+    ],
+    "draft_revision_id": 362,
+    "editorial_content_plan": {
+      "acknowledge": [
+        {
+          "authority_class": "client_request",
+          "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 3,
+          "proposition_key": "latest_client_detail",
+          "reason": "current_turn_delta",
+          "role": "ACKNOWLEDGE",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message",
+          "topic": "latest_client_detail",
+          "value": {
+            "focus": "the change or clarification in the latest message",
+            "kind": "new_client_detail"
+          }
+        }
+      ],
+      "already_communicated": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "included_in_model_payload": false,
+          "prior_turn_status": "unchanged_answer_in_prior_draft",
+          "priority": 50,
+          "proposition_key": "fact:catering_kitchen",
+          "reason": "unchanged_answer_already_explained",
+          "role": "ALREADY_COMMUNICATED",
+          "semantic_key": "fact:catering_kitchen",
+          "source_reference": "SERV-003",
+          "topic": "catering_kitchen",
+          "value": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "included_in_model_payload": false,
+          "prior_turn_status": "unchanged_answer_in_prior_draft",
+          "priority": 50,
+          "proposition_key": "fact:audio_playback",
+          "reason": "unchanged_answer_already_explained",
+          "role": "ALREADY_COMMUNICATED",
+          "semantic_key": "fact:audio_playback",
+          "source_reference": "phase4:technical_audio_playback_supported",
+          "topic": "audio_playback",
+          "value": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          }
+        }
+      ],
+      "client_visible_pending_state": [
+        {
+          "action": "check what can be arranged",
+          "request": "booking fee adjustment",
+          "status": "check_required",
+          "topic": "commercial_next_step"
+        },
+        {
+          "action": "check",
+          "status": "check_required",
+          "subjects": [
+            "requested facilitator availability and format"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "defer": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:74b98767a0208fcb",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:74b98767a0208fcb",
+          "source_reference": "SERV-003",
+          "topic": "catering_kitchen",
+          "value": {
+            "source_text": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:c860c453d6ac37bf",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:c860c453d6ac37bf",
+          "source_reference": "SERV-004",
+          "topic": "external_supplier_setup",
+          "value": {
+            "source_text": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "guidance:f3bb9a44431341d3",
+          "reason": "secondary_or_unstructured_guidance_not_needed_now",
+          "role": "DEFER",
+          "semantic_key": "guidance:f3bb9a44431341d3",
+          "source_reference": "SERV-004",
+          "topic": "external_supplier_setup",
+          "value": {
+            "source_text": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:compatibility",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:compatibility",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "compatibility",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:adapters",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:adapters",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "adapters",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:files",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:files",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "files",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 2,
+          "proposition_key": "condition:projection:screenless setup suitability",
+          "reason": "secondary_condition_covered_by_practical_setup_check",
+          "role": "DEFER",
+          "semantic_key": "condition:projection:screenless setup suitability",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_detail",
+          "value": {
+            "check_required": "screenless setup suitability",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:projection_display",
+          "reason": "not_needed_in_current_turn",
+          "role": "DEFER",
+          "semantic_key": "fact:projection_display",
+          "source_reference": "phase4:technical_projection_display_confirmation",
+          "topic": "projection_display",
+          "value": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "061c04201015b5917cd5a3a988b86ac1a65f368e6c604f8873c2b9e6998138a2",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:dj_sound_booth",
+          "reason": "client_already_acknowledges_restriction",
+          "role": "DEFER",
+          "semantic_key": "fact:dj_sound_booth",
+          "source_reference": "phase4:technical_dj_sound_booth_restriction",
+          "topic": "dj_sound_booth",
+          "value": {
+            "capability": "dj sound booth",
+            "status": "not_supported",
+            "supplier_requirement": "external supplier"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "817fd8b9e509953bbe4fb3746e10a128f733d7fa080be2be2eaa0ed813da73d7",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:event_type",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case",
+          "topic": "event_type",
+          "value": {
+            "fact": "event_type: January gathering"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "456e120a424a2fe5c89eb23e5e9000bcf6fda29bad8a4c6194d62bb8442f2b58",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:guest_count",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case",
+          "topic": "guest_count",
+          "value": {
+            "fact": "guest_count: 24"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested rental type code",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case",
+          "topic": "Requested rental type code",
+          "value": {
+            "fact": "Requested rental type code: studio_space"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "75022c10ae45ac11c227274f089b7ba03deaeb0f4e4a91ae19a6523a7c819bf7",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested active event start",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested active event start",
+          "source_reference": "governed_case",
+          "topic": "Requested active event start",
+          "value": {
+            "fact": "Requested active event start: 2027-01-21 16:00:00+00"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "36b16b0b318ad234a897a36a7b98ebd33eb0408c8f3690e81ecc9530f58179ba",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested active event end",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested active event end",
+          "source_reference": "governed_case",
+          "topic": "Requested active event end",
+          "value": {
+            "fact": "Requested active event end: 2027-01-21 20:00:00+00"
+          }
+        }
+      ],
+      "do_not_repeat": [
+        "catering_kitchen",
+        "audio_playback"
+      ],
+      "editorial_rationale": "minimal_substantive_items_optional_guidance_ranked_last",
+      "helpful_now": [],
+      "internal_only": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e58cd246d69f9a9a9241d352320ae18d8796238ebca0e9217e78e5f7278f2c20",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Feasibility as requested",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Feasibility as requested",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Feasibility as requested: Requires confirmation"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e084eb1ddf7869d97ab6fe0e778af8f41984f4d766b8f01801864ed1864b18b6",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Confirmation still required",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Confirmation still required",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Confirmation still required: Yes"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "f3aa99ab6cc740a8594d46d87e45560ccb64fea769c74c116e7ad552748ad900",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Hard constraint",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Hard constraint: Approval must be approved or the proposed case decision must be rejected."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "67768bef8836f92f35951e1411fe23977d9f12ebfda8bb7bfcedbcb2aff3963d",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:case_decision:83",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:case_decision:83",
+          "source_reference": "case_decision:83",
+          "topic": "resolution",
+          "value": {
+            "message": "booking fee override",
+            "owner": "GOVERNED_DECISION",
+            "status": "REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "cc505f060a1584a4a4245c08e216a42fe87f79ae86389479da787370d5050475",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2309",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2309",
+          "source_reference": "blocker:2309",
+          "topic": "resolution",
+          "value": {
+            "message": "Confirm event-specific technical setup",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "f2f406d9560043de6cb6556f1883f08d137e89993e8476a6208029562e12cb8c",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2310",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2310",
+          "source_reference": "blocker:2310",
+          "topic": "resolution",
+          "value": {
+            "message": "Contact facilitator about the requested availability and format",
+            "owner": "EXTERNAL_PARTY",
+            "status": "CONTACT_REQUIRED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "bc981f3cbb0c2a49db8bac1b23bfcdb88ab4f654e9165c551920feb3889a5904",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+          "source_reference": "availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+          "topic": "resolution",
+          "value": {
+            "message": "Confirm studio space availability for 2027-01-21 16:00:00+00 to 2027-01-21 20:00:00+00",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        }
+      ],
+      "must_ask": [],
+      "must_communicate": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "commercial.current",
+          "reason": "current_or_unanswered_earlier_commercial_question",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "commercial.current",
+          "source_reference": "governed_case",
+          "topic": "commercial",
+          "value": {
+            "booking_fee": "EUR 75 excl. VAT",
+            "vat": "21%"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "decision:booking fee override",
+          "reason": "pending_governed_decision_in_current_conversation",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "decision:booking fee override",
+          "source_reference": "governed_case",
+          "topic": "commercial_next_step",
+          "value": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "next_step",
+          "reason": "immediate_wnc_owned_next_step",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case",
+          "topic": "next_step",
+          "value": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          }
+        }
+      ],
+      "primary_client_need": [
+        "respond_to_current_update"
+      ],
+      "response_intent": "DECISION_PENDING",
+      "source_bindings": [
+        {
+          "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message"
+        },
+        {
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "semantic_key": "commercial.current",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "semantic_key": "decision:booking fee override",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "semantic_key": "fact:catering_kitchen",
+          "source_reference": "SERV-003"
+        },
+        {
+          "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+          "semantic_key": "guidance:74b98767a0208fcb",
+          "source_reference": "SERV-003"
+        },
+        {
+          "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+          "semantic_key": "guidance:c860c453d6ac37bf",
+          "source_reference": "SERV-004"
+        },
+        {
+          "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+          "semantic_key": "guidance:f3bb9a44431341d3",
+          "source_reference": "SERV-004"
+        },
+        {
+          "fingerprint": "6122a3ce441a205292345e4d3d4a38bb3109a91e3f917dd76ae2eef9a236ca7c",
+          "semantic_key": "condition:projection:compatibility",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "5e8f29a1d9629cc021bd2ccd83aa4468a851fc511a44b7ecad568d55fc4bd47e",
+          "semantic_key": "condition:projection:adapters",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "b6312d47aaacfa659bd04872fbbcb938cb4df350aeeac5bd29dcced00b324a89",
+          "semantic_key": "condition:projection:files",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "387c84d92eb347262b6b659159512dd9b332201e339e80a87b97e954df522a69",
+          "semantic_key": "condition:projection:screenless setup suitability",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "semantic_key": "fact:projection_display",
+          "source_reference": "phase4:technical_projection_display_confirmation"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "semantic_key": "fact:audio_playback",
+          "source_reference": "phase4:technical_audio_playback_supported"
+        },
+        {
+          "fingerprint": "061c04201015b5917cd5a3a988b86ac1a65f368e6c604f8873c2b9e6998138a2",
+          "semantic_key": "fact:dj_sound_booth",
+          "source_reference": "phase4:technical_dj_sound_booth_restriction"
+        },
+        {
+          "fingerprint": "e58cd246d69f9a9a9241d352320ae18d8796238ebca0e9217e78e5f7278f2c20",
+          "semantic_key": "restriction:Feasibility as requested",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "e084eb1ddf7869d97ab6fe0e778af8f41984f4d766b8f01801864ed1864b18b6",
+          "semantic_key": "restriction:Confirmation still required",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "f3aa99ab6cc740a8594d46d87e45560ccb64fea769c74c116e7ad552748ad900",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "817fd8b9e509953bbe4fb3746e10a128f733d7fa080be2be2eaa0ed813da73d7",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "456e120a424a2fe5c89eb23e5e9000bcf6fda29bad8a4c6194d62bb8442f2b58",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "75022c10ae45ac11c227274f089b7ba03deaeb0f4e4a91ae19a6523a7c819bf7",
+          "semantic_key": "case_fact:Requested active event start",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "36b16b0b318ad234a897a36a7b98ebd33eb0408c8f3690e81ecc9530f58179ba",
+          "semantic_key": "case_fact:Requested active event end",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "67768bef8836f92f35951e1411fe23977d9f12ebfda8bb7bfcedbcb2aff3963d",
+          "semantic_key": "internal:case_decision:83",
+          "source_reference": "case_decision:83"
+        },
+        {
+          "fingerprint": "cc505f060a1584a4a4245c08e216a42fe87f79ae86389479da787370d5050475",
+          "semantic_key": "internal:blocker:2309",
+          "source_reference": "blocker:2309"
+        },
+        {
+          "fingerprint": "f2f406d9560043de6cb6556f1883f08d137e89993e8476a6208029562e12cb8c",
+          "semantic_key": "internal:blocker:2310",
+          "source_reference": "blocker:2310"
+        },
+        {
+          "fingerprint": "bc981f3cbb0c2a49db8bac1b23bfcdb88ab4f654e9165c551920feb3889a5904",
+          "semantic_key": "internal:availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+          "source_reference": "availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case"
+        }
+      ],
+      "substantive_budget": 3,
+      "version": "editorial_content_plan_v3"
+    },
+    "generation_audit": {
+      "attempts": [
+        {
+          "candidate_hash": "c2f9199cf07b4feb70242afef98c30926e7f62b60065ddb54bbcd8a36c850015",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_d3ccff0551c34fe2b0ab5c4027f204f6",
+          "provider_response_id": "resp_092b7f226d04ae3a016ac0d8fff8c887d283db485a26802c80",
+          "realization_results": [
+            {
+              "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+              "kind": "commercial",
+              "realized": true,
+              "required_meaning": {
+                "booking_fee": "EUR 75 excl. VAT",
+                "vat": "21%"
+              },
+              "semantic_key": "commercial.current",
+              "topic": "commercial"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "context_hash": "32656ee4099a8920451ecb71007c2a931806ab57586a84b9128bf03ac284d50f",
+      "contract_identity": "e45561598b7dd00e62e89d29d6390a29a29a6305135f64d87f0c89881d4b5832",
+      "corrective_retry_count": 0,
+      "final_realization_results": [
+        {
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "kind": "commercial",
+          "realized": true,
+          "required_meaning": {
+            "booking_fee": "EUR 75 excl. VAT",
+            "vat": "21%"
+          },
+          "semantic_key": "commercial.current",
+          "topic": "commercial"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ],
+      "initial_candidate_hash": "c2f9199cf07b4feb70242afef98c30926e7f62b60065ddb54bbcd8a36c850015",
+      "plan_identity": "58189ed32aada22bc68d0124611473c70b886d0f7107abe45cd26b6f25016bd7",
+      "policy": "required_realization_single_correction_v1",
+      "source_case_revision": 4
+    },
+    "model": "gpt-5.6-sol",
+    "operator_annotations": [
+      {
+        "blocking": true,
+        "message": "Confirm event-specific technical setup",
+        "proposition_key": "blocker:2309",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1520
+      },
+      {
+        "blocking": true,
+        "message": "Contact facilitator about the requested availability and format",
+        "proposition_key": "blocker:2310",
+        "type": "EXTERNAL_CONTACT",
+        "workflow_action_id": 1521
+      },
+      {
+        "blocking": true,
+        "message": "Confirm studio space availability for 2027-01-21 16:00:00+00 to 2027-01-21 20:00:00+00",
+        "proposition_key": "availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1522
+      }
+    ],
+    "provider": "openai",
+    "provider_incomplete_reason": null,
+    "provider_request_id": "req_d3ccff0551c34fe2b0ab5c4027f204f6",
+    "provider_response_id": "resp_092b7f226d04ae3a016ac0d8fff8c887d283db485a26802c80",
+    "provider_response_status": "completed",
+    "resolution_items": [
+      {
+        "blocking": true,
+        "client_visibility": "DECISION_PENDING_VISIBLE",
+        "message": "booking fee override",
+        "proposition_key": "case_decision:83",
+        "resolution_owner": "GOVERNED_DECISION",
+        "resolution_status": "REQUIRED",
+        "workflow_action_id": null
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Confirm event-specific technical setup",
+        "proposition_key": "blocker:2309",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1520
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Contact facilitator about the requested availability and format",
+        "proposition_key": "blocker:2310",
+        "resolution_owner": "EXTERNAL_PARTY",
+        "resolution_status": "CONTACT_REQUIRED",
+        "workflow_action_id": 1521
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Confirm studio space availability for 2027-01-21 16:00:00+00 to 2027-01-21 20:00:00+00",
+        "proposition_key": "availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1522
+      }
+    ],
+    "response_intent": "DECISION_PENDING",
+    "validation_failure_codes": [],
+    "workflow_action_id": 1523
+  }
+]

@@ -1,0 +1,1321 @@
+{
+  "generated_at": "2026-10-03T10:27:23.093253+00:00",
+  "run_slug": "required-realization-targeted-20261003-102723",
+  "baseline": {
+    "git_commit": "4b31672ec26ea233208a65d59a365344e94370c9",
+    "render_commit": "4b31672",
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "health": {
+      "application": {
+        "detail": "WSGI application responded.",
+        "metrics": {
+          "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+        },
+        "status": "ok"
+      },
+      "database": {
+        "detail": "Bounded database query succeeded.",
+        "status": "ok"
+      },
+      "environment": "staging",
+      "phase5": {
+        "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+        "metrics": {
+          "active_model_count": 1,
+          "active_model_id": 1,
+          "eligible_chunks": 492,
+          "embedded_chunks": 492,
+          "missing_chunks": 0
+        },
+        "status": "ok"
+      },
+      "phase6": {
+        "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+        "metrics": {
+          "active_model_count": 1,
+          "active_model_id": 1,
+          "eligible_units": 112,
+          "embedded_units": 112,
+          "missing_units": 0,
+          "stale_units": 0
+        },
+        "status": "ok"
+      },
+      "providers": {
+        "asana": "configured_but_disabled",
+        "outlook": "configured_draft_only"
+      },
+      "status": "ok"
+    },
+    "scenario_count": 1,
+    "synthetic_only": true,
+    "approval_or_execution_calls": 0
+  },
+  "results": [
+    {
+      "scenario_id": "UAT-012",
+      "title": "Messy compound inquiry",
+      "turns": [
+        {
+          "turn_number": 1,
+          "incoming_message": {
+            "subject": "A few questions about a January gathering",
+            "body": "Hi WNC,\n\nWe are putting together a January gathering in the Studio. We would like slides and light background music, would bring an outside caterer, and may ask WNC for a short facilitator-led opening. We know a DJ setup is not available, which is fine. Could you also explain the booking fee and whether there is any room to adjust it? We are still confirming final numbers and timing.\n\nThank you,\nAri"
+          },
+          "observations": [
+            {
+              "field_code": "event_type",
+              "value": "January gathering",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "technical_requirements",
+              "value": [
+                "projection_display",
+                "audio_playback",
+                "dj_sound_booth"
+              ],
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "catering_arrangement",
+              "value": "client_external_caterer",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "wnc_provided",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "booking_fee_override",
+              "value": {
+                "booking_fee": 0,
+                "currency": "EUR",
+                "reason": "Client asks whether fee can be adjusted."
+              },
+              "observation_type": "case_decision_candidate",
+              "claim_kind": "exception_request"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: REQUEST_CLIENT_INFORMATION",
+              "Draft revision id: 360",
+              "Workflow action id: 1510",
+              "Approval request id: 436"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-10-03 10:28:48.355984+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:9cf17ce3ec5c2bf26c60586d2f3f137327320de285cabf8eb11ad49f663589e1",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:569",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 569,
+              "semantic_subject_hash": "df8411953c09eefb1e4923cf834f5a5318929992d974f2c483041e8779f24d70",
+              "source_case_revision": 2,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1510:draft_revision:360",
+                "body": "Hi Ari,\n\nYour plans for a January gathering in the Studio sound thoughtful. WNC’s projector can display your slides, and light background music playback is available. I’ll check the practical projection setup, along with the availability and format of a short facilitator-led opening.\n\nFor your outside caterer, the kitchen is suitable for ready-made food, warming, plating and simple assembly, rather than large-scale food production. I’ll also check the booking fee for your request and what, if any, adjustment can be arranged.\n\nWhat day, start time and finish time would you like? How many guests are expected?",
+                "body_type": "text",
+                "context_hash": "248a580b29d59b1baf8178c8b4f22bdfe3596c3f1ae73c727608cda75a5e3833",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:569",
+                "draft_content_hash": "934cd4b2b08f016c886a2d61215c915398ea834554ff5a98bd95f8b1b647f004",
+                "draft_origin_workflow_action_id": 1510,
+                "draft_revision_id": 360,
+                "governed_context_hash": "df8411953c09eefb1e4923cf834f5a5318929992d974f2c483041e8779f24d70",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:569:5cdd8d2f8c9f277f3c9c726ceca52eac27de73b2ff5839d671ac22ec00950591",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "ari.patel@example.test",
+                "recipient_identity_hash": "2934c5ecac9440d1549772a67d968d994fda18c5ad2856a02305184d8a82cfa0",
+                "recipient_reference": "inquiry_response_draft:360",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 569,
+                "response_intent": "REQUEST_CLIENT_INFORMATION",
+                "source_case_revision": 2,
+                "subject": "January Studio gathering"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-10-03 10:28:48.539836+00",
+              "workflow_action_id": 1510,
+              "workflow_action_uuid": "33cb7005-1999-4771-a5fc-19891abff679"
+            },
+            "draft_revision": {
+              "approval_request_id": 436,
+              "approved_at": null,
+              "body_text": "Hi Ari,\n\nYour plans for a January gathering in the Studio sound thoughtful. WNC’s projector can display your slides, and light background music playback is available. I’ll check the practical projection setup, along with the availability and format of a short facilitator-led opening.\n\nFor your outside caterer, the kitchen is suitable for ready-made food, warming, plating and simple assembly, rather than large-scale food production. I’ll also check the booking fee for your request and what, if any, adjustment can be arranged.\n\nWhat day, start time and finish time would you like? How many guests are expected?",
+              "closing_text": "Warm regards,",
+              "content_hash": "934cd4b2b08f016c886a2d61215c915398ea834554ff5a98bd95f8b1b647f004",
+              "context_hash": "248a580b29d59b1baf8178c8b4f22bdfe3596c3f1ae73c727608cda75a5e3833",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Ari Patel",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "WNC can support catering, but the kitchen is best suited to ready-made food, warming, plating and easy on-site assembly rather than large-scale food production. Share the catering format and equipment needs before the event.",
+                    "source_reference": "SERV-003",
+                    "topic": "catering_kitchen"
+                  },
+                  {
+                    "client_safe_guidance": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning.",
+                    "source_reference": "SERV-003",
+                    "topic": "catering_kitchen"
+                  },
+                  {
+                    "client_safe_guidance": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery",
+                    "source_reference": "SERV-004",
+                    "topic": "external_supplier_setup"
+                  },
+                  {
+                    "client_safe_guidance": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in",
+                    "source_reference": "SERV-004",
+                    "topic": "external_supplier_setup"
+                  },
+                  {
+                    "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+                    "semantic_values": {
+                      "available_equipment": "WNC projector",
+                      "capability": "projection display",
+                      "check_required": [
+                        "compatibility",
+                        "adapters",
+                        "files",
+                        "screenless setup suitability"
+                      ],
+                      "status": "conditional",
+                      "topic": "projection_display"
+                    },
+                    "source_reference": "phase4:technical_projection_display_confirmation",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "audio playback: current technical provision is supported.",
+                    "semantic_values": {
+                      "capability": "audio playback",
+                      "status": "supported",
+                      "topic": "audio_playback"
+                    },
+                    "source_reference": "phase4:technical_audio_playback_supported",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "dj sound booth: requires an external supplier.",
+                    "semantic_values": {
+                      "capability": "dj sound booth",
+                      "status": "not_supported",
+                      "supplier_requirement": "external supplier",
+                      "topic": "dj_sound_booth"
+                    },
+                    "source_reference": "phase4:technical_dj_sound_booth_restriction",
+                    "topic": "technical_capabilities"
+                  }
+                ],
+                "conversation_key": "governed_client_response:569",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "January gathering"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: REQUEST_CLIENT_INFORMATION",
+                  "Contract hash: df8411953c09eefb1e4923cf834f5a5318929992d974f2c483041e8779f24d70"
+                ],
+                "open_questions": [
+                  {
+                    "human_question_text": "What date and time is the client requesting for the event?",
+                    "open_question_id": 2196,
+                    "question_type": "requested_event_timing"
+                  },
+                  {
+                    "human_question_text": "How many guests are expected?",
+                    "open_question_id": 2197,
+                    "question_type": "expected_guest_count"
+                  }
+                ],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2304",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1508
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Contact facilitator about the requested availability and format",
+                    "proposition_key": "blocker:2305",
+                    "type": "EXTERNAL_CONTACT",
+                    "workflow_action_id": 1509
+                  }
+                ],
+                "recipient_email": "ari.patel@example.test",
+                "recipient_label": "Ari Patel",
+                "rental_case_id": 569,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "ASK_CLIENT",
+                    "message": "What date and time is the client requesting for the event?",
+                    "proposition_key": "open_question:2196",
+                    "resolution_owner": "CLIENT",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "ASK_CLIENT",
+                    "message": "How many guests are expected?",
+                    "proposition_key": "open_question:2197",
+                    "resolution_owner": "CLIENT",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "DECISION_PENDING_VISIBLE",
+                    "message": "booking fee override",
+                    "proposition_key": "case_decision:83",
+                    "resolution_owner": "GOVERNED_DECISION",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2304",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1508
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Contact facilitator about the requested availability and format",
+                    "proposition_key": "blocker:2305",
+                    "resolution_owner": "EXTERNAL_PARTY",
+                    "resolution_status": "CONTACT_REQUIRED",
+                    "workflow_action_id": 1509
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 2,
+                "workflow_action_id": 1510
+              },
+              "conversation_key": "governed_client_response:569",
+              "created_at": "2026-10-03 10:28:48.384338+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 360,
+              "inquiry_response_draft_revision_uuid": "c10a3a2b-cf3a-418d-9379-91bbdb79d155",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [
+                {
+                  "human_question_text": "What day, start time and finish time would you like?",
+                  "open_question_id": 2196,
+                  "prompt_text": "What day, start time and finish time would you like?",
+                  "question_type": "governed_client_question"
+                },
+                {
+                  "human_question_text": "How many guests are expected?",
+                  "open_question_id": 2197,
+                  "prompt_text": "How many guests are expected?",
+                  "question_type": "governed_client_question"
+                }
+              ],
+              "recipient_email": "ari.patel@example.test",
+              "recipient_label": "Ari Patel",
+              "rejected_at": null,
+              "rental_case_id": 569,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 2,
+              "subject": "January Studio gathering",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-10-03 10:28:48.776937+00",
+              "workflow_action_id": 1510
+            },
+            "approval_request": {
+              "approval_request_id": 436,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-10-03 10:28:48.771841+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1510",
+                "inquiry_response_draft:360"
+              ],
+              "reason_text": "Approve inquiry response draft revision 360 before simulated send.",
+              "rental_case_id": 569,
+              "required_approver_reference": "semantic:approval:workflow_action:1510:draft_revision:360",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1510,
+              "target_entity_reference": "workflow_action:1510:draft_revision:360",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-10-03 10:28:48.771841+00"
+            },
+            "response_intent": "REQUEST_CLIENT_INFORMATION"
+          },
+          "before_generation": {
+            "case_revision": 2,
+            "open_question_ids": [
+              2196,
+              2197
+            ],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          },
+          "after_generation": {
+            "case_revision": 2,
+            "open_question_ids": [
+              2196,
+              2197
+            ],
+            "execution_attempt_count": 0,
+            "open_approval_count": 2
+          }
+        },
+        {
+          "turn_number": 2,
+          "incoming_message": {
+            "subject": "Re: A few questions about a January gathering",
+            "body": "We now expect 24 people. The facilitator would only need to welcome the group for about 20 minutes, and we can work around WNC availability. Timing is still being finalised.\n\nAri"
+          },
+          "observations": [
+            {
+              "field_code": "guest_count",
+              "value": 24,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "facilitator_arrangement",
+              "value": "wnc_provided",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: REQUEST_CLIENT_INFORMATION",
+              "Draft revision id: 361",
+              "Workflow action id: 1517",
+              "Approval request id: 437"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-10-03 10:29:07.181112+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:49cbea729f40d40fe4ce1b20445074bc43ea9f23a6ec71769052ef7e4a68e2ae",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:569",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 569,
+              "semantic_subject_hash": "e48755306968a0ea3bf3d1747fb27052eb3a0d6b9c0f58b5550e386e66e600a0",
+              "source_case_revision": 3,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1517:draft_revision:361",
+                "body": "Hi Ari,\n\nThe update to 24 people and a flexible 20-minute welcome is helpful. Once the timing is clearer, I’ll check the requested facilitator availability and format, as well as the booking fee and what adjustment can be arranged.\n\nWhat day, start time and finish time would you like?",
+                "body_type": "text",
+                "context_hash": "85dcf383f7c54cc8466ce466d4169d3337afe0c1c0ceed46bef4cf96367bd84c",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:569",
+                "draft_content_hash": "a89022304b6a96d1f88fe55ab53dfa2737a1428755c2f310f59f623a2e05b903",
+                "draft_origin_workflow_action_id": 1517,
+                "draft_revision_id": 361,
+                "governed_context_hash": "e48755306968a0ea3bf3d1747fb27052eb3a0d6b9c0f58b5550e386e66e600a0",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:569:ab73107995408d18186478ae671fc4174ce7312778e10b56f355877d1a0da2b5",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "ari.patel@example.test",
+                "recipient_identity_hash": "2934c5ecac9440d1549772a67d968d994fda18c5ad2856a02305184d8a82cfa0",
+                "recipient_reference": "inquiry_response_draft:361",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 569,
+                "response_intent": "REQUEST_CLIENT_INFORMATION",
+                "source_case_revision": 3,
+                "subject": "Updated group plans"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-10-03 10:29:07.362311+00",
+              "workflow_action_id": 1517,
+              "workflow_action_uuid": "f1fb2b06-2487-4620-b5ac-bc0d2ae57e33"
+            },
+            "draft_revision": {
+              "approval_request_id": 437,
+              "approved_at": null,
+              "body_text": "Hi Ari,\n\nThe update to 24 people and a flexible 20-minute welcome is helpful. Once the timing is clearer, I’ll check the requested facilitator availability and format, as well as the booking fee and what adjustment can be arranged.\n\nWhat day, start time and finish time would you like?",
+              "closing_text": "Warm regards,",
+              "content_hash": "a89022304b6a96d1f88fe55ab53dfa2737a1428755c2f310f59f623a2e05b903",
+              "context_hash": "85dcf383f7c54cc8466ce466d4169d3337afe0c1c0ceed46bef4cf96367bd84c",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Ari Patel",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "WNC can support catering, but the kitchen is best suited to ready-made food, warming, plating and easy on-site assembly rather than large-scale food production. Share the catering format and equipment needs before the event.",
+                    "source_reference": "SERV-003",
+                    "topic": "catering_kitchen"
+                  },
+                  {
+                    "client_safe_guidance": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning.",
+                    "source_reference": "SERV-003",
+                    "topic": "catering_kitchen"
+                  },
+                  {
+                    "client_safe_guidance": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery",
+                    "source_reference": "SERV-004",
+                    "topic": "external_supplier_setup"
+                  },
+                  {
+                    "client_safe_guidance": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in",
+                    "source_reference": "SERV-004",
+                    "topic": "external_supplier_setup"
+                  },
+                  {
+                    "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+                    "semantic_values": {
+                      "available_equipment": "WNC projector",
+                      "capability": "projection display",
+                      "check_required": [
+                        "compatibility",
+                        "adapters",
+                        "files",
+                        "screenless setup suitability"
+                      ],
+                      "status": "conditional",
+                      "topic": "projection_display"
+                    },
+                    "source_reference": "phase4:technical_projection_display_confirmation",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "audio playback: current technical provision is supported.",
+                    "semantic_values": {
+                      "capability": "audio playback",
+                      "status": "supported",
+                      "topic": "audio_playback"
+                    },
+                    "source_reference": "phase4:technical_audio_playback_supported",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "dj sound booth: requires an external supplier.",
+                    "semantic_values": {
+                      "capability": "dj sound booth",
+                      "status": "not_supported",
+                      "supplier_requirement": "external supplier",
+                      "topic": "dj_sound_booth"
+                    },
+                    "source_reference": "phase4:technical_dj_sound_booth_restriction",
+                    "topic": "technical_capabilities"
+                  }
+                ],
+                "conversation_key": "governed_client_response:569",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "January gathering"
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 24
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: REQUEST_CLIENT_INFORMATION",
+                  "Contract hash: e48755306968a0ea3bf3d1747fb27052eb3a0d6b9c0f58b5550e386e66e600a0"
+                ],
+                "open_questions": [
+                  {
+                    "human_question_text": "What date and time is the client requesting for the event?",
+                    "open_question_id": 2196,
+                    "question_type": "requested_event_timing"
+                  }
+                ],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2307",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1515
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Contact facilitator about the requested availability and format",
+                    "proposition_key": "blocker:2308",
+                    "type": "EXTERNAL_CONTACT",
+                    "workflow_action_id": 1516
+                  }
+                ],
+                "recipient_email": "ari.patel@example.test",
+                "recipient_label": "Ari Patel",
+                "rental_case_id": 569,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "ASK_CLIENT",
+                    "message": "What date and time is the client requesting for the event?",
+                    "proposition_key": "open_question:2196",
+                    "resolution_owner": "CLIENT",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "DECISION_PENDING_VISIBLE",
+                    "message": "booking fee override",
+                    "proposition_key": "case_decision:83",
+                    "resolution_owner": "GOVERNED_DECISION",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2307",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1515
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Contact facilitator about the requested availability and format",
+                    "proposition_key": "blocker:2308",
+                    "resolution_owner": "EXTERNAL_PARTY",
+                    "resolution_status": "CONTACT_REQUIRED",
+                    "workflow_action_id": 1516
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 3,
+                "workflow_action_id": 1517
+              },
+              "conversation_key": "governed_client_response:569",
+              "created_at": "2026-10-03 10:29:07.254433+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 361,
+              "inquiry_response_draft_revision_uuid": "0a406170-bd23-4483-8c93-abf3abfb2158",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [
+                {
+                  "human_question_text": "What day, start time and finish time would you like?",
+                  "open_question_id": 2196,
+                  "prompt_text": "What day, start time and finish time would you like?",
+                  "question_type": "governed_client_question"
+                }
+              ],
+              "recipient_email": "ari.patel@example.test",
+              "recipient_label": "Ari Patel",
+              "rejected_at": null,
+              "rental_case_id": 569,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 3,
+              "subject": "Updated group plans",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-10-03 10:29:07.660627+00",
+              "workflow_action_id": 1517
+            },
+            "approval_request": {
+              "approval_request_id": 437,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-10-03 10:29:07.656074+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1517",
+                "inquiry_response_draft:361"
+              ],
+              "reason_text": "Approve inquiry response draft revision 361 before simulated send.",
+              "rental_case_id": 569,
+              "required_approver_reference": "semantic:approval:workflow_action:1517:draft_revision:361",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1517,
+              "target_entity_reference": "workflow_action:1517:draft_revision:361",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-10-03 10:29:07.656074+00"
+            },
+            "response_intent": "REQUEST_CLIENT_INFORMATION"
+          },
+          "before_generation": {
+            "case_revision": 3,
+            "open_question_ids": [
+              2196
+            ],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          },
+          "after_generation": {
+            "case_revision": 3,
+            "open_question_ids": [
+              2196
+            ],
+            "execution_attempt_count": 0,
+            "open_approval_count": 2
+          }
+        },
+        {
+          "turn_number": 3,
+          "incoming_message": {
+            "subject": "Re: A few questions about a January gathering - timing",
+            "body": "The gathering would be on 21 January from 17:00 to 21:00.\n\nAri"
+          },
+          "observations": [
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2027-01-21T17:00:00Z",
+                "active_event_end": "2027-01-21T21:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: DECISION_PENDING",
+              "Draft revision id: 362",
+              "Workflow action id: 1523",
+              "Approval request id: 438"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-10-03 10:29:24.27564+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:ed9d5c791938cafedd4bc04e6e38d5314864f233dc91d5d7b75cde1d5cdd5d27",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:569",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 569,
+              "semantic_subject_hash": "32656ee4099a8920451ecb71007c2a931806ab57586a84b9128bf03ac284d50f",
+              "source_case_revision": 4,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1523:draft_revision:362",
+                "body": "Hi Ari,\n\nThanks for confirming the gathering would be on 21 January from 17:00 to 21:00.\n\nThe booking fee is EUR 75 excl. VAT, with VAT at 21%. I’ll check what can be arranged regarding an adjustment to the fee, along with the requested facilitator’s availability and format.",
+                "body_type": "text",
+                "context_hash": "797fb124a48bee0923d04be154622af8348e99d2a3babb2fcc1a1cd8598b2832",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:569",
+                "draft_content_hash": "b3348b1562cd04fa59f32708ca7cafca0df57edbf82f02bd0797f05efa55f03f",
+                "draft_origin_workflow_action_id": 1523,
+                "draft_revision_id": 362,
+                "governed_context_hash": "32656ee4099a8920451ecb71007c2a931806ab57586a84b9128bf03ac284d50f",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:569:d359196f5c77a16fcf3084f911804ea0251777a7c0d77ddd4e1fa9e312d21837",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "ari.patel@example.test",
+                "recipient_identity_hash": "2934c5ecac9440d1549772a67d968d994fda18c5ad2856a02305184d8a82cfa0",
+                "recipient_reference": "inquiry_response_draft:362",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 569,
+                "response_intent": "DECISION_PENDING",
+                "source_case_revision": 4,
+                "subject": "21 January gathering"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-10-03 10:29:24.394434+00",
+              "workflow_action_id": 1523,
+              "workflow_action_uuid": "66d9cd55-099d-4c79-8afa-3e783e761482"
+            },
+            "draft_revision": {
+              "approval_request_id": 438,
+              "approved_at": null,
+              "body_text": "Hi Ari,\n\nThanks for confirming the gathering would be on 21 January from 17:00 to 21:00.\n\nThe booking fee is EUR 75 excl. VAT, with VAT at 21%. I’ll check what can be arranged regarding an adjustment to the fee, along with the requested facilitator’s availability and format.",
+              "closing_text": "Warm regards,",
+              "content_hash": "b3348b1562cd04fa59f32708ca7cafca0df57edbf82f02bd0797f05efa55f03f",
+              "context_hash": "797fb124a48bee0923d04be154622af8348e99d2a3babb2fcc1a1cd8598b2832",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Ari Patel",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "WNC can support catering, but the kitchen is best suited to ready-made food, warming, plating and easy on-site assembly rather than large-scale food production. Share the catering format and equipment needs before the event.",
+                    "source_reference": "SERV-003",
+                    "topic": "catering_kitchen"
+                  },
+                  {
+                    "client_safe_guidance": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning.",
+                    "source_reference": "SERV-003",
+                    "topic": "catering_kitchen"
+                  },
+                  {
+                    "client_safe_guidance": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery",
+                    "source_reference": "SERV-004",
+                    "topic": "external_supplier_setup"
+                  },
+                  {
+                    "client_safe_guidance": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in",
+                    "source_reference": "SERV-004",
+                    "topic": "external_supplier_setup"
+                  },
+                  {
+                    "client_safe_guidance": "projection display: Basic projection may be possible with the WNC projector, but compatibility, adapters, files, and whether a screenless setup is acceptable must still be confirmed.",
+                    "semantic_values": {
+                      "available_equipment": "WNC projector",
+                      "capability": "projection display",
+                      "check_required": [
+                        "compatibility",
+                        "adapters",
+                        "files",
+                        "screenless setup suitability"
+                      ],
+                      "status": "conditional",
+                      "topic": "projection_display"
+                    },
+                    "source_reference": "phase4:technical_projection_display_confirmation",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "audio playback: current technical provision is supported.",
+                    "semantic_values": {
+                      "capability": "audio playback",
+                      "status": "supported",
+                      "topic": "audio_playback"
+                    },
+                    "source_reference": "phase4:technical_audio_playback_supported",
+                    "topic": "technical_capabilities"
+                  },
+                  {
+                    "client_safe_guidance": "dj sound booth: requires an external supplier.",
+                    "semantic_values": {
+                      "capability": "dj sound booth",
+                      "status": "not_supported",
+                      "supplier_requirement": "external supplier",
+                      "topic": "dj_sound_booth"
+                    },
+                    "source_reference": "phase4:technical_dj_sound_booth_restriction",
+                    "topic": "technical_capabilities"
+                  }
+                ],
+                "conversation_key": "governed_client_response:569",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "January gathering"
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 24
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: DECISION_PENDING",
+                  "Contract hash: 32656ee4099a8920451ecb71007c2a931806ab57586a84b9128bf03ac284d50f"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2309",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1520
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Contact facilitator about the requested availability and format",
+                    "proposition_key": "blocker:2310",
+                    "type": "EXTERNAL_CONTACT",
+                    "workflow_action_id": 1521
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2027-01-21 16:00:00+00 to 2027-01-21 20:00:00+00",
+                    "proposition_key": "availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1522
+                  }
+                ],
+                "recipient_email": "ari.patel@example.test",
+                "recipient_label": "Ari Patel",
+                "rental_case_id": 569,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "DECISION_PENDING_VISIBLE",
+                    "message": "booking fee override",
+                    "proposition_key": "case_decision:83",
+                    "resolution_owner": "GOVERNED_DECISION",
+                    "resolution_status": "REQUIRED",
+                    "workflow_action_id": null
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm event-specific technical setup",
+                    "proposition_key": "blocker:2309",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1520
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Contact facilitator about the requested availability and format",
+                    "proposition_key": "blocker:2310",
+                    "resolution_owner": "EXTERNAL_PARTY",
+                    "resolution_status": "CONTACT_REQUIRED",
+                    "workflow_action_id": 1521
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2027-01-21 16:00:00+00 to 2027-01-21 20:00:00+00",
+                    "proposition_key": "availability:2027-01-21 16:00:00+00:2027-01-21 20:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1522
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 4,
+                "workflow_action_id": 1523
+              },
+              "conversation_key": "governed_client_response:569",
+              "created_at": "2026-10-03 10:29:24.352105+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 362,
+              "inquiry_response_draft_revision_uuid": "2ad2a50d-7465-48cd-8325-36979798a609",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [],
+              "recipient_email": "ari.patel@example.test",
+              "recipient_label": "Ari Patel",
+              "rejected_at": null,
+              "rental_case_id": 569,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 4,
+              "subject": "21 January gathering",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-10-03 10:29:24.654449+00",
+              "workflow_action_id": 1523
+            },
+            "approval_request": {
+              "approval_request_id": 438,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-10-03 10:29:24.649417+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1523",
+                "inquiry_response_draft:362"
+              ],
+              "reason_text": "Approve inquiry response draft revision 362 before simulated send.",
+              "rental_case_id": 569,
+              "required_approver_reference": "semantic:approval:workflow_action:1523:draft_revision:362",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1523,
+              "target_entity_reference": "workflow_action:1523:draft_revision:362",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-10-03 10:29:24.649417+00"
+            },
+            "response_intent": "DECISION_PENDING"
+          },
+          "before_generation": {
+            "case_revision": 4,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          },
+          "after_generation": {
+            "case_revision": 4,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 2
+          }
+        }
+      ],
+      "failures": [],
+      "rental_case_id": 569,
+      "case_reference_code": "RC-20261003102723218",
+      "final_state": {
+        "case_revision": 4,
+        "open_question_ids": [],
+        "execution_attempt_count": 0,
+        "open_approval_count": 2
+      },
+      "final_execution_attempts": [],
+      "final_approvals": [
+        {
+          "approval_request_id": 435,
+          "approval_type": "commercial_exception",
+          "created_at": "2026-10-03 10:28:32.264533+00",
+          "decided_at": null,
+          "decided_by_reference": null,
+          "decision_notes": null,
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "phase4:booking_fee",
+            "inbound_observation:2639"
+          ],
+          "reason_text": "Approval required before activating case decision 83.",
+          "rental_case_id": 569,
+          "required_approver_reference": "semantic:approval:case_decision:83",
+          "required_approver_role": "management_review",
+          "status": "open",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 83,
+          "target_entity_reference": "case_decision:83",
+          "target_entity_type": "case_decision",
+          "updated_at": "2026-10-03 10:28:32.264533+00"
+        },
+        {
+          "approval_request_id": 436,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-10-03 10:28:48.771841+00",
+          "decided_at": "2026-10-03 10:28:53.584058+00",
+          "decided_by_reference": null,
+          "decision_notes": "Draft source context became stale.",
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1510",
+            "inquiry_response_draft:360"
+          ],
+          "reason_text": "Approve inquiry response draft revision 360 before simulated send.",
+          "rental_case_id": 569,
+          "required_approver_reference": "semantic:approval:workflow_action:1510:draft_revision:360",
+          "required_approver_role": "client_communication_review",
+          "status": "cancelled",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1510,
+          "target_entity_reference": "workflow_action:1510:draft_revision:360",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-10-03 10:28:53.648018+00"
+        },
+        {
+          "approval_request_id": 437,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-10-03 10:29:07.656074+00",
+          "decided_at": "2026-10-03 10:29:10.77968+00",
+          "decided_by_reference": null,
+          "decision_notes": "Draft source context became stale.",
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1517",
+            "inquiry_response_draft:361"
+          ],
+          "reason_text": "Approve inquiry response draft revision 361 before simulated send.",
+          "rental_case_id": 569,
+          "required_approver_reference": "semantic:approval:workflow_action:1517:draft_revision:361",
+          "required_approver_role": "client_communication_review",
+          "status": "cancelled",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1517,
+          "target_entity_reference": "workflow_action:1517:draft_revision:361",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-10-03 10:29:10.848143+00"
+        },
+        {
+          "approval_request_id": 438,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-10-03 10:29:24.649417+00",
+          "decided_at": null,
+          "decided_by_reference": null,
+          "decision_notes": null,
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1523",
+            "inquiry_response_draft:362"
+          ],
+          "reason_text": "Approve inquiry response draft revision 362 before simulated send.",
+          "rental_case_id": 569,
+          "required_approver_reference": "semantic:approval:workflow_action:1523:draft_revision:362",
+          "required_approver_role": "client_communication_review",
+          "status": "open",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1523,
+          "target_entity_reference": "workflow_action:1523:draft_revision:362",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-10-03 10:29:24.649417+00"
+        }
+      ]
+    }
+  ],
+  "request_log": [
+    {
+      "method": "GET",
+      "path": "/healthz"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/raw-evidence"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/mailbox/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/raw-evidence"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/mailbox/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/raw-evidence"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/reconcile"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/569/mailbox/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/569"
+    }
+  ]
+}

@@ -1,0 +1,445 @@
+{
+  "provider_calls": 0,
+  "results": [
+    {
+      "turn": "UAT-012/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "808527135f11e4f6c01c48f1b4666d97bac8192ce2e5763e3ad1444d0e056752",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_d5f2816203644abe8dbb52ae24d95587",
+          "provider_response_id": "resp_01ecb10adeb8eb7f016ac0d8d8209c87d2b7f293be0243b3a0",
+          "realization_results": [
+            {
+              "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2196,
+                "question": "What day, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2196",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "d8e91680d1479430425f9d1136304343050d769f9433385a8dc73ecc9210766b",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2197,
+                "question": "How many guests are expected?"
+              },
+              "semantic_key": "question:2197",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+              "kind": "guidance",
+              "realized": true,
+              "required_meaning": {
+                "limitation": "not large-scale food production",
+                "suitable_for": [
+                  "ready-made food",
+                  "warming",
+                  "plating",
+                  "simple assembly"
+                ]
+              },
+              "semantic_key": "fact:catering_kitchen",
+              "topic": "catering_kitchen"
+            },
+            {
+              "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+              "kind": "conditional_capability",
+              "realized": true,
+              "required_meaning": {
+                "available_equipment": "WNC projector",
+                "capability": "projection display",
+                "check_required": [
+                  "practical projection setup"
+                ],
+                "status": "conditional"
+              },
+              "semantic_key": "fact:projection_display",
+              "topic": "projection_display"
+            },
+            {
+              "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+              "kind": "known_fact",
+              "realized": true,
+              "required_meaning": {
+                "action_required": false,
+                "client_fact": {
+                  "background_music_playback": true
+                },
+                "fact_state": "known"
+              },
+              "semantic_key": "fact:audio_playback",
+              "topic": "audio_playback"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2196,
+            "question": "What day, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2196",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "d8e91680d1479430425f9d1136304343050d769f9433385a8dc73ecc9210766b",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2197,
+            "question": "How many guests are expected?"
+          },
+          "semantic_key": "question:2197",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+          "kind": "guidance",
+          "realized": true,
+          "required_meaning": {
+            "limitation": "not large-scale food production",
+            "suitable_for": [
+              "ready-made food",
+              "warming",
+              "plating",
+              "simple assembly"
+            ]
+          },
+          "semantic_key": "fact:catering_kitchen",
+          "topic": "catering_kitchen"
+        },
+        {
+          "fingerprint": "611225d828231fc1d2df193b9e2b6261ba6eff562cf33deb3a4577cc0218ebd0",
+          "kind": "conditional_capability",
+          "realized": true,
+          "required_meaning": {
+            "available_equipment": "WNC projector",
+            "capability": "projection display",
+            "check_required": [
+              "practical projection setup"
+            ],
+            "status": "conditional"
+          },
+          "semantic_key": "fact:projection_display",
+          "topic": "projection_display"
+        },
+        {
+          "fingerprint": "56b7098e5b0a9ac30ba8cfde8467b7169972402c237cfbc411622176ff694303",
+          "kind": "known_fact",
+          "realized": true,
+          "required_meaning": {
+            "action_required": false,
+            "client_fact": {
+              "background_music_playback": true
+            },
+            "fact_state": "known"
+          },
+          "semantic_key": "fact:audio_playback",
+          "topic": "audio_playback"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-012/2",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "6e872cd7d61b124dfb00a2bd78cb435f91bed0fe501b5cdad3fe18a1431895df",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_741c866d1a6f4391b8427df1aed82b48",
+          "provider_response_id": "resp_0ab3b3d7b6aaa3d7016ac0d8ef978087d2be6be542ed7ea039",
+          "realization_results": [
+            {
+              "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+              "kind": "question",
+              "realized": true,
+              "required_meaning": {
+                "open_question_id": 2196,
+                "question": "What day, start time and finish time would you like?"
+              },
+              "semantic_key": "question:2196",
+              "topic": "client_information"
+            },
+            {
+              "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check requested booking fee or pricing",
+                "status": "check_required"
+              },
+              "semantic_key": "commercial.check",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "9b363ec03f13be4df3759887a35044d4f52ed62dbd78881b3733ab1c0d85f896",
+          "kind": "question",
+          "realized": true,
+          "required_meaning": {
+            "open_question_id": 2196,
+            "question": "What day, start time and finish time would you like?"
+          },
+          "semantic_key": "question:2196",
+          "topic": "client_information"
+        },
+        {
+          "fingerprint": "ce5b101ef2c0cf0ac8e6f03a94d256bc5bdcc8cd709f95396f8a767d60c2d110",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check requested booking fee or pricing",
+            "status": "check_required"
+          },
+          "semantic_key": "commercial.check",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-012/3",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "c2f9199cf07b4feb70242afef98c30926e7f62b60065ddb54bbcd8a36c850015",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_d3ccff0551c34fe2b0ab5c4027f204f6",
+          "provider_response_id": "resp_092b7f226d04ae3a016ac0d8fff8c887d283db485a26802c80",
+          "realization_results": [
+            {
+              "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+              "kind": "commercial",
+              "realized": true,
+              "required_meaning": {
+                "booking_fee": "EUR 75 excl. VAT",
+                "vat": "21%"
+              },
+              "semantic_key": "commercial.current",
+              "topic": "commercial"
+            },
+            {
+              "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check what can be arranged",
+                "request": "booking fee adjustment",
+                "status": "check_required"
+              },
+              "semantic_key": "decision:booking fee override",
+              "topic": "commercial_next_step"
+            },
+            {
+              "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "status": "check_required",
+                "subjects": [
+                  "requested facilitator availability and format"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+          "kind": "commercial",
+          "realized": true,
+          "required_meaning": {
+            "booking_fee": "EUR 75 excl. VAT",
+            "vat": "21%"
+          },
+          "semantic_key": "commercial.current",
+          "topic": "commercial"
+        },
+        {
+          "fingerprint": "01147dc1762bf2076f3036fcf36755e656ccd63e701a5fbc425912ce7dfd5a3c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check what can be arranged",
+            "request": "booking fee adjustment",
+            "status": "check_required"
+          },
+          "semantic_key": "decision:booking fee override",
+          "topic": "commercial_next_step"
+        },
+        {
+          "fingerprint": "52a59b6b10803b5e268da5805c92f7136caa50cd2a3f3f93eca4aa0365abb88c",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "status": "check_required",
+            "subjects": [
+              "requested facilitator availability and format"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    }
+  ],
+  "generation_operations": 3,
+  "model_candidates": 3
+}
