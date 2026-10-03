@@ -44,23 +44,18 @@ STYLE_PROFILE = (
     "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
     "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
     "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
-    "Translate technical status into everyday language about what works or what you can arrange; avoid catalogue labels such as supported or provision. Keep material conditions intact.",
+    "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
     "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language.",
 )
 
 
 def guidance_editorial_priority(item: ContextualGuidance, latest_message: str) -> str:
     """Writing attention only: never changes retrieval, authority, or restrictions."""
-    message = latest_message.lower()
-    topic_words = {
-        "capacity": ("capacity", "fit", "accommodat", "enough room", "suitab"),
-        "catering_kitchen": ("cater", "kitchen", "buffet", "food", "lunch", "cook"),
-        "external_supplier_setup": ("supplier", "vendor", "setup", "set up", "access", "load", "arriv", "handover", "florist"),
-        "technical_capabilities": ("technical", "project", "slide", "audio", "music", "microphone", "hologram", "rig"),
-        "facilitator_process": ("facilitat", "host", "opening", "welcome"),
-    }
+    from .editorial_content_planner import mentioned, alias_matches
     topic = "technical_capabilities" if item.topic.startswith("technical") else item.topic
-    if any(word in message for word in topic_words.get(topic, ())):
+    groups = {'external_supplier_setup': ('supplier_access',), 'facilitator_process': ('facilitator',),
+              'technical_capabilities': ('audio_playback', 'projection_display', 'microphones', 'dj_sound_booth', 'other_technical')}
+    if any(mentioned(t, latest_message) for t in groups.get(topic, (topic,))) or (topic == 'technical_capabilities' and alias_matches(('technical',), latest_message)):
         return "directly_relevant_to_latest_message"
     if item.topic == "capacity" and "outside the current capacity" in item.client_safe_guidance:
         return "prevents_likely_problem"
@@ -322,16 +317,17 @@ def detect_guidance_topics(snapshot: Any, latest_client_message: str | None, *, 
     facts = {str(item.field_code): item.value_payload for item in observed_fields
              if not getattr(item, "stale_observation", False) and getattr(item, "observation_status", "") != "superseded"}
     facts.update({str(getattr(item, "field_code", "")): getattr(item, "value_payload", None) for item in getattr(snapshot, "rental_case_facts", ())})
-    text = (latest_client_message or "").lower()
+    from .editorial_content_planner import mentioned, alias_matches
+    text = latest_client_message or ""
     topics: list[str] = []
     technical = facts.get("technical_requirements")
-    if any(word in text for word in ("cater", "buffet", "food", "kitchen")) or facts.get("catering_arrangement"):
+    if mentioned("catering_kitchen", text) or facts.get("catering_arrangement"):
         topics.extend(("catering_kitchen", "external_supplier_setup"))
-    if any(word in text for word in ("supplier", "florist", "loading", "handover", "delivery")):
+    if mentioned("supplier_access", text):
         topics.append("external_supplier_setup")
-    if technical or any(word in text for word in ("projector", "projection", "audio", "microphone", "hologram", "technical")):
+    if technical or (any(mentioned(t, text) for t in ("audio_playback", "projection_display", "microphones", "dj_sound_booth", "other_technical")) or alias_matches(("technical",), text)):
         topics.append("technical_capabilities")
-    if facts.get("facilitator_arrangement") or "facilitat" in text:
+    if facts.get("facilitator_arrangement") or mentioned("facilitator", text):
         topics.append("facilitator_process")
     guests = facts.get("guest_count")
     if facts.get("requested_rental_scope") == "entire_venue" or (isinstance(guests, int) and guests >= 40):

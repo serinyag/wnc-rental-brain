@@ -68,7 +68,7 @@ class EditorialContentPlan:
     items: tuple[EditorialContentItem, ...]
     substantive_budget: int
     budget_reason: str
-    version: str = 'editorial_content_plan_v2'
+    version: str = 'editorial_content_plan_v3'
 
     def role_items(self, role: EditorialRole) -> tuple[EditorialContentItem, ...]:
         return tuple(item for item in self.items if item.role == role)
@@ -91,24 +91,58 @@ class EditorialContentPlan:
 # A finite adapter for request topics already used by Phase 8. These selectors
 # decide attention only. All answers come from the governed contract below.
 TOPIC_TERMS = {
-    'audio_playback': ('music', 'audio', 'sound'),
-    'projection_display': ('project', 'slide', 'screen'),
-    'microphones': ('microphone', 'mic '),
-    'dj_sound_booth': ('dj', 'booth'),
-    'other_technical': ('hologram', 'aerial', 'rig', 'custom'),
-    'catering_kitchen': ('cater', 'kitchen', 'food', 'buffet', 'lunch'),
-    'supplier_access': ('setup', 'set up', 'load', 'deliver', 'arriv', 'supplier', 'handover'),
-    'facilitator': ('facilitat', 'welcome', 'opening'),
-    'commercial': ('fee', 'cost', 'price', 'pricing', 'waiv', 'flexibility'),
-    'capacity': ('fit', 'capacity', 'accommodat', 'suitab'),
+    'audio_playback': ('music', 'audio', 'sound system', 'background sound', 'amplified sound'),
+    'projection_display': ('projector', 'projectors', 'projection', 'slide', 'slides', 'screen', 'screens'),
+    'microphones': ('microphone', 'microphones', 'mic', 'mics'),
+    'dj_sound_booth': ('dj', 'dj setup', 'dj booth', 'sound booth'),
+    'other_technical': ('hologram', 'holograms', 'aerial', 'rig', 'rigs', 'custom technical'),
+    'catering_kitchen': ('caterer', 'caterers', 'catering', 'kitchen', 'food', 'buffet', 'lunch', 'cook', 'cooking'),
+    'supplier_access': ('setup', 'set up', 'loading', 'unloading', 'delivery', 'deliveries', 'deliver', 'arrive', 'arrival', 'supplier', 'suppliers', 'handover', 'florist'),
+    'facilitator': ('facilitator', 'facilitation', 'facilitate', 'host', 'welcome', 'opening'),
+    'commercial': ('fee', 'fees', 'cost', 'costs', 'price', 'prices', 'pricing', 'waive', 'waiver', 'flexibility'),
+    'capacity': ('fit', 'fits', 'capacity', 'accommodate', 'accommodation', 'suitable', 'suitability', 'enough room'),
 }
 
 
+def alias_matches(aliases: tuple[str, ...], text: str) -> bool:
+    normalized = ' '.join(re.findall(r"\w+", text.casefold()))
+    return any(re.search(r'(?<!\w)' + re.escape(alias) + r'(?!\w)', normalized) for alias in aliases)
+
+
 def mentioned(topic: str, text: str) -> bool:
-    return any(term in text.lower() for term in TOPIC_TERMS.get(topic, (topic,)))
+    return alias_matches(TOPIC_TERMS.get(topic, (topic.replace('_', ' '),)), text)
+
+
+def pricing_context(text: str) -> dict[str, Any]:
+    # A request for prices is not evidence that the client supplied a budget.
+    budget = 'absent'
+    if re.search(r'\b(?:budget|we have|we can spend)\b.{0,40}(?:\bEUR\s*\d|€\s*\d|\d[\d.,]*\s*(?:euros?|EUR)\b)', text, re.I):
+        budget = 'explicit_amount'
+    elif re.search(r'\bbudget\b', text, re.I):
+        budget = 'general_constraint'
+    requested = bool(re.search(r'\b(?:pricing|prices?|costs?)\b', text, re.I) and
+                     re.search(r'\b(?:what|how|does|can|could|realistic|fit|send|tell)\b|\?', text, re.I))
+    return {'overall_pricing_requested': requested, 'budget_context': budget}
+
+
+def optional_client_delta(text: str) -> dict[str, Any] | None:
+    for clause in re.split(r'[.!?\n]', text):
+        for item in ('hologram', 'projection', 'aerial rig'):
+            if alias_matches((item,), clause) and re.search(r'\boptional\b', clause, re.I):
+                delta = {'kind': 'client_preference_change', 'item': item, 'optional': True}
+                if re.search(r'(?:not|don.t) (?:hold up|delay)|should not delay', clause, re.I):
+                    delta['should_not_delay'] = ['event planning']
+                    if mentioned('projection_display', text) and item != 'projection':
+                        delta['should_not_delay'].insert(0, 'projection planning')
+                return delta
+    return None
 
 
 def asked_again(topic: str, text: str) -> bool:
+    # A supplier logistics question does not reopen food preparation guidance.
+    if topic == 'catering_kitchen' and logistics_needs(text) and not alias_matches(
+            ('kitchen', 'food', 'cook', 'cooking', 'prepare', 'preparation', 'warming', 'plating', 'buffet'), text):
+        return False
     # "The florist can arrive" is a new detail, not an explicit repeat question.
     return any(mentioned(topic, part) and ("?" in part or re.search(
         r'^\s*(?:can|could|would|what|how|is|are|does|please (?:confirm|explain|tell))\b', part, re.I))
@@ -174,6 +208,8 @@ def communication_evidence(item: EditorialContentItem, body: str) -> bool:
         return 'kitchen' in text and any(w in text for w in ('warming', 'plating', 'ready-made'))
     if item.topic == 'audio_playback':
         return mentioned(item.topic, text) and bool(re.search(r'\b(?:supported|fine|possible|can be played|available|no problem)\b', text))
+    if item.topic == 'projection_display':
+        return mentioned(item.topic, text) and bool(re.search(r'\b(?:projector|projection)\b.{0,25}\bavailable\b', text)) and bool(re.search(r'\b(?:check|checking)\b.{0,50}\b(?:setup|arrangement)\b', text))
     if item.topic == 'microphones':
         return mentioned(item.topic, text) and ('supplier' in text or 'external' in text)
     if item.topic == 'supplier_access':
@@ -218,7 +254,7 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
             EditorialRole.MUST_ASK, 'open_client_owned_question', priority=2)
 
     event_type = next((x.split(': ', 1)[1] for x in contract.confirmed_case_facts if x.startswith('event_type: ')), None)
-    acknowledgement = ({'kind': 'new_enquiry', 'about': event_type or 'the enquiry'} if not contract.prior_client_messages
+    acknowledgement = optional_client_delta(latest) or ({'kind': 'new_enquiry', 'about': event_type or 'the enquiry'} if not contract.prior_client_messages
                        else {'kind': 'new_client_detail', 'focus': 'the change or clarification in the latest message'})
     add('latest_client_detail', 'latest_client_detail', acknowledgement,
         EditorialRole.ACKNOWLEDGE, 'current_turn_delta', source='current_client_message', authority='client_request', priority=3)
@@ -240,8 +276,12 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
     if 'commercial' in requested_topics and not commercial:
         add('commercial.check', 'commercial_next_step', {'action': 'check requested booking fee or pricing', 'status': 'check_required'},
             EditorialRole.MUST_COMMUNICATE, 'requested_answer_not_yet_available', priority=4)
-    if re.search(r'\b(?:pricing|costs?|budget)\b', latest, re.I) and re.search(r'\b(?:what|how|does|can|could|realistic|fit)\b', latest, re.I):
-        add('commercial.overall_pricing', 'overall_pricing', {'action': 'check overall rental pricing against the client request and budget', 'status': 'check_required'},
+    pricing = pricing_context(latest)
+    if pricing['overall_pricing_requested']:
+        action = 'check overall rental pricing for the requested event/options'
+        if pricing['budget_context'] != 'absent':
+            action += ' taking the stated budget into account'
+        add('commercial.overall_pricing', 'overall_pricing', {**pricing, 'action': action, 'status': 'check_required'},
             EditorialRole.MUST_COMMUNICATE, 'overall_pricing_question_is_distinct_from_booking_fee', priority=1)
     for index, decision in enumerate(contract.pending_decisions):
         add('decision:' + decision, 'commercial_next_step', {'request': 'booking fee adjustment' if decision == 'booking fee override' else decision, 'status': 'check_required', 'action': 'check what can be arranged'},
@@ -286,13 +326,18 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
             if topic == 'projection_display' and value.get('status') == 'conditional':
                 checks = value.get('check_required', [])
                 for condition in checks:
-                    direct = any(token in latest.lower() for token in {'compatibility': ('compatib',), 'adapters': ('adapter',), 'files': ('file',), 'screenless setup suitability': ('screenless', 'without a screen')}.get(condition, (condition,)))
+                    direct = alias_matches({'compatibility': ('compatibility', 'compatible'), 'adapters': ('adapter', 'adapters'), 'files': ('file', 'files'), 'screenless setup suitability': ('screenless', 'without a screen')}.get(condition, (condition,)), latest)
                     add('condition:projection:' + condition, 'projection_detail', {'check_required': condition, 'status': 'check_required'},
                         EditorialRole.MUST_COMMUNICATE if direct else EditorialRole.DEFER,
                         'explicit_technical_detail_question' if direct else 'secondary_condition_covered_by_practical_setup_check', guide.source_reference, priority=2)
                 value = {**value, 'check_required': ['practical projection setup']}
+            elif topic == 'audio_playback' and value.get('status') == 'supported':
+                value = {'client_fact': {'background_music_playback': True}}
             elif topic == 'other_technical' and value.get('status') == 'conditional':
-                value = {**value, 'check_required': ['safe technical feasibility']}
+                aerial = alias_matches(('aerial', 'rig'), latest + '\n' + earlier)
+                value = {'action': 'check', 'subject': 'custom aerial rig' if aerial else 'requested custom equipment',
+                         'questions': ['can it be installed safely', 'can it be operated safely'],
+                         'report_back': True}
             add('fact:' + key, topic, value, role, reason, guide.source_reference, priority=priority, novelty=True)
 
     # Known restrictions remain mandatory. Internal feasibility summary labels

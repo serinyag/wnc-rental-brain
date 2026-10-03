@@ -1,0 +1,13 @@
+{
+  "status": "provider_free_regressions_passed",
+  "maximum_acceptance_runs": 1,
+  "tests": {
+    "focused": 118,
+    "focused_subtests": 13,
+    "full": 655,
+    "phase8_within_full_suite": 438,
+    "full_subtests": 160,
+    "failures": 0
+  },
+  "local_environment_recovery": "Started existing local Docker PostgreSQL container and installed declared dependencies in isolated test environment. Initial full run could not reach Docker and lacked psycopg; no staging or model calls occurred during this repair."
+}

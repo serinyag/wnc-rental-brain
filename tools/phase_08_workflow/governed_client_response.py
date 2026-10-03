@@ -338,7 +338,7 @@ def build_draft_contract(
         "prior_client_drafts": prior_client_drafts,
         "prior_editorial_items": prior_editorial_items,
         "latest_client_message": latest_client_message or "",
-        "editorial_planner_version": "editorial_content_plan_v2",
+        "editorial_planner_version": "editorial_content_plan_v3",
         "decisions": pending_decisions,
         "changes": changes,
         "resolution_items": [item.to_payload() for item in items],
@@ -482,6 +482,48 @@ def build_client_response_provider_from_env() -> GovernedClientResponseProvider:
     return OpenAIClientResponseProvider(api_key=api_key, model_code=model, timeout_seconds=timeout)
 
 
+def _known_no_contradiction(contract: DraftContract, body: str) -> bool:
+    """Compare capability wording with its governed topic, not the whole email.
+
+    Explicit topics reset scope at clause boundaries. Pronouns retain the last
+    subject so splitting a contradiction into a second sentence cannot hide it.
+    Legacy contracts without a named proposition keep their conservative check.
+    """
+    from .editorial_content_planner import TOPIC_TERMS, mentioned
+    negative = r"\b(?:not|never|cannot|can['’]t|doesn['’]t|don['’]t|unavailable)\b"
+    positive = r"\b(?:supported|available|can provide)\b"
+    known_no = {g.semantic_values['topic'] for g in contract.contextual_guidance
+                if g.semantic_values and g.semantic_values.get('status') == 'not_supported'}
+    for restriction in contract.known_restrictions:
+        if re.search(negative, restriction, re.I):
+            known_no.update(t for t in TOPIC_TERMS if mentioned(t, restriction))
+    if not known_no:
+        return any(re.search(positive, clause) and not re.search(negative, clause)
+                   for clause in re.split(r'[.!?;\n]|\b(?:but|and)\b', body))
+    previous_topics: set[str] = set()
+    coordinated_subjects: set[str] = set()
+    for clause in re.split(r'[.!?;\n,]|\b(?:but|and|whereas)\b', body):
+        topics = {t for t in TOPIC_TERMS if mentioned(t, clause)}
+        if coordinated_subjects:
+            topics |= coordinated_subjects
+        coordinated_subjects = topics if topics and not re.search(r'\b(?:is|are|can|cannot|need|needs|does|do|has|have|supported|available|unavailable|provided)\b', clause) else set()
+        if not topics and re.match(r"\s*(?:they|these|those|it|that|we|wnc)\b", clause):
+            topics = previous_topics
+        if topics:
+            previous_topics = topics
+        if not topics.intersection(known_no):
+            continue
+        for match in re.finditer(positive, clause):
+            # Negation must precede this assertion; a later disclaimer does not
+            # cancel an earlier positive assertion of the restricted capability.
+            if re.search(negative, clause[:match.start()]):
+                continue
+            if re.search(r'\b(?:from|through|by) (?:an? |the )?external supplier\b', clause) and not re.search(r'\b(?:wnc|we) can provide\b', clause):
+                continue
+            return True
+    return False
+
+
 def validate_client_response_draft(*, contract: DraftContract, draft: ClientResponseDraft, current_case_revision: int, current_context_hash: str) -> DraftValidationResult:
     failures: list[str] = []
     if current_case_revision != contract.source_case_revision or current_context_hash != contract.context_hash:
@@ -518,10 +560,7 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
         failures.append(DRAFT_VALIDATION_UNSUPPORTED_AVAILABILITY_OR_CONFIRMATION)
     if contract.response_intent.code == RESPONSE_INTENT_DECISION_PENDING and re.search(r"\b(?:waiver|discount|adjustment).{0,20}\b(?:approved|confirmed)\b", body):
         failures.append(DRAFT_VALIDATION_PENDING_DECISION_PRESENTED_AS_ACTIVE)
-    if contract.response_intent.code == RESPONSE_INTENT_COMMUNICATE_RESTRICTION and re.search(
-        r"(?<!not )\b(?:supported|available|can provide)\b",
-        body,
-    ):
+    if contract.response_intent.code == RESPONSE_INTENT_COMMUNICATE_RESTRICTION and _known_no_contradiction(contract, body):
         failures.append(DRAFT_VALIDATION_KNOWN_NO_CONTRADICTION)
     def euro_amounts(text: str) -> set[Decimal | str]:
         amounts: set[Decimal | str] = set()
