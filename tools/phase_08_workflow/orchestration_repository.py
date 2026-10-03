@@ -755,6 +755,23 @@ class InMemoryWorkflowOrchestrationRepository:
                 failure_codes=(EXECUTION_FAILURE_ACTION_NOT_EXECUTION_READY,),
             )
 
+        if action.target_adapter_code == "asana_projection":
+            from .asana_projection import projection_attempts
+            attempts = projection_attempts(snapshot)
+            if any(a.status == "started" or (a.status != "succeeded" and not a.retry_eligible) for a in attempts):
+                return WorkflowActionExecutionStartResult(
+                    rental_case_id=request.rental_case_id, workflow_action_id=action.workflow_action_id,
+                    case_revision=snapshot.rental_case.case_revision, action_status_before=action.status,
+                    action_status_after=action.status, failure_codes=("adapter_outcome_ambiguous",))
+            if attempts:
+                first = snapshot.find_workflow_action(attempts[0].workflow_action_id).structured_payload["projection"]
+                current = action.structured_payload["projection"]
+                if any(first[k] != current[k] for k in ("workspace_gid", "project_gid", "case_uuid")):
+                    return WorkflowActionExecutionStartResult(
+                        rental_case_id=request.rental_case_id, workflow_action_id=action.workflow_action_id,
+                        case_revision=snapshot.rental_case.case_revision, action_status_before=action.status,
+                        action_status_after=action.status, failure_codes=("adapter_forbidden",))
+
         started_at = request.started_at or current_timestamp()
         updated_action = self._replace_by_id(
             self.workflow_actions.setdefault(request.rental_case_id, []),

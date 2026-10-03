@@ -218,6 +218,11 @@ def build_human_work_preview(snapshot: WorkflowOrchestrationCaseSnapshot) -> tup
 
 
 def infer_asana_master_task_reference(snapshot: WorkflowOrchestrationCaseSnapshot) -> str | None:
+    for attempt in reversed(snapshot.execution_attempts):
+        if attempt.adapter_code == "asana_projection" and isinstance(attempt.response_snapshot, dict):
+            binding = attempt.response_snapshot.get("bindings", {}).get("master")
+            if binding:
+                return f"asana:task:{binding['gid']}"
     for artifact in snapshot.artifacts:
         if artifact.external_reference and artifact.external_reference.startswith("asana:"):
             return artifact.external_reference

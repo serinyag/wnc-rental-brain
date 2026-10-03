@@ -1572,6 +1572,34 @@ limit 1;
             failure_codes=result.failure_codes,
         )
 
+    def prepare_asana_rental_projection(self, *, rental_case_id: int) -> dict:
+        from .asana_projection import prepare_projection
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError("Asana rental projection certification is staging-only.")
+        self._load_test_case_metadata(rental_case_id)
+        config = AsanaAdapterConfig.from_env()
+        if not config.workspace_gid or not config.default_project_gid or not self.config.runtime.is_asana_project_allowed(config.default_project_gid):
+            raise TestConsoleError("An allowlisted Asana staging project and workspace are required.")
+        action = prepare_projection(self.orchestration_repository, rental_case_id=rental_case_id,
+            workspace_gid=config.workspace_gid, project_gid=config.default_project_gid, now=self.now())
+        return {"workflow_action_id": action.workflow_action_id, "projection": action.structured_payload["projection"],
+                "provider_called": False}
+
+    def observe_asana_rental_projection(self, *, rental_case_id: int, workflow_action_id: int) -> dict:
+        from .asana_adapter import UrllibAsanaTransport
+        from .asana_projection_adapter import AsanaProjectionAdapter
+        self._load_test_case_metadata(rental_case_id)
+        snapshot = self._require_case_snapshot(rental_case_id)
+        action = snapshot.find_workflow_action(workflow_action_id)
+        if action is None or action.target_adapter_code != "asana_projection":
+            raise TestConsoleError("A canonical Asana projection action is required.")
+        evidence = AsanaProjectionAdapter(AsanaAdapterConfig.from_env(), UrllibAsanaTransport(),
+            self.orchestration_repository, self.config.runtime).observe(action=action)
+        self._create_console_event(rental_case_id=rental_case_id, event_type_code="asana_projection_observed",
+            source_reference=f"workflow_action:{workflow_action_id}", occurred_at=self.now(), structured_payload=evidence,
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE, actor_type=TEST_CONSOLE_OPERATOR_TYPE)
+        return evidence
+
     def create_task_surface_test_action(
         self,
         *,
@@ -4301,7 +4329,20 @@ limit 1;
                         projected_action=provider_action,
                     ),
                 )
+            elif action.target_adapter_code == "asana_projection":
+                from .asana_adapter import UrllibAsanaTransport
+                from .asana_projection_adapter import AsanaProjectionAdapter
+                # Never execute this rollout without the database concurrency fence.
+                rows = self.orchestration_repository.query_runner(
+                    "select exists(select 1 from pg_trigger where tgname = 'asana_projection_attempt_fence' and tgenabled = 'O') as installed",
+                    expect_json=True)["rows"]
+                if not rows or not rows[0]["installed"]:
+                    raise TestConsoleError("Asana projection migration must be applied before real execution.")
+                registry.register("asana_projection", AsanaProjectionAdapter(AsanaAdapterConfig.from_env(),
+                    UrllibAsanaTransport(), self.orchestration_repository, self.config.runtime))
             elif action.target_adapter_code == "task_surface":
+                if action.structured_payload.get("resolution_item_key"):
+                    raise TestConsoleError("Prepare the rental master projection to execute governed resolution work in Asana.")
                 if self.config.runtime.is_staging and not self.config.runtime.staging_allow_real_asana:
                     raise TestConsoleError(
                         "Real Asana execution is disabled. Set STAGING_ALLOW_REAL_ASANA=true after global approval."

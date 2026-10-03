@@ -94,7 +94,7 @@ class UrllibAsanaTransport:
     ) -> tuple[int, str, Mapping[str, str]]:
         request = urllib.request.Request(
             url=url,
-            data=json.dumps(payload, sort_keys=True, ensure_ascii=True).encode("utf-8"),
+            data=None if method == "GET" else json.dumps(payload, sort_keys=True, ensure_ascii=True).encode("utf-8"),
             headers=dict(headers),
             method=method,
         )
@@ -383,7 +383,8 @@ def _classify_asana_failure(*, status_code: int) -> tuple[str, bool]:
     if status_code == 429:
         return EXECUTION_FAILURE_ADAPTER_RATE_LIMITED, True
     if status_code >= 500:
-        return EXECUTION_FAILURE_ADAPTER_SERVER_ERROR, True
+        # A server error can follow an accepted create; do not duplicate tasks.
+        return EXECUTION_FAILURE_ADAPTER_OUTCOME_AMBIGUOUS, False
     return EXECUTION_FAILURE_ADAPTER_RESULT_MALFORMED, False
 
 

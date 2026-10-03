@@ -267,6 +267,11 @@ class TestConsoleApp:
                 external_test_reference=payload.get("external_test_reference"),
             )
             return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
+        if len(parts) == 5 and parts[4] == "asana-projection" and method == "POST":
+            return self._respond_json(start_response, self.service.prepare_asana_rental_projection(rental_case_id=rental_case_id))
+        if len(parts) == 7 and parts[4] == "actions" and parts[6] == "observe-asana" and method == "POST":
+            return self._respond_json(start_response, self.service.observe_asana_rental_projection(
+                rental_case_id=rental_case_id, workflow_action_id=int(parts[5])))
         if len(parts) == 5 and parts[4] == "task-surface-actions" and method == "POST":
             payload = self._parse_json(environ)
             report = self.service.create_task_surface_test_action(

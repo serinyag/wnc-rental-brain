@@ -1,0 +1,202 @@
+"""Deterministic, outbound-only rental projection from persisted governed state.
+
+The existing action/attempt journal is the binding store. No provider value is
+used here to establish a fact, resolve an obligation, or confirm a booking.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+from copy import deepcopy
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
+from .contracts import WorkflowAction
+
+ADAPTER = "asana_projection"
+VERSION = "asana_rental_projection_v1"
+OWNERS = {"CLIENT", "WNC_INTERNAL", "EXTERNAL_PARTY", "GOVERNED_DECISION"}
+RESOLVED = {"resolved", "completed", "cancelled", "superseded"}
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def _text(value, fallback="Not yet provided"):
+    if value is None:
+        return fallback
+    if not isinstance(value, (str, int)) or isinstance(value, bool):
+        raise ValueError("Asana summary requires a scalar governed value")
+    result = str(value).strip()
+    if len(result) > 600 or "\n" in result:
+        raise ValueError("Asana summary text must be concise and single-line")
+    return result or fallback
+
+
+def _timing(value):
+    if not value:
+        return "Date to be confirmed"
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("Governed event timing requires timezone provenance")
+    return parsed.astimezone(ZoneInfo("Europe/Amsterdam")).strftime("%d %B %Y, %H:%M %Z")
+
+
+def build_projection(snapshot, *, workspace_gid, project_gid):
+    """Read existing facts and resolution actions; omission never means resolved.
+
+    Explicit resolution_group_key/title permit same-owner grouping. Each member
+    keeps its semantic identity and source WorkflowAction in the canonical plan.
+    """
+    case = snapshot.rental_case
+    facts = {f.field_code: f.value_payload for f in snapshot.rental_case_facts}
+    metadata = next((e.structured_payload for e in snapshot.workflow_events
+                     if e.event_type_code == "test_console_case_registered"), {})
+    client = _text(metadata.get("client_label") or case.client_account_ref, "Client not yet identified")
+    event = _text(facts.get("event_type"), "Rental inquiry").replace("_", " ")
+    date = _timing(case.active_event_start)
+    timing = date + (f" to {_timing(case.active_event_end)}" if case.active_event_end else "")
+    scope = _text(facts.get("requested_rental_scope"), "Scope to be confirmed").replace("_", " ")
+    guests = _text(facts.get("guest_count"))
+    latest = {}
+    for action in sorted(snapshot.workflow_actions, key=lambda a: (a.source_case_revision, a.workflow_action_id)):
+        p = action.structured_payload
+        if action.target_adapter_code == ADAPTER or not p.get("resolution_item_key"):
+            continue
+        owner = p.get("resolution_owner")
+        if owner not in OWNERS:
+            raise ValueError("Unknown resolution ownership; projection blocked")
+        latest[p["resolution_item_key"]] = action
+    groups = {}
+    client_items = []
+    for key, action in sorted(latest.items()):
+        p = action.structured_payload
+        owner = p["resolution_owner"]
+        closed = p.get("resolution_status") in RESOLVED
+        summary = _text(p.get("summary"))
+        if owner == "CLIENT":
+            if not closed:
+                client_items.append(summary)
+            continue
+        group = p.get("resolution_group_key")
+        identity = f"group:{owner}:{group}" if group else f"item:{key}"
+        title = _text(p.get("resolution_group_title")) if group else summary
+        item = groups.setdefault(identity, {"key": identity, "name": title, "owner": owner, "members": []})
+        if item["name"] != title or item["owner"] != owner:
+            raise ValueError("Conflicting governed group identity")
+        item["members"].append({"key": key, "workflow_action_id": action.workflow_action_id,
+                                "summary": summary, "resolved": closed})
+    other_open = []
+    for question in snapshot.open_questions:
+        if question.status == "open":
+            if question.requested_from_role in {None, "client", "CLIENT"}:
+                client_items.append(_text(question.human_question_text))
+            else:
+                other_open.append("Confirm with " + _text(question.requested_from_role).replace("_", " ") + ": " + _text(question.human_question_text))
+    for requirement in snapshot.requirements:
+        if requirement.status in {"required", "unresolved", "in_progress"}:
+            other_open.append("Check " + requirement.requirement_type.replace("_", " ") + ".")
+    for change in snapshot.proposed_changes:
+        if change.status in {"proposed", "under_review"}:
+            label = change.change_kind.replace("_", " ")
+            if isinstance(change.proposed_value_payload, (str, int)):
+                label += ": " + _text(change.proposed_value_payload)
+            other_open.append("Requested change awaiting review — " + label + ".")
+    for decision in snapshot.case_decisions:
+        if decision.status in {"proposed", "pending_approval"}:
+            other_open.append("Decision awaiting governed review — " + _text(decision.scope_description) + ".")
+    for blocker in snapshot.blockers:
+        if blocker.status == "open" and blocker.origin_entity_type not in {"open_question", "requirement", "case_decision", "workflow_action"}:
+            other_open.append(_text(blocker.resolution_condition_text))
+    other_open = list(dict.fromkeys(other_open))
+    client_items = list(dict.fromkeys(client_items))
+    work = []
+    owner_labels = {"WNC_INTERNAL": "WNC internal check", "EXTERNAL_PARTY": "WNC follow-up with external party",
+                    "GOVERNED_DECISION": "WNC governed decision review"}
+    for key, item in sorted(groups.items()):
+        item["completed"] = all(m["resolved"] for m in item["members"])
+        item["notes"] = owner_labels[item["owner"]] + "\n\n" + "\n".join(
+            ("Done: " if m["resolved"] else "To do: ") + m["summary"] for m in item["members"])
+        item["notes"] += "\n\nRecord the outcome for governed review before treating it as confirmed."
+        work.append(item)
+    opened = [w for w in work if not w["completed"]]
+    closed_case = case.lifecycle_state in {"closed", "closed_lost", "cancelled"}
+    if closed_case:
+        stage = "Closed / cancelled"
+    elif any(w["owner"] == "GOVERNED_DECISION" for w in opened):
+        stage = "Decision required"
+    elif any(w["owner"] == "WNC_INTERNAL" for w in opened):
+        stage = "Internal checks"
+    elif opened:
+        stage = "Waiting on external party"
+    elif other_open:
+        stage = "Internal checks"
+    elif client_items:
+        stage = "Needs client info"
+    else:
+        stage = {"proposal_pending_client": "Awaiting client", "confirmed_pre_event": "Confirmed / progressing",
+                 "event_ready": "Confirmed / progressing", "event_in_progress": "Confirmed / progressing",
+                 "inquiry_active": "New inquiry"}.get(case.lifecycle_state, "Ready for client response")
+    open_lines = [f"- {owner_labels[w['owner']]}: {w['name']}" for w in opened]
+    open_lines += [f"- Client to answer: {q}" for q in client_items]
+    open_lines += [f"- {line}" for line in other_open]
+    communication = "Client response is waiting on internal work." if opened or other_open else (
+        "Client information is still needed." if client_items else "Review the next client response in WNC Rental Brain.")
+    marker = "WNC reference: " + case.case_reference_code + " / " + digest(case.rental_case_uuid)[:12]
+    notes = (f"CLIENT\n{client}\n\nEVENT\n{event}\nRequested timing: {timing}\n"
+             f"Requested venue / scope: {scope}\nGuests: {guests}\n\nCURRENT STATUS\n{stage}\n"
+             f"{communication}\n\nOPEN ITEMS\n" + ("\n".join(open_lines) or "No unresolved operational items.")
+             + "\n\nNEXT ACTIONS\n" + ("Complete the checks below and record their outcomes for review." if opened or other_open
+                 else "Review the case and prepare the next appropriate client response.")
+             + "\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\n" + marker)
+    value = {"version": VERSION, "rental_case_id": case.rental_case_id,
+             "case_uuid": case.rental_case_uuid, "case_revision": case.case_revision,
+             "workspace_gid": str(workspace_gid), "project_gid": str(project_gid),
+             "master": {"name": f"{client} — {event} — {date.split(',')[0]}",
+                        "notes": notes, "completed": closed_case}, "work": work, "custom_fields": {}, "marker": marker}
+    if len(notes) > 10000 or len(work) > 25:
+        raise ValueError("Projection needs operator review: too much work for a concise task")
+    return value
+
+
+def prepare_projection(repository, *, rental_case_id, workspace_gid, project_gid, now=None):
+    snapshot = repository.load_case_snapshot(rental_case_id)
+    if snapshot is None:
+        raise ValueError("Case not found")
+    value = build_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid)
+    key = f"{VERSION}:{rental_case_id}:{digest(value)}"
+    timestamp = now or datetime.now(timezone.utc).isoformat()
+    action = WorkflowAction(workflow_action_id=1, workflow_action_uuid="pending",
+        rental_case_id=rental_case_id, action_type="CREATE_INTERNAL_TASK_ITEM", action_category="coordination",
+        target_adapter_code=ADAPTER, reason_entity_type="rental_case", reason_entity_id=rental_case_id,
+        approval_posture="automatic_allowed",
+        status="ready_to_execute", semantic_subject_hash=digest(value),
+        source_case_revision=snapshot.rental_case.case_revision, idempotency_key=key,
+        structured_payload={"task_kind": VERSION, "summary": value["master"]["name"],
+                            "reason": "Project governed rental operations", "projection": value},
+        created_at=timestamp, updated_at=timestamp)
+    return repository.create_workflow_action(action)
+
+
+def validate_projection(action, snapshot, config):
+    expected = build_projection(snapshot, workspace_gid=config.workspace_gid, project_gid=config.default_project_gid)
+    if (action.target_adapter_code != ADAPTER or action.action_type != "CREATE_INTERNAL_TASK_ITEM"
+            or action.structured_payload.get("projection") != expected
+            or action.semantic_subject_hash != digest(expected)
+            or action.idempotency_key != f"{VERSION}:{action.rental_case_id}:{digest(expected)}"):
+        raise ValueError("Canonical Asana projection mismatch")
+    return expected
+
+
+def projection_attempts(snapshot):
+    return sorted((a for a in snapshot.execution_attempts if a.adapter_code == ADAPTER),
+                  key=lambda a: a.execution_attempt_id)
+
+
+def prior_bindings(snapshot):
+    bindings = {}
+    for attempt in projection_attempts(snapshot):
+        if isinstance(attempt.response_snapshot, dict):
+            bindings.update(deepcopy(attempt.response_snapshot.get("bindings", {})))
+    return bindings

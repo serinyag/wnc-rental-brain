@@ -375,7 +375,7 @@ class AsanaAdapterTests(unittest.TestCase):
             (403, EXECUTION_FAILURE_ADAPTER_FORBIDDEN, False),
             (404, EXECUTION_FAILURE_ADAPTER_RESOURCE_NOT_FOUND, False),
             (429, EXECUTION_FAILURE_ADAPTER_RATE_LIMITED, True),
-            (500, EXECUTION_FAILURE_ADAPTER_SERVER_ERROR, True),
+            (500, EXECUTION_FAILURE_ADAPTER_OUTCOME_AMBIGUOUS, False),
         )
         for status_code, expected_failure_code, expected_retry_eligible in scenarios:
             with self.subTest(status_code=status_code):
