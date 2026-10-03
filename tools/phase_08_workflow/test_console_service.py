@@ -101,6 +101,7 @@ from .inquiry_response_drafting import (
     INQUIRY_DRAFT_STATUS_SEND_FAILED,
     INQUIRY_DRAFT_STATUS_SEND_OUTCOME_UNCERTAIN,
     INQUIRY_DRAFT_STATUS_SIMULATED_SENT,
+    INQUIRY_DRAFT_STATUS_HUMAN_CONFIRMED_DELIVERED,
     INQUIRY_DRAFT_STATUS_STALE,
     content_hash_payload,
     context_hash_payload,
@@ -3132,6 +3133,63 @@ limit 1;
             failure_codes=() if result.outcome != "read_failed" else (result.failure_code or "outlook_draft_read_failed",),
         )
 
+    def reconcile_human_confirmed_outlook_delivery(
+        self, *, rental_case_id: int, workflow_action_id: int, draft_revision_id: int,
+        approval_request_id: int, execution_attempt_id: int, recipient: str,
+        subject: str, evidence_note: str,
+    ) -> OperationReport:
+        """Record operator-attested receipt without constructing a provider adapter.
+
+        Automated ambiguity remains on the original attempt. The repository's
+        atomic reconciliation event supplies separate human delivery provenance.
+        """
+        def blocked(reason):
+            raise TestConsoleError(reason, failure_code="OUTLOOK_AMBIGUOUS_RECONCILIATION_BLOCKED")
+
+        runtime = self.config.runtime
+        if not runtime.is_staging or runtime.staging_allow_real_outlook_send:
+            blocked("Human delivery reconciliation requires staging with the send gate disabled.")
+        if not evidence_note.strip():
+            blocked("Human recipient confirmation evidence is required.")
+        snapshot = self._require_case_snapshot(rental_case_id)
+        action = snapshot.find_workflow_action(workflow_action_id)
+        revision = self._load_draft_revision_by_id(rental_case_id, draft_revision_id)
+        approval = snapshot.find_approval_request(approval_request_id)
+        attempt = snapshot.find_execution_attempt(execution_attempt_id)
+        if action is None or revision is None or approval is None or attempt is None:
+            blocked("The exact action/revision/approval/attempt lineage must exist.")
+        value = validate_outlook_action(action)
+        target = f"workflow_action:{workflow_action_id}:draft_revision:{draft_revision_id}"
+        if (not revision.is_current or revision.workflow_action_id != workflow_action_id
+                or value.draft_revision_id != draft_revision_id
+                or revision.approval_request_id != approval_request_id
+                or approval.status != "approved" or approval.target_entity_type != "workflow_action"
+                or approval.target_entity_id != workflow_action_id or approval.target_entity_reference != target
+                or recipient != revision.recipient_email or subject != revision.subject
+                or recipient.casefold() not in runtime.staging_allowed_email_recipients
+                or attempt.workflow_action_id != workflow_action_id
+                or len([t for t in snapshot.execution_attempts if t.workflow_action_id == workflow_action_id]) != 1
+                or attempt.failure_code != "adapter_outcome_ambiguous" or attempt.retry_eligible
+                or attempt.status != "failed"
+                or attempt.response_snapshot.get("stage") != "verify_sent_message"
+                or attempt.response_snapshot.get("reason") != "send_verification_inconclusive"
+                or action.status not in {"failed", "succeeded"}
+                or revision.draft_status not in {INQUIRY_DRAFT_STATUS_SEND_OUTCOME_UNCERTAIN,
+                                               INQUIRY_DRAFT_STATUS_HUMAN_CONFIRMED_DELIVERED}):
+            blocked("The confirmed receipt does not match one terminal ambiguous approved send.")
+        self._validate_outlook_revision_binding(snapshot, action=action, revision=revision, value=value)
+        result = self.orchestration_repository.reconcile_outlook_human_delivery(
+            rental_case_id=rental_case_id, workflow_action_id=workflow_action_id,
+            draft_revision_id=draft_revision_id, approval_request_id=approval_request_id,
+            execution_attempt_id=execution_attempt_id, expected_payload=value.to_payload(),
+            recipient=recipient, subject=subject, evidence_note=evidence_note,
+            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE)
+        return OperationReport(title="Outlook Human Delivery Reconciled", success=True, lines=(
+            f"Workflow event id: {result['workflow_event_id']}",
+            f"Already reconciled: {result['already_reconciled']}",
+            "Delivery outcome: human_confirmed_delivered", "Original attempt: ambiguity preserved",
+            "Send gate: disabled", "Provider calls: 0", "New execution attempts: 0"))
+
     def reconcile_governed_outlook_draft(
         self,
         *,
@@ -5694,6 +5752,7 @@ returning
         rental_case_id = snapshot.rental_case.rental_case_id
         sent_statuses = {
             INQUIRY_DRAFT_STATUS_SIMULATED_SENT,
+            INQUIRY_DRAFT_STATUS_HUMAN_CONFIRMED_DELIVERED,
             INQUIRY_DRAFT_STATUS_SEND_FAILED,
             INQUIRY_DRAFT_STATUS_SEND_OUTCOME_UNCERTAIN,
         }

@@ -2889,6 +2889,19 @@ returning
 """.strip()
         return FollowUp(**self.query_runner(sql, expect_json=True)["rows"][0])
 
+    def reconcile_outlook_human_delivery(self, *, rental_case_id: int,
+            workflow_action_id: int, draft_revision_id: int, approval_request_id: int,
+            execution_attempt_id: int, expected_payload: dict[str, Any], recipient: str,
+            subject: str, evidence_note: str, actor_reference: str) -> dict[str, Any]:
+        """Atomically append receipt evidence and settle delivery; never edit attempts."""
+        sql = f"""select public.reconcile_outlook_human_delivery(
+            {_sql_int(rental_case_id)}, {_sql_int(workflow_action_id)},
+            {_sql_int(draft_revision_id)}, {_sql_int(approval_request_id)},
+            {_sql_int(execution_attempt_id)}, {_sql_json(expected_payload)},
+            {sql_text(recipient)}, {sql_text(subject)}, {sql_text(evidence_note)},
+            {sql_text(actor_reference)}) as result"""
+        return self.query_runner(sql, expect_json=True)["rows"][0]["result"]
+
     def create_workflow_event(
         self,
         *,

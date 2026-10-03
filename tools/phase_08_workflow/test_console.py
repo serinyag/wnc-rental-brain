@@ -316,6 +316,17 @@ class TestConsoleApp:
                     "report": self._serialize_for_json(report),
                 },
             )
+        if len(parts) == 7 and parts[4] == "actions" and parts[6] == "confirm-delivery" and method == "POST":
+            payload = self._parse_json(environ)
+            report = self.service.reconcile_human_confirmed_outlook_delivery(
+                rental_case_id=rental_case_id, workflow_action_id=int(parts[5]),
+                draft_revision_id=int(self._required_json_field(payload, "draft_revision_id")),
+                approval_request_id=int(self._required_json_field(payload, "approval_request_id")),
+                execution_attempt_id=int(self._required_json_field(payload, "execution_attempt_id")),
+                recipient=self._required_json_field(payload, "recipient"),
+                subject=self._required_json_field(payload, "subject"),
+                evidence_note=self._required_json_field(payload, "evidence_note"))
+            return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         if len(parts) == 8 and parts[4] == "mailbox" and parts[5] == "drafts" and parts[7] == "outlook-reconcile" and method == "POST":
             report = self.service.reconcile_governed_outlook_draft(
                 rental_case_id=rental_case_id,
