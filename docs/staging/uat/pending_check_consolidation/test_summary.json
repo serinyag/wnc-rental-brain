@@ -1,0 +1,18 @@
+{
+  "focused": {
+    "passed": 130,
+    "subtests": 0
+  },
+  "phase8": {
+    "passed": 550,
+    "subtests": 126
+  },
+  "full": {
+    "passed": 767,
+    "subtests": 160
+  },
+  "failures": 0,
+  "skipped": 0,
+  "diff_check": "PASS",
+  "environment_note": "Initial full run selected a different local Docker database. A test-process-only binding to supabase_db_wnc_rental_brain resolved it. No staging environment variables were changed."
+}

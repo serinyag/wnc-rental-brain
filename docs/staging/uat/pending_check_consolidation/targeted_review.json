@@ -1,0 +1,67 @@
+{
+  "result": "PASS",
+  "assessment_method": "Direct assistant review of exact two drafts and provider-free audits; no model judge",
+  "case_id": 583,
+  "draft_revisions": [
+    384,
+    385
+  ],
+  "original_change_requirements": [
+    {
+      "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+      "kind": "pending_action",
+      "realized": true,
+      "required_meaning": {
+        "action": "check the requested change and come back to the client",
+        "requested_change": "guest count",
+        "status": "check_required"
+      },
+      "semantic_key": "change:1cc4cfa2252d",
+      "topic": "requested_change"
+    },
+    {
+      "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+      "kind": "pending_action",
+      "realized": true,
+      "required_meaning": {
+        "action": "check the requested change and come back to the client",
+        "requested_change": "requested rental scope",
+        "status": "check_required"
+      },
+      "semantic_key": "change:511fc7dc85f1",
+      "topic": "requested_change"
+    },
+    {
+      "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+      "kind": "pending_action",
+      "realized": true,
+      "required_meaning": {
+        "action": "check the requested change and come back to the client",
+        "requested_change": "requested reschedule is awaiting review",
+        "status": "check_required"
+      },
+      "semantic_key": "change:1ee0a6f6bb73",
+      "topic": "requested_change"
+    }
+  ],
+  "guest_count_change_realized": true,
+  "full_venue_change_realized": true,
+  "reschedule_realized": true,
+  "consolidated_check_statement_count": 1,
+  "report_back_promise_count": 1,
+  "repetition_flag": 0,
+  "unnecessary_information": 0,
+  "unanswered_request": 0,
+  "false_confirmation": 0,
+  "safety_failures": 0,
+  "em_dash": 0,
+  "year_questions": 0,
+  "timing_note": "The draft acknowledges the reschedule request without restating 13 November, 15:00\u201320:00. No exact prose or date/time recap is required.",
+  "generation_operations": 2,
+  "model_candidates": 2,
+  "corrective_retries": [
+    0,
+    0
+  ],
+  "accepted_revision_cardinality": "PASS"
+}

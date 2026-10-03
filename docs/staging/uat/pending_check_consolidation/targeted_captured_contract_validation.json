@@ -1,0 +1,25 @@
+{
+  "provider_calls": 0,
+  "results": [
+    {
+      "scenario_id": "UAT-006",
+      "turn": 1,
+      "draft_revision_id": 384,
+      "action_id": 1612,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 2,
+      "draft_revision_id": 385,
+      "action_id": 1618,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "final_marker": "WNC_GOVERNED_DRAFTING_STAGING_ACCEPTED",
+  "deployment": {
+    "implementation_commit": "7ef15d28bcad6bd8991510e6315ea1d32e12f54b",
+    "deploy_id": "dep-db0eg660tbcc73ffrrpg",
+    "service_id": "srv-da2m6qdg1s2s73d10ro0",
+    "status": "live",
+    "environment": "staging"
+  },
+  "tests": {
+    "focused": {
+      "passed": 130,
+      "subtests": 0
+    },
+    "phase8": {
+      "passed": 550,
+      "subtests": 126
+    },
+    "full": {
+      "passed": 767,
+      "subtests": 160
+    },
+    "failures": 0,
+    "skipped": 0,
+    "diff_check": "PASS",
+    "environment_note": "Initial full run selected a different local Docker database. A test-process-only binding to supabase_db_wnc_rental_brain resolved it. No staging environment variables were changed."
+  },
+  "targeted": {
+    "result": "PASS",
+    "assessment_method": "Direct assistant review of exact two drafts and provider-free audits; no model judge",
+    "case_id": 583,
+    "draft_revisions": [
+      384,
+      385
+    ],
+    "original_change_requirements": [
+      {
+        "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+        "kind": "pending_action",
+        "realized": true,
+        "required_meaning": {
+          "action": "check the requested change and come back to the client",
+          "requested_change": "guest count",
+          "status": "check_required"
+        },
+        "semantic_key": "change:1cc4cfa2252d",
+        "topic": "requested_change"
+      },
+      {
+        "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+        "kind": "pending_action",
+        "realized": true,
+        "required_meaning": {
+          "action": "check the requested change and come back to the client",
+          "requested_change": "requested rental scope",
+          "status": "check_required"
+        },
+        "semantic_key": "change:511fc7dc85f1",
+        "topic": "requested_change"
+      },
+      {
+        "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+        "kind": "pending_action",
+        "realized": true,
+        "required_meaning": {
+          "action": "check the requested change and come back to the client",
+          "requested_change": "requested reschedule is awaiting review",
+          "status": "check_required"
+        },
+        "semantic_key": "change:1ee0a6f6bb73",
+        "topic": "requested_change"
+      }
+    ],
+    "guest_count_change_realized": true,
+    "full_venue_change_realized": true,
+    "reschedule_realized": true,
+    "consolidated_check_statement_count": 1,
+    "report_back_promise_count": 1,
+    "repetition_flag": 0,
+    "unnecessary_information": 0,
+    "unanswered_request": 0,
+    "false_confirmation": 0,
+    "safety_failures": 0,
+    "em_dash": 0,
+    "year_questions": 0,
+    "timing_note": "The draft acknowledges the reschedule request without restating 13 November, 15:00\u201320:00. No exact prose or date/time recap is required.",
+    "generation_operations": 2,
+    "model_candidates": 2,
+    "corrective_retries": [
+      0,
+      0
+    ],
+    "accepted_revision_cardinality": "PASS"
+  },
+  "safety": {
+    "Graph mutations": 0,
+    "Outlook sends": 0,
+    "actions approved": 0,
+    "ExecutionAttempts": 0,
+    "real Asana": 0,
+    "production": 0,
+    "send_gate": "DISABLED",
+    "evidence": "Guarded staging-only request log, two persisted generations, zero execution attempts, no approval/execution routes, health provider postures; no independent provider-account telemetry queried."
+  },
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "stopped": true
+}

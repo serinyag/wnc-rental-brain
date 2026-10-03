@@ -1,0 +1,721 @@
+{
+  "generated_at": "2026-10-03T11:35:18.236040+00:00",
+  "run_slug": "pending-check-consolidation-targeted-20261003-113518",
+  "baseline": {
+    "git_commit": "7ef15d28bcad6bd8991510e6315ea1d32e12f54b",
+    "render_commit": "7ef15d28bcad6bd8991510e6315ea1d32e12f54b",
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "health": {
+      "application": {
+        "detail": "WSGI application responded.",
+        "metrics": {
+          "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+        },
+        "status": "ok"
+      },
+      "database": {
+        "detail": "Bounded database query succeeded.",
+        "status": "ok"
+      },
+      "environment": "staging",
+      "phase5": {
+        "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+        "metrics": {
+          "active_model_count": 1,
+          "active_model_id": 1,
+          "eligible_chunks": 492,
+          "embedded_chunks": 492,
+          "missing_chunks": 0
+        },
+        "status": "ok"
+      },
+      "phase6": {
+        "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+        "metrics": {
+          "active_model_count": 1,
+          "active_model_id": 1,
+          "eligible_units": 112,
+          "embedded_units": 112,
+          "missing_units": 0,
+          "stale_units": 0
+        },
+        "status": "ok"
+      },
+      "providers": {
+        "asana": "configured_but_disabled",
+        "outlook": "configured_draft_only"
+      },
+      "status": "ok"
+    },
+    "scenario_count": 1,
+    "synthetic_only": true,
+    "approval_or_execution_calls": 0
+  },
+  "results": [
+    {
+      "scenario_id": "UAT-006",
+      "title": "Client changes the plan",
+      "turns": [
+        {
+          "turn_number": 1,
+          "incoming_message": {
+            "subject": "Initial planning meeting",
+            "body": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo"
+          },
+          "observations": [
+            {
+              "field_code": "event_type",
+              "value": "planning meeting",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "guest_count",
+              "value": 16,
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "studio_space",
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            },
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2026-11-12T13:00:00Z",
+                "active_event_end": "2026-11-12T16:00:00Z"
+              },
+              "observation_type": "fact_candidate",
+              "claim_kind": "new_information"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: COMPLETE_INQUIRY_RESPONSE",
+              "Draft revision id: 384",
+              "Workflow action id: 1612",
+              "Approval request id: 463"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-10-03 11:36:49.162361+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:8ce3cdf160e60bdfb01e5a35a285dea6e0d291d3dddac99b686547ce0faf8177",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:583",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 583,
+              "semantic_subject_hash": "569402b062bb9e1300054d35a3134202980645c24b83855d04341f19ed1419c0",
+              "source_case_revision": 2,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1612:draft_revision:384",
+                "body": "Hi Theo,\n\nThanks for sharing the details of your planning meeting. I’ll check the Studio’s availability for the requested date and time and get back to you.",
+                "body_type": "text",
+                "context_hash": "0991d3333d6794a34b940424a599eda1cc93fda51f2f15eb8d7136c7c222ee87",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:583",
+                "draft_content_hash": "7911dd86ddffc2de38387b355e8ff0da0b3dc2ed1395d4802896643d5dd2e832",
+                "draft_origin_workflow_action_id": 1612,
+                "draft_revision_id": 384,
+                "governed_context_hash": "569402b062bb9e1300054d35a3134202980645c24b83855d04341f19ed1419c0",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:583:3bd6d9f7df1351b64be1dd462e8551d8fb3bd592744f47fb400dc350b43f7146",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "theo.martin@example.test",
+                "recipient_identity_hash": "bf613fa03c8e64701ab4cb2a823d11040dfe477256c82348324e53ea908e1675",
+                "recipient_reference": "inquiry_response_draft:384",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 583,
+                "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+                "source_case_revision": 2,
+                "subject": "Studio planning meeting"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-10-03 11:36:49.288365+00",
+              "workflow_action_id": 1612,
+              "workflow_action_uuid": "eda62710-273a-4b37-8c18-21386e6d0f90"
+            },
+            "draft_revision": {
+              "approval_request_id": 463,
+              "approved_at": null,
+              "body_text": "Hi Theo,\n\nThanks for sharing the details of your planning meeting. I’ll check the Studio’s availability for the requested date and time and get back to you.",
+              "closing_text": "Warm regards,",
+              "content_hash": "7911dd86ddffc2de38387b355e8ff0da0b3dc2ed1395d4802896643d5dd2e832",
+              "context_hash": "0991d3333d6794a34b940424a599eda1cc93fda51f2f15eb8d7136c7c222ee87",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Theo Martin",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "The requested 16 guests are within the current capacity rules for studio space. The applicable maximum is 40 guests. ",
+                    "semantic_values": {
+                      "near_limit": false,
+                      "requested_guests": 16,
+                      "scope": "studio space",
+                      "status": "within_limits",
+                      "topic": "capacity"
+                    },
+                    "source_reference": "phase4:capacity_studio_within_all_published_limits",
+                    "topic": "capacity"
+                  }
+                ],
+                "conversation_key": "governed_client_response:583",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 16
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "planning meeting"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: COMPLETE_INQUIRY_RESPONSE",
+                  "Contract hash: 569402b062bb9e1300054d35a3134202980645c24b83855d04341f19ed1419c0"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+                    "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1611
+                  }
+                ],
+                "recipient_email": "theo.martin@example.test",
+                "recipient_label": "Theo Martin",
+                "rental_case_id": 583,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+                    "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1611
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 2,
+                "workflow_action_id": 1612
+              },
+              "conversation_key": "governed_client_response:583",
+              "created_at": "2026-10-03 11:36:49.236637+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 384,
+              "inquiry_response_draft_revision_uuid": "54def7e7-8b95-4a26-808e-35b6f35a6fc4",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [],
+              "recipient_email": "theo.martin@example.test",
+              "recipient_label": "Theo Martin",
+              "rejected_at": null,
+              "rental_case_id": 583,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 2,
+              "subject": "Studio planning meeting",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-10-03 11:36:49.556487+00",
+              "workflow_action_id": 1612
+            },
+            "approval_request": {
+              "approval_request_id": 463,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-10-03 11:36:49.550617+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1612",
+                "inquiry_response_draft:384"
+              ],
+              "reason_text": "Approve inquiry response draft revision 384 before simulated send.",
+              "rental_case_id": 583,
+              "required_approver_reference": "semantic:approval:workflow_action:1612:draft_revision:384",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1612,
+              "target_entity_reference": "workflow_action:1612:draft_revision:384",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-10-03 11:36:49.550617+00"
+            },
+            "response_intent": "COMPLETE_INQUIRY_RESPONSE"
+          },
+          "before_generation": {
+            "case_revision": 2,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 0
+          },
+          "after_generation": {
+            "case_revision": 2,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          }
+        },
+        {
+          "turn_number": 2,
+          "incoming_message": {
+            "subject": "Re: Initial planning meeting - revised plan",
+            "body": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo"
+          },
+          "observations": [
+            {
+              "field_code": "guest_count",
+              "value": 30,
+              "observation_type": "change_candidate",
+              "claim_kind": "change_request"
+            },
+            {
+              "field_code": "requested_rental_scope",
+              "value": "entire_venue",
+              "observation_type": "change_candidate",
+              "claim_kind": "change_request"
+            },
+            {
+              "field_code": "active_event_window",
+              "value": {
+                "active_event_start": "2026-11-13T15:00:00Z",
+                "active_event_end": "2026-11-13T20:00:00Z"
+              },
+              "observation_type": "change_candidate",
+              "claim_kind": "change_request"
+            }
+          ],
+          "generation_report": {
+            "failure_codes": [],
+            "lines": [
+              "Response intent: CHANGE_ACKNOWLEDGEMENT",
+              "Draft revision id: 385",
+              "Workflow action id: 1618",
+              "Approval request id: 464"
+            ],
+            "success": true,
+            "title": "Governed Client Response Draft Generated"
+          },
+          "draft": {
+            "workflow_action": {
+              "action_category": "communication",
+              "action_type": "SEND_INQUIRY_RESPONSE",
+              "approval_posture": "approval_required",
+              "created_at": "2026-10-03 11:37:04.668312+00",
+              "due_at": null,
+              "idempotency_key": "governed_outlook_v1:1da96fccd9c6043f424eddc9bb838c9d68143a657d7182152fc559ab8032a7ea",
+              "reason_entity_id": null,
+              "reason_entity_reference": "governed_client_response:583",
+              "reason_entity_type": "rental_case",
+              "rental_case_id": 583,
+              "semantic_subject_hash": "5a6ef2aa512fd29bef7cd4b3df0c87b249891fd5a016d6c72b15b2e104260741",
+              "source_case_revision": 3,
+              "status": "awaiting_approval",
+              "structured_payload": {
+                "action_type": "SEND_INQUIRY_RESPONSE",
+                "approval_target": "workflow_action:1618:draft_revision:385",
+                "body": "Hi Theo,\n\nThanks for letting me know the group has grown to 30 and that you’re now requesting the entire venue. I’ll check the updated guest count, full-venue scope and reschedule request, then report back once they’ve been reviewed.",
+                "body_type": "text",
+                "context_hash": "46341d595e0e21b9d718ec43a5b2084670409ba3d65b6b42a666543fc093da52",
+                "contract_version": "governed_outlook_v1",
+                "conversation_key": "governed_client_response:583",
+                "draft_content_hash": "330f52aa305686f96b4197587c90464c1ce5b6868cc90c778ecc6e49c9b25f77",
+                "draft_origin_workflow_action_id": 1618,
+                "draft_revision_id": 385,
+                "governed_context_hash": "5a6ef2aa512fd29bef7cd4b3df0c87b249891fd5a016d6c72b15b2e104260741",
+                "graph_message_id": null,
+                "message_mode": "new",
+                "plan_identity": "governed_outlook_reservation_v1:583:331f07cbb4b0b791cd79f7ce5154f131ef3774961831a73e69e2f3712d32d791",
+                "provenance": "governed_model",
+                "provider_type": "microsoft_graph_outlook",
+                "purpose": "governed_client_response_draft",
+                "reason": "operator_requested_governed_client_response",
+                "recipient_email": "theo.martin@example.test",
+                "recipient_identity_hash": "bf613fa03c8e64701ab4cb2a823d11040dfe477256c82348324e53ea908e1675",
+                "recipient_reference": "inquiry_response_draft:385",
+                "recovery_draft_revision_id": null,
+                "recovery_origin_workflow_action_id": null,
+                "recovery_predecessor_action_id": null,
+                "rental_case_id": 583,
+                "response_intent": "CHANGE_ACKNOWLEDGEMENT",
+                "source_case_revision": 3,
+                "subject": "Updated venue enquiry"
+              },
+              "supersedes_workflow_action_id": null,
+              "target_adapter_code": "outlook",
+              "target_scope_key": null,
+              "updated_at": "2026-10-03 11:37:04.850506+00",
+              "workflow_action_id": 1618,
+              "workflow_action_uuid": "c448bc11-c187-438a-b5a3-3cbba9f51515"
+            },
+            "draft_revision": {
+              "approval_request_id": 464,
+              "approved_at": null,
+              "body_text": "Hi Theo,\n\nThanks for letting me know the group has grown to 30 and that you’re now requesting the entire venue. I’ll check the updated guest count, full-venue scope and reschedule request, then report back once they’ve been reviewed.",
+              "closing_text": "Warm regards,",
+              "content_hash": "330f52aa305686f96b4197587c90464c1ce5b6868cc90c778ecc6e49c9b25f77",
+              "context_hash": "46341d595e0e21b9d718ec43a5b2084670409ba3d65b6b42a666543fc093da52",
+              "context_payload": {
+                "allow_empty_open_questions": true,
+                "contact_label": "Theo Martin",
+                "contextual_guidance": [
+                  {
+                    "client_safe_guidance": "The requested 16 guests are within the current capacity rules for studio space. The applicable maximum is 40 guests. ",
+                    "semantic_values": {
+                      "near_limit": false,
+                      "requested_guests": 16,
+                      "scope": "studio space",
+                      "status": "within_limits",
+                      "topic": "capacity"
+                    },
+                    "source_reference": "phase4:capacity_studio_within_all_published_limits",
+                    "topic": "capacity"
+                  }
+                ],
+                "conversation_key": "governed_client_response:583",
+                "current_facts": [
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "guest_count",
+                    "value_payload": 16
+                  },
+                  {
+                    "domain_code": "event_profile",
+                    "field_code": "event_type",
+                    "value_payload": "planning meeting"
+                  }
+                ],
+                "guidance_references": [
+                  "WF-003",
+                  "WF-004"
+                ],
+                "metadata_summary_lines": [
+                  "Governed response intent: CHANGE_ACKNOWLEDGEMENT",
+                  "Contract hash: 5a6ef2aa512fd29bef7cd4b3df0c87b249891fd5a016d6c72b15b2e104260741"
+                ],
+                "open_questions": [],
+                "operator_annotations": [
+                  {
+                    "blocking": true,
+                    "message": "The proposed change must be accepted, rejected, or superseded",
+                    "proposition_key": "blocker:2383",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1616
+                  },
+                  {
+                    "blocking": true,
+                    "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+                    "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+                    "type": "INTERNAL_CONFIRMATION",
+                    "workflow_action_id": 1617
+                  }
+                ],
+                "recipient_email": "theo.martin@example.test",
+                "recipient_label": "Theo Martin",
+                "rental_case_id": 583,
+                "resolution_items": [
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "The proposed change must be accepted, rejected, or superseded",
+                    "proposition_key": "blocker:2383",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1616
+                  },
+                  {
+                    "blocking": true,
+                    "client_visibility": "INTERNAL_ONLY",
+                    "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+                    "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+                    "resolution_owner": "WNC_INTERNAL",
+                    "resolution_status": "ACTION_CREATED",
+                    "workflow_action_id": 1617
+                  }
+                ],
+                "sender_email": "wnc-rentals-simulated@example.test",
+                "sender_label": "WNC Rentals (Simulated)",
+                "source_case_revision": 3,
+                "workflow_action_id": 1618
+              },
+              "conversation_key": "governed_client_response:583",
+              "created_at": "2026-10-03 11:37:04.746558+00",
+              "created_by_reference": "test_console:operator",
+              "delivered_at": null,
+              "delivery_external_reference": null,
+              "delivery_failure_code": null,
+              "draft_source": "generated",
+              "draft_status": "needs_approval",
+              "inquiry_response_draft_revision_id": 385,
+              "inquiry_response_draft_revision_uuid": "0b70ec2e-8a61-4403-9d7b-9a4a00ff0de9",
+              "intro_text": "Governed client response.",
+              "is_current": true,
+              "question_lines": [],
+              "recipient_email": "theo.martin@example.test",
+              "recipient_label": "Theo Martin",
+              "rejected_at": null,
+              "rental_case_id": 583,
+              "salutation": "Hello,",
+              "sender_display_name": null,
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "signoff_text": "WNC Rentals",
+              "source_case_revision": 3,
+              "subject": "Updated venue enquiry",
+              "supersedes_draft_revision_id": null,
+              "updated_at": "2026-10-03 11:37:05.138614+00",
+              "workflow_action_id": 1618
+            },
+            "approval_request": {
+              "approval_request_id": 464,
+              "approval_type": "client_communication_send",
+              "created_at": "2026-10-03 11:37:05.133411+00",
+              "decided_at": null,
+              "decided_by_reference": null,
+              "decision_notes": null,
+              "decision_payload": null,
+              "evidence_reference_keys": [
+                "workflow_action:1618",
+                "inquiry_response_draft:385"
+              ],
+              "reason_text": "Approve inquiry response draft revision 385 before simulated send.",
+              "rental_case_id": 583,
+              "required_approver_reference": "semantic:approval:workflow_action:1618:draft_revision:385",
+              "required_approver_role": "client_communication_review",
+              "status": "open",
+              "supersedes_approval_request_id": null,
+              "target_entity_id": 1618,
+              "target_entity_reference": "workflow_action:1618:draft_revision:385",
+              "target_entity_type": "workflow_action",
+              "updated_at": "2026-10-03 11:37:05.133411+00"
+            },
+            "response_intent": "CHANGE_ACKNOWLEDGEMENT"
+          },
+          "before_generation": {
+            "case_revision": 3,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 0
+          },
+          "after_generation": {
+            "case_revision": 3,
+            "open_question_ids": [],
+            "execution_attempt_count": 0,
+            "open_approval_count": 1
+          }
+        }
+      ],
+      "failures": [],
+      "rental_case_id": 583,
+      "case_reference_code": "RC-20261003113518355",
+      "final_state": {
+        "case_revision": 3,
+        "open_question_ids": [],
+        "execution_attempt_count": 0,
+        "open_approval_count": 1
+      },
+      "final_execution_attempts": [],
+      "final_approvals": [
+        {
+          "approval_request_id": 463,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-10-03 11:36:49.550617+00",
+          "decided_at": "2026-10-03 11:36:54.654533+00",
+          "decided_by_reference": null,
+          "decision_notes": "Draft source context became stale.",
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1612",
+            "inquiry_response_draft:384"
+          ],
+          "reason_text": "Approve inquiry response draft revision 384 before simulated send.",
+          "rental_case_id": 583,
+          "required_approver_reference": "semantic:approval:workflow_action:1612:draft_revision:384",
+          "required_approver_role": "client_communication_review",
+          "status": "cancelled",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1612,
+          "target_entity_reference": "workflow_action:1612:draft_revision:384",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-10-03 11:36:54.677687+00"
+        },
+        {
+          "approval_request_id": 464,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-10-03 11:37:05.133411+00",
+          "decided_at": null,
+          "decided_by_reference": null,
+          "decision_notes": null,
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1618",
+            "inquiry_response_draft:385"
+          ],
+          "reason_text": "Approve inquiry response draft revision 385 before simulated send.",
+          "rental_case_id": 583,
+          "required_approver_reference": "semantic:approval:workflow_action:1618:draft_revision:385",
+          "required_approver_role": "client_communication_review",
+          "status": "open",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1618,
+          "target_entity_reference": "workflow_action:1618:draft_revision:385",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-10-03 11:37:05.133411+00"
+        }
+      ]
+    }
+  ],
+  "request_log": [
+    {
+      "method": "GET",
+      "path": "/healthz"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/raw-evidence"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/reconcile"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/583"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/mailbox/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/583"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/raw-evidence"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/structured-observations"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/inquiry-intake"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/reconcile"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/inquiry-waiting"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/reconcile"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/583"
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/cases/583/mailbox/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/583"
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/cases/583"
+    }
+  ]
+}

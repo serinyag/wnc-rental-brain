@@ -1,0 +1,77 @@
+{
+  "provider_calls": 0,
+  "observations": [
+    {
+      "scenario_id": "UAT-006",
+      "observation_id": 2718,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-11-13T19:00:00+00:00",
+        "active_event_start": "2026-11-13T14:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 13,
+            "finish_time": "20:00",
+            "month": 11,
+            "start_time": "15:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 11:36:50.690912+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:3101",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 13,
+        "finish_time": "20:00",
+        "month": 11,
+        "resolved_date": "2026-11-13",
+        "start_time": "15:00"
+      },
+      "source_received_at": "2026-10-03 11:36:50.690912+00",
+      "provenance_validation": "PASS"
+    },
+    {
+      "scenario_id": "UAT-006",
+      "observation_id": 2714,
+      "status": "validated",
+      "value": {
+        "active_event_end": "2026-11-12T15:00:00+00:00",
+        "active_event_start": "2026-11-12T12:00:00+00:00",
+        "date_provenance": {
+          "client_components": {
+            "day": 12,
+            "finish_time": "16:00",
+            "month": 11,
+            "start_time": "13:00"
+          },
+          "explicit_client_year": null,
+          "reference_timestamp": "2026-10-03 11:36:37.010494+00",
+          "resolved_year": 2026,
+          "rule": "next_calendar_occurrence_v1",
+          "source_reference": "inbound_source_record:3097",
+          "timezone": "Europe/Amsterdam",
+          "year_source": "system_inferred_next_occurrence"
+        },
+        "day": 12,
+        "finish_time": "16:00",
+        "month": 11,
+        "resolved_date": "2026-11-12",
+        "start_time": "13:00"
+      },
+      "source_received_at": "2026-10-03 11:36:37.010494+00",
+      "provenance_validation": "PASS"
+    }
+  ],
+  "draft_question_checks": [
+    {
+      "turn": "UAT-006/1",
+      "asks_client_for_year": false
+    },
+    {
+      "turn": "UAT-006/2",
+      "asks_client_for_year": false
+    }
+  ]
+}

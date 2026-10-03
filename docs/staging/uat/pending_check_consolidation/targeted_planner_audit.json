@@ -1,0 +1,1004 @@
+[
+  {
+    "rental_case_id": 583,
+    "event_type": "governed_client_response_draft_generated",
+    "approval_request_id": 463,
+    "client_generation_payload": {
+      "acknowledgements": [
+        {
+          "about": "planning meeting",
+          "kind": "new_enquiry",
+          "topic": "latest_client_detail"
+        }
+      ],
+      "do_not_repeat_topics": [],
+      "external_pending": [],
+      "forbidden_claims": [
+        "Do not confirm venue availability or booking.",
+        "Do not describe a pending internal confirmation as completed.",
+        "Do not describe a pending decision or fee adjustment as approved.",
+        "Do not use historical precedent as current policy.",
+        "Do not use an em dash in the subject or body.",
+        "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+      ],
+      "latest_client_message": "Hello,\n\nWe would like the Studio for a 16-person planning meeting on 12 November from 13:00 to 16:00.\n\nBest,\nTheo",
+      "must_say": [
+        {
+          "action": "check",
+          "requested_event_window": [
+            "Requested active event start: 2026-11-12 12:00:00+00",
+            "Requested active event end: 2026-11-12 15:00:00+00"
+          ],
+          "status": "check_required",
+          "subjects": [
+            "requested date and venue availability"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "open_client_questions": [],
+      "optional_helpful_now": [],
+      "primary_client_need": [
+        "respond_to_current_update"
+      ],
+      "recipient_label": "Theo Martin",
+      "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+      "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+      "style_profile": [
+        "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+        "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+        "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+        "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+        "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+        "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+        "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+        "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+        "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+        "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+        "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
+        "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+        "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+      ]
+    },
+    "communicated_editorial_items": [],
+    "context_hash": "569402b062bb9e1300054d35a3134202980645c24b83855d04341f19ed1419c0",
+    "contextual_guidance_topics": [
+      "capacity"
+    ],
+    "draft_revision_id": 384,
+    "editorial_content_plan": {
+      "acknowledge": [
+        {
+          "authority_class": "client_request",
+          "fingerprint": "e6ead920c1db2df77679e64bc3a254fd6b893805d8eea12e92cfccd8525ab8ee",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 3,
+          "proposition_key": "latest_client_detail",
+          "reason": "current_turn_delta",
+          "role": "ACKNOWLEDGE",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message",
+          "topic": "latest_client_detail",
+          "value": {
+            "about": "planning meeting",
+            "kind": "new_enquiry"
+          }
+        }
+      ],
+      "already_communicated": [],
+      "client_visible_pending_state": [
+        {
+          "action": "check",
+          "requested_event_window": [
+            "Requested active event start: 2026-11-12 12:00:00+00",
+            "Requested active event end: 2026-11-12 15:00:00+00"
+          ],
+          "status": "check_required",
+          "subjects": [
+            "requested date and venue availability"
+          ],
+          "topic": "next_step"
+        }
+      ],
+      "defer": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "8a576100427e33cc3ab09a472aa14164bdbec24a22d1d25d5abc78543b8b4e1c",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "commercial.current",
+          "reason": "not_needed_for_current_question",
+          "role": "DEFER",
+          "semantic_key": "commercial.current",
+          "source_reference": "governed_case",
+          "topic": "commercial",
+          "value": {
+            "booking_fee": "EUR 50 excl. VAT",
+            "vat": "21%"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "1aac4a999e023d4c468e00325b620988bb899229dd42805ba7a6c965fc5ee1e4",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:capacity",
+          "reason": "not_needed_in_current_turn",
+          "role": "DEFER",
+          "semantic_key": "fact:capacity",
+          "source_reference": "phase4:capacity_studio_within_all_published_limits",
+          "topic": "capacity",
+          "value": {
+            "near_limit": false,
+            "requested_guests": 16,
+            "scope": "studio space",
+            "status": "within_limits"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5094bce10a64051692f98960591bed682f301d090be3dc1ff47fb05dc64d3c96",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:guest_count",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case",
+          "topic": "guest_count",
+          "value": {
+            "fact": "guest_count: 16"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "c869eee7b521e3fa79302ff78e26eb52432b1df3353b83eee9605bdb48caf95f",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:event_type",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case",
+          "topic": "event_type",
+          "value": {
+            "fact": "event_type: planning meeting"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested rental type code",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case",
+          "topic": "Requested rental type code",
+          "value": {
+            "fact": "Requested rental type code: studio_space"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "a5bc72ac3cc052a980a39ef20b261b541558165ece76d4f096999dd990d30c51",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested active event start",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested active event start",
+          "source_reference": "governed_case",
+          "topic": "Requested active event start",
+          "value": {
+            "fact": "Requested active event start: 2026-11-12 12:00:00+00"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "72fad5029b83326de29dc2cfe0647d532156f3638cb83b9fde48abcf254ebbeb",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested active event end",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested active event end",
+          "source_reference": "governed_case",
+          "topic": "Requested active event end",
+          "value": {
+            "fact": "Requested active event end: 2026-11-12 15:00:00+00"
+          }
+        }
+      ],
+      "do_not_repeat": [],
+      "editorial_rationale": "minimal_substantive_items_optional_guidance_ranked_last",
+      "helpful_now": [],
+      "internal_only": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e1eced418816172195f0f1c754545d872b9a0fa8321507b5aac8bbeee455758b",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "source_reference": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "topic": "resolution",
+          "value": {
+            "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        }
+      ],
+      "must_ask": [],
+      "must_communicate": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 4,
+          "proposition_key": "next_step",
+          "reason": "immediate_wnc_owned_next_step",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case",
+          "topic": "next_step",
+          "value": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2026-11-12 12:00:00+00",
+              "Requested active event end: 2026-11-12 15:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          }
+        }
+      ],
+      "primary_client_need": [
+        "respond_to_current_update"
+      ],
+      "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+      "source_bindings": [
+        {
+          "fingerprint": "e6ead920c1db2df77679e64bc3a254fd6b893805d8eea12e92cfccd8525ab8ee",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message"
+        },
+        {
+          "fingerprint": "8a576100427e33cc3ab09a472aa14164bdbec24a22d1d25d5abc78543b8b4e1c",
+          "semantic_key": "commercial.current",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "1aac4a999e023d4c468e00325b620988bb899229dd42805ba7a6c965fc5ee1e4",
+          "semantic_key": "fact:capacity",
+          "source_reference": "phase4:capacity_studio_within_all_published_limits"
+        },
+        {
+          "fingerprint": "5094bce10a64051692f98960591bed682f301d090be3dc1ff47fb05dc64d3c96",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "c869eee7b521e3fa79302ff78e26eb52432b1df3353b83eee9605bdb48caf95f",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "a5bc72ac3cc052a980a39ef20b261b541558165ece76d4f096999dd990d30c51",
+          "semantic_key": "case_fact:Requested active event start",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "72fad5029b83326de29dc2cfe0647d532156f3638cb83b9fde48abcf254ebbeb",
+          "semantic_key": "case_fact:Requested active event end",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "e1eced418816172195f0f1c754545d872b9a0fa8321507b5aac8bbeee455758b",
+          "semantic_key": "internal:availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "source_reference": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00"
+        },
+        {
+          "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+          "semantic_key": "next_step",
+          "source_reference": "governed_case"
+        }
+      ],
+      "substantive_budget": 3,
+      "version": "editorial_content_plan_v3"
+    },
+    "generation_audit": {
+      "attempts": [
+        {
+          "candidate_hash": "8d39c797fb1f8ff539a03952c3cbe0bfba808613ca82487b0292c0d35619dcbb",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_c438c8151c994c41a49846a3021b436b",
+          "provider_response_id": "resp_070935fd5992dc60016ac0e8cf589c87d2926d71c278373deb",
+          "realization_results": [
+            {
+              "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "requested_event_window": [
+                  "Requested active event start: 2026-11-12 12:00:00+00",
+                  "Requested active event end: 2026-11-12 15:00:00+00"
+                ],
+                "status": "check_required",
+                "subjects": [
+                  "requested date and venue availability"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "context_hash": "569402b062bb9e1300054d35a3134202980645c24b83855d04341f19ed1419c0",
+      "contract_identity": "3687a7e9548ce83211b0ee774ac9451f076f360c673d3a1e49597e5e3017e38e",
+      "corrective_retry_count": 0,
+      "final_realization_results": [
+        {
+          "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2026-11-12 12:00:00+00",
+              "Requested active event end: 2026-11-12 15:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ],
+      "initial_candidate_hash": "8d39c797fb1f8ff539a03952c3cbe0bfba808613ca82487b0292c0d35619dcbb",
+      "plan_identity": "23c9ac0cbfc45607d19fa437fce636cfbc8b2b1d89f74581a85d0068bcf4ad82",
+      "policy": "required_realization_single_correction_v1",
+      "source_case_revision": 2
+    },
+    "model": "gpt-5.6-sol",
+    "operator_annotations": [
+      {
+        "blocking": true,
+        "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+        "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1611
+      }
+    ],
+    "provider": "openai",
+    "provider_incomplete_reason": null,
+    "provider_request_id": "req_c438c8151c994c41a49846a3021b436b",
+    "provider_response_id": "resp_070935fd5992dc60016ac0e8cf589c87d2926d71c278373deb",
+    "provider_response_status": "completed",
+    "resolution_items": [
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+        "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1611
+      }
+    ],
+    "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+    "validation_failure_codes": [],
+    "workflow_action_id": 1612
+  },
+  {
+    "rental_case_id": 583,
+    "event_type": "governed_client_response_draft_generated",
+    "approval_request_id": 464,
+    "client_generation_payload": {
+      "acknowledgements": [
+        {
+          "focus": "the change or clarification in the latest message",
+          "kind": "new_client_detail",
+          "topic": "latest_client_detail"
+        }
+      ],
+      "do_not_repeat_topics": [],
+      "external_pending": [],
+      "forbidden_claims": [
+        "Do not confirm venue availability or booking.",
+        "Do not describe a pending internal confirmation as completed.",
+        "Do not describe a pending decision or fee adjustment as approved.",
+        "Do not use historical precedent as current policy.",
+        "Do not use an em dash in the subject or body.",
+        "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+      ],
+      "latest_client_message": "Hi,\n\nOur group has grown to 30 and we now need the entire venue from 15:00 to 20:00 on 13 November instead. Could you update the enquiry?\n\nTheo",
+      "must_say": [
+        {
+          "action": "check",
+          "grouping_reason": "same_current_turn_related_update",
+          "report_back": true,
+          "status": "check_required",
+          "subjects": [
+            "guest count",
+            "requested rental scope",
+            "requested reschedule is awaiting review"
+          ],
+          "topic": "pending_action_group"
+        }
+      ],
+      "open_client_questions": [],
+      "optional_helpful_now": [],
+      "primary_client_need": [
+        "respond_to_current_update"
+      ],
+      "recipient_label": "Theo Martin",
+      "response_intent": "CHANGE_ACKNOWLEDGEMENT",
+      "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+      "style_profile": [
+        "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+        "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+        "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+        "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+        "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+        "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+        "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+        "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+        "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+        "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+        "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client’s budget or plans plainly.",
+        "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+        "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+      ]
+    },
+    "communicated_editorial_items": [],
+    "context_hash": "5a6ef2aa512fd29bef7cd4b3df0c87b249891fd5a016d6c72b15b2e104260741",
+    "contextual_guidance_topics": [
+      "capacity"
+    ],
+    "draft_revision_id": 385,
+    "editorial_content_plan": {
+      "acknowledge": [
+        {
+          "authority_class": "client_request",
+          "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 3,
+          "proposition_key": "latest_client_detail",
+          "reason": "current_turn_delta",
+          "role": "ACKNOWLEDGE",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message",
+          "topic": "latest_client_detail",
+          "value": {
+            "focus": "the change or clarification in the latest message",
+            "kind": "new_client_detail"
+          }
+        }
+      ],
+      "already_communicated": [],
+      "client_visible_pending_state": [
+        {
+          "action": "check the requested change and come back to the client",
+          "requested_change": "guest count",
+          "status": "check_required",
+          "topic": "requested_change"
+        },
+        {
+          "action": "check the requested change and come back to the client",
+          "requested_change": "requested rental scope",
+          "status": "check_required",
+          "topic": "requested_change"
+        },
+        {
+          "action": "check the requested change and come back to the client",
+          "requested_change": "requested reschedule is awaiting review",
+          "status": "check_required",
+          "topic": "requested_change"
+        }
+      ],
+      "defer": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "8a576100427e33cc3ab09a472aa14164bdbec24a22d1d25d5abc78543b8b4e1c",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "commercial.current",
+          "reason": "not_needed_for_current_question",
+          "role": "DEFER",
+          "semantic_key": "commercial.current",
+          "source_reference": "governed_case",
+          "topic": "commercial",
+          "value": {
+            "booking_fee": "EUR 50 excl. VAT",
+            "vat": "21%"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "1aac4a999e023d4c468e00325b620988bb899229dd42805ba7a6c965fc5ee1e4",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "fact:capacity",
+          "reason": "not_needed_in_current_turn",
+          "role": "DEFER",
+          "semantic_key": "fact:capacity",
+          "source_reference": "phase4:capacity_studio_within_all_published_limits",
+          "topic": "capacity",
+          "value": {
+            "near_limit": false,
+            "requested_guests": 16,
+            "scope": "studio space",
+            "status": "within_limits"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "5094bce10a64051692f98960591bed682f301d090be3dc1ff47fb05dc64d3c96",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:guest_count",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case",
+          "topic": "guest_count",
+          "value": {
+            "fact": "guest_count: 16"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "c869eee7b521e3fa79302ff78e26eb52432b1df3353b83eee9605bdb48caf95f",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:event_type",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case",
+          "topic": "event_type",
+          "value": {
+            "fact": "event_type: planning meeting"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested rental type code",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case",
+          "topic": "Requested rental type code",
+          "value": {
+            "fact": "Requested rental type code: studio_space"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "a5bc72ac3cc052a980a39ef20b261b541558165ece76d4f096999dd990d30c51",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested active event start",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested active event start",
+          "source_reference": "governed_case",
+          "topic": "Requested active event start",
+          "value": {
+            "fact": "Requested active event start: 2026-11-12 12:00:00+00"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "72fad5029b83326de29dc2cfe0647d532156f3638cb83b9fde48abcf254ebbeb",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "case_fact:Requested active event end",
+          "reason": "case_summary_not_needed_for_this_reply",
+          "role": "DEFER",
+          "semantic_key": "case_fact:Requested active event end",
+          "source_reference": "governed_case",
+          "topic": "Requested active event end",
+          "value": {
+            "fact": "Requested active event end: 2026-11-12 15:00:00+00"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "1391a35bfba161659451c77a2e493c1ed818432be34c2ed79eebd887a4a96057",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "next_step.availability",
+          "reason": "concrete_requested_check_already_supplies_next_step",
+          "role": "DEFER",
+          "semantic_key": "next_step.availability",
+          "source_reference": "governed_case",
+          "topic": "next_step",
+          "value": {
+            "action": "check",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          }
+        }
+      ],
+      "do_not_repeat": [],
+      "editorial_rationale": "minimal_substantive_items_optional_guidance_ranked_last",
+      "helpful_now": [],
+      "internal_only": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "555c5325dae54869727ae3647b497465cc0ef4d88934ca217f02f7ccda2b8ba9",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 0,
+          "proposition_key": "restriction:Hard constraint",
+          "reason": "internal_feasibility_summary",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case",
+          "topic": "restriction",
+          "value": {
+            "text": "Hard constraint: The proposed change must be accepted, rejected, or superseded."
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "0b06d567b194ddfaf63bdd79562487b91f2d41e99a5169f715a72aed2aab263f",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:blocker:2383",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:blocker:2383",
+          "source_reference": "blocker:2383",
+          "topic": "resolution",
+          "value": {
+            "message": "The proposed change must be accepted, rejected, or superseded",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "e1eced418816172195f0f1c754545d872b9a0fa8321507b5aac8bbeee455758b",
+          "included_in_model_payload": false,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 50,
+          "proposition_key": "internal:availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "reason": "ownership_and_workflow_mechanics_stay_local",
+          "role": "INTERNAL_ONLY",
+          "semantic_key": "internal:availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "source_reference": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "topic": "resolution",
+          "value": {
+            "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+            "owner": "WNC_INTERNAL",
+            "status": "ACTION_CREATED"
+          }
+        }
+      ],
+      "must_ask": [],
+      "must_communicate": [
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "change:1cc4cfa2252d",
+          "reason": "prevent_requested_change_becoming_confirmation",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "change:1cc4cfa2252d",
+          "source_reference": "governed_case",
+          "topic": "requested_change",
+          "value": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "guest count",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "change:511fc7dc85f1",
+          "reason": "prevent_requested_change_becoming_confirmation",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "change:511fc7dc85f1",
+          "source_reference": "governed_case",
+          "topic": "requested_change",
+          "value": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested rental scope",
+            "status": "check_required"
+          }
+        },
+        {
+          "authority_class": "current_governed",
+          "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+          "included_in_model_payload": true,
+          "prior_turn_status": "not_previously_communicated",
+          "priority": 1,
+          "proposition_key": "change:1ee0a6f6bb73",
+          "reason": "prevent_requested_change_becoming_confirmation",
+          "role": "MUST_COMMUNICATE",
+          "semantic_key": "change:1ee0a6f6bb73",
+          "source_reference": "governed_case",
+          "topic": "requested_change",
+          "value": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested reschedule is awaiting review",
+            "status": "check_required"
+          }
+        }
+      ],
+      "primary_client_need": [
+        "respond_to_current_update"
+      ],
+      "response_intent": "CHANGE_ACKNOWLEDGEMENT",
+      "source_bindings": [
+        {
+          "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+          "semantic_key": "latest_client_detail",
+          "source_reference": "current_client_message"
+        },
+        {
+          "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+          "semantic_key": "change:1cc4cfa2252d",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+          "semantic_key": "change:511fc7dc85f1",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+          "semantic_key": "change:1ee0a6f6bb73",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "8a576100427e33cc3ab09a472aa14164bdbec24a22d1d25d5abc78543b8b4e1c",
+          "semantic_key": "commercial.current",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "1aac4a999e023d4c468e00325b620988bb899229dd42805ba7a6c965fc5ee1e4",
+          "semantic_key": "fact:capacity",
+          "source_reference": "phase4:capacity_studio_within_all_published_limits"
+        },
+        {
+          "fingerprint": "555c5325dae54869727ae3647b497465cc0ef4d88934ca217f02f7ccda2b8ba9",
+          "semantic_key": "restriction:Hard constraint",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "5094bce10a64051692f98960591bed682f301d090be3dc1ff47fb05dc64d3c96",
+          "semantic_key": "case_fact:guest_count",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "c869eee7b521e3fa79302ff78e26eb52432b1df3353b83eee9605bdb48caf95f",
+          "semantic_key": "case_fact:event_type",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+          "semantic_key": "case_fact:Requested rental type code",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "a5bc72ac3cc052a980a39ef20b261b541558165ece76d4f096999dd990d30c51",
+          "semantic_key": "case_fact:Requested active event start",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "72fad5029b83326de29dc2cfe0647d532156f3638cb83b9fde48abcf254ebbeb",
+          "semantic_key": "case_fact:Requested active event end",
+          "source_reference": "governed_case"
+        },
+        {
+          "fingerprint": "0b06d567b194ddfaf63bdd79562487b91f2d41e99a5169f715a72aed2aab263f",
+          "semantic_key": "internal:blocker:2383",
+          "source_reference": "blocker:2383"
+        },
+        {
+          "fingerprint": "e1eced418816172195f0f1c754545d872b9a0fa8321507b5aac8bbeee455758b",
+          "semantic_key": "internal:availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+          "source_reference": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00"
+        },
+        {
+          "fingerprint": "1391a35bfba161659451c77a2e493c1ed818432be34c2ed79eebd887a4a96057",
+          "semantic_key": "next_step.availability",
+          "source_reference": "governed_case"
+        }
+      ],
+      "substantive_budget": 3,
+      "version": "editorial_content_plan_v3"
+    },
+    "generation_audit": {
+      "attempts": [
+        {
+          "candidate_hash": "9dee2c9f3689d6a360afe99bd084d632de70fe662d04888362a9e4301ce43908",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_1d308e06e6164c529faad56579aebd70",
+          "provider_response_id": "resp_051ff76919851d8f016ac0e8de1b5887d2bc3311845de4cdac",
+          "realization_results": [
+            {
+              "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "guest count",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1cc4cfa2252d",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested rental scope",
+                "status": "check_required"
+              },
+              "semantic_key": "change:511fc7dc85f1",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested reschedule is awaiting review",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1ee0a6f6bb73",
+              "topic": "requested_change"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "context_hash": "5a6ef2aa512fd29bef7cd4b3df0c87b249891fd5a016d6c72b15b2e104260741",
+      "contract_identity": "815c730752fc247938b5cf15bd2d959dd3486388a5ab0f70ff40e13a7222c82b",
+      "corrective_retry_count": 0,
+      "final_realization_results": [
+        {
+          "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "guest count",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1cc4cfa2252d",
+          "topic": "requested_change"
+        },
+        {
+          "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested rental scope",
+            "status": "check_required"
+          },
+          "semantic_key": "change:511fc7dc85f1",
+          "topic": "requested_change"
+        },
+        {
+          "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested reschedule is awaiting review",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1ee0a6f6bb73",
+          "topic": "requested_change"
+        }
+      ],
+      "initial_candidate_hash": "9dee2c9f3689d6a360afe99bd084d632de70fe662d04888362a9e4301ce43908",
+      "plan_identity": "cf003495a8a717522a0cc9c8d0be18c265203dee5b79b416361551acfa33a642",
+      "policy": "required_realization_single_correction_v1",
+      "source_case_revision": 3
+    },
+    "model": "gpt-5.6-sol",
+    "operator_annotations": [
+      {
+        "blocking": true,
+        "message": "The proposed change must be accepted, rejected, or superseded",
+        "proposition_key": "blocker:2383",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1616
+      },
+      {
+        "blocking": true,
+        "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+        "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+        "type": "INTERNAL_CONFIRMATION",
+        "workflow_action_id": 1617
+      }
+    ],
+    "provider": "openai",
+    "provider_incomplete_reason": null,
+    "provider_request_id": "req_1d308e06e6164c529faad56579aebd70",
+    "provider_response_id": "resp_051ff76919851d8f016ac0e8de1b5887d2bc3311845de4cdac",
+    "provider_response_status": "completed",
+    "resolution_items": [
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "The proposed change must be accepted, rejected, or superseded",
+        "proposition_key": "blocker:2383",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1616
+      },
+      {
+        "blocking": true,
+        "client_visibility": "INTERNAL_ONLY",
+        "message": "Confirm studio space availability for 2026-11-12 12:00:00+00 to 2026-11-12 15:00:00+00",
+        "proposition_key": "availability:2026-11-12 12:00:00+00:2026-11-12 15:00:00+00",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "ACTION_CREATED",
+        "workflow_action_id": 1617
+      }
+    ],
+    "response_intent": "CHANGE_ACKNOWLEDGEMENT",
+    "validation_failure_codes": [],
+    "workflow_action_id": 1618
+  }
+]

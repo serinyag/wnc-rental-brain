@@ -1,0 +1,155 @@
+{
+  "provider_calls": 0,
+  "results": [
+    {
+      "turn": "UAT-006/1",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "8d39c797fb1f8ff539a03952c3cbe0bfba808613ca82487b0292c0d35619dcbb",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_c438c8151c994c41a49846a3021b436b",
+          "provider_response_id": "resp_070935fd5992dc60016ac0e8cf589c87d2926d71c278373deb",
+          "realization_results": [
+            {
+              "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check",
+                "requested_event_window": [
+                  "Requested active event start: 2026-11-12 12:00:00+00",
+                  "Requested active event end: 2026-11-12 15:00:00+00"
+                ],
+                "status": "check_required",
+                "subjects": [
+                  "requested date and venue availability"
+                ]
+              },
+              "semantic_key": "next_step",
+              "topic": "next_step"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "3e55fe32492e4cacd6e4663b62ebd249ed549ee8a372212b6f68fb4238090cc2",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check",
+            "requested_event_window": [
+              "Requested active event start: 2026-11-12 12:00:00+00",
+              "Requested active event end: 2026-11-12 15:00:00+00"
+            ],
+            "status": "check_required",
+            "subjects": [
+              "requested date and venue availability"
+            ]
+          },
+          "semantic_key": "next_step",
+          "topic": "next_step"
+        }
+      ]
+    },
+    {
+      "turn": "UAT-006/2",
+      "persisted": true,
+      "retry_count": 0,
+      "attempts": [
+        {
+          "candidate_hash": "9dee2c9f3689d6a360afe99bd084d632de70fe662d04888362a9e4301ce43908",
+          "failed_realization_item_ids": [],
+          "generation_attempt": 1,
+          "provider_request_id": "req_1d308e06e6164c529faad56579aebd70",
+          "provider_response_id": "resp_051ff76919851d8f016ac0e8de1b5887d2bc3311845de4cdac",
+          "realization_results": [
+            {
+              "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "guest count",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1cc4cfa2252d",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested rental scope",
+                "status": "check_required"
+              },
+              "semantic_key": "change:511fc7dc85f1",
+              "topic": "requested_change"
+            },
+            {
+              "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+              "kind": "pending_action",
+              "realized": true,
+              "required_meaning": {
+                "action": "check the requested change and come back to the client",
+                "requested_change": "requested reschedule is awaiting review",
+                "status": "check_required"
+              },
+              "semantic_key": "change:1ee0a6f6bb73",
+              "topic": "requested_change"
+            }
+          ],
+          "safety_failure_codes": []
+        }
+      ],
+      "plan_identity": "PASS",
+      "final_realization_results": [
+        {
+          "fingerprint": "56b2356b66d7aff0c361697f7aedfe6baa328b4fa7f27ec56949be74bfec7d14",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "guest count",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1cc4cfa2252d",
+          "topic": "requested_change"
+        },
+        {
+          "fingerprint": "6fc150274753ef4dc195f38dde3cda8adf892dad05822203fd978f68e906783d",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested rental scope",
+            "status": "check_required"
+          },
+          "semantic_key": "change:511fc7dc85f1",
+          "topic": "requested_change"
+        },
+        {
+          "fingerprint": "acd5957be252e4e3c42524a836e16ec40af0feae0f2cfd8e7dc945a7080d269b",
+          "kind": "pending_action",
+          "realized": true,
+          "required_meaning": {
+            "action": "check the requested change and come back to the client",
+            "requested_change": "requested reschedule is awaiting review",
+            "status": "check_required"
+          },
+          "semantic_key": "change:1ee0a6f6bb73",
+          "topic": "requested_change"
+        }
+      ]
+    }
+  ],
+  "generation_operations": 2,
+  "model_candidates": 2
+}
