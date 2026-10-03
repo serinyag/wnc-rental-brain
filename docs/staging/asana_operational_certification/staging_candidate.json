@@ -1,0 +1,87 @@
+{
+  "rental_case_id": 585,
+  "workflow_action_id": 1626,
+  "projection": {
+    "work": [
+      {
+        "key": "group:EXTERNAL_PARTY:supplier-logistics",
+        "name": "Confirm supplier logistics",
+        "notes": "WNC follow-up with external party\n\nTo do: Confirm supplier arrival timing\nTo do: Confirm handover arrangements\nTo do: Confirm the loading route\n\nRecord the outcome for governed review before treating it as confirmed.",
+        "owner": "EXTERNAL_PARTY",
+        "members": [
+          {
+            "key": "supplier:arrival",
+            "summary": "Confirm supplier arrival timing",
+            "resolved": false,
+            "workflow_action_id": 1623
+          },
+          {
+            "key": "supplier:handover",
+            "summary": "Confirm handover arrangements",
+            "resolved": false,
+            "workflow_action_id": 1621
+          },
+          {
+            "key": "supplier:loading",
+            "summary": "Confirm the loading route",
+            "resolved": false,
+            "workflow_action_id": 1622
+          }
+        ],
+        "completed": false
+      },
+      {
+        "key": "item:fee-review",
+        "name": "Review the requested fee adjustment",
+        "notes": "WNC governed decision review\n\nTo do: Review the requested fee adjustment\n\nRecord the outcome for governed review before treating it as confirmed.",
+        "owner": "GOVERNED_DECISION",
+        "members": [
+          {
+            "key": "fee-review",
+            "summary": "Review the requested fee adjustment",
+            "resolved": false,
+            "workflow_action_id": 1624
+          }
+        ],
+        "completed": false
+      },
+      {
+        "key": "item:venue",
+        "name": "Confirm studio availability for the requested time",
+        "notes": "WNC internal check\n\nTo do: Confirm studio availability for the requested time\n\nRecord the outcome for governed review before treating it as confirmed.",
+        "owner": "WNC_INTERNAL",
+        "members": [
+          {
+            "key": "venue",
+            "summary": "Confirm studio availability for the requested time",
+            "resolved": false,
+            "workflow_action_id": 1620
+          }
+        ],
+        "completed": false
+      }
+    ],
+    "marker": "WNC reference: RC-20261003152913292 / 6db3e9eacf60",
+    "master": {
+      "name": "SYNTHETIC TEST — WNC Operations — team workshop — 12 November 2026",
+      "notes": "CLIENT\nSYNTHETIC TEST — WNC Operations\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: studio space\nGuests: 24\n\nCURRENT STATUS\nDecision required\nClient response is waiting on internal work.\n\nOPEN ITEMS\n- WNC follow-up with external party: Confirm supplier logistics\n- WNC governed decision review: Review the requested fee adjustment\n- WNC internal check: Confirm studio availability for the requested time\n- Client to answer: Confirm the preferred room layout\n\nNEXT ACTIONS\nComplete the checks below and record their outcomes for review.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261003152913292 / 6db3e9eacf60",
+      "completed": false
+    },
+    "version": "asana_rental_projection_v1",
+    "case_uuid": "04597ee3-59a8-49d5-9806-ba552c573cd6",
+    "project_gid": "1217642260793817",
+    "case_revision": 0,
+    "custom_fields": {},
+    "workspace_gid": "1208455784737302",
+    "rental_case_id": 585
+  },
+  "canonical_hash": "6e5caebd7b9a5262425cb77705043d78e60059e65926334781b6451e270cbb97",
+  "provider_mutations": 0,
+  "new_execution_attempts": 0,
+  "protected_cases_unchanged": [
+    424,
+    584
+  ],
+  "migration": "20261003000200",
+  "migration_sha256": "3010b4d1c557c91189cc879df558db56e032513f7837c80dfeac4c6db2ff5072"
+}

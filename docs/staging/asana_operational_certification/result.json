@@ -1,0 +1,61 @@
+{
+  "marker": "ASANA_REAL_STAGING_READY_FOR_HUMAN_AUTHORIZATION",
+  "rental_case_id": 585,
+  "workflow_action_id": 1626,
+  "action_status": "ready_to_execute",
+  "runtime_commit": "59e3a033eeed150c974b964b8da86cf7b1cd621d",
+  "branch": "codex/final-drafting-closure",
+  "main_changed": false,
+  "deployment_id": "dep-db0i008u01pc73afcjng",
+  "migration": "20261003000200",
+  "project_gid": "1217642260793817",
+  "workspace_gid": "1208455784737302",
+  "canonical_hash": "6e5caebd7b9a5262425cb77705043d78e60059e65926334781b6451e270cbb97",
+  "staging_attempts": 0,
+  "hosted_prepare_idempotent": true,
+  "tests": {
+    "focused": 50,
+    "focused_subtests": 11,
+    "phase8": 594,
+    "phase8_subtests": 126,
+    "full_repository": 811,
+    "full_repository_subtests": 160,
+    "failures": 0,
+    "skips": 0,
+    "git_diff_check": "passed"
+  },
+  "safety": {
+    "Graph_calls": 0,
+    "Outlook_sends": 0,
+    "real_Asana_calls": 0,
+    "real_Asana_mutations": 0,
+    "new_staging_execution_attempts": 0,
+    "OpenAI_calls": 0,
+    "production_changes": 0,
+    "historical_case_424_unchanged": true,
+    "Outlook_case_584_unchanged": true,
+    "accepted_drafting_unchanged": true
+  },
+  "providers": {
+    "asana": "configured_but_disabled",
+    "outlook": "configured_draft_only"
+  },
+  "staging_asana_gate_before": true,
+  "staging_asana_gate_after": false,
+  "outlook_send_gate_unchanged": true,
+  "human_authorization_required": true,
+  "initial_provider_object_plan": {
+    "master_tasks": 1,
+    "subtasks": 3
+  },
+  "one_synthetic_update": {
+    "guest_count": 30,
+    "complete_existing_venue_subtask": true,
+    "new_technical_subtask": 1
+  },
+  "limits": [
+    "Provider mutation remains untested against real Asana until authorization.",
+    "Human Asana changes are observations only; no automatic truth synchronization or ambiguity-fence release."
+  ],
+  "outlook_send_gate_after": false
+}

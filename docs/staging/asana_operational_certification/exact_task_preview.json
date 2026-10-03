@@ -1,0 +1,32 @@
+{
+  "workspace_gid": "1208455784737302",
+  "project_gid": "1217642260793817",
+  "master": {
+    "name": "SYNTHETIC TEST — WNC Operations — team workshop — 12 November 2026",
+    "notes": "CLIENT\nSYNTHETIC TEST — WNC Operations\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: studio space\nGuests: 24\n\nCURRENT STATUS\nDecision required\nClient response is waiting on internal work.\n\nOPEN ITEMS\n- WNC follow-up with external party: Confirm supplier logistics\n- WNC governed decision review: Review the requested fee adjustment\n- WNC internal check: Confirm studio availability for the requested time\n- Client to answer: Confirm the preferred room layout\n\nNEXT ACTIONS\nComplete the checks below and record their outcomes for review.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261003152913292 / 6db3e9eacf60",
+    "completed": false
+  },
+  "custom_fields": {},
+  "assignee": null,
+  "due_date": null,
+  "subtasks": [
+    {
+      "name": "Confirm supplier logistics",
+      "notes": "WNC follow-up with external party\n\nTo do: Confirm supplier arrival timing\nTo do: Confirm handover arrangements\nTo do: Confirm the loading route\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261003152913292 / 6db3e9eacf60 / work d27d45b61c7a",
+      "completed": false,
+      "owner": "EXTERNAL_PARTY"
+    },
+    {
+      "name": "Review the requested fee adjustment",
+      "notes": "WNC governed decision review\n\nTo do: Review the requested fee adjustment\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261003152913292 / 6db3e9eacf60 / work 4c7e41cf0455",
+      "completed": false,
+      "owner": "GOVERNED_DECISION"
+    },
+    {
+      "name": "Confirm studio availability for the requested time",
+      "notes": "WNC internal check\n\nTo do: Confirm studio availability for the requested time\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261003152913292 / 6db3e9eacf60 / work fda5b0d1ab9f",
+      "completed": false,
+      "owner": "WNC_INTERNAL"
+    }
+  ]
+}

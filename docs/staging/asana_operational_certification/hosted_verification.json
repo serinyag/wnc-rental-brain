@@ -1,0 +1,16 @@
+{
+  "hosted_prepare_idempotent": true,
+  "case": 585,
+  "action": 1626,
+  "staging_execution_attempts": 0,
+  "protected_cases_unchanged": [
+    424,
+    584
+  ],
+  "providers": {
+    "asana": "configured_but_disabled",
+    "outlook": "configured_draft_only"
+  },
+  "deployment": "dep-db0i008u01pc73afcjng",
+  "runtime_commit": "59e3a033eeed150c974b964b8da86cf7b1cd621d"
+}
