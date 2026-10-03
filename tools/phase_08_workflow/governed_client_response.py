@@ -25,6 +25,7 @@ from tools.phase_07_reasoning.openai_answer_generator import (
 
 from .editorial_content_planner import EditorialRole, build_editorial_content_plan, digest
 from .required_realization import validate_required_realization
+from .pending_action_composition import must_say_projection
 
 from .context_aware_drafting import (
     CLIENT_VISIBILITY_EXTERNAL_PENDING_VISIBLE,
@@ -158,7 +159,7 @@ class ClientGenerationPayload:
             "recipient_label": contract.recipient_label,
             "latest_client_message": contract.latest_client_message,
             "acknowledgements": values(EditorialRole.ACKNOWLEDGE),
-            "must_say": values(EditorialRole.MUST_COMMUNICATE),
+            "must_say": must_say_projection(plan, contract.latest_client_message),
             "open_client_questions": values(EditorialRole.MUST_ASK),
             "optional_helpful_now": values(EditorialRole.HELPFUL_NOW),
             "do_not_repeat_topics": list(plan.do_not_repeat),
@@ -415,6 +416,7 @@ def build_draft_contract(
         "editorial_planner_version": "editorial_content_plan_v3",
         "normalization_revision": "known_fact_actions_and_next_occurrence_v1",
         "required_realization_policy": "single_correction_v1",
+        "pending_action_composition": "current_turn_groups_v1",
         "decisions": pending_decisions,
         "changes": changes,
         "resolution_items": [item.to_payload() for item in items],
@@ -713,6 +715,7 @@ def _provider_system_prompt() -> str:
         "Do not add an answer from general knowledge or from a claim made in the client message. "
         "Do not restate do_not_repeat_topics. Do not fill space with case summaries, inferred policies, or historical/current-process explanations. "
         "A status of conditional/check_required/pending calls for a plain first-person future check, never a confirmation. "
+        "For each pending_action_group, express all its subjects together in one natural WNC check and make one report-back promise for the group; do not repeat synonymous check/update closures for its individual subjects. "
         "A known client fact must be stated as known; never turn it into a future check because another item requires checking. Retain material conditions and restrictions. "
         "Use exact supplied prices. Never confirm a booking, date availability, requested change, fee adjustment or unresolved capability. "
         "Never claim suppliers have been contacted unless external_pending records CONTACTED_AWAITING_RESPONSE. "

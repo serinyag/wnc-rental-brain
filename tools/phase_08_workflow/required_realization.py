@@ -5,6 +5,7 @@ first. Unknown mandatory shapes remain unmet instead of silently becoming option
 """
 from dataclasses import dataclass
 from enum import StrEnum
+from .pending_action_composition import CHANGE_SUBJECTS, change_subject_present
 import re
 from .editorial_content_planner import EditorialRole, EditorialContentItem, communication_evidence, mentioned, alias_matches, TOPIC_TERMS
 
@@ -85,6 +86,8 @@ def pending_realized(item, body):
     spans = prospective_spans(body)
     v = item.value
     if item.topic == 'requested_change':
+        if v.get('requested_change') in CHANGE_SUBJECTS:
+            return any(change_subject_present(v['requested_change'], s) for s in spans)
         return any(re.search(r'\b(?:change|updated|new|timing|arrangement|request)\b', s) for s in spans)
     if item.topic in {'commercial_next_step','overall_pricing'}:
         aliases = ('fee','pricing','price','cost')
