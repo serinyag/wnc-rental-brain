@@ -1,0 +1,704 @@
+{
+  "case": {
+    "asana_master_task_reference": null,
+    "evidence_bundles": [],
+    "evidence_notice": null,
+    "human_work_preview": [
+      "Approval needed: Approve inquiry response draft revision 386 before simulated send.",
+      "Workflow action: Send Inquiry Response [Awaiting Approval]"
+    ],
+    "metadata": {
+      "client_label": "Serinya (synthetic certification)",
+      "contact_email": "Serinya@whennaturecalls.nl",
+      "created_at": "2026-10-03 12:21:41.085405+00",
+      "created_by": "test_console:operator",
+      "event_reference": "Synthetic execution certification only; no rental booking",
+      "label": "SYNTHETIC final Outlook send certification"
+    },
+    "orchestration_snapshot": {
+      "approval_requests": [
+        {
+          "approval_request_id": 465,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-10-03 12:21:40.948714+00",
+          "decided_at": null,
+          "decided_by_reference": null,
+          "decision_notes": null,
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:1619",
+            "inquiry_response_draft:386"
+          ],
+          "reason_text": "Approve inquiry response draft revision 386 before simulated send.",
+          "rental_case_id": 584,
+          "required_approver_reference": "semantic:approval:workflow_action:1619:draft_revision:386",
+          "required_approver_role": "client_communication_review",
+          "status": "open",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 1619,
+          "target_entity_reference": "workflow_action:1619:draft_revision:386",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-10-03 12:21:40.948714+00"
+        }
+      ],
+      "artifacts": [],
+      "blockers": [],
+      "case_decisions": [],
+      "execution_attempts": [],
+      "follow_ups": [],
+      "milestones": [],
+      "open_questions": [],
+      "proposed_changes": [],
+      "reasoning_projections": [],
+      "rental_case": {
+        "active_event_end": null,
+        "active_event_start": null,
+        "case_reference_code": "RC-20261003122141085",
+        "case_revision": 0,
+        "client_account_ref": null,
+        "commercial_summary_status": "unknown",
+        "created_at": "2026-10-03 12:21:41.085405+00",
+        "current_agreement_artifact_id": null,
+        "current_proposal_artifact_id": null,
+        "dormant_origin_state": null,
+        "dormant_reason_code": null,
+        "dormant_review_at": null,
+        "is_active": true,
+        "lifecycle_state": "inquiry_active",
+        "operational_summary_status": "unknown",
+        "primary_contact_ref": null,
+        "rental_case_id": 584,
+        "rental_case_uuid": "d8b22cfe-5e6b-4ffb-8c7d-6463f4e4fc70",
+        "rental_type_code": "custom_scope",
+        "resume_target_state": null,
+        "service_level_or_type": "SYNTHETIC final Outlook send certification",
+        "updated_at": "2026-10-03 12:21:41.085405+00"
+      },
+      "rental_case_facts": [],
+      "requirements": [],
+      "reschedule_requests": [],
+      "workflow_actions": [
+        {
+          "action_category": "communication",
+          "action_type": "SEND_INQUIRY_RESPONSE",
+          "approval_posture": "approval_required",
+          "created_at": "2026-10-03 12:21:40.948714+00",
+          "due_at": null,
+          "idempotency_key": "governed_outlook_v1:19527fb465c9bb8626fea3d65bfbd0dcf43623456148156f22512006d4bcc4d9",
+          "reason_entity_id": null,
+          "reason_entity_reference": "governed_client_response:584",
+          "reason_entity_type": "rental_case",
+          "rental_case_id": 584,
+          "semantic_subject_hash": "d48dbf7bd524eaed0e1f3471510c05fdfcdd4e8459ac44f41605f8622b9c68ed",
+          "source_case_revision": 0,
+          "status": "awaiting_approval",
+          "structured_payload": {
+            "action_type": "SEND_INQUIRY_RESPONSE",
+            "approval_target": "workflow_action:1619:draft_revision:386",
+            "body": "Hi Serinya,\n\nThis is a synthetic test message for the Outlook approval and execution path. No action is required from you.",
+            "body_type": "text",
+            "context_hash": "593d6264c01f5c1da0e24a8b8637b72b0da4401629ce67c583ef9476c10e479a",
+            "contract_version": "governed_outlook_v1",
+            "conversation_key": "governed_client_response:584",
+            "draft_content_hash": "4b32159890f4e22c33fa6aec3fa23d42aff6060297af7f651714eadb40e6417b",
+            "draft_origin_workflow_action_id": 1619,
+            "draft_revision_id": 386,
+            "governed_context_hash": "d48dbf7bd524eaed0e1f3471510c05fdfcdd4e8459ac44f41605f8622b9c68ed",
+            "graph_message_id": null,
+            "message_mode": "new",
+            "plan_identity": "governed_outlook_reservation_v1:584:ba24a5d25b7551b39bfb412065318368278a04af4f039efd9a2bbc027a16b1aa",
+            "provenance": "deterministic_fixture",
+            "provider_type": "microsoft_graph_outlook",
+            "purpose": "governed_client_response_draft",
+            "reason": "operator_requested_governed_client_response",
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_identity_hash": "4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+            "recipient_reference": "inquiry_response_draft:386",
+            "recovery_draft_revision_id": null,
+            "recovery_origin_workflow_action_id": null,
+            "recovery_predecessor_action_id": null,
+            "rental_case_id": 584,
+            "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+            "source_case_revision": 0,
+            "subject": "SYNTHETIC TEST - Outlook final send certification"
+          },
+          "supersedes_workflow_action_id": null,
+          "target_adapter_code": "outlook",
+          "target_scope_key": null,
+          "updated_at": "2026-10-03 12:21:40.948714+00",
+          "workflow_action_id": 1619,
+          "workflow_action_uuid": "a6f45763-d0cd-4236-8840-293c60d6d98b"
+        }
+      ],
+      "workflow_events": [
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "test-console:case:RC-20261003122141085",
+          "event_type_code": "test_console_case_registered",
+          "occurred_at": "2026-10-03 12:21:41.085405+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-10-03 12:21:41.085405+00",
+          "rental_case_id": 584,
+          "source_reference": "test_console:create_case",
+          "source_type": "test_console",
+          "structured_payload": {
+            "client_label": "Serinya (synthetic certification)",
+            "contact_email": "Serinya@whennaturecalls.nl",
+            "event_reference": "Synthetic execution certification only; no rental booking",
+            "label": "SYNTHETIC final Outlook send certification",
+            "test_case": true
+          },
+          "workflow_event_id": 17088,
+          "workflow_event_uuid": "11cff3ed-3e8c-40eb-bace-55c79bcae479"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "governed_client_response_draft_generated:584:64c70cc30f0417c7b6fd30055874ace0dd4f612a565d581204b760c1dc9519ae",
+          "event_type_code": "governed_client_response_draft_generated",
+          "occurred_at": "2026-10-03 12:21:41.897917+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-10-03 12:21:41.897917+00",
+          "rental_case_id": 584,
+          "source_reference": "inquiry_response_draft:386",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 465,
+            "client_generation_payload": {
+              "acknowledgements": [
+                {
+                  "about": "the enquiry",
+                  "kind": "new_enquiry",
+                  "topic": "latest_client_detail"
+                }
+              ],
+              "do_not_repeat_topics": [],
+              "external_pending": [],
+              "forbidden_claims": [
+                "Do not confirm venue availability or booking.",
+                "Do not describe a pending internal confirmation as completed.",
+                "Do not describe a pending decision or fee adjustment as approved.",
+                "Do not use historical precedent as current policy.",
+                "Do not use an em dash in the subject or body.",
+                "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+              ],
+              "latest_client_message": "",
+              "must_say": [],
+              "open_client_questions": [],
+              "optional_helpful_now": [],
+              "primary_client_need": [
+                "respond_to_current_update"
+              ],
+              "recipient_label": "Serinya (synthetic certification)",
+              "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+              "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+              "style_profile": [
+                "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+                "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+                "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+                "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+                "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+                "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+                "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+                "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+                "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+                "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+                "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client\u2019s budget or plans plainly.",
+                "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+                "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+              ]
+            },
+            "communicated_editorial_items": [],
+            "context_hash": "d48dbf7bd524eaed0e1f3471510c05fdfcdd4e8459ac44f41605f8622b9c68ed",
+            "contextual_guidance_topics": [],
+            "draft_revision_id": 386,
+            "editorial_content_plan": {
+              "acknowledge": [
+                {
+                  "authority_class": "client_request",
+                  "fingerprint": "5af9b6474d577fd7ebc47159db273bc4b5c5f61477cfba55032edc2d102390b9",
+                  "included_in_model_payload": true,
+                  "prior_turn_status": "not_previously_communicated",
+                  "priority": 3,
+                  "proposition_key": "latest_client_detail",
+                  "reason": "current_turn_delta",
+                  "role": "ACKNOWLEDGE",
+                  "semantic_key": "latest_client_detail",
+                  "source_reference": "current_client_message",
+                  "topic": "latest_client_detail",
+                  "value": {
+                    "about": "the enquiry",
+                    "kind": "new_enquiry"
+                  }
+                }
+              ],
+              "already_communicated": [],
+              "client_visible_pending_state": [],
+              "defer": [
+                {
+                  "authority_class": "current_governed",
+                  "fingerprint": "5e1b7a59bf98cd79bf717b0d18768ff2bf2a969ee1c16d258e22d0e6a2ef0bcb",
+                  "included_in_model_payload": false,
+                  "prior_turn_status": "not_previously_communicated",
+                  "priority": 50,
+                  "proposition_key": "case_fact:Requested rental type code",
+                  "reason": "case_summary_not_needed_for_this_reply",
+                  "role": "DEFER",
+                  "semantic_key": "case_fact:Requested rental type code",
+                  "source_reference": "governed_case",
+                  "topic": "Requested rental type code",
+                  "value": {
+                    "fact": "Requested rental type code: custom_scope"
+                  }
+                }
+              ],
+              "do_not_repeat": [],
+              "editorial_rationale": "minimal_substantive_items_optional_guidance_ranked_last",
+              "helpful_now": [],
+              "internal_only": [],
+              "must_ask": [],
+              "must_communicate": [],
+              "primary_client_need": [
+                "respond_to_current_update"
+              ],
+              "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+              "source_bindings": [
+                {
+                  "fingerprint": "5af9b6474d577fd7ebc47159db273bc4b5c5f61477cfba55032edc2d102390b9",
+                  "semantic_key": "latest_client_detail",
+                  "source_reference": "current_client_message"
+                },
+                {
+                  "fingerprint": "5e1b7a59bf98cd79bf717b0d18768ff2bf2a969ee1c16d258e22d0e6a2ef0bcb",
+                  "semantic_key": "case_fact:Requested rental type code",
+                  "source_reference": "governed_case"
+                }
+              ],
+              "substantive_budget": 3,
+              "version": "editorial_content_plan_v3"
+            },
+            "generation_audit": {
+              "attempts": [
+                {
+                  "candidate_hash": "f237639bb9194ee173945e96cd811c17f124ce2705c1975d77d39e6dc3235b4f",
+                  "failed_realization_item_ids": [],
+                  "generation_attempt": 1,
+                  "provider_request_id": null,
+                  "provider_response_id": null,
+                  "realization_results": [],
+                  "safety_failure_codes": []
+                }
+              ],
+              "context_hash": "d48dbf7bd524eaed0e1f3471510c05fdfcdd4e8459ac44f41605f8622b9c68ed",
+              "contract_identity": "e45cbc1bc85c155665ccc65758fc4af93792fc647716442dc4f3ddd0dca4e9b1",
+              "corrective_retry_count": 0,
+              "final_realization_results": [],
+              "initial_candidate_hash": "f237639bb9194ee173945e96cd811c17f124ce2705c1975d77d39e6dc3235b4f",
+              "plan_identity": "f522a8bc8253b9e1bb5a44e32396f3ec2774c765a96a9ad7c7d567fb7f26d91e",
+              "policy": "required_realization_single_correction_v1",
+              "source_case_revision": 0
+            },
+            "model": null,
+            "operator_annotations": [],
+            "provider": "deterministic_fake",
+            "provider_incomplete_reason": null,
+            "provider_request_id": null,
+            "provider_response_id": null,
+            "provider_response_status": null,
+            "resolution_items": [],
+            "response_intent": "COMPLETE_INQUIRY_RESPONSE",
+            "validation_failure_codes": [],
+            "workflow_action_id": 1619
+          },
+          "workflow_event_id": 17089,
+          "workflow_event_uuid": "e45d1c4d-afbe-4558-bce5-258bce19a8da"
+        }
+      ]
+    },
+    "provider_mode_lines": [
+      "REAL PROVIDER EXECUTION ENABLED",
+      "outlook -> Microsoft Graph (canonical governed actions only)",
+      "task_surface -> Asana"
+    ],
+    "simulated_outlook_threads": [
+      {
+        "approval_blocked_by_operator_annotations": false,
+        "can_edit": true,
+        "can_generate": false,
+        "can_regenerate": true,
+        "can_simulate_send": false,
+        "conversation_key": "governed_client_response:584",
+        "current_display_status": "needs_approval",
+        "current_revision": {
+          "approval_request_id": 465,
+          "approved_at": null,
+          "body_text": "Hi Serinya,\n\nThis is a synthetic test message for the Outlook approval and execution path. No action is required from you.",
+          "closing_text": "Warm regards,",
+          "content_hash": "4b32159890f4e22c33fa6aec3fa23d42aff6060297af7f651714eadb40e6417b",
+          "context_hash": "593d6264c01f5c1da0e24a8b8637b72b0da4401629ce67c583ef9476c10e479a",
+          "context_payload": {
+            "allow_empty_open_questions": true,
+            "contact_label": "Serinya (synthetic certification)",
+            "contextual_guidance": [],
+            "conversation_key": "governed_client_response:584",
+            "current_facts": [],
+            "guidance_references": [
+              "WF-003",
+              "WF-004"
+            ],
+            "metadata_summary_lines": [
+              "Governed response intent: COMPLETE_INQUIRY_RESPONSE",
+              "Contract hash: d48dbf7bd524eaed0e1f3471510c05fdfcdd4e8459ac44f41605f8622b9c68ed"
+            ],
+            "open_questions": [],
+            "operator_annotations": [],
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_label": "Serinya (synthetic certification)",
+            "rental_case_id": 584,
+            "resolution_items": [],
+            "sender_email": "wnc-rentals-simulated@example.test",
+            "sender_label": "WNC Rentals (Simulated)",
+            "source_case_revision": 0,
+            "workflow_action_id": 1619
+          },
+          "conversation_key": "governed_client_response:584",
+          "created_at": "2026-10-03 12:21:41.630916+00",
+          "created_by_reference": "test_console:operator",
+          "delivered_at": null,
+          "delivery_external_reference": null,
+          "delivery_failure_code": null,
+          "draft_source": "generated",
+          "draft_status": "needs_approval",
+          "inquiry_response_draft_revision_id": 386,
+          "inquiry_response_draft_revision_uuid": "f2a8e28a-0c08-4318-884e-7bc343b91c24",
+          "intro_text": "Governed client response.",
+          "is_current": true,
+          "question_lines": [],
+          "recipient_email": "Serinya@whennaturecalls.nl",
+          "recipient_label": "Serinya (synthetic certification)",
+          "rejected_at": null,
+          "rental_case_id": 584,
+          "salutation": "Hello,",
+          "sender_display_name": null,
+          "sender_email": "wnc-rentals-simulated@example.test",
+          "sender_label": "WNC Rentals (Simulated)",
+          "signoff_text": "WNC Rentals",
+          "source_case_revision": 0,
+          "subject": "SYNTHETIC TEST - Outlook final send certification",
+          "supersedes_draft_revision_id": null,
+          "updated_at": "2026-10-03 12:21:41.866598+00",
+          "workflow_action_id": 1619
+        },
+        "draft_history": [
+          {
+            "approval_request_id": 465,
+            "approved_at": null,
+            "body_text": "Hi Serinya,\n\nThis is a synthetic test message for the Outlook approval and execution path. No action is required from you.",
+            "closing_text": "Warm regards,",
+            "content_hash": "4b32159890f4e22c33fa6aec3fa23d42aff6060297af7f651714eadb40e6417b",
+            "context_hash": "593d6264c01f5c1da0e24a8b8637b72b0da4401629ce67c583ef9476c10e479a",
+            "context_payload": {
+              "allow_empty_open_questions": true,
+              "contact_label": "Serinya (synthetic certification)",
+              "contextual_guidance": [],
+              "conversation_key": "governed_client_response:584",
+              "current_facts": [],
+              "guidance_references": [
+                "WF-003",
+                "WF-004"
+              ],
+              "metadata_summary_lines": [
+                "Governed response intent: COMPLETE_INQUIRY_RESPONSE",
+                "Contract hash: d48dbf7bd524eaed0e1f3471510c05fdfcdd4e8459ac44f41605f8622b9c68ed"
+              ],
+              "open_questions": [],
+              "operator_annotations": [],
+              "recipient_email": "Serinya@whennaturecalls.nl",
+              "recipient_label": "Serinya (synthetic certification)",
+              "rental_case_id": 584,
+              "resolution_items": [],
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "source_case_revision": 0,
+              "workflow_action_id": 1619
+            },
+            "conversation_key": "governed_client_response:584",
+            "created_at": "2026-10-03 12:21:41.630916+00",
+            "created_by_reference": "test_console:operator",
+            "delivered_at": null,
+            "delivery_external_reference": null,
+            "delivery_failure_code": null,
+            "draft_source": "generated",
+            "draft_status": "needs_approval",
+            "inquiry_response_draft_revision_id": 386,
+            "inquiry_response_draft_revision_uuid": "f2a8e28a-0c08-4318-884e-7bc343b91c24",
+            "intro_text": "Governed client response.",
+            "is_current": true,
+            "question_lines": [],
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_label": "Serinya (synthetic certification)",
+            "rejected_at": null,
+            "rental_case_id": 584,
+            "salutation": "Hello,",
+            "sender_display_name": null,
+            "sender_email": "wnc-rentals-simulated@example.test",
+            "sender_label": "WNC Rentals (Simulated)",
+            "signoff_text": "WNC Rentals",
+            "source_case_revision": 0,
+            "subject": "SYNTHETIC TEST - Outlook final send certification",
+            "supersedes_draft_revision_id": null,
+            "updated_at": "2026-10-03 12:21:41.866598+00",
+            "workflow_action_id": 1619
+          }
+        ],
+        "open_approval_request_id": 465,
+        "question_labels": [],
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "status_note": null,
+        "thread_label": "SYNTHETIC TEST - Outlook final send certification",
+        "workflow_action_id": 1619,
+        "workflow_action_status": "awaiting_approval"
+      }
+    ],
+    "test_metadata_lines": [
+      "Label: SYNTHETIC final Outlook send certification",
+      "Client / company: Serinya (synthetic certification)",
+      "Test contact email: Serinya@whennaturecalls.nl",
+      "Event reference: Synthetic execution certification only; no rental booking",
+      "Created by: test_console:operator"
+    ],
+    "timeline_notice": null,
+    "workflow_event_limit": 100,
+    "workflow_event_total_count": 2,
+    "working_proposal": {
+      "approvals": [
+        {
+          "detail": "Approve inquiry response draft revision 386 before simulated send.",
+          "label": "Client Communication Send",
+          "source": "workflow_action:1619:draft_revision:386",
+          "state": "blocked",
+          "value": "Open"
+        }
+      ],
+      "blockers": [
+        {
+          "detail": null,
+          "label": "Current blockers",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "changes": [
+        {
+          "detail": null,
+          "label": "Proposed or pending changes",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "commercial_snapshot": [
+        {
+          "detail": "Current booking-fee authority cannot be established from the current structured schedule scope.",
+          "label": "Booking fee baseline",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "VAT",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Case-specific exceptions",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        },
+        {
+          "detail": null,
+          "label": "Unresolved commercial items",
+          "source": null,
+          "state": "none",
+          "value": "0"
+        }
+      ],
+      "communication": [
+        {
+          "detail": "Why: operator_requested_governed_client_response",
+          "label": "Latest outbound workflow action",
+          "source": "governed_client_response:584",
+          "state": "blocked",
+          "value": "Send Inquiry Response"
+        }
+      ],
+      "feasibility_snapshot": [
+        {
+          "detail": null,
+          "label": "Feasibility as requested",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not yet evaluated"
+        },
+        {
+          "detail": null,
+          "label": "Supported alternative",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Confirmation still required",
+          "source": null,
+          "state": "none",
+          "value": "No"
+        },
+        {
+          "detail": null,
+          "label": "Hard constraint",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "missing_client_information": [
+        {
+          "detail": null,
+          "label": "Outstanding client information",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "next_actions": [
+        {
+          "detail": "Why: operator_requested_governed_client_response",
+          "label": "Send Inquiry Response",
+          "source": "governed_client_response:584",
+          "state": "blocked",
+          "value": "Awaiting Approval"
+        }
+      ],
+      "operations": [
+        {
+          "detail": null,
+          "label": "Current working scope",
+          "source": null,
+          "state": "none",
+          "value": "No structured operational facts are established yet."
+        }
+      ],
+      "proposal_freshness": [
+        {
+          "detail": null,
+          "label": "Proposal artifact",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not yet established"
+        }
+      ],
+      "rental_snapshot": [
+        {
+          "detail": null,
+          "label": "Client / company",
+          "source": null,
+          "state": "current",
+          "value": "Serinya (synthetic certification)"
+        },
+        {
+          "detail": null,
+          "label": "Working scope label",
+          "source": null,
+          "state": "current",
+          "value": "SYNTHETIC final Outlook send certification"
+        },
+        {
+          "detail": null,
+          "label": "Rental type",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Requested spaces",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Lifecycle status",
+          "source": null,
+          "state": "current",
+          "value": "Inquiry Active"
+        },
+        {
+          "detail": null,
+          "label": "Inquiry reference",
+          "source": null,
+          "state": "reference",
+          "value": "Synthetic execution certification only; no rental booking"
+        },
+        {
+          "detail": null,
+          "label": "Event date",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not provided"
+        },
+        {
+          "detail": null,
+          "label": "Event time",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not provided"
+        },
+        {
+          "detail": null,
+          "label": "Guest count",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not provided"
+        },
+        {
+          "detail": null,
+          "label": "Event type",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        }
+      ],
+      "requirements": [
+        {
+          "detail": null,
+          "label": "Outstanding requirements",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "clock": {
+    "current_time": "2026-10-03T12:21:43.489731Z",
+    "real_current_time": "2026-10-03T12:21:43.489713Z",
+    "simulated": false
+  },
+  "clock_controls_enabled": false,
+  "environment": "staging"
+}

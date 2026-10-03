@@ -1,0 +1,2321 @@
+{
+  "case": {
+    "asana_master_task_reference": null,
+    "evidence_bundles": [
+      {
+        "effects": [],
+        "observations": [],
+        "raw_evidence": {
+          "body": "Hello, I would like to ask about using the Studio for a small planning session. Please let me know what details you need from me. Thanks, Alex Test.",
+          "external_test_reference": "synthetic-outlook-draft-only-fixture-424",
+          "inbound_source_record_id": 2031,
+          "occurred_at": "2026-09-11 09:47:00+00",
+          "sender": "alex.test@example.test",
+          "source_label": "synthetic_outlook_draft_only_fixture",
+          "subject": "Studio planning session inquiry",
+          "workflow_event_id": 10930
+        },
+        "source_record": {
+          "association_basis": "test_console_explicit_case",
+          "association_status": "resolved",
+          "case_reference_hint": null,
+          "confidentiality_posture": null,
+          "conversation_reference": "Studio planning session inquiry",
+          "created_at": "2026-09-11 09:47:00.638126+00",
+          "dedupe_key": "synthetic-outlook-draft-only-fixture-424",
+          "evidence_excerpt": "Hello, I would like to ask about using the Studio for a small planning session. Please let me know what details you need from me. Thanks, Alex Test.",
+          "external_source_id": "synthetic-outlook-draft-only-fixture-424",
+          "inbound_source_record_id": 2031,
+          "occurred_at": "2026-09-11 09:47:00+00",
+          "pi_posture": null,
+          "received_at": "2026-09-11 09:47:00+00",
+          "resolved_rental_case_id": 424,
+          "sender_actor_reference": "alex.test@example.test",
+          "sender_actor_type": "client",
+          "source_hash": "sha256:cdce18c69ce084d4c0ca407197aa079eeb5cdb7e8c0728891a265561b15113b9",
+          "source_location_reference": "synthetic_outlook_draft_only_fixture",
+          "source_record_type": "message",
+          "source_system_code": "email"
+        }
+      }
+    ],
+    "evidence_notice": null,
+    "human_work_preview": [
+      "Resolve blocker: Open question 1620 must be resolved.",
+      "Resolve blocker: Open question 1621 must be resolved.",
+      "Resolve blocker: Open question 1622 must be resolved.",
+      "Resolve blocker: Open question 1623 must be resolved.",
+      "Resolve question: What date and time is the client requesting for the event?",
+      "Resolve question: How many guests are expected?",
+      "Resolve question: Which space or rental scope is the client requesting?",
+      "Resolve question: What type of event is the client planning?",
+      "Approval needed: Approve exact recovery send for inquiry response draft revision 144.",
+      "Workflow action: Prepare client information request for follow-up #1. [Awaiting Approval]",
+      "Workflow action: Send Inquiry Response [Ready To Execute]",
+      "Workflow action: Send Inquiry Response [Awaiting Approval]",
+      "Follow-up: Inquiry Missing Information [Scheduled]"
+    ],
+    "metadata": {
+      "client_label": "Alex Test",
+      "contact_email": "Serinya@whennaturecalls.nl",
+      "created_at": "2026-09-11 09:46:29.962451+00",
+      "created_by": "test_console:operator",
+      "event_reference": "Synthetic Outlook draft-only adapter smoke",
+      "label": "Outlook draft-only deterministic fixture 20260911"
+    },
+    "orchestration_snapshot": {
+      "approval_requests": [
+        {
+          "approval_request_id": 183,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-09-11 09:53:44.939931+00",
+          "decided_at": "2026-09-11 09:54:14.446032+00",
+          "decided_by_reference": "test_console:operator",
+          "decision_notes": null,
+          "decision_payload": {
+            "decision": "approved"
+          },
+          "evidence_reference_keys": [
+            "workflow_action:582",
+            "inquiry_response_draft:143"
+          ],
+          "reason_text": "Approve inquiry response draft revision 143 before simulated send.",
+          "rental_case_id": 424,
+          "required_approver_reference": "semantic:approval:workflow_action:582:draft_revision:143",
+          "required_approver_role": "client_communication_review",
+          "status": "approved",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 582,
+          "target_entity_reference": "workflow_action:582:draft_revision:143",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-09-11 09:54:14.606164+00"
+        },
+        {
+          "approval_request_id": 184,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-09-12 09:40:21.334483+00",
+          "decided_at": "2026-09-12 10:46:05.542516+00",
+          "decided_by_reference": "test_console:operator",
+          "decision_notes": null,
+          "decision_payload": {
+            "decision": "approved"
+          },
+          "evidence_reference_keys": [
+            "workflow_action:586",
+            "inquiry_response_draft:144"
+          ],
+          "reason_text": "Approve inquiry response draft revision 144 before simulated send.",
+          "rental_case_id": 424,
+          "required_approver_reference": "semantic:approval:workflow_action:586:draft_revision:144",
+          "required_approver_role": "client_communication_review",
+          "status": "approved",
+          "supersedes_approval_request_id": null,
+          "target_entity_id": 586,
+          "target_entity_reference": "workflow_action:586:draft_revision:144",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-09-12 10:46:05.640592+00"
+        },
+        {
+          "approval_request_id": 185,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-09-12 16:25:22.991803+00",
+          "decided_at": "2026-09-12 16:40:14.607705+00",
+          "decided_by_reference": "test_console:operator",
+          "decision_notes": null,
+          "decision_payload": {
+            "decision": "approved"
+          },
+          "evidence_reference_keys": [
+            "workflow_action:587",
+            "workflow_action:586",
+            "inquiry_response_draft:144"
+          ],
+          "reason_text": "Approve exact recovery send for inquiry response draft revision 144.",
+          "rental_case_id": 424,
+          "required_approver_reference": "semantic:approval:workflow_action:587:draft_revision:144",
+          "required_approver_role": "client_communication_review",
+          "status": "approved",
+          "supersedes_approval_request_id": 184,
+          "target_entity_id": 587,
+          "target_entity_reference": "workflow_action:587:draft_revision:144",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-09-12 16:40:14.706807+00"
+        },
+        {
+          "approval_request_id": 186,
+          "approval_type": "client_communication_send",
+          "created_at": "2026-09-13 08:49:00.938725+00",
+          "decided_at": null,
+          "decided_by_reference": null,
+          "decision_notes": null,
+          "decision_payload": null,
+          "evidence_reference_keys": [
+            "workflow_action:588",
+            "workflow_action:586",
+            "inquiry_response_draft:144"
+          ],
+          "reason_text": "Approve exact recovery send for inquiry response draft revision 144.",
+          "rental_case_id": 424,
+          "required_approver_reference": "semantic:approval:workflow_action:588:draft_revision:144",
+          "required_approver_role": "client_communication_review",
+          "status": "open",
+          "supersedes_approval_request_id": 184,
+          "target_entity_id": 588,
+          "target_entity_reference": "workflow_action:588:draft_revision:144",
+          "target_entity_type": "workflow_action",
+          "updated_at": "2026-09-13 08:49:00.938725+00"
+        }
+      ],
+      "artifacts": [],
+      "blockers": [
+        {
+          "blocked_subject_id": null,
+          "blocked_subject_reference": "open_question:1620",
+          "blocked_subject_type": "transition",
+          "blocker_id": 1548,
+          "blocker_type": "missing_client_information",
+          "opened_at": "2026-09-11 09:47:13.200698+00",
+          "origin_entity_id": 1620,
+          "origin_entity_reference": "open_question:1620",
+          "origin_entity_type": "open_question",
+          "rental_case_id": 424,
+          "resolution_condition_text": "Open question 1620 must be resolved.",
+          "resolution_reference": "semantic:blocker:question:1620",
+          "resolved_at": null,
+          "severity": "high",
+          "status": "open",
+          "supersedes_blocker_id": null
+        },
+        {
+          "blocked_subject_id": null,
+          "blocked_subject_reference": "open_question:1621",
+          "blocked_subject_type": "transition",
+          "blocker_id": 1549,
+          "blocker_type": "missing_client_information",
+          "opened_at": "2026-09-11 09:47:13.200698+00",
+          "origin_entity_id": 1621,
+          "origin_entity_reference": "open_question:1621",
+          "origin_entity_type": "open_question",
+          "rental_case_id": 424,
+          "resolution_condition_text": "Open question 1621 must be resolved.",
+          "resolution_reference": "semantic:blocker:question:1621",
+          "resolved_at": null,
+          "severity": "high",
+          "status": "open",
+          "supersedes_blocker_id": null
+        },
+        {
+          "blocked_subject_id": null,
+          "blocked_subject_reference": "open_question:1622",
+          "blocked_subject_type": "transition",
+          "blocker_id": 1550,
+          "blocker_type": "missing_client_information",
+          "opened_at": "2026-09-11 09:47:13.200698+00",
+          "origin_entity_id": 1622,
+          "origin_entity_reference": "open_question:1622",
+          "origin_entity_type": "open_question",
+          "rental_case_id": 424,
+          "resolution_condition_text": "Open question 1622 must be resolved.",
+          "resolution_reference": "semantic:blocker:question:1622",
+          "resolved_at": null,
+          "severity": "high",
+          "status": "open",
+          "supersedes_blocker_id": null
+        },
+        {
+          "blocked_subject_id": null,
+          "blocked_subject_reference": "open_question:1623",
+          "blocked_subject_type": "transition",
+          "blocker_id": 1551,
+          "blocker_type": "missing_client_information",
+          "opened_at": "2026-09-11 09:47:13.200698+00",
+          "origin_entity_id": 1623,
+          "origin_entity_reference": "open_question:1623",
+          "origin_entity_type": "open_question",
+          "rental_case_id": 424,
+          "resolution_condition_text": "Open question 1623 must be resolved.",
+          "resolution_reference": "semantic:blocker:question:1623",
+          "resolved_at": null,
+          "severity": "high",
+          "status": "open",
+          "supersedes_blocker_id": null
+        }
+      ],
+      "case_decisions": [],
+      "execution_attempts": [
+        {
+          "adapter_code": "outlook",
+          "attempt_number": 1,
+          "completed_at": "2026-09-11 09:54:37.528852+00",
+          "execution_attempt_id": 21,
+          "execution_attempt_uuid": "761adbb0-411e-4294-845f-2f811219ebec",
+          "external_reference": null,
+          "failure_code": "adapter_result_malformed",
+          "rental_case_id": 424,
+          "response_snapshot": {
+            "reason": "adapter_code_mismatch",
+            "received_adapter_code": "email"
+          },
+          "retry_eligible": false,
+          "started_at": "2026-09-11 09:54:36.210043+00",
+          "status": "failed",
+          "workflow_action_id": 582
+        },
+        {
+          "adapter_code": "outlook",
+          "attempt_number": 1,
+          "completed_at": "2026-09-12 11:39:14.61855+00",
+          "execution_attempt_id": 22,
+          "execution_attempt_uuid": "9b91742b-8ac1-418f-9eea-3831ad7d54b7",
+          "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+          "failure_code": "outlook_send_governance_invalid",
+          "rental_case_id": 424,
+          "response_snapshot": {
+            "provider": "microsoft_graph_outlook",
+            "reason": "current_draft_action_binding_changed",
+            "stage": "pre_send_governance"
+          },
+          "retry_eligible": false,
+          "started_at": "2026-09-12 11:39:14.177691+00",
+          "status": "failed",
+          "workflow_action_id": 586
+        }
+      ],
+      "follow_ups": [
+        {
+          "attempt_count": 0,
+          "cadence_policy_code": "inquiry_cold_weekly",
+          "completed_at": null,
+          "context_payload": {
+            "episode_key": "inquiry_episode:6092dfe1fc32f98b9c11a721fda7fffc8ce9073a86e7724e45e8eee1789bdac5",
+            "event_proximity": "unscheduled",
+            "intended_recipient_role": "client",
+            "lead_posture": "cold_inquiry",
+            "open_question_ids": [
+              1620,
+              1621,
+              1622,
+              1623
+            ],
+            "purpose": "request_missing_information",
+            "question_labels": [
+              "Requested schedule",
+              "Guest count",
+              "Requested space",
+              "Event type"
+            ],
+            "question_texts": [
+              "What date and time is the client requesting for the event?",
+              "How many guests are expected?",
+              "Which space or rental scope is the client requesting?",
+              "What type of event is the client planning?"
+            ],
+            "question_types": [
+              "requested_event_timing",
+              "expected_guest_count",
+              "requested_rental_scope",
+              "requested_event_type"
+            ],
+            "reason": "Client information is still missing for: Requested schedule, Guest count, Requested space, Event type.",
+            "recipient_reference": null,
+            "required_field_codes": [
+              "requested_schedule",
+              "guest_count",
+              "requested_space",
+              "event_type"
+            ],
+            "sequence_number": 1
+          },
+          "created_at": "2026-09-11 09:47:13.200698+00",
+          "due_at": "2026-09-11 09:47:13.200698+00",
+          "escalate_after": null,
+          "follow_up_id": 210,
+          "next_action_type": "REQUEST_CLIENT_INFORMATION",
+          "reason_code": "inquiry_missing_information",
+          "rental_case_id": 424,
+          "semantic_identity_key": "inquiry_follow_up:d4d5ca7fb12687c849aad0943f25885f1c226675bb91e48eaafff8e825eb5129",
+          "sequence_number": 1,
+          "status": "scheduled",
+          "updated_at": "2026-09-11 09:47:13.200698+00",
+          "urgency_level": "medium",
+          "waiting_for_reference": null,
+          "waiting_for_role": "client"
+        }
+      ],
+      "milestones": [],
+      "open_questions": [
+        {
+          "blocking_scope": "transition",
+          "created_at": "2026-09-11 09:47:07.613479+00",
+          "domain_code": "timing",
+          "human_question_text": "What date and time is the client requesting for the event?",
+          "open_question_id": 1620,
+          "proposed_answer_payload": null,
+          "question_type": "requested_event_timing",
+          "rental_case_id": 424,
+          "requested_from_role": "client",
+          "resolved_at": null,
+          "source_reference": "inquiry_intake:requested_schedule",
+          "status": "open",
+          "supersedes_open_question_id": null
+        },
+        {
+          "blocking_scope": "transition",
+          "created_at": "2026-09-11 09:47:07.613479+00",
+          "domain_code": "event_profile",
+          "human_question_text": "How many guests are expected?",
+          "open_question_id": 1621,
+          "proposed_answer_payload": null,
+          "question_type": "expected_guest_count",
+          "rental_case_id": 424,
+          "requested_from_role": "client",
+          "resolved_at": null,
+          "source_reference": "inquiry_intake:guest_count",
+          "status": "open",
+          "supersedes_open_question_id": null
+        },
+        {
+          "blocking_scope": "transition",
+          "created_at": "2026-09-11 09:47:07.613479+00",
+          "domain_code": "event_profile",
+          "human_question_text": "Which space or rental scope is the client requesting?",
+          "open_question_id": 1622,
+          "proposed_answer_payload": null,
+          "question_type": "requested_rental_scope",
+          "rental_case_id": 424,
+          "requested_from_role": "client",
+          "resolved_at": null,
+          "source_reference": "inquiry_intake:requested_space",
+          "status": "open",
+          "supersedes_open_question_id": null
+        },
+        {
+          "blocking_scope": "transition",
+          "created_at": "2026-09-11 09:47:07.613479+00",
+          "domain_code": "event_profile",
+          "human_question_text": "What type of event is the client planning?",
+          "open_question_id": 1623,
+          "proposed_answer_payload": null,
+          "question_type": "requested_event_type",
+          "rental_case_id": 424,
+          "requested_from_role": "client",
+          "resolved_at": null,
+          "source_reference": "inquiry_intake:event_type",
+          "status": "open",
+          "supersedes_open_question_id": null
+        }
+      ],
+      "proposed_changes": [],
+      "reasoning_projections": [],
+      "rental_case": {
+        "active_event_end": null,
+        "active_event_start": null,
+        "case_reference_code": "RC-20260911094629962",
+        "case_revision": 1,
+        "client_account_ref": null,
+        "commercial_summary_status": "unknown",
+        "created_at": "2026-09-11 09:46:29.962451+00",
+        "current_agreement_artifact_id": null,
+        "current_proposal_artifact_id": null,
+        "dormant_origin_state": null,
+        "dormant_reason_code": null,
+        "dormant_review_at": null,
+        "is_active": true,
+        "lifecycle_state": "inquiry_active",
+        "operational_summary_status": "unknown",
+        "primary_contact_ref": null,
+        "rental_case_id": 424,
+        "rental_case_uuid": "f2078230-f2b2-470a-a5cd-67d0829b6086",
+        "rental_type_code": "custom_scope",
+        "resume_target_state": null,
+        "service_level_or_type": "Outlook draft-only deterministic fixture 20260911",
+        "updated_at": "2026-09-11 09:47:07.714881+00"
+      },
+      "rental_case_facts": [],
+      "requirements": [],
+      "reschedule_requests": [],
+      "workflow_actions": [
+        {
+          "action_category": "communication",
+          "action_type": "REQUEST_CLIENT_INFORMATION",
+          "approval_posture": "approval_required",
+          "created_at": "2026-09-11 09:47:13.98316+00",
+          "due_at": "2026-09-11 09:47:13.200698+00",
+          "idempotency_key": "action:REQUEST_CLIENT_INFORMATION:d41191c8abbecefe7c39daec7be75cbf8c2ff896d11d2dd4abb7c5a9f594d3bb:1",
+          "reason_entity_id": 210,
+          "reason_entity_reference": "follow_up:210",
+          "reason_entity_type": "follow_up",
+          "rental_case_id": 424,
+          "semantic_subject_hash": "d41191c8abbecefe7c39daec7be75cbf8c2ff896d11d2dd4abb7c5a9f594d3bb",
+          "source_case_revision": 1,
+          "status": "awaiting_approval",
+          "structured_payload": {
+            "due_at": "2026-09-11 09:47:13.200698+00",
+            "follow_up_id": 210,
+            "intended_recipient_role": "client",
+            "open_question_ids": [
+              1620,
+              1621,
+              1622,
+              1623
+            ],
+            "purpose": "request_missing_information",
+            "question_texts": [
+              "What date and time is the client requesting for the event?",
+              "How many guests are expected?",
+              "Which space or rental scope is the client requesting?",
+              "What type of event is the client planning?"
+            ],
+            "reason": "Client information is still missing for: Requested schedule, Guest count, Requested space, Event type.",
+            "reason_code": "inquiry_missing_information",
+            "recipient_reference": null,
+            "required_field_codes": [
+              "requested_schedule",
+              "guest_count",
+              "requested_space",
+              "event_type"
+            ],
+            "sequence_number": 1,
+            "summary": "Prepare client information request for follow-up #1."
+          },
+          "supersedes_workflow_action_id": null,
+          "target_adapter_code": "internal",
+          "target_scope_key": null,
+          "updated_at": "2026-09-11 09:47:13.98316+00",
+          "workflow_action_id": 581,
+          "workflow_action_uuid": "91a17ac0-f454-4111-b45f-e08c096591e6"
+        },
+        {
+          "action_category": "communication",
+          "action_type": "SEND_INQUIRY_RESPONSE",
+          "approval_posture": "approval_required",
+          "created_at": "2026-09-11 09:53:44.63507+00",
+          "due_at": null,
+          "idempotency_key": "governed_client_response:424:successor:d28b470de9a04424",
+          "reason_entity_id": null,
+          "reason_entity_reference": "governed_client_response:424",
+          "reason_entity_type": "rental_case",
+          "rental_case_id": 424,
+          "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+          "source_case_revision": 1,
+          "status": "failed",
+          "structured_payload": {
+            "context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+            "purpose": "governed_client_response_draft",
+            "reason": "operator_requested_governed_client_response",
+            "response_intent": "REQUEST_CLIENT_INFORMATION"
+          },
+          "supersedes_workflow_action_id": null,
+          "target_adapter_code": "outlook",
+          "target_scope_key": null,
+          "updated_at": "2026-09-11 09:54:37.552696+00",
+          "workflow_action_id": 582,
+          "workflow_action_uuid": "d5f667f2-8e53-4dbb-a671-8cde95c5a3b1"
+        },
+        {
+          "action_category": "communication",
+          "action_type": "SEND_INQUIRY_RESPONSE",
+          "approval_posture": "approval_required",
+          "created_at": "2026-09-12 09:40:21.038554+00",
+          "due_at": null,
+          "idempotency_key": "governed_client_response:424:context:d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4:content:6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f:recipient:4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+          "reason_entity_id": null,
+          "reason_entity_reference": "governed_client_response:424",
+          "reason_entity_type": "rental_case",
+          "rental_case_id": 424,
+          "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+          "source_case_revision": 1,
+          "status": "failed",
+          "structured_payload": {
+            "context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+            "conversation_key": "governed_client_response:424",
+            "draft_content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "purpose": "governed_client_response_draft",
+            "reason": "operator_requested_governed_client_response",
+            "recipient_identity_hash": "4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+            "response_intent": "REQUEST_CLIENT_INFORMATION"
+          },
+          "supersedes_workflow_action_id": null,
+          "target_adapter_code": "outlook",
+          "target_scope_key": null,
+          "updated_at": "2026-09-12 11:39:14.681492+00",
+          "workflow_action_id": 586,
+          "workflow_action_uuid": "5674f0a3-de2e-48dc-9824-174cbc6517a7"
+        },
+        {
+          "action_category": "communication",
+          "action_type": "SEND_INQUIRY_RESPONSE",
+          "approval_posture": "approval_required",
+          "created_at": "2026-09-12 16:25:22.892592+00",
+          "due_at": null,
+          "idempotency_key": "governed_client_response:424:outlook_send_recovery:draft_revision:144:origin_action:586",
+          "reason_entity_id": null,
+          "reason_entity_reference": "governed_client_response:424",
+          "reason_entity_type": "rental_case",
+          "rental_case_id": 424,
+          "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+          "source_case_revision": 1,
+          "status": "ready_to_execute",
+          "structured_payload": {
+            "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+            "conversation_key": "governed_client_response:424",
+            "draft_content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "governed_context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recovery_draft_revision_id": 144,
+            "recovery_origin_workflow_action_id": 586
+          },
+          "supersedes_workflow_action_id": 586,
+          "target_adapter_code": "outlook",
+          "target_scope_key": null,
+          "updated_at": "2026-09-12 16:40:14.706807+00",
+          "workflow_action_id": 587,
+          "workflow_action_uuid": "4c164cbe-6ca6-4807-94da-518338bd99e3"
+        },
+        {
+          "action_category": "communication",
+          "action_type": "SEND_INQUIRY_RESPONSE",
+          "approval_posture": "approval_required",
+          "created_at": "2026-09-13 08:48:59.899343+00",
+          "due_at": null,
+          "idempotency_key": "governed_outlook_v1:d4dfff7f1ccd99ff0513dbf8e78408bdef6e08870569f8a039d48a25d665bb50",
+          "reason_entity_id": null,
+          "reason_entity_reference": "governed_client_response:424",
+          "reason_entity_type": "rental_case",
+          "rental_case_id": 424,
+          "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+          "source_case_revision": 1,
+          "status": "awaiting_approval",
+          "structured_payload": {
+            "action_type": "SEND_INQUIRY_RESPONSE",
+            "approval_target": "workflow_action:588:draft_revision:144",
+            "body": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nAfter we know those details, we are happy to move forward with next steps! \n\nWarmly,\nWhen Nature Calls Team",
+            "body_type": "text",
+            "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+            "contract_version": "governed_outlook_v1",
+            "conversation_key": "governed_client_response:424",
+            "draft_content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "draft_origin_workflow_action_id": 586,
+            "draft_revision_id": 144,
+            "governed_context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+            "graph_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+            "message_mode": "existing_draft",
+            "plan_identity": "governed_outlook_reservation_v1:424:65b73a2c0ad80a3911d63bd250cd27b43e5c2d6d2a8b5132bd4861e640911492",
+            "provenance": "outlook_send_recovery",
+            "provider_type": "microsoft_graph_outlook",
+            "purpose": "governed_client_response_draft",
+            "reason": "operator_requested_governed_client_response",
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_identity_hash": "4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+            "recipient_reference": "inquiry_response_draft:144",
+            "recovery_draft_revision_id": 144,
+            "recovery_origin_workflow_action_id": 586,
+            "recovery_predecessor_action_id": 587,
+            "rental_case_id": 424,
+            "response_intent": "REQUEST_CLIENT_INFORMATION",
+            "source_case_revision": 1,
+            "subject": "A few details for your inquiry"
+          },
+          "supersedes_workflow_action_id": 586,
+          "target_adapter_code": "outlook",
+          "target_scope_key": null,
+          "updated_at": "2026-09-13 08:49:00.205516+00",
+          "workflow_action_id": 588,
+          "workflow_action_uuid": "429347cc-4412-4836-a451-ed32543578ab"
+        }
+      ],
+      "workflow_events": [
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "test-console:case:RC-20260911094629962",
+          "event_type_code": "test_console_case_registered",
+          "occurred_at": "2026-09-11 09:46:29.962451+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-11 09:46:29.962451+00",
+          "rental_case_id": 424,
+          "source_reference": "test_console:create_case",
+          "source_type": "test_console",
+          "structured_payload": {
+            "client_label": "Alex Test",
+            "contact_email": "Serinya@whennaturecalls.nl",
+            "event_reference": "Synthetic Outlook draft-only adapter smoke",
+            "label": "Outlook draft-only deterministic fixture 20260911",
+            "test_case": true
+          },
+          "workflow_event_id": 10929,
+          "workflow_event_uuid": "95c0e5c9-2d01-4b9c-8802-ec16d0fe0717"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "test_console_raw_evidence_recorded:424:e3834667efa7892cb68ea7555141cdf52c5b6c50c8f420297ec24ac15c933f05",
+          "event_type_code": "test_console_raw_evidence_recorded",
+          "occurred_at": "2026-09-11 09:47:00+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-11 09:47:00+00",
+          "rental_case_id": 424,
+          "source_reference": "inbound_source_record:2031",
+          "source_type": "test_console",
+          "structured_payload": {
+            "body": "Hello, I would like to ask about using the Studio for a small planning session. Please let me know what details you need from me. Thanks, Alex Test.",
+            "case_reference_code": "Synthetic Outlook draft-only adapter smoke",
+            "external_test_reference": "synthetic-outlook-draft-only-fixture-424",
+            "inbound_source_record_id": 2031,
+            "received_at": "2026-09-11T09:47:00Z",
+            "sender": "alex.test@example.test",
+            "source_label": "synthetic_outlook_draft_only_fixture",
+            "subject": "Studio planning session inquiry"
+          },
+          "workflow_event_id": 10930,
+          "workflow_event_uuid": "9934fd26-a2ca-4a5e-9f6f-30006d1edb63"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry-intake:requested_schedule:create_open_question:1ba7c5b831580573d1e49246fa856ae463c76491c36a231d743142293b56bd02",
+          "event_type_code": "inquiry_open_question_created",
+          "occurred_at": "2026-09-11 09:47:07.613479+00",
+          "origin_metadata": {
+            "phase": "8.8b"
+          },
+          "recorded_at": "2026-09-11 09:47:07.613479+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_intake:requested_schedule",
+          "source_type": "inquiry_intake_runtime",
+          "structured_payload": {
+            "case_revision": 1,
+            "current_value": null,
+            "effect_code": "create_open_question",
+            "field_code": "requested_schedule",
+            "proposed_value": null,
+            "reason_code": "missing_core_field",
+            "source_observation_ids": []
+          },
+          "workflow_event_id": 10931,
+          "workflow_event_uuid": "0ad76a95-fac8-4282-8581-496ac6fe10d9"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry-intake:guest_count:create_open_question:4a1d727e5472ef9310f8ff542e379238a2196573735ac3cf8974fa24d3aa4ad1",
+          "event_type_code": "inquiry_open_question_created",
+          "occurred_at": "2026-09-11 09:47:07.613479+00",
+          "origin_metadata": {
+            "phase": "8.8b"
+          },
+          "recorded_at": "2026-09-11 09:47:07.613479+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_intake:guest_count",
+          "source_type": "inquiry_intake_runtime",
+          "structured_payload": {
+            "case_revision": 1,
+            "current_value": null,
+            "effect_code": "create_open_question",
+            "field_code": "guest_count",
+            "proposed_value": null,
+            "reason_code": "missing_core_field",
+            "source_observation_ids": []
+          },
+          "workflow_event_id": 10932,
+          "workflow_event_uuid": "7c057b6b-1d02-4155-970d-ff922fd797ba"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry-intake:requested_space:create_open_question:71852ee82294d6417e721d86664e53d8ffc05cb839c2bacda83b12e0b3934ea6",
+          "event_type_code": "inquiry_open_question_created",
+          "occurred_at": "2026-09-11 09:47:07.613479+00",
+          "origin_metadata": {
+            "phase": "8.8b"
+          },
+          "recorded_at": "2026-09-11 09:47:07.613479+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_intake:requested_space",
+          "source_type": "inquiry_intake_runtime",
+          "structured_payload": {
+            "case_revision": 1,
+            "current_value": null,
+            "effect_code": "create_open_question",
+            "field_code": "requested_space",
+            "proposed_value": null,
+            "reason_code": "missing_core_field",
+            "source_observation_ids": []
+          },
+          "workflow_event_id": 10933,
+          "workflow_event_uuid": "0c6be5d7-62e7-496a-9393-ae858f106089"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry-intake:event_type:create_open_question:5af0f5c5706122458ffae0c05a7a2f0d124cab0ccb9fe23878b0a4d120b19e66",
+          "event_type_code": "inquiry_open_question_created",
+          "occurred_at": "2026-09-11 09:47:07.613479+00",
+          "origin_metadata": {
+            "phase": "8.8b"
+          },
+          "recorded_at": "2026-09-11 09:47:07.613479+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_intake:event_type",
+          "source_type": "inquiry_intake_runtime",
+          "structured_payload": {
+            "case_revision": 1,
+            "current_value": null,
+            "effect_code": "create_open_question",
+            "field_code": "event_type",
+            "proposed_value": null,
+            "reason_code": "missing_core_field",
+            "source_observation_ids": []
+          },
+          "workflow_event_id": 10934,
+          "workflow_event_uuid": "32fdfb1d-a1e1-4b94-b2d8-ba9bf867b79b"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry_waiting:follow_up:inquiry_follow_up:d4d5ca7fb12687c849aad0943f25885f1c226675bb91e48eaafff8e825eb5129:23ca6dfd730f956da890732e22f34ad3e1cea657368ac032cd2c85a443211593",
+          "event_type_code": "inquiry_follow_up_scheduled",
+          "occurred_at": "2026-09-11 09:47:13.200698+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:47:13.200698+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_follow_up:d4d5ca7fb12687c849aad0943f25885f1c226675bb91e48eaafff8e825eb5129",
+          "source_type": "inquiry_waiting_runtime",
+          "structured_payload": {
+            "due_at": "2026-09-11 09:47:13.200698+00",
+            "follow_up_id": 210,
+            "open_question_ids": [
+              1620,
+              1621,
+              1622,
+              1623
+            ],
+            "plan_fingerprint": "23ca6dfd730f956da890732e22f34ad3e1cea657368ac032cd2c85a443211593",
+            "required_field_codes": [
+              "requested_schedule",
+              "guest_count",
+              "requested_space",
+              "event_type"
+            ],
+            "sequence_number": 1
+          },
+          "workflow_event_id": 10935,
+          "workflow_event_uuid": "ce104288-f9cd-4241-8457-1c43e3b7067c"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "orchestration:blocker:create:blocker:question:1620:1",
+          "event_type_code": "orchestration_blocker_created",
+          "occurred_at": "2026-09-11 09:47:13.200698+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:47:13.200698+00",
+          "rental_case_id": 424,
+          "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+          "source_type": "orchestration_runtime",
+          "structured_payload": {
+            "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+            "semantic_issue_key": "blocker:question:1620"
+          },
+          "workflow_event_id": 10936,
+          "workflow_event_uuid": "f259a5ed-f054-462b-aa43-c40cd3c7e722"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "orchestration:blocker:create:blocker:question:1621:1",
+          "event_type_code": "orchestration_blocker_created",
+          "occurred_at": "2026-09-11 09:47:13.200698+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:47:13.200698+00",
+          "rental_case_id": 424,
+          "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+          "source_type": "orchestration_runtime",
+          "structured_payload": {
+            "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+            "semantic_issue_key": "blocker:question:1621"
+          },
+          "workflow_event_id": 10937,
+          "workflow_event_uuid": "11769375-c636-4148-9fd6-efb92286e5ed"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "orchestration:blocker:create:blocker:question:1622:1",
+          "event_type_code": "orchestration_blocker_created",
+          "occurred_at": "2026-09-11 09:47:13.200698+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:47:13.200698+00",
+          "rental_case_id": 424,
+          "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+          "source_type": "orchestration_runtime",
+          "structured_payload": {
+            "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+            "semantic_issue_key": "blocker:question:1622"
+          },
+          "workflow_event_id": 10938,
+          "workflow_event_uuid": "e9447f5a-9bf8-4953-8248-28c00b5432dc"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "orchestration:blocker:create:blocker:question:1623:1",
+          "event_type_code": "orchestration_blocker_created",
+          "occurred_at": "2026-09-11 09:47:13.200698+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:47:13.200698+00",
+          "rental_case_id": 424,
+          "source_reference": "RULE_MISSING_CLIENT_INFORMATION",
+          "source_type": "orchestration_runtime",
+          "structured_payload": {
+            "rule_code": "RULE_MISSING_CLIENT_INFORMATION",
+            "semantic_issue_key": "blocker:question:1623"
+          },
+          "workflow_event_id": 10939,
+          "workflow_event_uuid": "ac26e9eb-10a7-412d-86a0-6748523534f1"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "orchestration:action:create:581:1",
+          "event_type_code": "workflow_action_created",
+          "occurred_at": "2026-09-11 09:47:13.200698+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:47:13.200698+00",
+          "rental_case_id": 424,
+          "source_reference": "RULE_DUE_FOLLOW_UP",
+          "source_type": "orchestration_runtime",
+          "structured_payload": {
+            "action_type": "REQUEST_CLIENT_INFORMATION",
+            "approval_posture": "approval_required",
+            "rule_code": "RULE_DUE_FOLLOW_UP",
+            "status": "awaiting_approval",
+            "workflow_action_id": 581
+          },
+          "workflow_event_id": 10940,
+          "workflow_event_uuid": "5f41a9f9-3c10-460c-a98f-a1ea569e2beb"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "governed_client_response_draft_generated:424:5386d2c89023371158fafaa5ef5defb055d5d446426dc6fb49abf84c8029c638",
+          "event_type_code": "governed_client_response_draft_generated",
+          "occurred_at": "2026-09-11 09:53:45.023315+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-11 09:53:45.023315+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_response_draft:143",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 183,
+            "context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+            "contextual_guidance_topics": [],
+            "draft_revision_id": 143,
+            "model": null,
+            "operator_annotations": [],
+            "provider": "deterministic_fake",
+            "provider_incomplete_reason": null,
+            "provider_request_id": null,
+            "provider_response_id": null,
+            "provider_response_status": null,
+            "resolution_items": [
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "What date and time is the client requesting for the event?",
+                "proposition_key": "open_question:1620",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              },
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "How many guests are expected?",
+                "proposition_key": "open_question:1621",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              },
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "Which space or rental scope is the client requesting?",
+                "proposition_key": "open_question:1622",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              },
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "What type of event is the client planning?",
+                "proposition_key": "open_question:1623",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              }
+            ],
+            "response_intent": "REQUEST_CLIENT_INFORMATION",
+            "validation_failure_codes": [],
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10941,
+          "workflow_event_uuid": "8abae499-107a-4419-8d9e-568d6daa9bd9"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:approval:workflow_action:183:approved:1",
+          "event_type_code": "approval_decided",
+          "occurred_at": "2026-09-11 09:54:14.446032+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:54:14.446032+00",
+          "rental_case_id": 424,
+          "source_reference": "approval:183",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "approval_request_id": 183,
+            "status_after": "approved",
+            "status_before": "open",
+            "target_entity_id": 582,
+            "target_entity_type": "workflow_action"
+          },
+          "workflow_event_id": 10942,
+          "workflow_event_uuid": "cee44ba9-216d-48b5-9f6d-d6427000c820"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:workflow_action:status1:582:1:approved",
+          "event_type_code": "workflow_action_status_changed",
+          "occurred_at": "2026-09-11 09:54:14.446032+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:54:14.446032+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:582",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "status_after": "approved",
+            "status_before": "awaiting_approval",
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10943,
+          "workflow_event_uuid": "1cc014cf-003f-49f3-97a7-b0713c859418"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:workflow_action:status2:582:1",
+          "event_type_code": "workflow_action_status_changed",
+          "occurred_at": "2026-09-11 09:54:14.446032+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-11 09:54:14.446032+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:582",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "status_after": "ready_to_execute",
+            "status_before": "approved",
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10944,
+          "workflow_event_uuid": "0e60dceb-d564-46e3-83e5-97a3da9033e5"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry_response_draft_approved:424:9886a2c898283f39334e74a1ad7db877b09e5029c7b496f4a83bf8fddafae81f",
+          "event_type_code": "inquiry_response_draft_approved",
+          "occurred_at": "2026-09-11 09:54:14.715876+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-11 09:54:14.715876+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_response_draft:143",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 183,
+            "draft_revision_id": 143,
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10945,
+          "workflow_event_uuid": "5bdac4ee-a5c2-4ead-aafa-ae3b33c7f8e1"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "action_execution_started:582:1",
+          "event_type_code": "workflow_action_execution_started",
+          "occurred_at": "2026-09-11 09:54:36.210043+00",
+          "origin_metadata": {
+            "phase": "8.6"
+          },
+          "recorded_at": "2026-09-11 09:54:36.210043+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:582",
+          "source_type": "execution_runtime",
+          "structured_payload": {
+            "action_status_after": "executing",
+            "action_status_before": "ready_to_execute",
+            "adapter_code": "outlook",
+            "attempt_number": 1,
+            "execution_attempt_id": 21,
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10946,
+          "workflow_event_uuid": "c590c33c-544a-4a95-9494-b629710f4751"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "action_execution_completed:582:21",
+          "event_type_code": "workflow_action_execution_completed",
+          "occurred_at": "2026-09-11 09:54:37.528852+00",
+          "origin_metadata": {
+            "phase": "8.7A"
+          },
+          "recorded_at": "2026-09-11 09:54:37.528852+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:582",
+          "source_type": "execution_runtime",
+          "structured_payload": {
+            "action_status_after": "failed",
+            "action_status_before": "executing",
+            "attempt_status": "failed",
+            "execution_attempt_id": 21,
+            "external_reference": null,
+            "failure_code": "adapter_result_malformed",
+            "retry_eligible": false,
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10947,
+          "workflow_event_uuid": "7f3f3a02-33a1-4b24-af38-944417faad4e"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "outlook_draft_reconciled_after_adapter_code_mismatch:424:8110992ea6fee7ced406ca9bd294e71342ad3f64bcf1696b35677874000e7e4f",
+          "event_type_code": "outlook_draft_reconciled_after_adapter_code_mismatch",
+          "occurred_at": "2026-09-11 10:36:15.650523+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-11 10:36:15.650523+00",
+          "rental_case_id": 424,
+          "source_reference": "execution_attempt:21",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 183,
+            "body_matches": true,
+            "canonical_adapter_code": "outlook",
+            "draft_revision_id": 143,
+            "execution_attempt_id": 21,
+            "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+            "historical_attempt_adapter_code": "outlook",
+            "historical_failure_code": "adapter_result_malformed",
+            "historical_failure_reason": "adapter_code_mismatch",
+            "is_draft": true,
+            "provider_outcome": "draft_created_send_disabled",
+            "recipient_matches": true,
+            "reconciliation_mode": "graph_get_exact_match",
+            "send_enabled": false,
+            "subject_matches": true,
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10948,
+          "workflow_event_uuid": "cd705b00-fa50-4060-a378-2a1c8ccb400f"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "outlook_human_edit_detected:424:d4d646be6a2f4834f31b1253e1e968e16448dc1ec94a328554077d657e091b91",
+          "event_type_code": "outlook_human_edit_detected",
+          "occurred_at": "2026-09-11 12:39:56.117345+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-11 12:39:56.117345+00",
+          "rental_case_id": 424,
+          "source_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+          "source_type": "test_console",
+          "structured_payload": {
+            "candidate_content_hash": "05062544f5f2e4b23128b8681e6eee9d7657ff1c1e69948c1b8761a2f82d46a0",
+            "comparison": {
+              "body_changed": true,
+              "body_content_type": "text",
+              "current_cc_recipients": [],
+              "current_to_recipients": [
+                "serinya@whennaturecalls.nl"
+              ],
+              "formatting_only_changed": false,
+              "last_modified_at": "2026-09-11T11:03:06Z",
+              "recipients_changed": false,
+              "subject_changed": false
+            },
+            "graph_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+            "graph_operations": {
+              "create": 0,
+              "get": 1,
+              "patch": 0,
+              "send": 0
+            },
+            "mailbox_identity": {
+              "authorized": true,
+              "classification": "MAILBOX_IDENTITY_FIELDS_ABSENT",
+              "configured_mailbox": "serinya@whennaturecalls.nl",
+              "graph_from_display_name": null,
+              "graph_from_mailbox": null,
+              "graph_mailbox_target": "serinya@whennaturecalls.nl",
+              "graph_sender_display_name": null,
+              "graph_sender_mailbox": null,
+              "identity_field_unavailable": true,
+              "unavailable_fields": [
+                "from",
+                "sender"
+              ]
+            },
+            "original_content_hash": "c5123423d4c73b7663aa4e5883d3c828d19fb93879ad7051e7aa84934e41ec25",
+            "originating_draft_revision_id": 143,
+            "workflow_action_id": 582
+          },
+          "workflow_event_id": 10949,
+          "workflow_event_uuid": "99bba958-4de5-4145-b046-40fef0ef5fae"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "outlook_human_edit_revision_created:424:c195ae2a2434e15391059202f236c3e04d65cb4a5735b1142235af5562b792aa",
+          "event_type_code": "outlook_human_edit_revision_created",
+          "occurred_at": "2026-09-12 09:40:21.370746+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-12 09:40:21.370746+00",
+          "rental_case_id": 424,
+          "source_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 184,
+            "comparison": {
+              "body_changed": true,
+              "body_content_type": "text",
+              "current_cc_recipients": [],
+              "current_to_recipients": [
+                "serinya@whennaturecalls.nl"
+              ],
+              "formatting_only_changed": false,
+              "last_modified_at": "2026-09-11T11:03:06Z",
+              "recipients_changed": false,
+              "subject_changed": false
+            },
+            "content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+            "draft_revision_id": 144,
+            "graph_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+            "graph_operations": {
+              "create": 0,
+              "get": 1,
+              "patch": 0,
+              "send": 0
+            },
+            "mailbox_identity": {
+              "authorized": true,
+              "classification": "MAILBOX_IDENTITY_FIELDS_ABSENT",
+              "configured_mailbox": "serinya@whennaturecalls.nl",
+              "graph_from_display_name": null,
+              "graph_from_mailbox": null,
+              "graph_mailbox_target": "serinya@whennaturecalls.nl",
+              "graph_sender_display_name": null,
+              "graph_sender_mailbox": null,
+              "identity_field_unavailable": true,
+              "unavailable_fields": [
+                "from",
+                "sender"
+              ]
+            },
+            "original_content_hash": "c5123423d4c73b7663aa4e5883d3c828d19fb93879ad7051e7aa84934e41ec25",
+            "originating_draft_revision_id": 143,
+            "originating_workflow_action_id": 582,
+            "source_case_revision": 1,
+            "validation_result": "passed",
+            "workflow_action_id": 586
+          },
+          "workflow_event_id": 10953,
+          "workflow_event_uuid": "ff40a8c3-2c77-4ab3-8f63-d06633c24dac"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:approval:workflow_action:184:approved:1",
+          "event_type_code": "approval_decided",
+          "occurred_at": "2026-09-12 10:46:05.542516+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-12 10:46:05.542516+00",
+          "rental_case_id": 424,
+          "source_reference": "approval:184",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "approval_request_id": 184,
+            "status_after": "approved",
+            "status_before": "open",
+            "target_entity_id": 586,
+            "target_entity_type": "workflow_action"
+          },
+          "workflow_event_id": 10954,
+          "workflow_event_uuid": "f666bdc8-0c10-4be0-91f7-5f0384b92033"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:workflow_action:status1:586:1:approved",
+          "event_type_code": "workflow_action_status_changed",
+          "occurred_at": "2026-09-12 10:46:05.542516+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-12 10:46:05.542516+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:586",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "status_after": "approved",
+            "status_before": "awaiting_approval",
+            "workflow_action_id": 586
+          },
+          "workflow_event_id": 10955,
+          "workflow_event_uuid": "06ed4baf-ee05-4655-90cd-40d14f02c12d"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:workflow_action:status2:586:1",
+          "event_type_code": "workflow_action_status_changed",
+          "occurred_at": "2026-09-12 10:46:05.542516+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-12 10:46:05.542516+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:586",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "status_after": "ready_to_execute",
+            "status_before": "approved",
+            "workflow_action_id": 586
+          },
+          "workflow_event_id": 10956,
+          "workflow_event_uuid": "ab9f26c5-ed09-4175-b4ad-9fc8e80d7010"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "inquiry_response_draft_approved:424:c51097e6c500ae84add77100a2f7fa2cd322594488d21cf0c30dadebc79243cf",
+          "event_type_code": "inquiry_response_draft_approved",
+          "occurred_at": "2026-09-12 10:46:05.777692+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-12 10:46:05.777692+00",
+          "rental_case_id": 424,
+          "source_reference": "inquiry_response_draft:144",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 184,
+            "draft_revision_id": 144,
+            "workflow_action_id": 586
+          },
+          "workflow_event_id": 10957,
+          "workflow_event_uuid": "547a81db-dd94-471a-b92c-3496f66b979c"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "action_execution_started:586:1",
+          "event_type_code": "workflow_action_execution_started",
+          "occurred_at": "2026-09-12 11:39:14.177691+00",
+          "origin_metadata": {
+            "phase": "8.6"
+          },
+          "recorded_at": "2026-09-12 11:39:14.177691+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:586",
+          "source_type": "execution_runtime",
+          "structured_payload": {
+            "action_status_after": "executing",
+            "action_status_before": "ready_to_execute",
+            "adapter_code": "outlook",
+            "attempt_number": 1,
+            "execution_attempt_id": 22,
+            "workflow_action_id": 586
+          },
+          "workflow_event_id": 10958,
+          "workflow_event_uuid": "7c6c2c1f-4858-45dc-9872-8ff0589ed0af"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "action_execution_completed:586:22",
+          "event_type_code": "workflow_action_execution_completed",
+          "occurred_at": "2026-09-12 11:39:14.61855+00",
+          "origin_metadata": {
+            "phase": "8.7A"
+          },
+          "recorded_at": "2026-09-12 11:39:14.61855+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:586",
+          "source_type": "execution_runtime",
+          "structured_payload": {
+            "action_status_after": "failed",
+            "action_status_before": "executing",
+            "attempt_status": "failed",
+            "execution_attempt_id": 22,
+            "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+            "failure_code": "outlook_send_governance_invalid",
+            "retry_eligible": false,
+            "workflow_action_id": 586
+          },
+          "workflow_event_id": 10959,
+          "workflow_event_uuid": "81c1fc58-0236-40da-abcc-65cea1075cad"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "outlook_send_recovery_prepared:424:2ad0ad7a280a727763185658f2fd592dd38ea2e774320449d047d2cde8302336",
+          "event_type_code": "outlook_send_recovery_prepared",
+          "occurred_at": "2026-09-12 16:25:22.785378+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-12 16:25:22.785378+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:587",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 185,
+            "content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+            "draft_revision_id": 144,
+            "origin_workflow_action_id": 586,
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "workflow_action_id": 587
+          },
+          "workflow_event_id": 10960,
+          "workflow_event_uuid": "e70a7c92-7eeb-477d-ac45-043921b82387"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:approval:workflow_action:185:approved:1",
+          "event_type_code": "approval_decided",
+          "occurred_at": "2026-09-12 16:40:14.607705+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-12 16:40:14.607705+00",
+          "rental_case_id": 424,
+          "source_reference": "approval:185",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "approval_request_id": 185,
+            "status_after": "approved",
+            "status_before": "open",
+            "target_entity_id": 587,
+            "target_entity_type": "workflow_action"
+          },
+          "workflow_event_id": 10961,
+          "workflow_event_uuid": "b9967c75-fcb5-4e8e-a7f1-3e6c5d4c7f18"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:workflow_action:status1:587:1:approved",
+          "event_type_code": "workflow_action_status_changed",
+          "occurred_at": "2026-09-12 16:40:14.607705+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-12 16:40:14.607705+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:587",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "status_after": "approved",
+            "status_before": "awaiting_approval",
+            "workflow_action_id": 587
+          },
+          "workflow_event_id": 10962,
+          "workflow_event_uuid": "bdf11778-56ab-4bd8-9004-508133841116"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "phase8:workflow_action:status2:587:1",
+          "event_type_code": "workflow_action_status_changed",
+          "occurred_at": "2026-09-12 16:40:14.607705+00",
+          "origin_metadata": {
+            "phase": "8.5r"
+          },
+          "recorded_at": "2026-09-12 16:40:14.607705+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:587",
+          "source_type": "phase8_atomic_commit",
+          "structured_payload": {
+            "status_after": "ready_to_execute",
+            "status_before": "approved",
+            "workflow_action_id": 587
+          },
+          "workflow_event_id": 10963,
+          "workflow_event_uuid": "13dce9c9-56b3-4ce4-a081-81c28cc4f182"
+        },
+        {
+          "actor_reference": "test_console:operator",
+          "actor_type": "operator",
+          "event_identity_key": "outlook_send_recovery_prepared:424:525c4d0f0636e1dd0402f4be40c6904ae8cc1fea436bb177167853030770c4ea",
+          "event_type_code": "outlook_send_recovery_prepared",
+          "occurred_at": "2026-09-13 08:48:59.433042+00",
+          "origin_metadata": {
+            "phase": "8.8a",
+            "surface": "test_console"
+          },
+          "recorded_at": "2026-09-13 08:48:59.433042+00",
+          "rental_case_id": 424,
+          "source_reference": "workflow_action:588",
+          "source_type": "test_console",
+          "structured_payload": {
+            "approval_request_id": 186,
+            "content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+            "draft_revision_id": 144,
+            "origin_workflow_action_id": 586,
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "workflow_action_id": 588
+          },
+          "workflow_event_id": 10964,
+          "workflow_event_uuid": "a87611a5-8617-4919-b6a0-cce999c46db2"
+        }
+      ]
+    },
+    "provider_mode_lines": [
+      "REAL PROVIDER EXECUTION ENABLED",
+      "outlook -> Microsoft Graph (canonical governed actions only)",
+      "task_surface -> Asana"
+    ],
+    "simulated_outlook_threads": [
+      {
+        "approval_blocked_by_operator_annotations": false,
+        "can_edit": true,
+        "can_generate": false,
+        "can_regenerate": true,
+        "can_simulate_send": false,
+        "conversation_key": "governed_client_response:424",
+        "current_display_status": "send_failed",
+        "current_revision": {
+          "approval_request_id": 184,
+          "approved_at": "2026-09-12 10:46:05.727705+00",
+          "body_text": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nAfter we know those details, we are happy to move forward with next steps! \n\nWarmly,\nWhen Nature Calls Team",
+          "closing_text": "Warm regards,",
+          "content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+          "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+          "context_payload": {
+            "allow_empty_open_questions": true,
+            "contact_label": "Alex Test",
+            "contextual_guidance": [],
+            "conversation_key": "governed_client_response:424",
+            "current_facts": [],
+            "guidance_references": [
+              "WF-003",
+              "WF-004"
+            ],
+            "metadata_summary_lines": [
+              "Governed response intent: REQUEST_CLIENT_INFORMATION",
+              "Contract hash: d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4"
+            ],
+            "open_questions": [
+              {
+                "human_question_text": "What date and time is the client requesting for the event?",
+                "open_question_id": 1620,
+                "question_type": "requested_event_timing"
+              },
+              {
+                "human_question_text": "How many guests are expected?",
+                "open_question_id": 1621,
+                "question_type": "expected_guest_count"
+              },
+              {
+                "human_question_text": "Which space or rental scope is the client requesting?",
+                "open_question_id": 1622,
+                "question_type": "requested_rental_scope"
+              },
+              {
+                "human_question_text": "What type of event is the client planning?",
+                "open_question_id": 1623,
+                "question_type": "requested_event_type"
+              }
+            ],
+            "operator_annotations": [],
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_label": "Alex Test",
+            "rental_case_id": 424,
+            "resolution_items": [
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "What date and time is the client requesting for the event?",
+                "proposition_key": "open_question:1620",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              },
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "How many guests are expected?",
+                "proposition_key": "open_question:1621",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              },
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "Which space or rental scope is the client requesting?",
+                "proposition_key": "open_question:1622",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              },
+              {
+                "blocking": true,
+                "client_visibility": "ASK_CLIENT",
+                "message": "What type of event is the client planning?",
+                "proposition_key": "open_question:1623",
+                "resolution_owner": "CLIENT",
+                "resolution_status": "REQUIRED",
+                "workflow_action_id": null
+              }
+            ],
+            "sender_email": "wnc-rentals-simulated@example.test",
+            "sender_label": "WNC Rentals (Simulated)",
+            "source_case_revision": 1,
+            "workflow_action_id": 586
+          },
+          "conversation_key": "governed_client_response:424",
+          "created_at": "2026-09-12 09:40:21.060522+00",
+          "created_by_reference": "test_console:operator",
+          "delivered_at": "2026-09-12 11:39:15.104304+00",
+          "delivery_external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+          "delivery_failure_code": "outlook_send_governance_invalid",
+          "draft_source": "human_edited",
+          "draft_status": "send_failed",
+          "inquiry_response_draft_revision_id": 144,
+          "inquiry_response_draft_revision_uuid": "4cb57feb-f3c0-4f01-bba3-d16d069ffd4b",
+          "intro_text": "Governed client response.",
+          "is_current": true,
+          "question_lines": [
+            {
+              "human_question_text": "What date and time is the client requesting for the event?",
+              "open_question_id": 1620,
+              "prompt_text": "What date and time is the client requesting for the event?",
+              "question_type": "governed_client_question"
+            },
+            {
+              "human_question_text": "How many guests are expected?",
+              "open_question_id": 1621,
+              "prompt_text": "How many guests are expected?",
+              "question_type": "governed_client_question"
+            },
+            {
+              "human_question_text": "Which space or rental scope is the client requesting?",
+              "open_question_id": 1622,
+              "prompt_text": "Which space or rental scope is the client requesting?",
+              "question_type": "governed_client_question"
+            },
+            {
+              "human_question_text": "What type of event is the client planning?",
+              "open_question_id": 1623,
+              "prompt_text": "What type of event is the client planning?",
+              "question_type": "governed_client_question"
+            }
+          ],
+          "recipient_email": "Serinya@whennaturecalls.nl",
+          "recipient_label": "Alex Test",
+          "rejected_at": null,
+          "rental_case_id": 424,
+          "salutation": "Hello,",
+          "sender_display_name": null,
+          "sender_email": "wnc-rentals-simulated@example.test",
+          "sender_label": "WNC Rentals (Simulated)",
+          "signoff_text": "WNC Rentals",
+          "source_case_revision": 1,
+          "subject": "A few details for your inquiry",
+          "supersedes_draft_revision_id": 143,
+          "updated_at": "2026-09-12 11:39:15.104327+00",
+          "workflow_action_id": 586
+        },
+        "draft_history": [
+          {
+            "approval_request_id": 184,
+            "approved_at": "2026-09-12 10:46:05.727705+00",
+            "body_text": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nAfter we know those details, we are happy to move forward with next steps! \n\nWarmly,\nWhen Nature Calls Team",
+            "closing_text": "Warm regards,",
+            "content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+            "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+            "context_payload": {
+              "allow_empty_open_questions": true,
+              "contact_label": "Alex Test",
+              "contextual_guidance": [],
+              "conversation_key": "governed_client_response:424",
+              "current_facts": [],
+              "guidance_references": [
+                "WF-003",
+                "WF-004"
+              ],
+              "metadata_summary_lines": [
+                "Governed response intent: REQUEST_CLIENT_INFORMATION",
+                "Contract hash: d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4"
+              ],
+              "open_questions": [
+                {
+                  "human_question_text": "What date and time is the client requesting for the event?",
+                  "open_question_id": 1620,
+                  "question_type": "requested_event_timing"
+                },
+                {
+                  "human_question_text": "How many guests are expected?",
+                  "open_question_id": 1621,
+                  "question_type": "expected_guest_count"
+                },
+                {
+                  "human_question_text": "Which space or rental scope is the client requesting?",
+                  "open_question_id": 1622,
+                  "question_type": "requested_rental_scope"
+                },
+                {
+                  "human_question_text": "What type of event is the client planning?",
+                  "open_question_id": 1623,
+                  "question_type": "requested_event_type"
+                }
+              ],
+              "operator_annotations": [],
+              "recipient_email": "Serinya@whennaturecalls.nl",
+              "recipient_label": "Alex Test",
+              "rental_case_id": 424,
+              "resolution_items": [
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "What date and time is the client requesting for the event?",
+                  "proposition_key": "open_question:1620",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "How many guests are expected?",
+                  "proposition_key": "open_question:1621",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "Which space or rental scope is the client requesting?",
+                  "proposition_key": "open_question:1622",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "What type of event is the client planning?",
+                  "proposition_key": "open_question:1623",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                }
+              ],
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "source_case_revision": 1,
+              "workflow_action_id": 586
+            },
+            "conversation_key": "governed_client_response:424",
+            "created_at": "2026-09-12 09:40:21.060522+00",
+            "created_by_reference": "test_console:operator",
+            "delivered_at": "2026-09-12 11:39:15.104304+00",
+            "delivery_external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+            "delivery_failure_code": "outlook_send_governance_invalid",
+            "draft_source": "human_edited",
+            "draft_status": "send_failed",
+            "inquiry_response_draft_revision_id": 144,
+            "inquiry_response_draft_revision_uuid": "4cb57feb-f3c0-4f01-bba3-d16d069ffd4b",
+            "intro_text": "Governed client response.",
+            "is_current": true,
+            "question_lines": [
+              {
+                "human_question_text": "What date and time is the client requesting for the event?",
+                "open_question_id": 1620,
+                "prompt_text": "What date and time is the client requesting for the event?",
+                "question_type": "governed_client_question"
+              },
+              {
+                "human_question_text": "How many guests are expected?",
+                "open_question_id": 1621,
+                "prompt_text": "How many guests are expected?",
+                "question_type": "governed_client_question"
+              },
+              {
+                "human_question_text": "Which space or rental scope is the client requesting?",
+                "open_question_id": 1622,
+                "prompt_text": "Which space or rental scope is the client requesting?",
+                "question_type": "governed_client_question"
+              },
+              {
+                "human_question_text": "What type of event is the client planning?",
+                "open_question_id": 1623,
+                "prompt_text": "What type of event is the client planning?",
+                "question_type": "governed_client_question"
+              }
+            ],
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_label": "Alex Test",
+            "rejected_at": null,
+            "rental_case_id": 424,
+            "salutation": "Hello,",
+            "sender_display_name": null,
+            "sender_email": "wnc-rentals-simulated@example.test",
+            "sender_label": "WNC Rentals (Simulated)",
+            "signoff_text": "WNC Rentals",
+            "source_case_revision": 1,
+            "subject": "A few details for your inquiry",
+            "supersedes_draft_revision_id": 143,
+            "updated_at": "2026-09-12 11:39:15.104327+00",
+            "workflow_action_id": 586
+          },
+          {
+            "approval_request_id": 183,
+            "approved_at": "2026-09-11 09:54:14.666619+00",
+            "body_text": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nWarmly,\nWNC",
+            "closing_text": "Warm regards,",
+            "content_hash": "c5123423d4c73b7663aa4e5883d3c828d19fb93879ad7051e7aa84934e41ec25",
+            "context_hash": "036f3b88fadfa046244c5d25c6dc7b7b8792e48743787b954906e3e18fa0c525",
+            "context_payload": {
+              "allow_empty_open_questions": true,
+              "contact_label": "Alex Test",
+              "contextual_guidance": [],
+              "conversation_key": "governed_client_response:424",
+              "current_facts": [],
+              "guidance_references": [
+                "WF-003",
+                "WF-004"
+              ],
+              "metadata_summary_lines": [
+                "Governed response intent: REQUEST_CLIENT_INFORMATION",
+                "Contract hash: d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4"
+              ],
+              "open_questions": [
+                {
+                  "human_question_text": "What date and time is the client requesting for the event?",
+                  "open_question_id": 1620,
+                  "question_type": "requested_event_timing"
+                },
+                {
+                  "human_question_text": "How many guests are expected?",
+                  "open_question_id": 1621,
+                  "question_type": "expected_guest_count"
+                },
+                {
+                  "human_question_text": "Which space or rental scope is the client requesting?",
+                  "open_question_id": 1622,
+                  "question_type": "requested_rental_scope"
+                },
+                {
+                  "human_question_text": "What type of event is the client planning?",
+                  "open_question_id": 1623,
+                  "question_type": "requested_event_type"
+                }
+              ],
+              "operator_annotations": [],
+              "recipient_email": "Serinya@whennaturecalls.nl",
+              "recipient_label": "Alex Test",
+              "rental_case_id": 424,
+              "resolution_items": [
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "What date and time is the client requesting for the event?",
+                  "proposition_key": "open_question:1620",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "How many guests are expected?",
+                  "proposition_key": "open_question:1621",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "Which space or rental scope is the client requesting?",
+                  "proposition_key": "open_question:1622",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                },
+                {
+                  "blocking": true,
+                  "client_visibility": "ASK_CLIENT",
+                  "message": "What type of event is the client planning?",
+                  "proposition_key": "open_question:1623",
+                  "resolution_owner": "CLIENT",
+                  "resolution_status": "REQUIRED",
+                  "workflow_action_id": null
+                }
+              ],
+              "sender_email": "wnc-rentals-simulated@example.test",
+              "sender_label": "WNC Rentals (Simulated)",
+              "source_case_revision": 1,
+              "workflow_action_id": 582
+            },
+            "conversation_key": "governed_client_response:424",
+            "created_at": "2026-09-11 09:53:44.670866+00",
+            "created_by_reference": "test_console:operator",
+            "delivered_at": "2026-09-11 09:54:38.032938+00",
+            "delivery_external_reference": null,
+            "delivery_failure_code": "adapter_result_malformed",
+            "draft_source": "generated",
+            "draft_status": "send_failed",
+            "inquiry_response_draft_revision_id": 143,
+            "inquiry_response_draft_revision_uuid": "eff6b17b-f8a5-404e-b88f-3670756939d6",
+            "intro_text": "Governed client response.",
+            "is_current": false,
+            "question_lines": [
+              {
+                "human_question_text": "What date and time is the client requesting for the event?",
+                "open_question_id": 1620,
+                "prompt_text": "What date and time is the client requesting for the event?",
+                "question_type": "governed_client_question"
+              },
+              {
+                "human_question_text": "How many guests are expected?",
+                "open_question_id": 1621,
+                "prompt_text": "How many guests are expected?",
+                "question_type": "governed_client_question"
+              },
+              {
+                "human_question_text": "Which space or rental scope is the client requesting?",
+                "open_question_id": 1622,
+                "prompt_text": "Which space or rental scope is the client requesting?",
+                "question_type": "governed_client_question"
+              },
+              {
+                "human_question_text": "What type of event is the client planning?",
+                "open_question_id": 1623,
+                "prompt_text": "What type of event is the client planning?",
+                "question_type": "governed_client_question"
+              }
+            ],
+            "recipient_email": "Serinya@whennaturecalls.nl",
+            "recipient_label": "Alex Test",
+            "rejected_at": null,
+            "rental_case_id": 424,
+            "salutation": "Hello,",
+            "sender_display_name": null,
+            "sender_email": "wnc-rentals-simulated@example.test",
+            "sender_label": "WNC Rentals (Simulated)",
+            "signoff_text": "WNC Rentals",
+            "source_case_revision": 1,
+            "subject": "A few details for your inquiry",
+            "supersedes_draft_revision_id": null,
+            "updated_at": "2026-09-12 09:40:21.060522+00",
+            "workflow_action_id": 582
+          }
+        ],
+        "open_approval_request_id": null,
+        "question_labels": [
+          "What date and time is the client requesting for the event?",
+          "How many guests are expected?",
+          "Which space or rental scope is the client requesting?",
+          "What type of event is the client planning?"
+        ],
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "status_note": null,
+        "thread_label": "A few details for your inquiry",
+        "workflow_action_id": 586,
+        "workflow_action_status": "failed"
+      },
+      {
+        "approval_blocked_by_operator_annotations": false,
+        "can_edit": false,
+        "can_generate": true,
+        "can_regenerate": false,
+        "can_simulate_send": false,
+        "conversation_key": "action:REQUEST_CLIENT_INFORMATION:d41191c8abbecefe7c39daec7be75cbf8c2ff896d11d2dd4abb7c5a9f594d3bb:1",
+        "current_display_status": null,
+        "current_revision": null,
+        "draft_history": [],
+        "open_approval_request_id": null,
+        "question_labels": [
+          "What date and time is the client requesting for the event?",
+          "How many guests are expected?",
+          "Which space or rental scope is the client requesting?",
+          "What type of event is the client planning?"
+        ],
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "status_note": null,
+        "thread_label": "Missing information: What date and time is the client requesting for the event? (+3 more)",
+        "workflow_action_id": 581,
+        "workflow_action_status": "awaiting_approval"
+      }
+    ],
+    "test_metadata_lines": [
+      "Label: Outlook draft-only deterministic fixture 20260911",
+      "Client / company: Alex Test",
+      "Test contact email: Serinya@whennaturecalls.nl",
+      "Event reference: Synthetic Outlook draft-only adapter smoke",
+      "Created by: test_console:operator"
+    ],
+    "timeline_notice": null,
+    "workflow_event_limit": 100,
+    "workflow_event_total_count": 33,
+    "working_proposal": {
+      "approvals": [
+        {
+          "detail": "Approve exact recovery send for inquiry response draft revision 144.",
+          "label": "Client Communication Send",
+          "source": "workflow_action:588:draft_revision:144",
+          "state": "blocked",
+          "value": "Open"
+        }
+      ],
+      "blockers": [
+        {
+          "detail": "Open question 1620 must be resolved.",
+          "label": "Missing Client Information",
+          "source": "open_question:1620",
+          "state": "blocked",
+          "value": "High"
+        },
+        {
+          "detail": "Open question 1621 must be resolved.",
+          "label": "Missing Client Information",
+          "source": "open_question:1621",
+          "state": "blocked",
+          "value": "High"
+        },
+        {
+          "detail": "Open question 1622 must be resolved.",
+          "label": "Missing Client Information",
+          "source": "open_question:1622",
+          "state": "blocked",
+          "value": "High"
+        },
+        {
+          "detail": "Open question 1623 must be resolved.",
+          "label": "Missing Client Information",
+          "source": "open_question:1623",
+          "state": "blocked",
+          "value": "High"
+        }
+      ],
+      "changes": [
+        {
+          "detail": null,
+          "label": "Proposed or pending changes",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "commercial_snapshot": [
+        {
+          "detail": "Current booking-fee authority cannot be established from the current structured schedule scope.",
+          "label": "Booking fee baseline",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "VAT",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Case-specific exceptions",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        },
+        {
+          "detail": null,
+          "label": "Unresolved commercial items",
+          "source": null,
+          "state": "none",
+          "value": "0"
+        }
+      ],
+      "communication": [
+        {
+          "detail": "From alex.test@example.test via synthetic_outlook_draft_only_fixture on 2026-09-11 09:47.",
+          "label": "Last inbound communication",
+          "source": null,
+          "state": "reference",
+          "value": "Studio planning session inquiry"
+        },
+        {
+          "detail": "Why: operator_requested_governed_client_response",
+          "label": "Latest outbound workflow action",
+          "source": "governed_client_response:424",
+          "state": "blocked",
+          "value": "Send Inquiry Response"
+        },
+        {
+          "detail": "Sequence: 1. Due: 2026-09-11 09:47. Urgency: Medium. Waiting for: Client. Next action type: Request Client Information. Missing: Requested schedule, Guest count, Requested space, Event type.",
+          "label": "Follow-up #1: Inquiry Missing Information",
+          "source": "client",
+          "state": "proposed",
+          "value": "Scheduled"
+        }
+      ],
+      "feasibility_snapshot": [
+        {
+          "detail": null,
+          "label": "Feasibility as requested",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not yet evaluated"
+        },
+        {
+          "detail": null,
+          "label": "Supported alternative",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Confirmation still required",
+          "source": null,
+          "state": "unresolved",
+          "value": "Yes"
+        },
+        {
+          "detail": null,
+          "label": "Hard constraint",
+          "source": "open_question:1620",
+          "state": "blocked",
+          "value": "Open question 1620 must be resolved."
+        }
+      ],
+      "missing_client_information": [
+        {
+          "detail": "Scope: Transition. Requested from: Client.",
+          "label": "What date and time is the client requesting for the event?",
+          "source": "inquiry_intake:requested_schedule",
+          "state": "blocked",
+          "value": "Open"
+        },
+        {
+          "detail": "Scope: Transition. Requested from: Client.",
+          "label": "How many guests are expected?",
+          "source": "inquiry_intake:guest_count",
+          "state": "blocked",
+          "value": "Open"
+        },
+        {
+          "detail": "Scope: Transition. Requested from: Client.",
+          "label": "Which space or rental scope is the client requesting?",
+          "source": "inquiry_intake:requested_space",
+          "state": "blocked",
+          "value": "Open"
+        },
+        {
+          "detail": "Scope: Transition. Requested from: Client.",
+          "label": "What type of event is the client planning?",
+          "source": "inquiry_intake:event_type",
+          "state": "blocked",
+          "value": "Open"
+        }
+      ],
+      "next_actions": [
+        {
+          "detail": "Why: Client information is still missing for: Requested schedule, Guest count, Requested space, Event type. Due: 2026-09-11 09:47.",
+          "label": "Prepare client information request for follow-up #1.",
+          "source": "follow_up:210",
+          "state": "blocked",
+          "value": "Awaiting Approval"
+        },
+        {
+          "detail": "Why: Not explicitly linked.",
+          "label": "Send Inquiry Response",
+          "source": "governed_client_response:424",
+          "state": "current",
+          "value": "Ready To Execute"
+        },
+        {
+          "detail": "Why: operator_requested_governed_client_response",
+          "label": "Send Inquiry Response",
+          "source": "governed_client_response:424",
+          "state": "blocked",
+          "value": "Awaiting Approval"
+        }
+      ],
+      "operations": [
+        {
+          "detail": null,
+          "label": "Current working scope",
+          "source": null,
+          "state": "none",
+          "value": "No structured operational facts are established yet."
+        }
+      ],
+      "proposal_freshness": [
+        {
+          "detail": null,
+          "label": "Proposal artifact",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not yet established"
+        }
+      ],
+      "rental_snapshot": [
+        {
+          "detail": null,
+          "label": "Client / company",
+          "source": null,
+          "state": "current",
+          "value": "Alex Test"
+        },
+        {
+          "detail": null,
+          "label": "Working scope label",
+          "source": null,
+          "state": "current",
+          "value": "Outlook draft-only deterministic fixture 20260911"
+        },
+        {
+          "detail": null,
+          "label": "Rental type",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Requested spaces",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        },
+        {
+          "detail": null,
+          "label": "Lifecycle status",
+          "source": null,
+          "state": "current",
+          "value": "Inquiry Active"
+        },
+        {
+          "detail": null,
+          "label": "Inquiry reference",
+          "source": null,
+          "state": "reference",
+          "value": "Synthetic Outlook draft-only adapter smoke"
+        },
+        {
+          "detail": null,
+          "label": "Event date",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not provided"
+        },
+        {
+          "detail": null,
+          "label": "Event time",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not provided"
+        },
+        {
+          "detail": null,
+          "label": "Guest count",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not provided"
+        },
+        {
+          "detail": null,
+          "label": "Event type",
+          "source": null,
+          "state": "unresolved",
+          "value": "Not established"
+        }
+      ],
+      "requirements": [
+        {
+          "detail": null,
+          "label": "Outstanding requirements",
+          "source": null,
+          "state": "none",
+          "value": "None"
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "clock": {
+    "current_time": "2026-10-03T12:11:12.335695Z",
+    "real_current_time": "2026-10-03T12:11:12.335675Z",
+    "simulated": false
+  },
+  "clock_controls_enabled": false,
+  "environment": "staging"
+}

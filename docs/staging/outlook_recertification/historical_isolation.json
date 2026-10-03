@@ -1,0 +1,53 @@
+{
+  "full_case_424_rows_unchanged": true,
+  "tables": {
+    "workflow_actions": {
+      "rows": 5,
+      "sha256": "519ef2fa7852c1ba8aa6cf46f69ba6b979c8fd8ee33ec77504be1660248a1e23"
+    },
+    "rental_case_approval_requests": {
+      "rows": 4,
+      "sha256": "15b7db9f10081a880f3ff3482351dc5e9602491278c36cbfac7d9936f90fe279"
+    },
+    "workflow_execution_attempts": {
+      "rows": 2,
+      "sha256": "d25b2f318af66fab27e7f0adb9327353ceda857cb8394a478fa41553d18a6a1c"
+    },
+    "inquiry_response_draft_revisions": {
+      "rows": 2,
+      "sha256": "97f8af0e85fa66afb211273e8fb202a09f202e5b56503b32b0d840320d7ba7d6"
+    }
+  },
+  "actions": [
+    {
+      "action_id": 582,
+      "persisted_status": "failed",
+      "canonical_validation": "outlook_action_contract_invalid:action_type,approval_target,body,body_type,contract_version,conversation_key,draft_content_hash,draft_origin_workflow_action_id,draft_revision_id,governed_context_hash,graph_message_id,message_mode,plan_identity,provenance,provider_type,recipient_email,recipient_identity_hash,recipient_reference,recovery_draft_revision_id,recovery_origin_workflow_action_id,recovery_predecessor_action_id,rental_case_id,source_case_revision,subject"
+    },
+    {
+      "action_id": 586,
+      "persisted_status": "failed",
+      "canonical_validation": "outlook_action_contract_invalid:action_type,approval_target,body,body_type,contract_version,draft_origin_workflow_action_id,draft_revision_id,governed_context_hash,graph_message_id,message_mode,plan_identity,provenance,provider_type,recipient_email,recipient_reference,recovery_draft_revision_id,recovery_origin_workflow_action_id,recovery_predecessor_action_id,rental_case_id,source_case_revision,subject"
+    },
+    {
+      "action_id": 587,
+      "persisted_status": "ready_to_execute",
+      "canonical_validation": "outlook_action_contract_invalid:action_type,approval_target,body,body_type,contract_version,draft_origin_workflow_action_id,draft_revision_id,graph_message_id,message_mode,plan_identity,provenance,provider_type,purpose,reason,recipient_identity_hash,recipient_reference,recovery_predecessor_action_id,rental_case_id,response_intent,source_case_revision,subject"
+    },
+    {
+      "action_id": 588,
+      "persisted_status": "awaiting_approval",
+      "canonical_validation": "PASS (structural only)"
+    }
+  ],
+  "historical_588_readiness": {
+    "status_code": 409,
+    "error": {
+      "failure_code": "OUTLOOK_SEND_READINESS_CONTEXT_INVALID",
+      "message": "The governed Outlook draft no longer matches current send truth.",
+      "status": 409
+    }
+  },
+  "old_approvals_cannot_target_fresh_lineage": true,
+  "idempotency_collision": false
+}

@@ -1,0 +1,80 @@
+{
+  "marker": "OUTLOOK_FINAL_SEND_RECERTIFIED_READY_FOR_APPROVAL",
+  "accepted_commit": "7ef15d28bcad6bd8991510e6315ea1d32e12f54b",
+  "case_id": 584,
+  "draft_revision_id": 386,
+  "workflow_action_id": 1619,
+  "approval_request_id": 465,
+  "recipient": "Serinya@whennaturecalls.nl",
+  "subject": "SYNTHETIC TEST - Outlook final send certification",
+  "draft_status": "needs_approval",
+  "draft_current": true,
+  "action_status": "awaiting_approval",
+  "approval_status": "open",
+  "approval_target": "workflow_action:1619:draft_revision:386",
+  "execution_attempts": 0,
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "send_gate": "disabled",
+  "tests": {
+    "focused": 128,
+    "focused_subtests": 102,
+    "phase8": 552,
+    "phase8_subtests": 126,
+    "full": 769,
+    "full_subtests": 160,
+    "failures": 0,
+    "skipped": 0
+  },
+  "safety": {
+    "Graph calls": 0,
+    "Outlook mutations": 0,
+    "Outlook sends": 0,
+    "real Asana": 0,
+    "production": 0,
+    "OpenAI calls": 0,
+    "hosted approvals": 0,
+    "hosted ExecutionAttempts": 0
+  },
+  "deployment": "none needed; accepted deployed source unchanged"
+}

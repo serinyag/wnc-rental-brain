@@ -1,0 +1,627 @@
+{
+  "workflow_actions": [
+    {
+      "id": 581,
+      "workflow_action_uuid": "91a17ac0-f454-4111-b45f-e08c096591e6",
+      "rental_case_id": 424,
+      "action_type": "REQUEST_CLIENT_INFORMATION",
+      "action_category": "communication",
+      "target_adapter_code": "internal",
+      "reason_entity_type": "follow_up",
+      "reason_entity_id": 210,
+      "reason_entity_reference": "follow_up:210",
+      "structured_payload": {
+        "due_at": "2026-09-11 09:47:13.200698+00",
+        "reason": "Client information is still missing for: Requested schedule, Guest count, Requested space, Event type.",
+        "purpose": "request_missing_information",
+        "summary": "Prepare client information request for follow-up #1.",
+        "reason_code": "inquiry_missing_information",
+        "follow_up_id": 210,
+        "question_texts": [
+          "What date and time is the client requesting for the event?",
+          "How many guests are expected?",
+          "Which space or rental scope is the client requesting?",
+          "What type of event is the client planning?"
+        ],
+        "sequence_number": 1,
+        "open_question_ids": [
+          1620,
+          1621,
+          1622,
+          1623
+        ],
+        "recipient_reference": null,
+        "required_field_codes": [
+          "requested_schedule",
+          "guest_count",
+          "requested_space",
+          "event_type"
+        ],
+        "intended_recipient_role": "client"
+      },
+      "approval_posture": "approval_required",
+      "status": "awaiting_approval",
+      "semantic_subject_hash": "d41191c8abbecefe7c39daec7be75cbf8c2ff896d11d2dd4abb7c5a9f594d3bb",
+      "source_case_revision": 1,
+      "target_scope_key": null,
+      "idempotency_key": "action:REQUEST_CLIENT_INFORMATION:d41191c8abbecefe7c39daec7be75cbf8c2ff896d11d2dd4abb7c5a9f594d3bb:1",
+      "due_at": "2026-09-11T09:47:13.200698+00:00",
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-09-11T09:47:13.98316+00:00",
+      "updated_at": "2026-09-11T09:47:13.98316+00:00"
+    },
+    {
+      "id": 582,
+      "workflow_action_uuid": "d5f667f2-8e53-4dbb-a671-8cde95c5a3b1",
+      "rental_case_id": 424,
+      "action_type": "SEND_INQUIRY_RESPONSE",
+      "action_category": "communication",
+      "target_adapter_code": "outlook",
+      "reason_entity_type": "rental_case",
+      "reason_entity_id": null,
+      "reason_entity_reference": "governed_client_response:424",
+      "structured_payload": {
+        "reason": "operator_requested_governed_client_response",
+        "purpose": "governed_client_response_draft",
+        "context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+        "response_intent": "REQUEST_CLIENT_INFORMATION"
+      },
+      "approval_posture": "approval_required",
+      "status": "failed",
+      "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+      "source_case_revision": 1,
+      "target_scope_key": null,
+      "idempotency_key": "governed_client_response:424:successor:d28b470de9a04424",
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-09-11T09:53:44.63507+00:00",
+      "updated_at": "2026-09-11T09:54:37.552696+00:00"
+    },
+    {
+      "id": 586,
+      "workflow_action_uuid": "5674f0a3-de2e-48dc-9824-174cbc6517a7",
+      "rental_case_id": 424,
+      "action_type": "SEND_INQUIRY_RESPONSE",
+      "action_category": "communication",
+      "target_adapter_code": "outlook",
+      "reason_entity_type": "rental_case",
+      "reason_entity_id": null,
+      "reason_entity_reference": "governed_client_response:424",
+      "structured_payload": {
+        "reason": "operator_requested_governed_client_response",
+        "purpose": "governed_client_response_draft",
+        "context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+        "response_intent": "REQUEST_CLIENT_INFORMATION",
+        "conversation_key": "governed_client_response:424",
+        "draft_content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+        "recipient_identity_hash": "4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137"
+      },
+      "approval_posture": "approval_required",
+      "status": "failed",
+      "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+      "source_case_revision": 1,
+      "target_scope_key": null,
+      "idempotency_key": "governed_client_response:424:context:d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4:content:6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f:recipient:4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-09-12T09:40:21.038554+00:00",
+      "updated_at": "2026-09-12T11:39:14.681492+00:00"
+    },
+    {
+      "id": 587,
+      "workflow_action_uuid": "4c164cbe-6ca6-4807-94da-518338bd99e3",
+      "rental_case_id": 424,
+      "action_type": "SEND_INQUIRY_RESPONSE",
+      "action_category": "communication",
+      "target_adapter_code": "outlook",
+      "reason_entity_type": "rental_case",
+      "reason_entity_id": null,
+      "reason_entity_reference": "governed_client_response:424",
+      "structured_payload": {
+        "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "conversation_key": "governed_client_response:424",
+        "draft_content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+        "governed_context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+        "recovery_draft_revision_id": 144,
+        "recovery_origin_workflow_action_id": 586
+      },
+      "approval_posture": "approval_required",
+      "status": "ready_to_execute",
+      "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+      "source_case_revision": 1,
+      "target_scope_key": null,
+      "idempotency_key": "governed_client_response:424:outlook_send_recovery:draft_revision:144:origin_action:586",
+      "due_at": null,
+      "supersedes_workflow_action_id": 586,
+      "created_at": "2026-09-12T16:25:22.892592+00:00",
+      "updated_at": "2026-09-12T16:40:14.706807+00:00"
+    },
+    {
+      "id": 588,
+      "workflow_action_uuid": "429347cc-4412-4836-a451-ed32543578ab",
+      "rental_case_id": 424,
+      "action_type": "SEND_INQUIRY_RESPONSE",
+      "action_category": "communication",
+      "target_adapter_code": "outlook",
+      "reason_entity_type": "rental_case",
+      "reason_entity_id": null,
+      "reason_entity_reference": "governed_client_response:424",
+      "structured_payload": {
+        "body": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nAfter we know those details, we are happy to move forward with next steps! \n\nWarmly,\nWhen Nature Calls Team",
+        "reason": "operator_requested_governed_client_response",
+        "purpose": "governed_client_response_draft",
+        "subject": "A few details for your inquiry",
+        "body_type": "text",
+        "provenance": "outlook_send_recovery",
+        "action_type": "SEND_INQUIRY_RESPONSE",
+        "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+        "message_mode": "existing_draft",
+        "plan_identity": "governed_outlook_reservation_v1:424:65b73a2c0ad80a3911d63bd250cd27b43e5c2d6d2a8b5132bd4861e640911492",
+        "provider_type": "microsoft_graph_outlook",
+        "rental_case_id": 424,
+        "approval_target": "workflow_action:588:draft_revision:144",
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "response_intent": "REQUEST_CLIENT_INFORMATION",
+        "contract_version": "governed_outlook_v1",
+        "conversation_key": "governed_client_response:424",
+        "graph_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+        "draft_revision_id": 144,
+        "draft_content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+        "recipient_reference": "inquiry_response_draft:144",
+        "source_case_revision": 1,
+        "governed_context_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+        "recipient_identity_hash": "4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+        "recovery_draft_revision_id": 144,
+        "recovery_predecessor_action_id": 587,
+        "draft_origin_workflow_action_id": 586,
+        "recovery_origin_workflow_action_id": 586
+      },
+      "approval_posture": "approval_required",
+      "status": "awaiting_approval",
+      "semantic_subject_hash": "d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4",
+      "source_case_revision": 1,
+      "target_scope_key": null,
+      "idempotency_key": "governed_outlook_v1:d4dfff7f1ccd99ff0513dbf8e78408bdef6e08870569f8a039d48a25d665bb50",
+      "due_at": null,
+      "supersedes_workflow_action_id": 586,
+      "created_at": "2026-09-13T08:48:59.899343+00:00",
+      "updated_at": "2026-09-13T08:49:00.205516+00:00"
+    }
+  ],
+  "rental_case_approval_requests": [
+    {
+      "id": 183,
+      "rental_case_approval_request_uuid": "d04979d8-d7b5-4c4e-98ec-2fd5cddd5c62",
+      "rental_case_id": 424,
+      "target_entity_type": "workflow_action",
+      "target_entity_id": 582,
+      "target_entity_reference": "workflow_action:582:draft_revision:143",
+      "approval_type": "client_communication_send",
+      "reason_text": "Approve inquiry response draft revision 143 before simulated send.",
+      "evidence_reference_keys": [
+        "workflow_action:582",
+        "inquiry_response_draft:143"
+      ],
+      "required_approver_role": "client_communication_review",
+      "required_approver_reference": "semantic:approval:workflow_action:582:draft_revision:143",
+      "status": "approved",
+      "decision_payload": {
+        "decision": "approved"
+      },
+      "decided_at": "2026-09-11T09:54:14.446032+00:00",
+      "decided_by_reference": "test_console:operator",
+      "decision_notes": null,
+      "supersedes_approval_request_id": null,
+      "created_at": "2026-09-11T09:53:44.939931+00:00",
+      "updated_at": "2026-09-11T09:54:14.606164+00:00"
+    },
+    {
+      "id": 184,
+      "rental_case_approval_request_uuid": "33c161e9-0b81-44ab-8436-43290f8e61ef",
+      "rental_case_id": 424,
+      "target_entity_type": "workflow_action",
+      "target_entity_id": 586,
+      "target_entity_reference": "workflow_action:586:draft_revision:144",
+      "approval_type": "client_communication_send",
+      "reason_text": "Approve inquiry response draft revision 144 before simulated send.",
+      "evidence_reference_keys": [
+        "workflow_action:586",
+        "inquiry_response_draft:144"
+      ],
+      "required_approver_role": "client_communication_review",
+      "required_approver_reference": "semantic:approval:workflow_action:586:draft_revision:144",
+      "status": "approved",
+      "decision_payload": {
+        "decision": "approved"
+      },
+      "decided_at": "2026-09-12T10:46:05.542516+00:00",
+      "decided_by_reference": "test_console:operator",
+      "decision_notes": null,
+      "supersedes_approval_request_id": null,
+      "created_at": "2026-09-12T09:40:21.334483+00:00",
+      "updated_at": "2026-09-12T10:46:05.640592+00:00"
+    },
+    {
+      "id": 185,
+      "rental_case_approval_request_uuid": "fe27bbb3-224b-4e7e-9c5b-8bff4649018a",
+      "rental_case_id": 424,
+      "target_entity_type": "workflow_action",
+      "target_entity_id": 587,
+      "target_entity_reference": "workflow_action:587:draft_revision:144",
+      "approval_type": "client_communication_send",
+      "reason_text": "Approve exact recovery send for inquiry response draft revision 144.",
+      "evidence_reference_keys": [
+        "workflow_action:587",
+        "workflow_action:586",
+        "inquiry_response_draft:144"
+      ],
+      "required_approver_role": "client_communication_review",
+      "required_approver_reference": "semantic:approval:workflow_action:587:draft_revision:144",
+      "status": "approved",
+      "decision_payload": {
+        "decision": "approved"
+      },
+      "decided_at": "2026-09-12T16:40:14.607705+00:00",
+      "decided_by_reference": "test_console:operator",
+      "decision_notes": null,
+      "supersedes_approval_request_id": 184,
+      "created_at": "2026-09-12T16:25:22.991803+00:00",
+      "updated_at": "2026-09-12T16:40:14.706807+00:00"
+    },
+    {
+      "id": 186,
+      "rental_case_approval_request_uuid": "b2c1fd2c-a5cb-4e4e-b629-9cb1c48b6fc9",
+      "rental_case_id": 424,
+      "target_entity_type": "workflow_action",
+      "target_entity_id": 588,
+      "target_entity_reference": "workflow_action:588:draft_revision:144",
+      "approval_type": "client_communication_send",
+      "reason_text": "Approve exact recovery send for inquiry response draft revision 144.",
+      "evidence_reference_keys": [
+        "workflow_action:588",
+        "workflow_action:586",
+        "inquiry_response_draft:144"
+      ],
+      "required_approver_role": "client_communication_review",
+      "required_approver_reference": "semantic:approval:workflow_action:588:draft_revision:144",
+      "status": "open",
+      "decision_payload": null,
+      "decided_at": null,
+      "decided_by_reference": null,
+      "decision_notes": null,
+      "supersedes_approval_request_id": 184,
+      "created_at": "2026-09-13T08:49:00.938725+00:00",
+      "updated_at": "2026-09-13T08:49:00.938725+00:00"
+    }
+  ],
+  "workflow_execution_attempts": [
+    {
+      "id": 21,
+      "workflow_execution_attempt_uuid": "761adbb0-411e-4294-845f-2f811219ebec",
+      "workflow_action_id": 582,
+      "rental_case_id": 424,
+      "attempt_number": 1,
+      "adapter_code": "outlook",
+      "started_at": "2026-09-11T09:54:36.210043+00:00",
+      "completed_at": "2026-09-11T09:54:37.528852+00:00",
+      "external_reference": null,
+      "status": "failed",
+      "failure_code": "adapter_result_malformed",
+      "retry_eligible": false,
+      "response_snapshot": {
+        "reason": "adapter_code_mismatch",
+        "received_adapter_code": "email"
+      },
+      "created_at": "2026-09-11T09:54:36.32457+00:00"
+    },
+    {
+      "id": 22,
+      "workflow_execution_attempt_uuid": "9b91742b-8ac1-418f-9eea-3831ad7d54b7",
+      "workflow_action_id": 586,
+      "rental_case_id": 424,
+      "attempt_number": 1,
+      "adapter_code": "outlook",
+      "started_at": "2026-09-12T11:39:14.177691+00:00",
+      "completed_at": "2026-09-12T11:39:14.61855+00:00",
+      "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+      "status": "failed",
+      "failure_code": "outlook_send_governance_invalid",
+      "retry_eligible": false,
+      "response_snapshot": {
+        "stage": "pre_send_governance",
+        "reason": "current_draft_action_binding_changed",
+        "provider": "microsoft_graph_outlook"
+      },
+      "created_at": "2026-09-12T11:39:14.280922+00:00"
+    }
+  ],
+  "inquiry_response_draft_revisions": [
+    {
+      "id": 143,
+      "inquiry_response_draft_revision_uuid": "eff6b17b-f8a5-404e-b88f-3670756939d6",
+      "rental_case_id": 424,
+      "workflow_action_id": 582,
+      "conversation_key": "governed_client_response:424",
+      "source_case_revision": 1,
+      "draft_status": "send_failed",
+      "draft_source": "generated",
+      "is_current": false,
+      "approval_request_id": 183,
+      "subject": "A few details for your inquiry",
+      "salutation": "Hello,",
+      "intro_text": "Governed client response.",
+      "question_lines": [
+        {
+          "prompt_text": "What date and time is the client requesting for the event?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1620,
+          "human_question_text": "What date and time is the client requesting for the event?"
+        },
+        {
+          "prompt_text": "How many guests are expected?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1621,
+          "human_question_text": "How many guests are expected?"
+        },
+        {
+          "prompt_text": "Which space or rental scope is the client requesting?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1622,
+          "human_question_text": "Which space or rental scope is the client requesting?"
+        },
+        {
+          "prompt_text": "What type of event is the client planning?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1623,
+          "human_question_text": "What type of event is the client planning?"
+        }
+      ],
+      "closing_text": "Warm regards,",
+      "signoff_text": "WNC Rentals",
+      "body_text": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nWarmly,\nWNC",
+      "context_payload": {
+        "sender_email": "wnc-rentals-simulated@example.test",
+        "sender_label": "WNC Rentals (Simulated)",
+        "contact_label": "Alex Test",
+        "current_facts": [],
+        "open_questions": [
+          {
+            "question_type": "requested_event_timing",
+            "open_question_id": 1620,
+            "human_question_text": "What date and time is the client requesting for the event?"
+          },
+          {
+            "question_type": "expected_guest_count",
+            "open_question_id": 1621,
+            "human_question_text": "How many guests are expected?"
+          },
+          {
+            "question_type": "requested_rental_scope",
+            "open_question_id": 1622,
+            "human_question_text": "Which space or rental scope is the client requesting?"
+          },
+          {
+            "question_type": "requested_event_type",
+            "open_question_id": 1623,
+            "human_question_text": "What type of event is the client planning?"
+          }
+        ],
+        "rental_case_id": 424,
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "recipient_label": "Alex Test",
+        "conversation_key": "governed_client_response:424",
+        "resolution_items": [
+          {
+            "message": "What date and time is the client requesting for the event?",
+            "blocking": true,
+            "proposition_key": "open_question:1620",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          },
+          {
+            "message": "How many guests are expected?",
+            "blocking": true,
+            "proposition_key": "open_question:1621",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          },
+          {
+            "message": "Which space or rental scope is the client requesting?",
+            "blocking": true,
+            "proposition_key": "open_question:1622",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          },
+          {
+            "message": "What type of event is the client planning?",
+            "blocking": true,
+            "proposition_key": "open_question:1623",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          }
+        ],
+        "workflow_action_id": 582,
+        "contextual_guidance": [],
+        "guidance_references": [
+          "WF-003",
+          "WF-004"
+        ],
+        "operator_annotations": [],
+        "source_case_revision": 1,
+        "metadata_summary_lines": [
+          "Governed response intent: REQUEST_CLIENT_INFORMATION",
+          "Contract hash: d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4"
+        ],
+        "allow_empty_open_questions": true
+      },
+      "context_hash": "036f3b88fadfa046244c5d25c6dc7b7b8792e48743787b954906e3e18fa0c525",
+      "content_hash": "c5123423d4c73b7663aa4e5883d3c828d19fb93879ad7051e7aa84934e41ec25",
+      "recipient_email": "Serinya@whennaturecalls.nl",
+      "recipient_label": "Alex Test",
+      "sender_email": "wnc-rentals-simulated@example.test",
+      "sender_label": "WNC Rentals (Simulated)",
+      "sender_display_name": null,
+      "supersedes_draft_revision_id": null,
+      "delivered_at": "2026-09-11T09:54:38.032938+00:00",
+      "delivery_external_reference": null,
+      "delivery_failure_code": "adapter_result_malformed",
+      "approved_at": "2026-09-11T09:54:14.666619+00:00",
+      "rejected_at": null,
+      "created_by_reference": "test_console:operator",
+      "created_at": "2026-09-11T09:53:44.670866+00:00",
+      "updated_at": "2026-09-12T09:40:21.060522+00:00"
+    },
+    {
+      "id": 144,
+      "inquiry_response_draft_revision_uuid": "4cb57feb-f3c0-4f01-bba3-d16d069ffd4b",
+      "rental_case_id": 424,
+      "workflow_action_id": 586,
+      "conversation_key": "governed_client_response:424",
+      "source_case_revision": 1,
+      "draft_status": "send_failed",
+      "draft_source": "human_edited",
+      "is_current": true,
+      "approval_request_id": 184,
+      "subject": "A few details for your inquiry",
+      "salutation": "Hello,",
+      "intro_text": "Governed client response.",
+      "question_lines": [
+        {
+          "prompt_text": "What date and time is the client requesting for the event?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1620,
+          "human_question_text": "What date and time is the client requesting for the event?"
+        },
+        {
+          "prompt_text": "How many guests are expected?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1621,
+          "human_question_text": "How many guests are expected?"
+        },
+        {
+          "prompt_text": "Which space or rental scope is the client requesting?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1622,
+          "human_question_text": "Which space or rental scope is the client requesting?"
+        },
+        {
+          "prompt_text": "What type of event is the client planning?",
+          "question_type": "governed_client_question",
+          "open_question_id": 1623,
+          "human_question_text": "What type of event is the client planning?"
+        }
+      ],
+      "closing_text": "Warm regards,",
+      "signoff_text": "WNC Rentals",
+      "body_text": "Hi Alex Test,\n\nThanks for getting in touch. To help us advise on the next steps, could you let us know:\n- What date and time is the client requesting for the event?\n- How many guests are expected?\n- Which space or rental scope is the client requesting?\n- What type of event is the client planning?\n\nAfter we know those details, we are happy to move forward with next steps! \n\nWarmly,\nWhen Nature Calls Team",
+      "context_payload": {
+        "sender_email": "wnc-rentals-simulated@example.test",
+        "sender_label": "WNC Rentals (Simulated)",
+        "contact_label": "Alex Test",
+        "current_facts": [],
+        "open_questions": [
+          {
+            "question_type": "requested_event_timing",
+            "open_question_id": 1620,
+            "human_question_text": "What date and time is the client requesting for the event?"
+          },
+          {
+            "question_type": "expected_guest_count",
+            "open_question_id": 1621,
+            "human_question_text": "How many guests are expected?"
+          },
+          {
+            "question_type": "requested_rental_scope",
+            "open_question_id": 1622,
+            "human_question_text": "Which space or rental scope is the client requesting?"
+          },
+          {
+            "question_type": "requested_event_type",
+            "open_question_id": 1623,
+            "human_question_text": "What type of event is the client planning?"
+          }
+        ],
+        "rental_case_id": 424,
+        "recipient_email": "Serinya@whennaturecalls.nl",
+        "recipient_label": "Alex Test",
+        "conversation_key": "governed_client_response:424",
+        "resolution_items": [
+          {
+            "message": "What date and time is the client requesting for the event?",
+            "blocking": true,
+            "proposition_key": "open_question:1620",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          },
+          {
+            "message": "How many guests are expected?",
+            "blocking": true,
+            "proposition_key": "open_question:1621",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          },
+          {
+            "message": "Which space or rental scope is the client requesting?",
+            "blocking": true,
+            "proposition_key": "open_question:1622",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          },
+          {
+            "message": "What type of event is the client planning?",
+            "blocking": true,
+            "proposition_key": "open_question:1623",
+            "resolution_owner": "CLIENT",
+            "client_visibility": "ASK_CLIENT",
+            "resolution_status": "REQUIRED",
+            "workflow_action_id": null
+          }
+        ],
+        "workflow_action_id": 586,
+        "contextual_guidance": [],
+        "guidance_references": [
+          "WF-003",
+          "WF-004"
+        ],
+        "operator_annotations": [],
+        "source_case_revision": 1,
+        "metadata_summary_lines": [
+          "Governed response intent: REQUEST_CLIENT_INFORMATION",
+          "Contract hash: d28b470de9a0442496cff49aa764fc600f21ee29f845dc185c7654c14561cfe4"
+        ],
+        "allow_empty_open_questions": true
+      },
+      "context_hash": "ae0edb12dd8af6235a3d2897e22364ce4bdcd2f1af2b7fc70dd2b8bdf2c5ef97",
+      "content_hash": "6bef408e5aa067fd4f12417ef454804c415bde32cdb2ee6b0f2285a0b65a288f",
+      "recipient_email": "Serinya@whennaturecalls.nl",
+      "recipient_label": "Alex Test",
+      "sender_email": "wnc-rentals-simulated@example.test",
+      "sender_label": "WNC Rentals (Simulated)",
+      "sender_display_name": null,
+      "supersedes_draft_revision_id": 143,
+      "delivered_at": "2026-09-12T11:39:15.104304+00:00",
+      "delivery_external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABj5ZEPQAA",
+      "delivery_failure_code": "outlook_send_governance_invalid",
+      "approved_at": "2026-09-12T10:46:05.727705+00:00",
+      "rejected_at": null,
+      "created_by_reference": "test_console:operator",
+      "created_at": "2026-09-12T09:40:21.060522+00:00",
+      "updated_at": "2026-09-12T11:39:15.104327+00:00"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "status_code": 409,
+  "error": {
+    "failure_code": "OUTLOOK_SEND_READINESS_CONTEXT_INVALID",
+    "message": "The governed Outlook draft no longer matches current send truth.",
+    "status": 409
+  }
+}

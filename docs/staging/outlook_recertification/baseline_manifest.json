@@ -1,0 +1,24 @@
+{
+  "accepted_implementation": "7ef15d28bcad6bd8991510e6315ea1d32e12f54b",
+  "accepted_marker": "WNC_GOVERNED_DRAFTING_STAGING_ACCEPTED",
+  "live_deploy": "dep-db0eg660tbcc73ffrrpg",
+  "implementation_matches_live_commit": true,
+  "file_sha256": {
+    "tools/phase_08_workflow/governed_client_response.py": "5f91d1fa8077dd4363bc31218afd2c0697f0f4857ad90343f840ba172af8ca9d",
+    "tools/phase_08_workflow/editorial_content_planner.py": "b06b8471ffe48a50b5e3dfa7249ff0a9e71c529717ab29e5808c36cfd12a269f",
+    "tools/phase_08_workflow/pending_action_composition.py": "aed5931d0e5cecf832027e79fa4615b400ddc767cbd052fd2a90f711235f9233",
+    "tools/phase_08_workflow/required_realization.py": "2ec817b5b442e214d6dbb2c1cc7bf5bd64114f7d5188b16ae7ca6136c9cc1553",
+    "tools/phase_08_workflow/date_normalization.py": "5cb6cae3965d877fe160216fefa7877ac673cc7a391fc42788ac9fd7a564778c",
+    "tools/phase_08_workflow/outlook_action_contract.py": "420943b81c44d99b70ff69419cdc73389b2160a1a19555a35d55e7365fb163eb",
+    "tools/phase_08_workflow/outlook_adapter.py": "6df6968c83860ca8d6e7f61637aa15c7095245ecc8e6ed80f2d8aba005f42e45",
+    "tools/phase_08_workflow/outlook_simulation.py": "9f7c5c9724702b7a6f7869f5b7c529f699ce3800fc2f3705b03595c208557d05",
+    "tools/phase_08_workflow/execution_runtime.py": "de3589a10c91e041df703229c5d171510a402a44ea251c3dd436451e5e164e6d",
+    "tools/phase_08_workflow/test_console_service.py": "3aae524f385fb1e04463b06daf272f185b6761a2fc6fb58e55128aa69f63ef8e",
+    "tools/phase_08_workflow/orchestration_runtime.py": "9786340d1ca2472bcb5968e66d4b9e07aa0ebc08f0a8d82aeedc4b190076e463",
+    "tools/phase_08_workflow/orchestration_repository.py": "cd09a183594afafa0456d07e168263f49b7cb73cb8252c93c72d0526a2321285",
+    "docs/staging/uat/required_realization/full_results.json": "ed146ace1fa75678f330938e20b96f9e5907768a5d283c4419cee2029796d636",
+    "docs/staging/uat/required_realization/program_status.json": "80fbf74b603ca18fd8d2ad679e5a53f8a6491c016c7de0be5e9fc27d0e539498",
+    "docs/staging/uat/pending_check_consolidation/targeted_results.json": "b6ff60a48b9e7d962799c4dd9225e6f5da12d9c6834e7926e95fe2af298a131c",
+    "docs/staging/uat/pending_check_consolidation/program_status.json": "4d6d5a2e0a2c7a8e1d98f32082184330120778777893619665b12d9c93ce4e51"
+  }
+}
