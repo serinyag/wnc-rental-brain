@@ -1,0 +1,46 @@
+{
+  "status": "provider_free_gates_passed",
+  "maximum_acceptance_runs": 1,
+  "tests": {
+    "focused": 124,
+    "focused_subtests": 0,
+    "phase8": 489,
+    "phase8_subtests": 126,
+    "full": 706,
+    "full_subtests": 160,
+    "failures": 0,
+    "git_diff_check": "PASS"
+  },
+  "provider_free_regressions": {
+    "concrete_check_without_status": "PASS",
+    "legacy_status_check": "PASS",
+    "known_audio_not_pending": "PASS",
+    "conditional_projection_pending": "PASS",
+    "distinct_fact_and_check_payload": "PASS",
+    "positive_audio_realization": "PASS",
+    "future_check_not_realized": "PASS",
+    "cross_clause_realization_rejected": "PASS",
+    "rig_no_unrequested_availability": "PASS",
+    "compound_audio_and_projection": "PASS",
+    "continuity_only_after_valid_realization": "PASS",
+    "future_day_month_current_year": "PASS",
+    "past_day_month_next_year": "PASS",
+    "explicit_year_wins": "PASS",
+    "later_explicit_correction_governed_reschedule": "PASS",
+    "leap_day_including_century": "PASS",
+    "authoritative_timezone_date_boundary": "PASS",
+    "DST_ambiguity_no_guessed_schedule": "PASS",
+    "raw_inbound_timestamp_provenance": "PASS",
+    "partial_date_time_completion": "PASS",
+    "only_genuinely_missing_components_asked": "PASS"
+  },
+  "date_decision": {
+    "anchor": "Inbound received_at, otherwise occurred_at; never generation wall clock",
+    "timezone": "Europe/Amsterdam",
+    "same_calendar_day": "eligible as today; missing times remain questions",
+    "provenance": "date_provenance.year_source = client_explicit or system_inferred_next_occurrence, persisted on immutable source-linked observations",
+    "later_correction": "Newest requested timing carries explicit provenance; current canonical dates change only through existing intake/reschedule governance",
+    "invalid_or_ambiguous": "Quarantine calendar/time candidates; do not infer over contradictions or DST ambiguity"
+  },
+  "remaining_issues": []
+}

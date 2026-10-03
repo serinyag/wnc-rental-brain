@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import datetime
 from typing import Any, Callable
 
@@ -128,6 +129,30 @@ def _ingest_one_candidate(
     repository: ObservationRepositoryProtocol,
     created_at: str,
 ) -> ObservationDispositionResult:
+    if candidate.reported_field_code == 'active_event_window' and isinstance(candidate.candidate_value_payload, dict):
+        from .date_normalization import normalize_timing
+        raw_value = candidate.candidate_value_payload
+        value = dict(raw_value)
+        retained_provenance = None
+        previous = () if case_association.rental_case_id is None else repository.list_observations_for_case(case_association.rental_case_id)
+        # Time-only or year-only corrections can complete the latest partial
+        # date. A newly supplied day/month never inherits an unrelated old year.
+        if not value.get('day') and not value.get('month') and any(k in value for k in ('year', 'start_time', 'finish_time')):
+            prior = next((o for o in sorted(previous, key=lambda o: (o.created_at, o.inbound_observation_id), reverse=True)
+                          if o.reported_field_code == 'active_event_window' and o.status == 'validated'
+                          and isinstance(o.candidate_value_payload, dict) and o.candidate_value_payload.get('resolved_date')), None)
+            if prior:
+                prior_value = prior.candidate_value_payload
+                value = {**{k: prior_value[k] for k in ('day', 'month', 'start_time', 'finish_time') if k in prior_value}, **value}
+                if 'year' not in raw_value:
+                    value['year'] = int(prior_value['resolved_date'][:4])
+                    retained_provenance = prior_value['date_provenance']
+        normalized = normalize_timing(value, reference_timestamp=source_record.received_at or source_record.occurred_at,
+                                      source_reference=f'inbound_source_record:{source_record.inbound_source_record_id}')
+        if retained_provenance and 'date_provenance' in normalized:
+            normalized['date_provenance'] = {**retained_provenance, 'timing_update_source_reference': f'inbound_source_record:{source_record.inbound_source_record_id}'}
+            normalized.pop('year', None) if retained_provenance['year_source'] != 'client_explicit' else None
+        candidate = replace(candidate, candidate_value_payload=normalized)
     field_definition = get_field_definition(candidate.reported_field_code)
     observation_status = OBSERVATION_STATUS_VALIDATED
     failure_codes: tuple[str, ...] = ()
@@ -623,6 +648,8 @@ def _validate_candidate(
     field_definition: ObservationFieldDefinition,
 ) -> tuple[str, ...]:
     failure_codes: list[str] = []
+    if candidate.reported_field_code == 'active_event_window' and isinstance(candidate.candidate_value_payload, dict) and candidate.candidate_value_payload.get('normalization_error'):
+        failure_codes.append(OBSERVATION_FAILURE_INVALID_VALUE_TYPE)
     if candidate.reported_domain_code is not None and candidate.reported_domain_code != field_definition.domain_code:
         failure_codes.append(OBSERVATION_FAILURE_MANUAL_MAPPING_REQUIRED)
     if candidate.observation_type not in field_definition.allowed_observation_types:

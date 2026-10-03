@@ -1434,8 +1434,8 @@ limit 1;
             "case_reference_code": metadata.event_reference,
         }
         dedupe_key = _normalize_optional_text(external_test_reference) or f"test-evidence:{_json_digest(payload)}"
-        source_record = self.observation_repository.create_source_record(
-            source_record_input=InboundSourceRecordInput(
+        from .date_normalization import timing_components
+        source_input = InboundSourceRecordInput(
                 source_system_code="email",
                 source_record_type="message",
                 occurred_at=payload["received_at"],
@@ -1448,14 +1448,28 @@ limit 1;
                 received_at=payload["received_at"],
                 source_location_reference=_normalize_optional_text(source_label),
                 evidence_excerpt=(body or "")[:500] or _normalize_optional_text(subject),
-            ),
-            case_association=CaseAssociationResult(
-                status="resolved",
-                rental_case_id=rental_case_id,
-                association_basis="test_console_explicit_case",
-            ),
-            created_at=self.now(),
-        )
+            )
+        timing = timing_components(body or '')
+        if timing:
+            result = ingest_structured_observations(
+                request=StructuredObservationIngestionRequest(
+                    source_record=source_input,
+                    case_association=CaseAssociationInput(rental_case_id=rental_case_id),
+                    observations=(StructuredObservationCandidate(
+                        reported_field_code='active_event_window', observation_type=OBSERVATION_TYPE_FACT_CANDIDATE,
+                        claim_kind=OBSERVATION_CLAIM_KIND_NEW_INFORMATION, candidate_value_payload=timing,
+                        source_evidence_reference='inbound_message:calendar_components',
+                        asserted_by_party_type=OBSERVATION_ASSERTED_BY_CLIENT,
+                        asserted_by_reference=_normalize_optional_text(sender), source_excerpt=(body or '')[:500],
+                        extraction_confidence=1.0),)),
+                repository=self.observation_repository, now=self.now)
+            source_record = result.source_record
+        else:
+            source_record = self.observation_repository.create_source_record(
+                source_record_input=source_input,
+                case_association=CaseAssociationResult(status='resolved', rental_case_id=rental_case_id,
+                                                       association_basis='test_console_explicit_case'),
+                created_at=self.now())
         self._create_console_event(
             rental_case_id=rental_case_id,
             event_type_code=TEST_CONSOLE_RAW_EVIDENCE_EVENT,

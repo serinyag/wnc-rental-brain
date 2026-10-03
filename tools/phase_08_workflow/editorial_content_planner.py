@@ -61,6 +61,30 @@ class EditorialContentItem:
         return {'topic': self.topic, **self.value}
 
 
+def is_pending_check_action(value: dict[str, Any]) -> bool:
+    """Recognize governed check semantics across both supported value shapes."""
+    return (value.get('status') in {'check_required', 'pending', 'conditional'} or
+            (value.get('action') == 'check' and bool(value.get('subject') or value.get('subjects') or value.get('questions'))))
+
+
+def audio_fact_realized(body: str) -> bool:
+    """Positive audio capability evidence must occur in its own proposition."""
+    for clause in re.split(r'[.!?;\n,]|\b(?:and|but|whereas)\b', body.casefold()):
+        if not mentioned('audio_playback', clause):
+            continue
+        if re.search(r"\b(?:check|checking|whether|if|might|may|could|not|cannot|unavailable|unsure)\b|\b(?:we|i)['’]ll\b", clause) and not re.search(r'\bno problem\b', clause):
+            continue
+        # Match the capability's own predicate, not a polarity word attached
+        # to an unrelated subject elsewhere in the same sentence.
+        audio = r'(?:background |light |some )*(?:music(?: playback)?|audio(?: playback)?)'
+        if re.search(r'\b' + audio + r'\s+(?:is|works|can be played)\b(?:\s+(?:also |already )?(?:available|supported|possible|fine|no problem))?', clause):
+            if re.search(r'\b' + audio + r'\s+(?:works|can be played)\b|\b' + audio + r'\s+is\s+(?:also |already )?(?:available|supported|possible|fine|no problem)\b', clause):
+                return True
+        if re.search(r'\b(?:you|we) can (?:play|provide)\s+' + audio + r'\b', clause):
+            return True
+    return False
+
+
 @dataclass(frozen=True)
 class EditorialContentPlan:
     response_intent: str
@@ -82,7 +106,7 @@ class EditorialContentPlan:
                 'primary_client_need': self.primary_client_need,
                 **{role.value.lower(): [item.to_payload() for item in self.role_items(role)] for role in EditorialRole},
                 'do_not_repeat': self.do_not_repeat,
-                'client_visible_pending_state': [item.writing_value() for item in self.items if item.included and item.value.get('status') in {'check_required', 'pending', 'conditional'}],
+                'client_visible_pending_state': [item.writing_value() for item in self.items if item.included and is_pending_check_action(item.value)],
                 'substantive_budget': self.substantive_budget, 'editorial_rationale': self.budget_reason,
                 'source_bindings': [{'semantic_key': i.semantic_key, 'source_reference': i.source_reference,
                                      'fingerprint': i.fingerprint} for i in self.items]}
@@ -207,7 +231,7 @@ def communication_evidence(item: EditorialContentItem, body: str) -> bool:
     if item.topic == 'catering_kitchen':
         return 'kitchen' in text and any(w in text for w in ('warming', 'plating', 'ready-made'))
     if item.topic == 'audio_playback':
-        return mentioned(item.topic, text) and bool(re.search(r'\b(?:supported|fine|possible|can be played|available|no problem)\b', text))
+        return audio_fact_realized(body)
     if item.topic == 'projection_display':
         return mentioned(item.topic, text) and bool(re.search(r'\b(?:projector|projection)\b.{0,25}\bavailable\b', text)) and bool(re.search(r'\b(?:check|checking)\b.{0,50}\b(?:setup|arrangement)\b', text))
     if item.topic == 'microphones':
@@ -304,7 +328,8 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
                 add('fact:' + key, topic, value, EditorialRole.DEFER, 'client_already_acknowledges_restriction', guide.source_reference)
                 continue
             if topic in {'audio_playback', 'projection_display', 'microphones', 'other_technical', 'dj_sound_booth'}:
-                if topic in current_topics or (topic in requested_topics and not contract.prior_client_drafts):
+                if topic in current_topics or (topic in requested_topics and (not contract.prior_client_drafts or
+                        (topic == 'audio_playback' and value.get('status') == 'supported' and 'fact:' + key not in prior))):
                     role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'requested_technical_capability', 1
                 if value.get('status') == 'not_supported' and topic in requested_topics:
                     role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'material_known_restriction', 0
@@ -332,7 +357,7 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
                         'explicit_technical_detail_question' if direct else 'secondary_condition_covered_by_practical_setup_check', guide.source_reference, priority=2)
                 value = {**value, 'check_required': ['practical projection setup']}
             elif topic == 'audio_playback' and value.get('status') == 'supported':
-                value = {'client_fact': {'background_music_playback': True}}
+                value = {'client_fact': {'background_music_playback': True}, 'fact_state': 'known', 'action_required': False}
             elif topic == 'other_technical' and value.get('status') == 'conditional':
                 aerial = alias_matches(('aerial', 'rig'), latest + '\n' + earlier)
                 value = {'action': 'check', 'subject': 'custom aerial rig' if aerial else 'requested custom equipment',
@@ -369,9 +394,14 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
         next_topics.extend(logistics)
     if 'facilitator' in current_topics or ('facilitator' in requested_topics and not contract.open_client_questions):
         next_topics.append('requested facilitator availability and format')
-    if not contract.open_client_questions and not next_topics and not any(i.included and i.value.get('status') in {'conditional','check_required','pending'} for i in items):
-        if any(i.proposition_key.startswith('availability:') for i in contract.resolution_items):
+    existing_check = any(i.included and is_pending_check_action(i.value) for i in items)
+    asks_availability = bool(re.search(r'\bavailability\b|\b(?:venue|date|studio)\b.{0,35}\bavailable\b', latest, re.I))
+    if not contract.open_client_questions and not next_topics and any(i.proposition_key.startswith('availability:') for i in contract.resolution_items):
+        if not existing_check or asks_availability:
             next_topics.append('requested date and venue availability')
+        else:
+            add('next_step.availability', 'next_step', {'action': 'check', 'subjects': ['requested date and venue availability']},
+                EditorialRole.DEFER, 'concrete_requested_check_already_supplies_next_step')
     if next_topics:
         add('next_step', 'next_step', {'action': 'check', 'subjects': next_topics, 'status': 'check_required',
              **({'requested_event_window': [x for x in contract.confirmed_case_facts if x.startswith('Requested active event')]}

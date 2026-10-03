@@ -205,16 +205,15 @@ def test_logistics_requests_create_stable_internal_checks_without_contact_claims
     assert 'Confirm the supplier loading route' not in str(c.to_provider_payload())
 
 
-def test_timing_question_requires_missing_year_not_just_returned_question_id():
+def test_timing_question_asks_only_missing_times_when_day_and_month_known():
     q=SimpleNamespace(open_question_id=7,human_question_text='What date and time is requested?',
         question_type='requested_event_timing',status='open',requested_from_role='client')
     c=build_draft_contract(snapshot=snapshot(open_questions=(q,)),recipient_label='Lena',latest_client_message='19 November')
-    assert 'including year' in c.open_client_questions[0][1]
+    assert c.open_client_questions[0][1] == 'What start time and finish time would you like?'
     def validate(body):
         return validate_client_response_draft(contract=c,draft=ClientResponseDraft('Date',body,(7,)),
             current_case_revision=2,current_context_hash=c.context_hash)
-    assert 'missing_client_question_component' in validate('What start and end times do you need on 19 November?').failure_codes
-    assert validate('Which year is 19 November, and what start and finish times do you need?').is_valid
+    assert validate('What start and end times do you need on 19 November?').is_valid
     assert 'missing_client_question_component' not in codes(contract(),'What start time would you prefer?')
 
 

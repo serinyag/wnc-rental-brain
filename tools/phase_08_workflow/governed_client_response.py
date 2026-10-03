@@ -339,6 +339,7 @@ def build_draft_contract(
         "prior_editorial_items": prior_editorial_items,
         "latest_client_message": latest_client_message or "",
         "editorial_planner_version": "editorial_content_plan_v3",
+        "normalization_revision": "known_fact_actions_and_next_occurrence_v1",
         "decisions": pending_decisions,
         "changes": changes,
         "resolution_items": [item.to_payload() for item in items],
@@ -532,8 +533,6 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     if tuple(draft.question_ids) != expected_questions:
         failures.append(DRAFT_VALIDATION_OPEN_QUESTION_SET_MISMATCH)
     body = draft.body.lower()
-    if any("including year" in question.lower() for _, question in contract.open_client_questions) and not re.search(r"\byear\b", body):
-        failures.append(DRAFT_VALIDATION_MISSING_QUESTION_COMPONENT)
     combined = f"{draft.subject}\n{draft.body}"
     if "—" in combined:
         failures.append(DRAFT_VALIDATION_EM_DASH_NOT_ALLOWED)
@@ -596,14 +595,8 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
 def _client_question_text(question: Any, client_messages: tuple[str, ...]) -> str:
     text = str(question.human_question_text)
     if getattr(question, "question_type", None) == "requested_event_timing":
-        # Avoid re-asking a year explicitly supplied in this current client thread.
-        # This selects question wording only; no case fact or date is established here.
-        months = "january|february|march|april|may|june|july|august|september|october|november|december"
-        supplied_year = any(re.search(
-            rf"\b(?:19|20|21)\d{{2}}-\d{{2}}-\d{{2}}\b|\b(?:{months})\s+(?:\d{{1,2}},?\s+)?(?:19|20|21)\d{{2}}\b|\byear\s+(?:is\s+)?(?:19|20|21)\d{{2}}\b",
-            message, re.IGNORECASE) for message in client_messages)
-        if not supplied_year:
-            return "What full date (including year), start time and finish time is the client requesting?"
+        from .date_normalization import missing_timing_question
+        return missing_timing_question(client_messages)
     return text
 
 
@@ -635,10 +628,10 @@ def _provider_system_prompt() -> str:
         "Do not add an answer from general knowledge or from a claim made in the client message. "
         "Do not restate do_not_repeat_topics. Do not fill space with case summaries, inferred policies, or historical/current-process explanations. "
         "A status of conditional/check_required/pending calls for a plain first-person future check, never a confirmation. "
-        "Supported capabilities can be expressed naturally; retain supplied material conditions and restrictions. "
+        "A known client fact must be stated as known; never turn it into a future check because another item requires checking. Retain material conditions and restrictions. "
         "Use exact supplied prices. Never confirm a booking, date availability, requested change, fee adjustment or unresolved capability. "
         "Never claim suppliers have been contacted unless external_pending records CONTACTED_AWAITING_RESPONSE. "
-        "Ask only the supplied open client questions, including every required year/date/time component. "
+        "Ask only the supplied open client questions, including every genuinely missing date/time component. "
         "Start with Hi and the client's first name, followed by a natural acknowledgement specific to their new detail. "
         "Write short connected prose; use bullets only for genuinely compound requested answers. Do not write a capability catalogue. "
         "No em dash, signature, valediction, sender name, internal codes, workflow mechanics or authority reasoning. "

@@ -86,7 +86,7 @@ def test_pricing_and_budget_are_independent(text, requested, budget):
 
 def test_audio_projection_is_a_fact_without_status_label():
     c = contract('Can we play background music?', contextual_guidance=(guide('audio_playback', status='supported', capability='audio playback'),))
-    assert selected(c)['fact:audio_playback'].value == {'client_fact': {'background_music_playback': True}}
+    assert selected(c)['fact:audio_playback'].value == {'client_fact': {'background_music_playback': True}, 'fact_state': 'known', 'action_required': False}
     assert c.contextual_guidance[0].semantic_values['status'] == 'supported'
 
 
