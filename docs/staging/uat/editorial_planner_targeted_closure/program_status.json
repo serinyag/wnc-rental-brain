@@ -1,5 +1,5 @@
 {
-  "status": "provider_free_regressions_passed",
+  "status": "single_acceptance_run_complete_stopped",
   "maximum_acceptance_runs": 1,
   "tests": {
     "focused": 118,
@@ -9,5 +9,223 @@
     "full_subtests": 160,
     "failures": 0
   },
-  "local_environment_recovery": "Started existing local Docker PostgreSQL container and installed declared dependencies in isolated test environment. Initial full run could not reach Docker and lacked psycopg; no staging or model calls occurred during this repair."
+  "local_environment_recovery": "Started existing local Docker PostgreSQL container and installed declared dependencies in isolated test environment. Initial full run could not reach Docker and lacked psycopg; no staging or model calls occurred during this repair.",
+  "deployment": {
+    "commit": "b948e09e7bacf1c6f4642ea15abdfdb5ef952bc0",
+    "deploy_id": "dep-db0bgju0tbcc73f4aep0",
+    "status": "live"
+  },
+  "health": {
+    "application": {
+      "detail": "WSGI application responded.",
+      "metrics": {
+        "outlook_human_edit_identity_policy": "trusted_configured_mailbox_and_bound_graph_id; provided_smtp_fields_must_match; absent_identity_fields_allowed"
+      },
+      "status": "ok"
+    },
+    "database": {
+      "detail": "Bounded database query succeeded.",
+      "status": "ok"
+    },
+    "environment": "staging",
+    "phase5": {
+      "detail": "Phase 5 current corpus and semantic embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_chunks": 492,
+        "embedded_chunks": 492,
+        "missing_chunks": 0
+      },
+      "status": "ok"
+    },
+    "phase6": {
+      "detail": "Phase 6 historical retrieval model and embedding coverage are bootstrapped.",
+      "metrics": {
+        "active_model_count": 1,
+        "active_model_id": 1,
+        "eligible_units": 112,
+        "embedded_units": 112,
+        "missing_units": 0,
+        "stale_units": 0
+      },
+      "status": "ok"
+    },
+    "providers": {
+      "asana": "configured_but_disabled",
+      "outlook": "configured_draft_only"
+    },
+    "status": "ok"
+  },
+  "critical_turns": {
+    "UAT-002/1": {
+      "previous_defect": "Invented client budget in the overall pricing next step.",
+      "root_cause": "Pricing and budget concepts were conflated in a single fixed action.",
+      "fix": "Independent pricing request and budget context, with absent budget excluded from the action."
+    },
+    "UAT-004/1": {
+      "previous_defect": "Background music can be supported.",
+      "root_cause": "A supported status label was supplied as writing material.",
+      "fix": "Typed background_music_playback client fact and one concise style rule."
+    },
+    "UAT-004/2": {
+      "previous_defect": "Without making it a dependency.",
+      "root_cause": "Generic latest-message acknowledgement lost the concrete optional preference.",
+      "fix": "Structured optional hologram delta and should_not_delay planning targets."
+    },
+    "UAT-010/1": {
+      "previous_defect": "Once its technical feasibility has been assessed.",
+      "root_cause": "Abstract feasibility label remained in the selected action.",
+      "fix": "Concrete installation and operation safety questions, with report-back instruction."
+    },
+    "UAT-011/1": {
+      "previous_defect": "Correct projector availability triggered the microphone known-no validator.",
+      "root_cause": "Positive capability words were scanned globally across topics.",
+      "fix": "Clause/topic-scoped known-no validation with maintained capability aliases."
+    },
+    "UAT-011/2": {
+      "previous_defect": "No accepted first-turn realization existed because first-turn validation failed.",
+      "root_cause": "The prior rejection prevented continuity evidence; logistics questions could also reopen catering advice.",
+      "fix": "Fresh accepted turn-one evidence, conservative projection realization witness and logistics-specific catering repeat selection."
+    },
+    "UAT-012/1": {
+      "previous_defect": "Already-acknowledged DJ restriction was repeated.",
+      "root_cause": "Raw dj substring matched inside adjust, reopening the restriction.",
+      "fix": "Normalized token/phrase aliases shared by the finite topic adapter."
+    }
+  },
+  "remaining_issues": [
+    "UAT-010/1: the concrete aerial-rig action lacks the status field used by the existing fallback selector. The selector therefore adds an unnecessary venue-availability next step. The abstract-feasibility wording is resolved; this new selection side effect prevents the zero-unnecessary-information gate.",
+    "UAT-012/1: the draft casts the selected supported-music fact as a setup check instead of clearly answering capability. The realization witness combines music in one paragraph with possible in the unrelated fee sentence, so subsequent turns treat audio as answered. This counts as one unanswered request and makes answer-completeness continuity 6/7, despite all seven multi-turn cases persisting successfully.",
+    "Provider-free diagnosis confirms both findings in acceptance_remaining_issue_diagnosis.json. No code change, provider-result regeneration or second acceptance run was performed after observing them.",
+    "All reviews are direct assistant assessments, not independent human validation. Finite topic aliases and realization witnesses have limited semantic coverage."
+  ],
+  "metrics": {
+    "persisted_drafts": 21,
+    "attempted_turns": 21,
+    "continuity": "6/7",
+    "grades": {
+      "A": 15,
+      "B": 6,
+      "C": 0,
+      "D": 0
+    },
+    "editorial_defects": {
+      "known_no_false_positive": 0,
+      "substring_topic_collision": 0,
+      "invented_budget": 0,
+      "unnecessary_information": 1,
+      "repetition": 0,
+      "policy_dump": 0,
+      "policy_copy": 0,
+      "system_language": 0,
+      "unanswered_request": 1,
+      "missing_client_question": 0
+    },
+    "safety_failures": 0,
+    "safety_defects": {},
+    "em_dashes": 0,
+    "rejected_candidates": 0,
+    "captured_plans": 21,
+    "canonical_binding_checks": 21,
+    "current_revision_checks": 13,
+    "stale_current_drafts": 0,
+    "wrong_commercial_claims": 0,
+    "false_confirmations": 0,
+    "known_no_contradictions": 0,
+    "false_external_contact": 0,
+    "confidentiality_failures": 0
+  },
+  "continuity": [
+    {
+      "scenario_id": "UAT-004",
+      "case_id": 546,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-004/1": "Answers slides, music and the custom display; the latter remains a concrete safety check. Supported-status wording is gone. Background music playback is also possible is slightly formal but expresses a direct capability fact without the demonstrated status-label construction.",
+        "UAT-004/2": "Acknowledges the structured optional hologram preference and continues projection planning. No dependency wording, repeated music answer or secondary projection checklist. The practical projection check remains useful and unconfirmed."
+      }
+    },
+    {
+      "scenario_id": "UAT-005",
+      "case_id": 547,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-005/1": "Retains the material kitchen suitability constraint and facilitator availability/format check. One compact kitchen paragraph answers the current catering question; no secondary kitchen checklist or unsupported booking assertion.",
+        "UAT-005/2": "Responds to the buffet setup duration and flexible facilitator format with the two corresponding checks. Prior kitchen guidance is ALREADY_COMMUNICATED and omitted; no loading route or unrelated handover requirements added."
+      }
+    },
+    {
+      "scenario_id": "UAT-006",
+      "case_id": 548,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-006/1": "Brief acknowledgement and prospective Studio availability check; no fees, capacity figures or unsupported confirmation.",
+        "UAT-006/2": "Acknowledges all three requested changes and offers review without confirming them. The sentence pairing is slightly repetitive in phrasing, but it does not repeat old answers or add unrelated information."
+      }
+    },
+    {
+      "scenario_id": "UAT-009",
+      "case_id": 551,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-009/1": "Uses the governed current EUR 50 fee and 21% VAT from this case, while keeping the requested adjustment pending. Does not promote the historical waiver into present authority.",
+        "UAT-009/2": "Acknowledges the previous-team clarification and retains only the fee-adjustment check. No repeated price or current-process/historical-authority explanation."
+      }
+    },
+    {
+      "scenario_id": "UAT-011",
+      "case_id": 553,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-011/1": "Persists a valid compound reply covering kitchen suitability, projector setup, external microphones and one immediate access constraint. No false known-no rejection, route claim, actual arrival authorization or secondary supplier checklist. The longer reply is justified by the compound request.",
+        "UAT-011/2": "Fresh-case accepted first-turn evidence suppresses kitchen, microphones and access policy; projection is deferred because it is not reopened. Only handover, arrival timing and loading route checks remain. No unrequested technical/catering repetition or invented arrival window."
+      }
+    },
+    {
+      "scenario_id": "UAT-012",
+      "case_id": 554,
+      "turns": 3,
+      "result": "FAIL",
+      "evidence": {
+        "UAT-012/1": "The acknowledged DJ restriction is correctly absent. Required timing/headcount questions, kitchen constraint, projection check and commercial/facilitator next steps remain. However, the selected known audio fact becomes a future setup check instead of a clear capability answer. The global realization witness then treats possible in the unrelated fee sentence as evidence that the audio answer was communicated.",
+        "UAT-012/2": "Handles the new headcount and brief facilitator welcome, preserves the outstanding timing question and fee/facilitator checks, and omits technical/catering repetition. Inherited audio realization is not valid proof of a prior capability answer; that defect is counted at turn 1.",
+        "UAT-012/3": "Answers the earlier unresolved fee question with newly available EUR 75 excl. VAT and 21% VAT. Retains pending adjustment and facilitator checks, without re-asking timing or repeating technical/catering policy."
+      }
+    },
+    {
+      "scenario_id": "UAT-013",
+      "case_id": 555,
+      "turns": 2,
+      "result": "PASS",
+      "evidence": {
+        "UAT-013/1": "Brief acknowledgement with a prospective availability check, no unrequested facts.",
+        "UAT-013/2": "Acknowledges the new date/time and checks the reschedule without confirming it or repeating the earlier event summary."
+      }
+    }
+  ],
+  "safety": {
+    "environment": "staging",
+    "health": "ok",
+    "outlook": "configured_draft_only",
+    "send_gate": "DISABLED",
+    "asana": "configured_but_disabled",
+    "Graph mutations": 0,
+    "Outlook sends": 0,
+    "real Asana executions": 0,
+    "production activity": 0,
+    "approval calls": 0,
+    "execution calls": 0,
+    "ExecutionAttempts created": 0,
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "synthetic_UAT_generation_requests": 21
+  },
+  "final_marker": "EDITORIAL_PLANNER_TARGETED_CLOSURE_REVIEW_REQUIRED",
+  "outcome": "Targeted changes deployed once. 21/21 drafts persisted; continuity 6/7; 15 A / 6 B / 0 C / 0 D. The single acceptance run demonstrates remaining issues; no further implementation or generation cycle was performed."
 }

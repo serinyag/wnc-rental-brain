@@ -1,0 +1,215 @@
+{
+  "provider_calls": 0,
+  "results": [
+    {
+      "scenario_id": "UAT-001",
+      "turn": 1,
+      "draft_revision_id": 318,
+      "action_id": 1333,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-002",
+      "turn": 1,
+      "draft_revision_id": 319,
+      "action_id": 1336,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-003",
+      "turn": 1,
+      "draft_revision_id": 320,
+      "action_id": 1339,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-004",
+      "turn": 1,
+      "draft_revision_id": 321,
+      "action_id": 1346,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-004",
+      "turn": 2,
+      "draft_revision_id": 322,
+      "action_id": 1349,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-005",
+      "turn": 1,
+      "draft_revision_id": 323,
+      "action_id": 1354,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-005",
+      "turn": 2,
+      "draft_revision_id": 324,
+      "action_id": 1355,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 1,
+      "draft_revision_id": 325,
+      "action_id": 1358,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-006",
+      "turn": 2,
+      "draft_revision_id": 326,
+      "action_id": 1364,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-007",
+      "turn": 1,
+      "draft_revision_id": 327,
+      "action_id": 1368,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-008",
+      "turn": 1,
+      "draft_revision_id": 328,
+      "action_id": 1372,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-009",
+      "turn": 1,
+      "draft_revision_id": 329,
+      "action_id": 1376,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-009",
+      "turn": 2,
+      "draft_revision_id": 330,
+      "action_id": 1377,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-010",
+      "turn": 1,
+      "draft_revision_id": 331,
+      "action_id": 1382,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-011",
+      "turn": 1,
+      "draft_revision_id": 332,
+      "action_id": 1387,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-011",
+      "turn": 2,
+      "draft_revision_id": 333,
+      "action_id": 1390,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 1,
+      "draft_revision_id": 334,
+      "action_id": 1398,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 2,
+      "draft_revision_id": 335,
+      "action_id": 1405,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-012",
+      "turn": 3,
+      "draft_revision_id": 336,
+      "action_id": 1411,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-013",
+      "turn": 1,
+      "draft_revision_id": 337,
+      "action_id": 1414,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    },
+    {
+      "scenario_id": "UAT-013",
+      "turn": 2,
+      "draft_revision_id": 338,
+      "action_id": 1416,
+      "canonical_payload": "PASS",
+      "revision_content_context_recipient_approval_binding": "PASS",
+      "approval_status": "open",
+      "message_mode": "new"
+    }
+  ]
+}

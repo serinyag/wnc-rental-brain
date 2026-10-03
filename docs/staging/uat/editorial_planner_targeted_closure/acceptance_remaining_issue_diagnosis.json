@@ -1,0 +1,52 @@
+{
+  "provider_calls": 0,
+  "saved_drafts_modified": false,
+  "implementation_modified": false,
+  "UAT-010/1": {
+    "concrete_check_value": {
+      "action": "check",
+      "questions": [
+        "can it be installed safely",
+        "can it be operated safely"
+      ],
+      "report_back": true,
+      "subject": "custom aerial rig"
+    },
+    "status_key_present": false,
+    "fallback_predicate": "any included item.value.status in conditional/check_required/pending",
+    "selected_fallback": [
+      {
+        "action": "check",
+        "requested_event_window": [
+          "Requested active event start: 2026-12-10 17:30:00+00",
+          "Requested active event end: 2026-12-10 23:00:00+00"
+        ],
+        "status": "check_required",
+        "subjects": [
+          "requested date and venue availability"
+        ],
+        "topic": "next_step"
+      }
+    ],
+    "diagnosis": "Concrete action is no longer recognized as an existing check by the fallback selector."
+  },
+  "UAT-012/1": {
+    "audio_value": {
+      "client_fact": {
+        "background_music_playback": true
+      }
+    },
+    "original_body_realization": true,
+    "realization_after_removing_only_unrelated_fee_phrase_from_local_copy": false,
+    "unrelated_fee_phrase": "what adjustment may be possible, and ",
+    "recorded_audio_metadata": [
+      {
+        "fingerprint": "672b1a863ea87ac08dad150ee3c17339d636ca915f70b17294df2679b3424af4",
+        "semantic_key": "fact:audio_playback",
+        "source_reference": "phase4:technical_audio_playback_supported",
+        "topic": "audio_playback"
+      }
+    ],
+    "diagnosis": "Realization combines a music topic mention with possible in an unrelated fee sentence; the actual audio paragraph promises a check instead of stating the selected capability fact."
+  }
+}

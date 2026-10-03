@@ -1,0 +1,153 @@
+{
+  "UAT-001/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Answers the fee with EUR 75 excl. VAT and 21% VAT, plus a prospective availability check. No unsupported confirmation or irrelevant policy.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-002/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Preserves all four required questions, including year/start/finish. Offers an options and overall-price check without inventing a budget; payload explicitly marks budget absent.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-003/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Answers suitability using the current within-limits capacity projection, without quoting an irrelevant maximum. Availability remains a prospective check. The historical scenario title does not override current governed capacity.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-004/1": {
+    "grade": "B",
+    "result": "PASS",
+    "assessment": "Answers slides, music and the custom display; the latter remains a concrete safety check. Supported-status wording is gone. Background music playback is also possible is slightly formal but expresses a direct capability fact without the demonstrated status-label construction.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-004/2": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Acknowledges the structured optional hologram preference and continues projection planning. No dependency wording, repeated music answer or secondary projection checklist. The practical projection check remains useful and unconfirmed.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-005/1": {
+    "grade": "B",
+    "result": "PASS",
+    "assessment": "Retains the material kitchen suitability constraint and facilitator availability/format check. One compact kitchen paragraph answers the current catering question; no secondary kitchen checklist or unsupported booking assertion.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-005/2": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Responds to the buffet setup duration and flexible facilitator format with the two corresponding checks. Prior kitchen guidance is ALREADY_COMMUNICATED and omitted; no loading route or unrelated handover requirements added.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-006/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Brief acknowledgement and prospective Studio availability check; no fees, capacity figures or unsupported confirmation.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-006/2": {
+    "grade": "B",
+    "result": "PASS",
+    "assessment": "Acknowledges all three requested changes and offers review without confirming them. The sentence pairing is slightly repetitive in phrasing, but it does not repeat old answers or add unrelated information.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-007/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Preserves the full timing question including year, start and finish. No kitchen guidance, equipment questions or unrelated supplier requirements.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-008/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Correct fee/VAT, overall pricing and pending flexibility check. Explicit tight budget remains general_constraint; primary need is commercial only, with no audio collision. No discount is asserted as approved.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-009/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Uses the governed current EUR 50 fee and 21% VAT from this case, while keeping the requested adjustment pending. Does not promote the historical waiver into present authority.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-009/2": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Acknowledges the previous-team clarification and retains only the fee-adjustment check. No repeated price or current-process/historical-authority explanation.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-010/1": {
+    "grade": "B",
+    "result": "FAIL",
+    "assessment": "The targeted abstract-feasibility wording is gone and the rig check is concrete. However, removing status from the new action value makes the existing fallback fail to recognize a pending check, so it adds an unnecessary venue-availability paragraph to this capability-focused reply. Safe but fails the strict editorial gate; no follow-on implementation is authorized.",
+    "editorial_flags": [
+      "unnecessary_information"
+    ],
+    "safety_flags": []
+  },
+  "UAT-011/1": {
+    "grade": "B",
+    "result": "PASS",
+    "assessment": "Persists a valid compound reply covering kitchen suitability, projector setup, external microphones and one immediate access constraint. No false known-no rejection, route claim, actual arrival authorization or secondary supplier checklist. The longer reply is justified by the compound request.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-011/2": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Fresh-case accepted first-turn evidence suppresses kitchen, microphones and access policy; projection is deferred because it is not reopened. Only handover, arrival timing and loading route checks remain. No unrequested technical/catering repetition or invented arrival window.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-012/1": {
+    "grade": "B",
+    "result": "FAIL",
+    "assessment": "The acknowledged DJ restriction is correctly absent. Required timing/headcount questions, kitchen constraint, projection check and commercial/facilitator next steps remain. However, the selected known audio fact becomes a future setup check instead of a clear capability answer. The global realization witness then treats possible in the unrelated fee sentence as evidence that the audio answer was communicated.",
+    "editorial_flags": [
+      "unanswered_request"
+    ],
+    "safety_flags": []
+  },
+  "UAT-012/2": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Handles the new headcount and brief facilitator welcome, preserves the outstanding timing question and fee/facilitator checks, and omits technical/catering repetition. Inherited audio realization is not valid proof of a prior capability answer; that defect is counted at turn 1.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-012/3": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Answers the earlier unresolved fee question with newly available EUR 75 excl. VAT and 21% VAT. Retains pending adjustment and facilitator checks, without re-asking timing or repeating technical/catering policy.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-013/1": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Brief acknowledgement with a prospective availability check, no unrequested facts.",
+    "editorial_flags": [],
+    "safety_flags": []
+  },
+  "UAT-013/2": {
+    "grade": "A",
+    "result": "PASS",
+    "assessment": "Acknowledges the new date/time and checks the reschedule without confirming it or repeating the earlier event summary.",
+    "editorial_flags": [],
+    "safety_flags": []
+  }
+}
