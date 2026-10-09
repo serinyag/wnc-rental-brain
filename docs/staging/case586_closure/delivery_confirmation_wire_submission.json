@@ -1,0 +1,8 @@
+{
+  "draft_revision_id": "387",
+  "approval_request_id": "466",
+  "execution_attempt_id": "29",
+  "recipient": "serinya@whennaturecalls.nl",
+  "subject": "Studio seating update",
+  "evidence_note": "Authorized synthetic operator receipt confirmation for Case 586 only. No human inbox observation is asserted. Bounded read-only Microsoft Graph verification matched the exact approved subject/body/sole recipient in both sent and Inbox copies, with identical Internet message ID and conversation. Inbox message AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bfAAA was received at 2026-10-09T11:00:28Z; Internet message ID <VI2PR07MB11032EAB82D557725CD2787B8D1922@VI2PR07MB11032.eurprd07.prod.outlook.com>. Original attempt 29 ambiguity and retry prohibition remain unchanged. No resend, new attempt, commercial commitment, or production effect."
+}

@@ -1,0 +1,2758 @@
+[
+  {
+    "id": 17111,
+    "workflow_event_uuid": "bfc69d36-e9a6-4ed5-b567-a7742d8388ac",
+    "rental_case_id": 586,
+    "event_type_code": "test_console_case_registered",
+    "source_type": "test_console",
+    "source_reference": "test_console:create_case",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T09:17:54.581181+00:00",
+    "recorded_at": "2026-10-09T09:17:54.581181+00:00",
+    "structured_payload": {
+      "label": "Real Outlook inbound synthetic enquiry",
+      "test_case": true,
+      "client_label": null,
+      "contact_email": "serinya@whennaturecalls.nl",
+      "event_reference": "outlook-inbound:1cff16e1067f5a5f8c464100eec07fd99aec4b4bbcf9fc81414a5a8c87a73414"
+    },
+    "event_identity_key": "test-console:case:RC-20261009091754581",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17112,
+    "workflow_event_uuid": "af1aabbb-52a8-47c3-bdbc-e2a522013528",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:17:53.891342+00:00",
+    "recorded_at": "2026-10-09T09:17:53.891342+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "incomplete_schedule_candidate",
+        "no_direct_truth_mutation"
+      ],
+      "failure_codes": [],
+      "disposition_code": "no_workflow_effect",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2721,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": null,
+      "inbound_source_record_id": 3104,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3104:active_event_window|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA|{\"date_provenance\":{\"client_components\":{\"day\":12,\"month\":11,\"year\":2026},\"explicit_client_year\":2026,\"reference_timestamp\":\"2026-10-09 09:12:12+00\",\"resolved_year\":2026,\"rule\":\"next_calendar_occurrence_v1\",\"source_reference\":\"inbound_source_record:3104\",\"timezone\":\"Europe/Amsterdam\",\"year_source\":\"client_explicit\"},\"day\":12,\"month\":11,\"resolved_date\":\"2026-11-12\",\"year\":2026}|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17113,
+    "workflow_event_uuid": "49417e79-3eaa-48a6-affe-b82c5fd765fd",
+    "rental_case_id": 586,
+    "event_type_code": "outlook_inbound_evidence_recorded",
+    "source_type": "outlook_inbound",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T09:12:12+00:00",
+    "recorded_at": "2026-10-09T09:12:12+00:00",
+    "structured_payload": {
+      "body": "Hi WNC,\n\nThis is a synthetic staging test, not a real booking.\n\nWe are enquiring about a Studio team workshop for 24 guests on 12 November 2026. We have not decided the start and finish times yet.\n\nWe plan to use an external caterer and would like basic projection. Please let us know what information you need next.\n\nThank you,\nSynthetic WNC client",
+      "sender": "serinya@whennaturecalls.nl",
+      "subject": "SYNTHETIC TEST \u2014 WNC Outlook inbound certification",
+      "source_hash": "73e89912fd10e944c347dd3f53173184923223afb3ada5011f3b97f094d71730",
+      "source_label": "Real Outlook Inbox",
+      "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "association_basis": "explicit_synthetic_new_enquiry_admission",
+      "provider_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA",
+      "external_test_reference": null,
+      "inbound_source_record_id": 3104
+    },
+    "event_identity_key": "outlook-inbound:1cff16e1067f5a5f8c464100eec07fd99aec4b4bbcf9fc81414a5a8c87a73414",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17114,
+    "workflow_event_uuid": "df800a37-ab72-4a92-a128-2c0bddf3e442",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_created",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inquiry_intake:requested_schedule",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T09:17:53.891342+00:00",
+    "recorded_at": "2026-10-09T09:17:53.891342+00:00",
+    "structured_payload": {
+      "field_code": "requested_schedule",
+      "effect_code": "create_open_question",
+      "reason_code": "missing_core_field",
+      "case_revision": 1,
+      "current_value": null,
+      "proposed_value": null,
+      "source_observation_ids": []
+    },
+    "event_identity_key": "inquiry-intake:requested_schedule:create_open_question:1ba7c5b831580573d1e49246fa856ae463c76491c36a231d743142293b56bd02",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17115,
+    "workflow_event_uuid": "ac90e7cf-2f2a-4d0d-be7b-5eb466f88686",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_created",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inquiry_intake:guest_count",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T09:17:53.891342+00:00",
+    "recorded_at": "2026-10-09T09:17:53.891342+00:00",
+    "structured_payload": {
+      "field_code": "guest_count",
+      "effect_code": "create_open_question",
+      "reason_code": "missing_core_field",
+      "case_revision": 1,
+      "current_value": null,
+      "proposed_value": null,
+      "source_observation_ids": []
+    },
+    "event_identity_key": "inquiry-intake:guest_count:create_open_question:4a1d727e5472ef9310f8ff542e379238a2196573735ac3cf8974fa24d3aa4ad1",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17116,
+    "workflow_event_uuid": "d1f06d87-ae88-4c2a-ac5c-dd65730fa639",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_created",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inquiry_intake:requested_space",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T09:17:53.891342+00:00",
+    "recorded_at": "2026-10-09T09:17:53.891342+00:00",
+    "structured_payload": {
+      "field_code": "requested_space",
+      "effect_code": "create_open_question",
+      "reason_code": "missing_core_field",
+      "case_revision": 1,
+      "current_value": null,
+      "proposed_value": null,
+      "source_observation_ids": []
+    },
+    "event_identity_key": "inquiry-intake:requested_space:create_open_question:71852ee82294d6417e721d86664e53d8ffc05cb839c2bacda83b12e0b3934ea6",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17117,
+    "workflow_event_uuid": "94fdf8f3-b30d-4305-92c0-3885a029052b",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_created",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inquiry_intake:event_type",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T09:17:53.891342+00:00",
+    "recorded_at": "2026-10-09T09:17:53.891342+00:00",
+    "structured_payload": {
+      "field_code": "event_type",
+      "effect_code": "create_open_question",
+      "reason_code": "missing_core_field",
+      "case_revision": 1,
+      "current_value": null,
+      "proposed_value": null,
+      "source_observation_ids": []
+    },
+    "event_identity_key": "inquiry-intake:event_type:create_open_question:5af0f5c5706122458ffae0c05a7a2f0d124cab0ccb9fe23878b0a4d120b19e66",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:17:53.892237+00:00"
+  },
+  {
+    "id": 17118,
+    "workflow_event_uuid": "1d6ee12f-834b-4b46-b29e-82dfffb33297",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3105",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:23:17.425071+00:00",
+    "recorded_at": "2026-10-09T09:23:17.425071+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "invalid_value_type"
+      ],
+      "failure_codes": [
+        "invalid_value_type"
+      ],
+      "disposition_code": "reject_quarantine",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2722,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": null,
+      "inbound_source_record_id": 3105,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3105:active_event_window|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZmgAA|{\"normalization_error\":\"multiple_calendar_dates_require_clarification\"}|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:23:17.426032+00:00"
+  },
+  {
+    "id": 17119,
+    "workflow_event_uuid": "a139ccd1-7679-4892-aad2-f546f4185b8b",
+    "rental_case_id": 586,
+    "event_type_code": "outlook_inbound_evidence_recorded",
+    "source_type": "outlook_inbound",
+    "source_reference": "inbound_source_record:3105",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T09:21:38+00:00",
+    "recorded_at": "2026-10-09T09:21:38+00:00",
+    "structured_payload": {
+      "body": "Hi WNC,\n\nContinuing the same synthetic staging enquiry: please use 14:00 to 18:00 on 12 November 2026.\n\nThank you,\nSynthetic WNC client\n\n\n\n\n\n\nFrom: Serinya <Serinya@whennaturecalls.nl>\nSent: Friday, October 9, 2026 11:12 AM\nTo: Serinya <Serinya@whennaturecalls.nl>\nSubject: SYNTHETIC TEST \u2014 WNC Outlook inbound certification\n\n\n\n\n\n\n\n\nHi WNC,\n\nThis is a synthetic staging test, not a real booking.\n\nWe are enquiring about a Studio team workshop for 24 guests on 12 November 2026. We have not decided the start and finish times yet.\n\nWe plan to use an external caterer and would like basic projection. Please let us know what information you need next.\n\nThank you,\nSynthetic WNC client",
+      "sender": "serinya@whennaturecalls.nl",
+      "subject": "Re: SYNTHETIC TEST \u2014 WNC Outlook inbound certification",
+      "source_hash": "6ce2395a812c9bb55207af47ef5f62b9eb2433c2212c97d11860a431460848f2",
+      "source_label": "Real Outlook Inbox",
+      "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "association_basis": "exact_provider_conversation",
+      "provider_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZmgAA",
+      "external_test_reference": null,
+      "inbound_source_record_id": 3105
+    },
+    "event_identity_key": "outlook-inbound:a05c28e27cac41df910ae6c464c65f2e230ed0dff57e8939143eda2f51bef147",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:23:17.426032+00:00"
+  },
+  {
+    "id": 17120,
+    "workflow_event_uuid": "416e2a94-aa87-4e5f-96d7-10230db6925c",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3105",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:27:31.44327+00:00",
+    "recorded_at": "2026-10-09T09:27:31.44327+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "schedule_candidate_pending_inquiry_intake",
+        "no_direct_truth_mutation"
+      ],
+      "failure_codes": [],
+      "disposition_code": "no_workflow_effect",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2723,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": null,
+      "inbound_source_record_id": 3105,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3105:active_event_window|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZmgAA|{\"active_event_end\":\"2026-11-12T17:00:00+00:00\",\"active_event_start\":\"2026-11-12T13:00:00+00:00\",\"date_provenance\":{\"client_components\":{\"day\":12,\"finish_time\":\"18:00\",\"month\":11,\"start_time\":\"14:00\",\"year\":2026},\"explicit_client_year\":2026,\"reference_timestamp\":\"2026-10-09 09:21:38+00\",\"resolved_year\":2026,\"rule\":\"next_calendar_occurrence_v1\",\"source_reference\":\"inbound_source_record:3105\",\"timezone\":\"Europe/Amsterdam\",\"year_source\":\"client_explicit\"},\"day\":12,\"finish_time\":\"18:00\",\"month\":11,\"resolved_date\":\"2026-11-12\",\"start_time\":\"14:00\",\"year\":2026}|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:27:31.321826+00:00"
+  },
+  {
+    "id": 17121,
+    "workflow_event_uuid": "d89afb99-1d9b-4214-bdc1-f19f6431809a",
+    "rental_case_id": 586,
+    "event_type_code": "case_fact_promoted_from_observation",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2723",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound_reply_reprocessing",
+    "occurred_at": "2026-10-09T09:27:31.44327+00:00",
+    "recorded_at": "2026-10-09T09:27:31.44327+00:00",
+    "structured_payload": {
+      "field_code": "requested_schedule",
+      "effect_code": "promote_current_value",
+      "reason_code": "initial_current_value_established",
+      "case_revision": 2,
+      "current_value": null,
+      "proposed_value": {
+        "active_event_end": "2026-11-12T17:00:00Z",
+        "active_event_start": "2026-11-12T13:00:00Z"
+      },
+      "source_observation_ids": [
+        2723
+      ]
+    },
+    "event_identity_key": "inquiry-intake:requested_schedule:promote_current_value:7081587e24b60c9c884fb33d46f1f0bbc05f762915988a00946d088c17ed7cb6",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:27:31.321826+00:00"
+  },
+  {
+    "id": 17122,
+    "workflow_event_uuid": "2b5eb933-5c20-4e29-af6e-f62459349981",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_resolved",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2723",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound_reply_reprocessing",
+    "occurred_at": "2026-10-09T09:27:31.44327+00:00",
+    "recorded_at": "2026-10-09T09:27:31.44327+00:00",
+    "structured_payload": {
+      "field_code": "requested_schedule",
+      "effect_code": "resolve_open_question",
+      "reason_code": "resolved_by_promoted_value",
+      "case_revision": 2,
+      "current_value": null,
+      "proposed_value": {
+        "active_event_end": "2026-11-12T17:00:00Z",
+        "active_event_start": "2026-11-12T13:00:00Z"
+      },
+      "source_observation_ids": [
+        2723
+      ]
+    },
+    "event_identity_key": "inquiry-intake:requested_schedule:resolve_open_question:e1049e4a06611dd9fd4b74b8bad2b996210bc6edf92df56379e369b39f4089e8",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:27:31.321826+00:00"
+  },
+  {
+    "id": 17123,
+    "workflow_event_uuid": "a340d31d-eeca-4f2f-9ee0-018fb5d1814f",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "question_answer_candidate",
+        "new_information_candidate"
+      ],
+      "failure_codes": [],
+      "disposition_code": "open_question_answer_candidate",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2724,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": 2257,
+      "inbound_source_record_id": 3104,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3104:guest_count|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA|24|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17124,
+    "workflow_event_uuid": "4b0544b1-4ed3-448a-b0fe-add9d41c1175",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "question_answer_candidate",
+        "new_information_candidate"
+      ],
+      "failure_codes": [],
+      "disposition_code": "open_question_answer_candidate",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2725,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": 2258,
+      "inbound_source_record_id": 3104,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3104:requested_rental_scope|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA|\"studio_space\"|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17125,
+    "workflow_event_uuid": "e8137f73-a125-418c-a787-eff55710b3e4",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "question_answer_candidate",
+        "new_information_candidate"
+      ],
+      "failure_codes": [],
+      "disposition_code": "open_question_answer_candidate",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2726,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": 2259,
+      "inbound_source_record_id": 3104,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3104:event_type|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA|\"team_workshop\"|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17126,
+    "workflow_event_uuid": "db339a1b-e55e-47cb-9465-14ceaf68d793",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "new_information_candidate",
+        "no_direct_truth_mutation"
+      ],
+      "failure_codes": [],
+      "disposition_code": "no_workflow_effect",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2727,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": null,
+      "inbound_source_record_id": 3104,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3104:catering_arrangement|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA|\"client_external_caterer\"|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17127,
+    "workflow_event_uuid": "f49c0c94-8e49-4aaf-b7c8-4eab8e70063f",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3104",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "new_information_candidate",
+        "no_direct_truth_mutation"
+      ],
+      "failure_codes": [],
+      "disposition_code": "no_workflow_effect",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2728,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": null,
+      "inbound_source_record_id": 3104,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3104:technical_requirements|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA|[\"projection_display\"]|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17128,
+    "workflow_event_uuid": "faeab7c8-1678-4fe9-8187-43ed4f2e54b2",
+    "rental_case_id": 586,
+    "event_type_code": "case_fact_promoted_from_observation",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2724",
+    "actor_type": "operator",
+    "actor_reference": "synthetic_integration:operator_extraction_of_source_3104",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "field_code": "guest_count",
+      "effect_code": "promote_current_value",
+      "reason_code": "initial_current_value_established",
+      "case_revision": 3,
+      "current_value": null,
+      "proposed_value": 24,
+      "source_observation_ids": [
+        2724
+      ]
+    },
+    "event_identity_key": "inquiry-intake:guest_count:promote_current_value:d72693eaa6df2855a37892bfadecd03fda731df911045758b1bab28e695bf12f",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17129,
+    "workflow_event_uuid": "10e13e5d-21be-4b83-8783-1830c850868d",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_resolved",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2724",
+    "actor_type": "operator",
+    "actor_reference": "synthetic_integration:operator_extraction_of_source_3104",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "field_code": "guest_count",
+      "effect_code": "resolve_open_question",
+      "reason_code": "resolved_by_promoted_value",
+      "case_revision": 3,
+      "current_value": null,
+      "proposed_value": 24,
+      "source_observation_ids": [
+        2724
+      ]
+    },
+    "event_identity_key": "inquiry-intake:guest_count:resolve_open_question:f0387281d79298c6a74a270a68601668fa1205adfd2f07f134fe1fba3ded80dd",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17130,
+    "workflow_event_uuid": "cbadba56-0cc1-4c35-8320-1cde5a89a4f4",
+    "rental_case_id": 586,
+    "event_type_code": "case_fact_promoted_from_observation",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2725",
+    "actor_type": "operator",
+    "actor_reference": "synthetic_integration:operator_extraction_of_source_3104",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "field_code": "requested_space",
+      "effect_code": "promote_current_value",
+      "reason_code": "initial_current_value_established",
+      "case_revision": 3,
+      "current_value": null,
+      "proposed_value": "studio_space",
+      "source_observation_ids": [
+        2725
+      ]
+    },
+    "event_identity_key": "inquiry-intake:requested_space:promote_current_value:750544e6683c99569942f62336a74320328653ec27587a4aa588004cb41adc40",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17131,
+    "workflow_event_uuid": "44e36bd1-fff1-48dc-b34f-4bddd6b3a1bc",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_resolved",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2725",
+    "actor_type": "operator",
+    "actor_reference": "synthetic_integration:operator_extraction_of_source_3104",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "field_code": "requested_space",
+      "effect_code": "resolve_open_question",
+      "reason_code": "resolved_by_promoted_value",
+      "case_revision": 3,
+      "current_value": null,
+      "proposed_value": "studio_space",
+      "source_observation_ids": [
+        2725
+      ]
+    },
+    "event_identity_key": "inquiry-intake:requested_space:resolve_open_question:2586091407e4eef911872f165ed0c7860af208bb27071c06fbb7373927ec8a08",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17132,
+    "workflow_event_uuid": "be9b3ed3-f7b8-49c3-9cde-bcf2d9ab1439",
+    "rental_case_id": 586,
+    "event_type_code": "case_fact_promoted_from_observation",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2726",
+    "actor_type": "operator",
+    "actor_reference": "synthetic_integration:operator_extraction_of_source_3104",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "field_code": "event_type",
+      "effect_code": "promote_current_value",
+      "reason_code": "initial_current_value_established",
+      "case_revision": 3,
+      "current_value": null,
+      "proposed_value": "team_workshop",
+      "source_observation_ids": [
+        2726
+      ]
+    },
+    "event_identity_key": "inquiry-intake:event_type:promote_current_value:8b57310440d826bef739793d1d4dfb9f320b9f8f043b5e953e3396b55858b0c7",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17133,
+    "workflow_event_uuid": "988e1cc8-a821-4497-8b07-be8f49180800",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_open_question_resolved",
+    "source_type": "inquiry_intake_runtime",
+    "source_reference": "inbound_observation:2726",
+    "actor_type": "operator",
+    "actor_reference": "synthetic_integration:operator_extraction_of_source_3104",
+    "occurred_at": "2026-10-09T09:44:58.628789+00:00",
+    "recorded_at": "2026-10-09T09:44:58.628789+00:00",
+    "structured_payload": {
+      "field_code": "event_type",
+      "effect_code": "resolve_open_question",
+      "reason_code": "resolved_by_promoted_value",
+      "case_revision": 3,
+      "current_value": null,
+      "proposed_value": "team_workshop",
+      "source_observation_ids": [
+        2726
+      ]
+    },
+    "event_identity_key": "inquiry-intake:event_type:resolve_open_question:2f314be9e0f9bdb4b073e1c3e57e08942dd4eaad21f161f703069f2abc5a3111",
+    "origin_metadata": {
+      "phase": "8.8b"
+    },
+    "created_at": "2026-10-09T09:44:58.571535+00:00"
+  },
+  {
+    "id": 17134,
+    "workflow_event_uuid": "f230b7f1-52df-4a12-984f-162ef2e576ab",
+    "rental_case_id": 586,
+    "event_type_code": "orchestration_blocker_created",
+    "source_type": "orchestration_runtime",
+    "source_reference": "RULE_AUTHORITY_GAP_BLOCK",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T09:46:05.038014+00:00",
+    "recorded_at": "2026-10-09T09:46:05.038014+00:00",
+    "structured_payload": {
+      "rule_code": "RULE_AUTHORITY_GAP_BLOCK",
+      "semantic_issue_key": "blocker:authority:missing:test-console-projection:e347093c59688a0b3579c6ca0374e73d74517fa5b1172a999c09fd37bd961634"
+    },
+    "event_identity_key": "orchestration:blocker:create:blocker:authority:missing:test-console-projection:e347093c59688a0b3579c6ca0374e73d74517fa5b1172a999c09fd37bd961634:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T09:46:01.557105+00:00"
+  },
+  {
+    "id": 17135,
+    "workflow_event_uuid": "4f76e5b5-1206-4db2-958a-59bead3f9104",
+    "rental_case_id": 586,
+    "event_type_code": "orchestration_blocker_created",
+    "source_type": "orchestration_runtime",
+    "source_reference": "RULE_CONFIRMATION_REQUIRED_BLOCK",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T09:46:05.038014+00:00",
+    "recorded_at": "2026-10-09T09:46:05.038014+00:00",
+    "structured_payload": {
+      "rule_code": "RULE_CONFIRMATION_REQUIRED_BLOCK",
+      "semantic_issue_key": "blocker:authority:confirmation:test-console-projection:208387bd2d10d8e947b97d53adaf47e3d1bc2056e15b626194d1ea9567330732"
+    },
+    "event_identity_key": "orchestration:blocker:create:blocker:authority:confirmation:test-console-projection:208387bd2d10d8e947b97d53adaf47e3d1bc2056e15b626194d1ea9567330732:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T09:46:01.557105+00:00"
+  },
+  {
+    "id": 17136,
+    "workflow_event_uuid": "481f311f-1b31-4252-9c62-50effddd435d",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_created",
+    "source_type": "orchestration_runtime",
+    "source_reference": "RULE_AUTHORITY_GAP_BLOCK",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T09:46:05.038014+00:00",
+    "recorded_at": "2026-10-09T09:46:05.038014+00:00",
+    "structured_payload": {
+      "status": "ready_to_execute",
+      "rule_code": "RULE_AUTHORITY_GAP_BLOCK",
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "approval_posture": "automatic_allowed",
+      "workflow_action_id": 1630
+    },
+    "event_identity_key": "orchestration:action:create:1630:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T09:46:01.557105+00:00"
+  },
+  {
+    "id": 17137,
+    "workflow_event_uuid": "4fd9b49b-3bbb-4d13-ab2f-f9be41246600",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_created",
+    "source_type": "orchestration_runtime",
+    "source_reference": "RULE_CONFIRMATION_REQUIRED_BLOCK",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T09:46:05.038014+00:00",
+    "recorded_at": "2026-10-09T09:46:05.038014+00:00",
+    "structured_payload": {
+      "status": "ready_to_execute",
+      "rule_code": "RULE_CONFIRMATION_REQUIRED_BLOCK",
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "approval_posture": "automatic_allowed",
+      "workflow_action_id": 1631
+    },
+    "event_identity_key": "orchestration:action:create:1631:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T09:46:01.557105+00:00"
+  },
+  {
+    "id": 17138,
+    "workflow_event_uuid": "a1d0c58a-2777-4b8e-944e-71fd2c4f5f27",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_started",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1635",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:13:01.066878+00:00",
+    "recorded_at": "2026-10-09T10:13:01.066878+00:00",
+    "structured_payload": {
+      "adapter_code": "asana_projection",
+      "attempt_number": 1,
+      "workflow_action_id": 1635,
+      "action_status_after": "executing",
+      "action_status_before": "ready_to_execute",
+      "execution_attempt_id": 26
+    },
+    "event_identity_key": "action_execution_started:1635:1",
+    "origin_metadata": {
+      "phase": "8.6"
+    },
+    "created_at": "2026-10-09T10:13:01.285971+00:00"
+  },
+  {
+    "id": 17139,
+    "workflow_event_uuid": "64afc10d-05c4-412a-862d-e531b3a29658",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_completed",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1635",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:13:08.563116+00:00",
+    "recorded_at": "2026-10-09T10:13:08.563116+00:00",
+    "structured_payload": {
+      "failure_code": null,
+      "attempt_status": "succeeded",
+      "retry_eligible": false,
+      "external_reference": "asana:projection:586:26",
+      "workflow_action_id": 1635,
+      "action_status_after": "succeeded",
+      "action_status_before": "executing",
+      "execution_attempt_id": 26
+    },
+    "event_identity_key": "action_execution_completed:1635:26",
+    "origin_metadata": {
+      "phase": "8.7A"
+    },
+    "created_at": "2026-10-09T10:13:08.583919+00:00"
+  },
+  {
+    "id": 17140,
+    "workflow_event_uuid": "620d73c9-ec07-40a8-869b-29421430e1b5",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "context_aware_resolution:586:blocker:2384:REQUIRED:revision:3",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:13:08.563116+00:00",
+    "recorded_at": "2026-10-09T10:13:08.563116+00:00",
+    "structured_payload": {
+      "idempotency_key": "context_aware_resolution:586:blocker:2384:REQUIRED:revision:3",
+      "workflow_action_id": 1632
+    },
+    "event_identity_key": "orchestration:action:supersede:1632:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:13:09.077012+00:00"
+  },
+  {
+    "id": 17141,
+    "workflow_event_uuid": "996f5bbe-111c-425c-a71c-fa0ca9b26db4",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "context_aware_resolution:586:blocker:2385:REQUIRED:revision:3",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:13:08.563116+00:00",
+    "recorded_at": "2026-10-09T10:13:08.563116+00:00",
+    "structured_payload": {
+      "idempotency_key": "context_aware_resolution:586:blocker:2385:REQUIRED:revision:3",
+      "workflow_action_id": 1633
+    },
+    "event_identity_key": "orchestration:action:supersede:1633:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:13:09.189086+00:00"
+  },
+  {
+    "id": 17142,
+    "workflow_event_uuid": "1fe659b6-53f3-4d7d-a8c1-207362ff3ae6",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "context_aware_resolution:586:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00:REQUIRED:revision:3",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:13:08.563116+00:00",
+    "recorded_at": "2026-10-09T10:13:08.563116+00:00",
+    "structured_payload": {
+      "idempotency_key": "context_aware_resolution:586:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00:REQUIRED:revision:3",
+      "workflow_action_id": 1634
+    },
+    "event_identity_key": "orchestration:action:supersede:1634:3",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:13:09.296998+00:00"
+  },
+  {
+    "id": 17143,
+    "workflow_event_uuid": "8e2883f9-4e9f-40aa-8766-6b0aed0eebc1",
+    "rental_case_id": 586,
+    "event_type_code": "asana_projection_observed",
+    "source_type": "test_console",
+    "source_reference": "workflow_action:1635",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:13:24.675463+00:00",
+    "recorded_at": "2026-10-09T10:13:24.675463+00:00",
+    "structured_payload": {
+      "status": "matches_projection",
+      "observed": {
+        "master": {
+          "gid": "1219351043478952",
+          "name": "Client not yet identified \u2014 team workshop \u2014 12 November 2026",
+          "notes": "CLIENT\nClient not yet identified\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: Scope to be confirmed\nGuests: 24\n\nCURRENT STATUS\nInternal checks\nClient response is waiting on internal work.\n\nOPEN ITEMS\n- WNC internal check: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n- WNC internal check: Confirm: Confirm the requested room layout against capacity requirements\n- WNC internal check: Confirm: Confirm event-specific technical setup\n- Current authority must be resolved before consequential workflow commitment.\n- Structured confirmation or review must be completed before commitment.\n\nNEXT ACTIONS\nComplete the checks below and record their outcomes for review.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200",
+          "parent": null,
+          "projects": [
+            {
+              "gid": "1217642260793817"
+            }
+          ],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:blocker:2384": {
+          "gid": "1219350621444728",
+          "name": "Confirm: Confirm the requested room layout against capacity requirements",
+          "notes": "WNC internal check\n\nTo do: Confirm: Confirm the requested room layout against capacity requirements\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 3653e2b33d8b",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:blocker:2385": {
+          "gid": "1219350811582361",
+          "name": "Confirm: Confirm event-specific technical setup",
+          "notes": "WNC internal check\n\nTo do: Confirm: Confirm event-specific technical setup\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work a652c9ce4de9",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00": {
+          "gid": "1219350621402939",
+          "name": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+          "notes": "WNC internal check\n\nTo do: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 98802667f266",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        }
+      },
+      "differences": [],
+      "retry_fence_released": false,
+      "canonical_truth_changed": false
+    },
+    "event_identity_key": "asana_projection_observed:586:987f4794839e4b8052e479c2ce24f83e1efc3294cd6261ed1e30ecede38ab7df",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T10:13:24.698644+00:00"
+  },
+  {
+    "id": 17144,
+    "workflow_event_uuid": "bc2308ce-e298-4eb8-9b5a-6a9ba5168371",
+    "rental_case_id": 586,
+    "event_type_code": "operational_resolution_accepted",
+    "source_type": "operator_resolution",
+    "source_reference": "staging:case586:authorized-synthetic-operator:1634:v1",
+    "actor_type": "wnc_operator",
+    "actor_reference": "SerinyaWNCstage",
+    "occurred_at": "2026-10-09T10:13:47.846874+00:00",
+    "recorded_at": "2026-10-09T10:19:19.738734+00:00",
+    "structured_payload": {
+      "result": {
+        "fact_id": 1058,
+        "event_id": 17144,
+        "replayed": false,
+        "case_revision": 4
+      },
+      "resolution": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "AVAILABILITY_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "studio_space"
+          ],
+          "workflow_action_id": 1634,
+          "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00"
+        },
+        "outcomes": {
+          "studio_space": "AVAILABLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:13:47.846874+00:00",
+        "evidence_text": "staging synthetic operator evidence: Studio is AVAILABLE for 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. This does not confirm a booking, capacity, catering, fees or any other date.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586-synthetic-operational-1634-v1",
+        "evidence_reference": "staging:case586:authorized-synthetic-operator:1634:v1",
+        "workflow_action_id": 1634,
+        "accepted_case_revision": 4,
+        "expected_case_revision": 3
+      },
+      "submission": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "AVAILABILITY_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "studio_space"
+          ],
+          "workflow_action_id": 1634,
+          "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00"
+        },
+        "outcomes": {
+          "studio_space": "AVAILABLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:13:47.846874+00:00",
+        "evidence_text": "staging synthetic operator evidence: Studio is AVAILABLE for 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. This does not confirm a booking, capacity, catering, fees or any other date.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586-synthetic-operational-1634-v1",
+        "evidence_reference": "staging:case586:authorized-synthetic-operator:1634:v1",
+        "workflow_action_id": 1634,
+        "expected_case_revision": 3
+      }
+    },
+    "event_identity_key": "operational_resolution:case586-synthetic-operational-1634-v1",
+    "origin_metadata": {
+      "synthetic": true,
+      "authority_contract": "operational_resolution_v1"
+    },
+    "created_at": "2026-10-09T10:19:19.703752+00:00"
+  },
+  {
+    "id": 17145,
+    "workflow_event_uuid": "4bd054f2-4b58-4495-bb22-72182b6fc55d",
+    "rental_case_id": 586,
+    "event_type_code": "operational_resolution_accepted",
+    "source_type": "operator_resolution",
+    "source_reference": "staging:case586:authorized-synthetic-operator:1633:v1",
+    "actor_type": "wnc_operator",
+    "actor_reference": "SerinyaWNCstage",
+    "occurred_at": "2026-10-09T10:19:18.949933+00:00",
+    "recorded_at": "2026-10-09T10:19:21.509219+00:00",
+    "structured_payload": {
+      "result": {
+        "fact_id": 1059,
+        "event_id": 17145,
+        "replayed": false,
+        "case_revision": 5
+      },
+      "resolution": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "TECHNICAL_CAPABILITY_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "projection_display"
+          ],
+          "workflow_action_id": 1633,
+          "resolution_item_key": "blocker:2385"
+        },
+        "outcomes": {
+          "projection_display": "FEASIBLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:19:18.949933+00:00",
+        "evidence_text": "staging synthetic operator evidence: The specifically requested projection_display setup is FEASIBLE for the Studio team workshop on 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. No microphone, technician, fee waiver or wider AV approval is confirmed.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586-synthetic-operational-1633-v1",
+        "evidence_reference": "staging:case586:authorized-synthetic-operator:1633:v1",
+        "workflow_action_id": 1633,
+        "accepted_case_revision": 5,
+        "expected_case_revision": 4
+      },
+      "submission": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "TECHNICAL_CAPABILITY_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "projection_display"
+          ],
+          "workflow_action_id": 1633,
+          "resolution_item_key": "blocker:2385"
+        },
+        "outcomes": {
+          "projection_display": "FEASIBLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:19:18.949933+00:00",
+        "evidence_text": "staging synthetic operator evidence: The specifically requested projection_display setup is FEASIBLE for the Studio team workshop on 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. No microphone, technician, fee waiver or wider AV approval is confirmed.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586-synthetic-operational-1633-v1",
+        "evidence_reference": "staging:case586:authorized-synthetic-operator:1633:v1",
+        "workflow_action_id": 1633,
+        "expected_case_revision": 4
+      }
+    },
+    "event_identity_key": "operational_resolution:case586-synthetic-operational-1633-v1",
+    "origin_metadata": {
+      "synthetic": true,
+      "authority_contract": "operational_resolution_v1"
+    },
+    "created_at": "2026-10-09T10:19:21.50487+00:00"
+  },
+  {
+    "id": 17146,
+    "workflow_event_uuid": "93c013f2-9950-48a7-916f-78c14aa0b27c",
+    "rental_case_id": 586,
+    "event_type_code": "orchestration_blocker_created",
+    "source_type": "orchestration_runtime",
+    "source_reference": "RULE_AUTHORITY_GAP_BLOCK",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:19:55.300578+00:00",
+    "recorded_at": "2026-10-09T10:19:55.300578+00:00",
+    "structured_payload": {
+      "rule_code": "RULE_AUTHORITY_GAP_BLOCK",
+      "semantic_issue_key": "blocker:authority:missing:test-console-projection:cd988b2a35456f04a32158b687bce79596b49e2b7f820efed279255131a0b399"
+    },
+    "event_identity_key": "orchestration:blocker:create:blocker:authority:missing:test-console-projection:cd988b2a35456f04a32158b687bce79596b49e2b7f820efed279255131a0b399:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:19:55.4377+00:00"
+  },
+  {
+    "id": 17147,
+    "workflow_event_uuid": "26a10dce-e1cc-4929-9624-db1b92d7b114",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_created",
+    "source_type": "orchestration_runtime",
+    "source_reference": "RULE_AUTHORITY_GAP_BLOCK",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:19:55.300578+00:00",
+    "recorded_at": "2026-10-09T10:19:55.300578+00:00",
+    "structured_payload": {
+      "status": "ready_to_execute",
+      "rule_code": "RULE_AUTHORITY_GAP_BLOCK",
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "approval_posture": "automatic_allowed",
+      "workflow_action_id": 1636
+    },
+    "event_identity_key": "orchestration:action:create:1636:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:19:55.612144+00:00"
+  },
+  {
+    "id": 17148,
+    "workflow_event_uuid": "60e6ed4b-97bb-4607-bbed-cca00c870142",
+    "rental_case_id": 586,
+    "event_type_code": "blocker_resolved",
+    "source_type": "orchestration_runtime",
+    "source_reference": "blocker:authority:missing:test-console-projection:e347093c59688a0b3579c6ca0374e73d74517fa5b1172a999c09fd37bd961634",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:19:55.300578+00:00",
+    "recorded_at": "2026-10-09T10:19:55.300578+00:00",
+    "structured_payload": {
+      "blocker_id": 2384,
+      "resolution_reference": "resolved:blocker:authority:missing:test-console-projection:e347093c59688a0b3579c6ca0374e73d74517fa5b1172a999c09fd37bd961634"
+    },
+    "event_identity_key": "orchestration:blocker:resolved:2384:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:19:55.810629+00:00"
+  },
+  {
+    "id": 17149,
+    "workflow_event_uuid": "5534a663-8bad-4695-a708-bcca0f3297ea",
+    "rental_case_id": 586,
+    "event_type_code": "blocker_resolved",
+    "source_type": "orchestration_runtime",
+    "source_reference": "blocker:authority:confirmation:test-console-projection:208387bd2d10d8e947b97d53adaf47e3d1bc2056e15b626194d1ea9567330732",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:19:55.300578+00:00",
+    "recorded_at": "2026-10-09T10:19:55.300578+00:00",
+    "structured_payload": {
+      "blocker_id": 2385,
+      "resolution_reference": "resolved:blocker:authority:confirmation:test-console-projection:208387bd2d10d8e947b97d53adaf47e3d1bc2056e15b626194d1ea9567330732"
+    },
+    "event_identity_key": "orchestration:blocker:resolved:2385:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:19:55.911263+00:00"
+  },
+  {
+    "id": 17150,
+    "workflow_event_uuid": "15a1a003-ce74-4ad5-8e74-39f5485815d9",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "action:CREATE_INTERNAL_TASK_ITEM:722cff81d7554a1502386a1f1a896b92f8ccc98c952aeac47592cbc242850cd1:3",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:19:55.300578+00:00",
+    "recorded_at": "2026-10-09T10:19:55.300578+00:00",
+    "structured_payload": {
+      "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:722cff81d7554a1502386a1f1a896b92f8ccc98c952aeac47592cbc242850cd1:3",
+      "workflow_action_id": 1630
+    },
+    "event_identity_key": "orchestration:action:supersede:1630:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:19:56.023977+00:00"
+  },
+  {
+    "id": 17151,
+    "workflow_event_uuid": "c0d2594b-84b3-4758-8f98-41360ed81ee2",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "action:CREATE_INTERNAL_TASK_ITEM:72594a38dbffd970c62b7a35f5f4bd469a674bbbb136a5dd3dea276246241341:3",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:19:55.300578+00:00",
+    "recorded_at": "2026-10-09T10:19:55.300578+00:00",
+    "structured_payload": {
+      "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:72594a38dbffd970c62b7a35f5f4bd469a674bbbb136a5dd3dea276246241341:3",
+      "workflow_action_id": 1631
+    },
+    "event_identity_key": "orchestration:action:supersede:1631:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:19:56.134748+00:00"
+  },
+  {
+    "id": 17152,
+    "workflow_event_uuid": "14702ac7-875f-47db-89c9-a8b4213849a9",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_started",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1637",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:20:10.508678+00:00",
+    "recorded_at": "2026-10-09T10:20:10.508678+00:00",
+    "structured_payload": {
+      "adapter_code": "asana_projection",
+      "attempt_number": 1,
+      "workflow_action_id": 1637,
+      "action_status_after": "executing",
+      "action_status_before": "ready_to_execute",
+      "execution_attempt_id": 27
+    },
+    "event_identity_key": "action_execution_started:1637:1",
+    "origin_metadata": {
+      "phase": "8.6"
+    },
+    "created_at": "2026-10-09T10:20:10.72468+00:00"
+  },
+  {
+    "id": 17153,
+    "workflow_event_uuid": "e8e61a7b-d1d4-47e0-a59e-f8fd3081f577",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_completed",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1637",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:20:15.470932+00:00",
+    "recorded_at": "2026-10-09T10:20:15.470932+00:00",
+    "structured_payload": {
+      "failure_code": null,
+      "attempt_status": "succeeded",
+      "retry_eligible": false,
+      "external_reference": "asana:projection:586:27",
+      "workflow_action_id": 1637,
+      "action_status_after": "succeeded",
+      "action_status_before": "executing",
+      "execution_attempt_id": 27
+    },
+    "event_identity_key": "action_execution_completed:1637:27",
+    "origin_metadata": {
+      "phase": "8.7A"
+    },
+    "created_at": "2026-10-09T10:20:15.496014+00:00"
+  },
+  {
+    "id": 17154,
+    "workflow_event_uuid": "c568aaf0-ca7d-4403-bdf6-4564f691d37c",
+    "rental_case_id": 586,
+    "event_type_code": "asana_projection_observed",
+    "source_type": "test_console",
+    "source_reference": "workflow_action:1637",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:20:38.266642+00:00",
+    "recorded_at": "2026-10-09T10:20:38.266642+00:00",
+    "structured_payload": {
+      "status": "matches_projection",
+      "observed": {
+        "master": {
+          "gid": "1219351043478952",
+          "name": "Client not yet identified \u2014 team workshop \u2014 12 November 2026",
+          "notes": "CLIENT\nClient not yet identified\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: Scope to be confirmed\nGuests: 24\n\nCURRENT STATUS\nInternal checks\nClient response is waiting on internal work.\n\nOPEN ITEMS\n- WNC internal check: Confirm: Confirm the requested room layout against capacity requirements\n- Current authority must be resolved before consequential workflow commitment.\n\nNEXT ACTIONS\nComplete the checks below and record their outcomes for review.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200",
+          "parent": null,
+          "projects": [
+            {
+              "gid": "1217642260793817"
+            }
+          ],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:blocker:2384": {
+          "gid": "1219350621444728",
+          "name": "Confirm: Confirm the requested room layout against capacity requirements",
+          "notes": "WNC internal check\n\nTo do: Confirm: Confirm the requested room layout against capacity requirements\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 3653e2b33d8b",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:blocker:2385": {
+          "gid": "1219350811582361",
+          "name": "Confirm: Confirm event-specific technical setup",
+          "notes": "WNC internal check\n\nDone: Confirm: Confirm event-specific technical setup\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work a652c9ce4de9",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": true,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00": {
+          "gid": "1219350621402939",
+          "name": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+          "notes": "WNC internal check\n\nDone: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 98802667f266",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": true,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        }
+      },
+      "differences": [],
+      "retry_fence_released": false,
+      "canonical_truth_changed": false
+    },
+    "event_identity_key": "asana_projection_observed:586:63bc8c13def8d7a6882dfcbb07061d067cf0d6978d6f88b44069425c41af69ab",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T10:20:38.29099+00:00"
+  },
+  {
+    "id": 17155,
+    "workflow_event_uuid": "44bc1315-506e-4e81-a184-dcd8a7e05652",
+    "rental_case_id": 586,
+    "event_type_code": "synthetic_client_transport_started",
+    "source_type": "staging_fixture",
+    "source_reference": "inbound_source_record:3105",
+    "actor_type": "operator",
+    "actor_reference": "authorized_synthetic_journey",
+    "occurred_at": "2026-10-09T10:48:45.068044+00:00",
+    "recorded_at": "2026-10-09T10:48:45.068044+00:00",
+    "structured_payload": {
+      "body": "STAGING SYNTHETIC CLIENT EVIDENCE \u2014 Case 586 only.\n\nThanks. We would prefer theatre-style seated seating for our existing 24 guests in the Studio. All other details of our synthetic enquiry remain unchanged.\n\nSynthetic client",
+      "source": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZmgAA",
+      "conversation": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "case_revision": 5,
+      "retry_allowed": false
+    },
+    "event_identity_key": "case586:synthetic-layout-reply:v1",
+    "origin_metadata": {},
+    "created_at": "2026-10-09T10:48:45.068044+00:00"
+  },
+  {
+    "id": 17156,
+    "workflow_event_uuid": "734734e3-a797-4f28-aa6b-e2f900f33f55",
+    "rental_case_id": 586,
+    "event_type_code": "synthetic_client_transport_accepted",
+    "source_type": "staging_fixture",
+    "source_reference": "outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bawAA",
+    "actor_type": "operator",
+    "actor_reference": "authorized_synthetic_journey",
+    "occurred_at": "2026-10-09T10:48:46.665696+00:00",
+    "recorded_at": "2026-10-09T10:48:46.665696+00:00",
+    "structured_payload": {
+      "draft_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bawAA",
+      "send_accepted": true,
+      "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "source_record_id": 3105,
+      "final_client_send": false
+    },
+    "event_identity_key": "case586:synthetic-layout-reply:v1:accepted",
+    "origin_metadata": {},
+    "created_at": "2026-10-09T10:48:46.665696+00:00"
+  },
+  {
+    "id": 17157,
+    "workflow_event_uuid": "48de6d7f-480e-4a28-96dd-0db843174407",
+    "rental_case_id": 586,
+    "event_type_code": "outlook_inbound_evidence_recorded",
+    "source_type": "outlook_inbound",
+    "source_reference": "inbound_source_record:3106",
+    "actor_type": "system",
+    "actor_reference": "outlook_inbound",
+    "occurred_at": "2026-10-09T10:48:48+00:00",
+    "recorded_at": "2026-10-09T10:48:48+00:00",
+    "structured_payload": {
+      "body": "STAGING SYNTHETIC CLIENT EVIDENCE \u2014 Case 586 only.\n\nThanks. We would prefer theatre-style seated seating for our existing 24 guests in the Studio. All other details of our synthetic enquiry remain unchanged.\n\nSynthetic client",
+      "sender": "serinya@whennaturecalls.nl",
+      "subject": "RE: SYNTHETIC TEST \u2014 WNC Outlook inbound certification",
+      "source_hash": "6663a37fa6e3e66533a2776ba5df31e9b55e1d191e783f042abd68252a4a18bb",
+      "source_label": "Real Outlook Inbox",
+      "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "association_basis": "exact_provider_conversation",
+      "provider_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bcQAA",
+      "external_test_reference": null,
+      "inbound_source_record_id": 3106
+    },
+    "event_identity_key": "outlook-inbound:feeb93a36935e15cff8556b47a82b8425284a433c484a3902d5128d8aa587440",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T10:48:54.273415+00:00"
+  },
+  {
+    "id": 17158,
+    "workflow_event_uuid": "df7f92ee-1cca-4fd6-a2e8-4b7857625503",
+    "rental_case_id": 586,
+    "event_type_code": "inbound_observation_recorded",
+    "source_type": "inbound_observation",
+    "source_reference": "inbound_source_record:3106",
+    "actor_type": "client",
+    "actor_reference": "serinya@whennaturecalls.nl",
+    "occurred_at": "2026-10-09T10:49:11.988912+00:00",
+    "recorded_at": "2026-10-09T10:49:11.988912+00:00",
+    "structured_payload": {
+      "reason_codes": [
+        "new_information_candidate",
+        "no_direct_truth_mutation"
+      ],
+      "failure_codes": [],
+      "disposition_code": "no_workflow_effect",
+      "stale_observation": false,
+      "linked_requirement_id": null,
+      "revalidation_required": true,
+      "inbound_observation_id": 2729,
+      "linked_case_decision_id": null,
+      "linked_open_question_id": null,
+      "inbound_source_record_id": 3106,
+      "linked_proposed_change_id": null,
+      "linked_reschedule_request_id": null
+    },
+    "event_identity_key": "inbound-observation:3106:layout_requirements|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bcQAA|{\"configuration_type\":\"seated\",\"style\":\"theatre\"}|",
+    "origin_metadata": {
+      "phase": "8.3"
+    },
+    "created_at": "2026-10-09T10:49:11.530654+00:00"
+  },
+  {
+    "id": 17159,
+    "workflow_event_uuid": "df78f81b-4a80-4fc9-969f-29d80ed77d3a",
+    "rental_case_id": 586,
+    "event_type_code": "rental_case_fact_mutated",
+    "source_type": "case_fact_mutation_service",
+    "source_reference": "inbound_observation:2729",
+    "actor_type": "operator",
+    "actor_reference": "authorized_case586_synthetic_operator",
+    "occurred_at": "2026-10-09T10:49:12.184519+00:00",
+    "recorded_at": "2026-10-09T10:49:12.184519+00:00",
+    "structured_payload": {
+      "field_code": "layout_requirements",
+      "domain_code": "layout",
+      "resolution_basis": "Authorized synthetic operator validation of explicit client layout preference from immutable Outlook evidence; not capacity confirmation."
+    },
+    "event_identity_key": "case_fact:mutation:layout_requirements:5",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:49:11.530654+00:00"
+  },
+  {
+    "id": 17160,
+    "workflow_event_uuid": "07ba754f-6804-46ae-ac15-ed85eaa39b30",
+    "rental_case_id": 586,
+    "event_type_code": "operational_resolution_accepted",
+    "source_type": "operator_resolution",
+    "source_reference": "synthetic:case586:operator:seated24:practical-check:v1",
+    "actor_type": "wnc_operator",
+    "actor_reference": "SerinyaWNCstage",
+    "occurred_at": "2026-10-09T10:49:18.108704+00:00",
+    "recorded_at": "2026-10-09T10:49:19.90104+00:00",
+    "structured_payload": {
+      "result": {
+        "fact_id": 1061,
+        "event_id": 17160,
+        "replayed": false,
+        "case_revision": 7
+      },
+      "resolution": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "CAPACITY_LAYOUT_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "inputs": {
+            "guest_count": 24,
+            "configuration_type": "seated",
+            "layout_requirements": {
+              "style": "theatre",
+              "configuration_type": "seated"
+            }
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "capacity_layout"
+          ],
+          "workflow_action_id": 1632,
+          "resolution_item_key": "blocker:2384"
+        },
+        "outcomes": {
+          "capacity_layout": "FEASIBLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:49:18.108704+00:00",
+        "evidence_text": "STAGING SYNTHETIC WNC OPERATOR EVIDENCE \u2014 Case 586 only. Independently checked the theatre-style seated configuration for 24 guests in the Studio on 12 November 2026 14:00\u201318:00 Europe/Amsterdam. Published seated maximum 40 (CAPACITY_STUDIO_SEATED); synthetic practical check confirms 24 chairs, clear access routes and projection sightlines for this workshop. Layout is feasible. No booking, commercial commitment, fee decision or policy exception.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586:capacity-layout:seated24:v1",
+        "evidence_reference": "synthetic:case586:operator:seated24:practical-check:v1",
+        "workflow_action_id": 1632,
+        "accepted_case_revision": 7,
+        "expected_case_revision": 6
+      },
+      "submission": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "CAPACITY_LAYOUT_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "inputs": {
+            "guest_count": 24,
+            "configuration_type": "seated",
+            "layout_requirements": {
+              "style": "theatre",
+              "configuration_type": "seated"
+            }
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "capacity_layout"
+          ],
+          "workflow_action_id": 1632,
+          "resolution_item_key": "blocker:2384"
+        },
+        "outcomes": {
+          "capacity_layout": "FEASIBLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:49:18.108704+00:00",
+        "evidence_text": "STAGING SYNTHETIC WNC OPERATOR EVIDENCE \u2014 Case 586 only. Independently checked the theatre-style seated configuration for 24 guests in the Studio on 12 November 2026 14:00\u201318:00 Europe/Amsterdam. Published seated maximum 40 (CAPACITY_STUDIO_SEATED); synthetic practical check confirms 24 chairs, clear access routes and projection sightlines for this workshop. Layout is feasible. No booking, commercial commitment, fee decision or policy exception.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586:capacity-layout:seated24:v1",
+        "evidence_reference": "synthetic:case586:operator:seated24:practical-check:v1",
+        "workflow_action_id": 1632,
+        "expected_case_revision": 6
+      }
+    },
+    "event_identity_key": "operational_resolution:case586:capacity-layout:seated24:v1",
+    "origin_metadata": {
+      "synthetic": true,
+      "authority_contract": "operational_resolution_v1"
+    },
+    "created_at": "2026-10-09T10:49:19.885781+00:00"
+  },
+  {
+    "id": 17161,
+    "workflow_event_uuid": "0bd05092-61e1-4eda-b52c-24f74c54712d",
+    "rental_case_id": 586,
+    "event_type_code": "blocker_resolved",
+    "source_type": "orchestration_runtime",
+    "source_reference": "blocker:authority:missing:test-console-projection:cd988b2a35456f04a32158b687bce79596b49e2b7f820efed279255131a0b399",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:49:43.972597+00:00",
+    "recorded_at": "2026-10-09T10:49:43.972597+00:00",
+    "structured_payload": {
+      "blocker_id": 2386,
+      "resolution_reference": "resolved:blocker:authority:missing:test-console-projection:cd988b2a35456f04a32158b687bce79596b49e2b7f820efed279255131a0b399"
+    },
+    "event_identity_key": "orchestration:blocker:resolved:2386:7",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:49:39.696858+00:00"
+  },
+  {
+    "id": 17162,
+    "workflow_event_uuid": "6df37cbd-4f9a-4ee0-8878-c3e3119b641e",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "action:CREATE_INTERNAL_TASK_ITEM:c56c4418910e6c4228a9fc49350c32a04f271f7b01fdfe9fedd88bff2c500931:5",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:49:43.972597+00:00",
+    "recorded_at": "2026-10-09T10:49:43.972597+00:00",
+    "structured_payload": {
+      "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:c56c4418910e6c4228a9fc49350c32a04f271f7b01fdfe9fedd88bff2c500931:5",
+      "workflow_action_id": 1636
+    },
+    "event_identity_key": "orchestration:action:supersede:1636:7",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:49:39.696858+00:00"
+  },
+  {
+    "id": 17163,
+    "workflow_event_uuid": "7f34b7de-c274-4660-a8ea-d164d4118ea6",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_started",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1639",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:53:02.394579+00:00",
+    "recorded_at": "2026-10-09T10:53:02.394579+00:00",
+    "structured_payload": {
+      "adapter_code": "asana_projection",
+      "attempt_number": 1,
+      "workflow_action_id": 1639,
+      "action_status_after": "executing",
+      "action_status_before": "ready_to_execute",
+      "execution_attempt_id": 28
+    },
+    "event_identity_key": "action_execution_started:1639:1",
+    "origin_metadata": {
+      "phase": "8.6"
+    },
+    "created_at": "2026-10-09T10:53:02.610441+00:00"
+  },
+  {
+    "id": 17164,
+    "workflow_event_uuid": "8c7a0477-d0ce-48d2-a3f3-37177c85210d",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_completed",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1639",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:53:06.775001+00:00",
+    "recorded_at": "2026-10-09T10:53:06.775001+00:00",
+    "structured_payload": {
+      "failure_code": null,
+      "attempt_status": "succeeded",
+      "retry_eligible": false,
+      "external_reference": "asana:projection:586:28",
+      "workflow_action_id": 1639,
+      "action_status_after": "succeeded",
+      "action_status_before": "executing",
+      "execution_attempt_id": 28
+    },
+    "event_identity_key": "action_execution_completed:1639:28",
+    "origin_metadata": {
+      "phase": "8.7A"
+    },
+    "created_at": "2026-10-09T10:53:06.801028+00:00"
+  },
+  {
+    "id": 17165,
+    "workflow_event_uuid": "273dc49d-20f0-474f-bacf-75e4de5e7cbf",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_superseded",
+    "source_type": "orchestration_runtime",
+    "source_reference": "asana_rental_projection_v1:586:f34426eb2772ed782cb4549d214a701ea182708439bd7cfa694f84457b0f7a9f",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:53:06.775001+00:00",
+    "recorded_at": "2026-10-09T10:53:06.775001+00:00",
+    "structured_payload": {
+      "idempotency_key": "asana_rental_projection_v1:586:f34426eb2772ed782cb4549d214a701ea182708439bd7cfa694f84457b0f7a9f",
+      "workflow_action_id": 1638
+    },
+    "event_identity_key": "orchestration:action:supersede:1638:7",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:53:07.037267+00:00"
+  },
+  {
+    "id": 17166,
+    "workflow_event_uuid": "961d136b-0a5d-4517-9016-4f915064ec52",
+    "rental_case_id": 586,
+    "event_type_code": "asana_projection_observed",
+    "source_type": "test_console",
+    "source_reference": "workflow_action:1639",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:53:17.597194+00:00",
+    "recorded_at": "2026-10-09T10:53:17.597194+00:00",
+    "structured_payload": {
+      "status": "matches_projection",
+      "observed": {
+        "master": {
+          "gid": "1219351043478952",
+          "name": "Client not yet identified \u2014 team workshop \u2014 12 November 2026",
+          "notes": "CLIENT\nClient not yet identified\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: studio space\nGuests: 24\n\nCURRENT STATUS\nNew inquiry\nReview the next client response in WNC Rental Brain.\n\nOPEN ITEMS\nNo unresolved operational items.\n\nNEXT ACTIONS\nReview the case and prepare the next appropriate client response.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200",
+          "parent": null,
+          "projects": [
+            {
+              "gid": "1217642260793817"
+            }
+          ],
+          "completed": false,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:blocker:2384": {
+          "gid": "1219350621444728",
+          "name": "Confirm: Confirm the requested room layout against capacity requirements",
+          "notes": "WNC internal check\n\nDone: Confirm: Confirm the requested room layout against capacity requirements\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 3653e2b33d8b",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": true,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:blocker:2385": {
+          "gid": "1219350811582361",
+          "name": "Confirm: Confirm event-specific technical setup",
+          "notes": "WNC internal check\n\nDone: Confirm: Confirm event-specific technical setup\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work a652c9ce4de9",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": true,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        },
+        "item:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00": {
+          "gid": "1219350621402939",
+          "name": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+          "notes": "WNC internal check\n\nDone: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 98802667f266",
+          "parent": {
+            "gid": "1219351043478952"
+          },
+          "projects": [],
+          "completed": true,
+          "workspace": {
+            "gid": "1208455784737302"
+          }
+        }
+      },
+      "differences": [],
+      "retry_fence_released": false,
+      "canonical_truth_changed": false
+    },
+    "event_identity_key": "asana_projection_observed:586:7bb0d76acefd2b95682bbb6feefc0441dee2dd0a1617c946ae6a76c815bab744",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T10:53:17.619098+00:00"
+  },
+  {
+    "id": 17167,
+    "workflow_event_uuid": "e46d63be-be92-4261-80ba-3077eaefc93c",
+    "rental_case_id": 586,
+    "event_type_code": "governed_client_response_draft_rejected",
+    "source_type": "test_console",
+    "source_reference": "governed_client_response_rejected:510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:53:29.998179+00:00",
+    "recorded_at": "2026-10-09T10:53:29.998179+00:00",
+    "structured_payload": {
+      "model": "gpt-5.6-sol",
+      "provider": "openai",
+      "content_hash": "7c4d476c3d0876e5ce2bec88422a7efd84c4ba9241498f39466f8d13b07df9be",
+      "context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+      "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+      "generation_audit": {
+        "policy": "required_realization_single_correction_v1",
+        "attempts": [
+          {
+            "candidate_hash": "7c4d476c3d0876e5ce2bec88422a7efd84c4ba9241498f39466f8d13b07df9be",
+            "generation_attempt": 1,
+            "provider_request_id": "req_b7d2600e1511478fae30d8002c9d6199",
+            "realization_results": [],
+            "provider_response_id": "resp_0862638d4c6223de016ac8c7a541ac87d28238767f535efcca",
+            "safety_failure_codes": [
+              "governed_operational_outcome_not_realized",
+              "governed_operational_outcome_not_realized",
+              "governed_operational_outcome_not_realized",
+              "unsupported_availability_or_confirmation",
+              "unsupported_operational_scope_expansion"
+            ],
+            "failed_realization_item_ids": []
+          }
+        ],
+        "context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+        "plan_identity": "79b6593af4ef713b824410559423213d701e7f3117cc7f38726aa479171f6f5b",
+        "contract_identity": "0c0650919f9b30ff421bff8367185e5236bb9e9480aada33b579123b5c66018f",
+        "source_case_revision": 7,
+        "corrective_retry_count": 0,
+        "initial_candidate_hash": "7c4d476c3d0876e5ce2bec88422a7efd84c4ba9241498f39466f8d13b07df9be",
+        "final_realization_results": []
+      },
+      "validation_codes": [
+        "governed_operational_outcome_not_realized",
+        "governed_operational_outcome_not_realized",
+        "governed_operational_outcome_not_realized",
+        "unsupported_availability_or_confirmation",
+        "unsupported_operational_scope_expansion"
+      ],
+      "validation_result": "rejected",
+      "provider_request_id": "req_b7d2600e1511478fae30d8002c9d6199",
+      "provider_response_id": "resp_0862638d4c6223de016ac8c7a541ac87d28238767f535efcca",
+      "source_case_revision": 7,
+      "provider_response_status": "completed",
+      "provider_incomplete_reason": null
+    },
+    "event_identity_key": "governed_client_response_draft_rejected:586:4a9ff6d7dbd7cbb201ddaec6e1c106de886d84c2a5b24d12e841be352ebffbda",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T10:53:30.024134+00:00"
+  },
+  {
+    "id": 17168,
+    "workflow_event_uuid": "124b5c0b-c148-42ee-8b95-01cd7787198b",
+    "rental_case_id": 586,
+    "event_type_code": "governed_client_response_draft_generated",
+    "source_type": "test_console",
+    "source_reference": "inquiry_response_draft:387",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:57:28.832713+00:00",
+    "recorded_at": "2026-10-09T10:57:28.832713+00:00",
+    "structured_payload": {
+      "model": "gpt-5.6-sol",
+      "provider": "openai",
+      "context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+      "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+      "generation_audit": {
+        "policy": "required_realization_single_correction_v1",
+        "attempts": [
+          {
+            "candidate_hash": "06f367c8044fc30244de2af5f39fd3b5b613bece80d7c14de02dd8b3c15160c0",
+            "generation_attempt": 1,
+            "provider_request_id": "req_739f3c549ebe486cb26551c7f3c9cedf",
+            "realization_results": [
+              {
+                "kind": "known_fact",
+                "topic": "operational_confirmation",
+                "realized": true,
+                "fingerprint": "f147758835ab6dd6187e5cef7525272cdf40ef76f2f4cbe02bcf1aa3f22d9ae1",
+                "semantic_key": "fact:operational_confirmation:studio_space",
+                "required_meaning": {
+                  "scope": {
+                    "end": "2026-11-12T17:00:00+00:00",
+                    "start": "2026-11-12T13:00:00+00:00",
+                    "venue": "studio_space"
+                  },
+                  "outcome": "AVAILABLE",
+                  "subject": "studio_space",
+                  "assertion": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+                  "fact_state": "known"
+                }
+              },
+              {
+                "kind": "known_fact",
+                "topic": "operational_confirmation",
+                "realized": true,
+                "fingerprint": "2cf14a61ceb284f4e99271b6eb8bd3ef71f3f8d4400bf72cd1c3b3e88e839a2c",
+                "semantic_key": "fact:operational_confirmation:projection_display",
+                "required_meaning": {
+                  "scope": {
+                    "end": "2026-11-12T17:00:00+00:00",
+                    "start": "2026-11-12T13:00:00+00:00",
+                    "venue": "studio_space"
+                  },
+                  "outcome": "FEASIBLE",
+                  "subject": "projection_display",
+                  "assertion": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+                  "fact_state": "known"
+                }
+              },
+              {
+                "kind": "known_fact",
+                "topic": "operational_confirmation",
+                "realized": true,
+                "fingerprint": "98f335020276f8b7a6918fbcf5ee8f00770c296a0e6eb6962448b49b2a6db03b",
+                "semantic_key": "fact:operational_confirmation:capacity_layout",
+                "required_meaning": {
+                  "scope": {
+                    "end": "2026-11-12T17:00:00+00:00",
+                    "start": "2026-11-12T13:00:00+00:00",
+                    "venue": "studio_space"
+                  },
+                  "outcome": "FEASIBLE",
+                  "subject": "capacity_layout",
+                  "assertion": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+                  "fact_state": "known"
+                }
+              }
+            ],
+            "provider_response_id": "resp_0777334ee6fb3054016ac8c893e96087d2b9ee2fb65fa83ea3",
+            "safety_failure_codes": [],
+            "failed_realization_item_ids": []
+          }
+        ],
+        "context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+        "plan_identity": "79b6593af4ef713b824410559423213d701e7f3117cc7f38726aa479171f6f5b",
+        "contract_identity": "0c0650919f9b30ff421bff8367185e5236bb9e9480aada33b579123b5c66018f",
+        "source_case_revision": 7,
+        "corrective_retry_count": 0,
+        "initial_candidate_hash": "06f367c8044fc30244de2af5f39fd3b5b613bece80d7c14de02dd8b3c15160c0",
+        "final_realization_results": [
+          {
+            "kind": "known_fact",
+            "topic": "operational_confirmation",
+            "realized": true,
+            "fingerprint": "f147758835ab6dd6187e5cef7525272cdf40ef76f2f4cbe02bcf1aa3f22d9ae1",
+            "semantic_key": "fact:operational_confirmation:studio_space",
+            "required_meaning": {
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space"
+              },
+              "outcome": "AVAILABLE",
+              "subject": "studio_space",
+              "assertion": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+              "fact_state": "known"
+            }
+          },
+          {
+            "kind": "known_fact",
+            "topic": "operational_confirmation",
+            "realized": true,
+            "fingerprint": "2cf14a61ceb284f4e99271b6eb8bd3ef71f3f8d4400bf72cd1c3b3e88e839a2c",
+            "semantic_key": "fact:operational_confirmation:projection_display",
+            "required_meaning": {
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space"
+              },
+              "outcome": "FEASIBLE",
+              "subject": "projection_display",
+              "assertion": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+              "fact_state": "known"
+            }
+          },
+          {
+            "kind": "known_fact",
+            "topic": "operational_confirmation",
+            "realized": true,
+            "fingerprint": "98f335020276f8b7a6918fbcf5ee8f00770c296a0e6eb6962448b49b2a6db03b",
+            "semantic_key": "fact:operational_confirmation:capacity_layout",
+            "required_meaning": {
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space"
+              },
+              "outcome": "FEASIBLE",
+              "subject": "capacity_layout",
+              "assertion": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+              "fact_state": "known"
+            }
+          }
+        ]
+      },
+      "resolution_items": [],
+      "draft_revision_id": 387,
+      "workflow_action_id": 1640,
+      "approval_request_id": 466,
+      "provider_request_id": "req_739f3c549ebe486cb26551c7f3c9cedf",
+      "operator_annotations": [],
+      "provider_response_id": "resp_0777334ee6fb3054016ac8c893e96087d2b9ee2fb65fa83ea3",
+      "editorial_content_plan": {
+        "defer": [
+          {
+            "role": "DEFER",
+            "topic": "commercial",
+            "value": {
+              "vat": "21%",
+              "booking_fee": "EUR 75 excl. VAT"
+            },
+            "reason": "not_needed_for_current_question",
+            "priority": 1,
+            "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+            "semantic_key": "commercial.current",
+            "authority_class": "current_governed",
+            "proposition_key": "commercial.current",
+            "source_reference": "governed_case",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "catering_kitchen",
+            "value": {
+              "limitation": "not large-scale food production",
+              "suitable_for": [
+                "ready-made food",
+                "warming",
+                "plating",
+                "simple assembly"
+              ]
+            },
+            "reason": "not_needed_in_current_turn",
+            "priority": 50,
+            "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+            "semantic_key": "fact:catering_kitchen",
+            "authority_class": "current_governed",
+            "proposition_key": "fact:catering_kitchen",
+            "source_reference": "SERV-003",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "catering_kitchen",
+            "value": {
+              "source_text": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+            },
+            "reason": "secondary_or_unstructured_guidance_not_needed_now",
+            "priority": 50,
+            "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+            "semantic_key": "guidance:74b98767a0208fcb",
+            "authority_class": "current_governed",
+            "proposition_key": "guidance:74b98767a0208fcb",
+            "source_reference": "SERV-003",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "external_supplier_setup",
+            "value": {
+              "source_text": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+            },
+            "reason": "secondary_or_unstructured_guidance_not_needed_now",
+            "priority": 50,
+            "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+            "semantic_key": "guidance:c860c453d6ac37bf",
+            "authority_class": "current_governed",
+            "proposition_key": "guidance:c860c453d6ac37bf",
+            "source_reference": "SERV-004",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "external_supplier_setup",
+            "value": {
+              "source_text": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+            },
+            "reason": "secondary_or_unstructured_guidance_not_needed_now",
+            "priority": 50,
+            "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+            "semantic_key": "guidance:f3bb9a44431341d3",
+            "authority_class": "current_governed",
+            "proposition_key": "guidance:f3bb9a44431341d3",
+            "source_reference": "SERV-004",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "capacity",
+            "value": {
+              "scope": "studio space",
+              "status": "within_limits",
+              "near_limit": false,
+              "requested_guests": 24
+            },
+            "reason": "not_needed_in_current_turn",
+            "priority": 50,
+            "fingerprint": "b64164f0bf059b98d9b763c68951e1c29ea2b1a33cf380f1944699ff776d4f43",
+            "semantic_key": "fact:capacity",
+            "authority_class": "current_governed",
+            "proposition_key": "fact:capacity",
+            "source_reference": "phase4:capacity_studio_within_capacity",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "guest_count",
+            "value": {
+              "fact": "guest_count: 24"
+            },
+            "reason": "case_summary_not_needed_for_this_reply",
+            "priority": 50,
+            "fingerprint": "456e120a424a2fe5c89eb23e5e9000bcf6fda29bad8a4c6194d62bb8442f2b58",
+            "semantic_key": "case_fact:guest_count",
+            "authority_class": "current_governed",
+            "proposition_key": "case_fact:guest_count",
+            "source_reference": "governed_case",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "event_type",
+            "value": {
+              "fact": "event_type: team_workshop"
+            },
+            "reason": "case_summary_not_needed_for_this_reply",
+            "priority": 50,
+            "fingerprint": "87d32785139b123539dcb103e5bae8abce618861c9f943aac482f589518cdefa",
+            "semantic_key": "case_fact:event_type",
+            "authority_class": "current_governed",
+            "proposition_key": "case_fact:event_type",
+            "source_reference": "governed_case",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "Requested rental type code",
+            "value": {
+              "fact": "Requested rental type code: studio_space"
+            },
+            "reason": "case_summary_not_needed_for_this_reply",
+            "priority": 50,
+            "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+            "semantic_key": "case_fact:Requested rental type code",
+            "authority_class": "current_governed",
+            "proposition_key": "case_fact:Requested rental type code",
+            "source_reference": "governed_case",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "Requested active event start",
+            "value": {
+              "fact": "Requested active event start: 2026-11-12 13:00:00+00"
+            },
+            "reason": "case_summary_not_needed_for_this_reply",
+            "priority": 50,
+            "fingerprint": "466495736dea44c46d43bc201cb40e28043efa3df86786e5220ba72fe28b9785",
+            "semantic_key": "case_fact:Requested active event start",
+            "authority_class": "current_governed",
+            "proposition_key": "case_fact:Requested active event start",
+            "source_reference": "governed_case",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          },
+          {
+            "role": "DEFER",
+            "topic": "Requested active event end",
+            "value": {
+              "fact": "Requested active event end: 2026-11-12 17:00:00+00"
+            },
+            "reason": "case_summary_not_needed_for_this_reply",
+            "priority": 50,
+            "fingerprint": "2d18cdb654b6f611c106e03f68eb9ce86877a3768e81ac5aa15d4a25c6e5724d",
+            "semantic_key": "case_fact:Requested active event end",
+            "authority_class": "current_governed",
+            "proposition_key": "case_fact:Requested active event end",
+            "source_reference": "governed_case",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": false
+          }
+        ],
+        "version": "editorial_content_plan_v3",
+        "must_ask": [],
+        "acknowledge": [
+          {
+            "role": "ACKNOWLEDGE",
+            "topic": "latest_client_detail",
+            "value": {
+              "kind": "new_client_detail",
+              "focus": "the change or clarification in the latest message"
+            },
+            "reason": "current_turn_delta",
+            "priority": 3,
+            "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+            "semantic_key": "latest_client_detail",
+            "authority_class": "client_request",
+            "proposition_key": "latest_client_detail",
+            "source_reference": "current_client_message",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": true
+          }
+        ],
+        "helpful_now": [],
+        "do_not_repeat": [],
+        "internal_only": [],
+        "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+        "source_bindings": [
+          {
+            "fingerprint": "984c78f876a4fcf93cdb2ccbd06f73779b4769f6436d3376a8a656104196b1ea",
+            "semantic_key": "latest_client_detail",
+            "source_reference": "current_client_message"
+          },
+          {
+            "fingerprint": "d48a4e749f26bd87be6140eb859f17d122a1ad07af3a4144f1406fc448f23d20",
+            "semantic_key": "commercial.current",
+            "source_reference": "governed_case"
+          },
+          {
+            "fingerprint": "8ba654ac396fc19822cecd67c06d7a927fd97238ba66a337daa3b0d9c888d61a",
+            "semantic_key": "fact:catering_kitchen",
+            "source_reference": "SERV-003"
+          },
+          {
+            "fingerprint": "feb5ab7f9af3e5bf7c3dd68e36294b0925bc52242b9bbf8c907ce1b49c314ff9",
+            "semantic_key": "guidance:74b98767a0208fcb",
+            "source_reference": "SERV-003"
+          },
+          {
+            "fingerprint": "6376528dba101c8aad7ad55646753b38051d5cc40c99279ce62d10d08aae0388",
+            "semantic_key": "guidance:c860c453d6ac37bf",
+            "source_reference": "SERV-004"
+          },
+          {
+            "fingerprint": "00fedd00a4fb4fc8f3ba78a4aedfcc6b10b3e45a53a683955b105d74d2cf8fbd",
+            "semantic_key": "guidance:f3bb9a44431341d3",
+            "source_reference": "SERV-004"
+          },
+          {
+            "fingerprint": "b64164f0bf059b98d9b763c68951e1c29ea2b1a33cf380f1944699ff776d4f43",
+            "semantic_key": "fact:capacity",
+            "source_reference": "phase4:capacity_studio_within_capacity"
+          },
+          {
+            "fingerprint": "f147758835ab6dd6187e5cef7525272cdf40ef76f2f4cbe02bcf1aa3f22d9ae1",
+            "semantic_key": "fact:operational_confirmation:studio_space",
+            "source_reference": "governed_operational_resolution"
+          },
+          {
+            "fingerprint": "2cf14a61ceb284f4e99271b6eb8bd3ef71f3f8d4400bf72cd1c3b3e88e839a2c",
+            "semantic_key": "fact:operational_confirmation:projection_display",
+            "source_reference": "governed_operational_resolution"
+          },
+          {
+            "fingerprint": "98f335020276f8b7a6918fbcf5ee8f00770c296a0e6eb6962448b49b2a6db03b",
+            "semantic_key": "fact:operational_confirmation:capacity_layout",
+            "source_reference": "governed_operational_resolution"
+          },
+          {
+            "fingerprint": "456e120a424a2fe5c89eb23e5e9000bcf6fda29bad8a4c6194d62bb8442f2b58",
+            "semantic_key": "case_fact:guest_count",
+            "source_reference": "governed_case"
+          },
+          {
+            "fingerprint": "87d32785139b123539dcb103e5bae8abce618861c9f943aac482f589518cdefa",
+            "semantic_key": "case_fact:event_type",
+            "source_reference": "governed_case"
+          },
+          {
+            "fingerprint": "3a1f8a2a7b03a7dea4ae51bbe7fbfe5fb55647f359d79b107c0d284f05f32c26",
+            "semantic_key": "case_fact:Requested rental type code",
+            "source_reference": "governed_case"
+          },
+          {
+            "fingerprint": "466495736dea44c46d43bc201cb40e28043efa3df86786e5220ba72fe28b9785",
+            "semantic_key": "case_fact:Requested active event start",
+            "source_reference": "governed_case"
+          },
+          {
+            "fingerprint": "2d18cdb654b6f611c106e03f68eb9ce86877a3768e81ac5aa15d4a25c6e5724d",
+            "semantic_key": "case_fact:Requested active event end",
+            "source_reference": "governed_case"
+          }
+        ],
+        "must_communicate": [
+          {
+            "role": "MUST_COMMUNICATE",
+            "topic": "operational_confirmation",
+            "value": {
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space"
+              },
+              "outcome": "AVAILABLE",
+              "subject": "studio_space",
+              "assertion": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+              "fact_state": "known"
+            },
+            "reason": "new_governed_operational_answer",
+            "priority": 0,
+            "fingerprint": "f147758835ab6dd6187e5cef7525272cdf40ef76f2f4cbe02bcf1aa3f22d9ae1",
+            "semantic_key": "fact:operational_confirmation:studio_space",
+            "authority_class": "current_governed",
+            "proposition_key": "fact:operational_confirmation:studio_space",
+            "source_reference": "governed_operational_resolution",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": true
+          },
+          {
+            "role": "MUST_COMMUNICATE",
+            "topic": "operational_confirmation",
+            "value": {
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space"
+              },
+              "outcome": "FEASIBLE",
+              "subject": "projection_display",
+              "assertion": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+              "fact_state": "known"
+            },
+            "reason": "new_governed_operational_answer",
+            "priority": 0,
+            "fingerprint": "2cf14a61ceb284f4e99271b6eb8bd3ef71f3f8d4400bf72cd1c3b3e88e839a2c",
+            "semantic_key": "fact:operational_confirmation:projection_display",
+            "authority_class": "current_governed",
+            "proposition_key": "fact:operational_confirmation:projection_display",
+            "source_reference": "governed_operational_resolution",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": true
+          },
+          {
+            "role": "MUST_COMMUNICATE",
+            "topic": "operational_confirmation",
+            "value": {
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space"
+              },
+              "outcome": "FEASIBLE",
+              "subject": "capacity_layout",
+              "assertion": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+              "fact_state": "known"
+            },
+            "reason": "new_governed_operational_answer",
+            "priority": 0,
+            "fingerprint": "98f335020276f8b7a6918fbcf5ee8f00770c296a0e6eb6962448b49b2a6db03b",
+            "semantic_key": "fact:operational_confirmation:capacity_layout",
+            "authority_class": "current_governed",
+            "proposition_key": "fact:operational_confirmation:capacity_layout",
+            "source_reference": "governed_operational_resolution",
+            "prior_turn_status": "not_previously_communicated",
+            "included_in_model_payload": true
+          }
+        ],
+        "substantive_budget": 3,
+        "editorial_rationale": "minimal_substantive_items_optional_guidance_ranked_last",
+        "primary_client_need": [
+          "respond_to_current_update"
+        ],
+        "already_communicated": [],
+        "client_visible_pending_state": []
+      },
+      "provider_response_status": "completed",
+      "validation_failure_codes": [],
+      "client_generation_payload": {
+        "must_say": [
+          {
+            "scope": {
+              "end": "2026-11-12T17:00:00+00:00",
+              "start": "2026-11-12T13:00:00+00:00",
+              "venue": "studio_space"
+            },
+            "topic": "operational_confirmation",
+            "outcome": "AVAILABLE",
+            "subject": "studio_space",
+            "assertion": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+            "fact_state": "known"
+          },
+          {
+            "scope": {
+              "end": "2026-11-12T17:00:00+00:00",
+              "start": "2026-11-12T13:00:00+00:00",
+              "venue": "studio_space"
+            },
+            "topic": "operational_confirmation",
+            "outcome": "FEASIBLE",
+            "subject": "projection_display",
+            "assertion": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+            "fact_state": "known"
+          },
+          {
+            "scope": {
+              "end": "2026-11-12T17:00:00+00:00",
+              "start": "2026-11-12T13:00:00+00:00",
+              "venue": "studio_space"
+            },
+            "topic": "operational_confirmation",
+            "outcome": "FEASIBLE",
+            "subject": "capacity_layout",
+            "assertion": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+            "fact_state": "known"
+          }
+        ],
+        "style_profile": [
+          "Write like an experienced WNC operator answering this particular message, not summarizing policy.",
+          "Use the minimum governed information needed to answer the actual question, prevent a likely misunderstanding, explain one useful constraint or make the next step clear. Allowed facts are optional, not a checklist.",
+          "Normally use 2 to 4 short paragraphs; a simple reply can be three sentences. Use bullets only for several requested details or genuinely clearer logistics.",
+          "Start with Hi <first name> and acknowledge the specific new detail. Vary naturally; do not force a stock thanks phrase.",
+          "Concision should still feel personal: include a brief natural acknowledgement of the message rather than opening with a bare price or technical status.",
+          "Prefer personal, plain first-person next steps. Avoid current process, applicable maximum, technical provision and explanations of governance logic.",
+          "Do not repeat capacity maxima, fees, equipment or policies merely because they are known. Mention capacity only when suitability or a limit matters; fees when price, an exception or the immediate next step requires them.",
+          "For follow-ups, respond to the change. Do not repeat an unchanged policy already covered in the earlier draft. Do not claim that an unsent draft was sent or received.",
+          "Use at most one unsolicited practical policy caveat per topic; retain every material requirement needed to answer the actual question safely. Relevant-later details stay out of this email.",
+          "Acknowledge a clarification without explaining how you will classify the request or treat historical evidence. Give the practical answer or next step.",
+          "Keep limitations constructive: describe the practical next step instead of your inability to assess or analyse. Avoid business jargon such as cost sensitivity; speak about the client\u2019s budget or plans plainly.",
+          "Express facts and checks in ordinary client language; do not turn supported, conditional, feasible, pending or confirmed status labels into system prose. Keep material conditions intact.",
+          "Use a short, plain subject. No signature block, valediction, em dash or internal workflow language."
+        ],
+        "recipient_label": "there",
+        "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+        "acknowledgements": [
+          {
+            "kind": "new_client_detail",
+            "focus": "the change or clarification in the latest message",
+            "topic": "latest_client_detail"
+          }
+        ],
+        "external_pending": [],
+        "forbidden_claims": [
+          "Do not confirm booking. State availability only using the exact supplied scoped operational assertion; no broader confirmation.",
+          "Do not describe a pending internal confirmation as completed.",
+          "Do not describe a pending decision or fee adjustment as approved.",
+          "Do not use historical precedent as current policy.",
+          "Do not use an em dash in the subject or body.",
+          "Do not derive concrete supplier arrival or unloading times from requested event times. State general access policy without authorizing an access window. Never imply a loading route has already been provided unless the supplied facts establish it."
+        ],
+        "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
+        "primary_client_need": [
+          "respond_to_current_update"
+        ],
+        "do_not_repeat_topics": [],
+        "optional_helpful_now": [],
+        "latest_client_message": "STAGING SYNTHETIC CLIENT EVIDENCE \u2014 Case 586 only.\n\nThanks. We would prefer theatre-style seated seating for our existing 24 guests in the Studio. All other details of our synthetic enquiry remain unchanged.\n\nSynthetic client",
+        "open_client_questions": []
+      },
+      "contextual_guidance_topics": [
+        "catering_kitchen",
+        "catering_kitchen",
+        "external_supplier_setup",
+        "external_supplier_setup",
+        "capacity",
+        "operational_confirmation",
+        "operational_confirmation",
+        "operational_confirmation"
+      ],
+      "provider_incomplete_reason": null,
+      "communicated_editorial_items": [
+        {
+          "topic": "operational_confirmation",
+          "fingerprint": "f147758835ab6dd6187e5cef7525272cdf40ef76f2f4cbe02bcf1aa3f22d9ae1",
+          "semantic_key": "fact:operational_confirmation:studio_space",
+          "source_reference": "governed_operational_resolution"
+        },
+        {
+          "topic": "operational_confirmation",
+          "fingerprint": "2cf14a61ceb284f4e99271b6eb8bd3ef71f3f8d4400bf72cd1c3b3e88e839a2c",
+          "semantic_key": "fact:operational_confirmation:projection_display",
+          "source_reference": "governed_operational_resolution"
+        },
+        {
+          "topic": "operational_confirmation",
+          "fingerprint": "98f335020276f8b7a6918fbcf5ee8f00770c296a0e6eb6962448b49b2a6db03b",
+          "semantic_key": "fact:operational_confirmation:capacity_layout",
+          "source_reference": "governed_operational_resolution"
+        }
+      ]
+    },
+    "event_identity_key": "governed_client_response_draft_generated:586:3dde18a50b26549ad119541baa829d3e1555f32d7eb166ec849f3b344ba4ec05",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T10:57:28.914142+00:00"
+  },
+  {
+    "id": 17169,
+    "workflow_event_uuid": "7508acd8-d252-4077-8fa6-c1d8656f3896",
+    "rental_case_id": 586,
+    "event_type_code": "approval_decided",
+    "source_type": "phase8_atomic_commit",
+    "source_reference": "approval:466",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:58:51.792518+00:00",
+    "recorded_at": "2026-10-09T10:58:51.792518+00:00",
+    "structured_payload": {
+      "status_after": "approved",
+      "status_before": "open",
+      "target_entity_id": 1640,
+      "target_entity_type": "workflow_action",
+      "approval_request_id": 466
+    },
+    "event_identity_key": "phase8:approval:workflow_action:466:approved:7",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:58:51.904623+00:00"
+  },
+  {
+    "id": 17170,
+    "workflow_event_uuid": "f93f5482-03e3-4392-ad17-0814ab535341",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_status_changed",
+    "source_type": "phase8_atomic_commit",
+    "source_reference": "workflow_action:1640",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:58:51.792518+00:00",
+    "recorded_at": "2026-10-09T10:58:51.792518+00:00",
+    "structured_payload": {
+      "status_after": "approved",
+      "status_before": "awaiting_approval",
+      "workflow_action_id": 1640
+    },
+    "event_identity_key": "phase8:workflow_action:status1:1640:7:approved",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:58:51.904623+00:00"
+  },
+  {
+    "id": 17171,
+    "workflow_event_uuid": "7c303b77-7895-45ff-8948-9578284a9f32",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_status_changed",
+    "source_type": "phase8_atomic_commit",
+    "source_reference": "workflow_action:1640",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:58:51.792518+00:00",
+    "recorded_at": "2026-10-09T10:58:51.792518+00:00",
+    "structured_payload": {
+      "status_after": "ready_to_execute",
+      "status_before": "approved",
+      "workflow_action_id": 1640
+    },
+    "event_identity_key": "phase8:workflow_action:status2:1640:7",
+    "origin_metadata": {
+      "phase": "8.5r"
+    },
+    "created_at": "2026-10-09T10:58:51.904623+00:00"
+  },
+  {
+    "id": 17172,
+    "workflow_event_uuid": "31de04e8-8b0c-4c42-87cc-4c3eb740c4f0",
+    "rental_case_id": 586,
+    "event_type_code": "inquiry_response_draft_approved",
+    "source_type": "test_console",
+    "source_reference": "inquiry_response_draft:387",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T10:58:52.083909+00:00",
+    "recorded_at": "2026-10-09T10:58:52.083909+00:00",
+    "structured_payload": {
+      "draft_revision_id": 387,
+      "workflow_action_id": 1640,
+      "approval_request_id": 466
+    },
+    "event_identity_key": "inquiry_response_draft_approved:586:b4e8d0c3cd530c399773d63c4342bf461b051b2177bab15c8cd91339532e5c8d",
+    "origin_metadata": {
+      "phase": "8.8a",
+      "surface": "test_console"
+    },
+    "created_at": "2026-10-09T10:58:52.106061+00:00"
+  },
+  {
+    "id": 17173,
+    "workflow_event_uuid": "febb5b44-9cc8-4d8c-a151-3f180a524dda",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_started",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1640",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T11:00:23.875567+00:00",
+    "recorded_at": "2026-10-09T11:00:23.875567+00:00",
+    "structured_payload": {
+      "adapter_code": "outlook",
+      "attempt_number": 1,
+      "workflow_action_id": 1640,
+      "action_status_after": "executing",
+      "action_status_before": "ready_to_execute",
+      "execution_attempt_id": 29
+    },
+    "event_identity_key": "action_execution_started:1640:1",
+    "origin_metadata": {
+      "phase": "8.6"
+    },
+    "created_at": "2026-10-09T11:00:24.006621+00:00"
+  },
+  {
+    "id": 17174,
+    "workflow_event_uuid": "a62fd19b-9c17-4ec6-8922-acabc8cb870b",
+    "rental_case_id": 586,
+    "event_type_code": "workflow_action_execution_completed",
+    "source_type": "execution_runtime",
+    "source_reference": "workflow_action:1640",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T11:00:26.98376+00:00",
+    "recorded_at": "2026-10-09T11:00:26.98376+00:00",
+    "structured_payload": {
+      "failure_code": "adapter_outcome_ambiguous",
+      "attempt_status": "failed",
+      "retry_eligible": false,
+      "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+      "workflow_action_id": 1640,
+      "action_status_after": "failed",
+      "action_status_before": "executing",
+      "execution_attempt_id": 29
+    },
+    "event_identity_key": "action_execution_completed:1640:29",
+    "origin_metadata": {
+      "phase": "8.7A"
+    },
+    "created_at": "2026-10-09T11:00:27.006854+00:00"
+  },
+  {
+    "id": 17175,
+    "workflow_event_uuid": "c5b99731-9c72-41b1-8a69-77d6adb93fca",
+    "rental_case_id": 586,
+    "event_type_code": "outlook_delivery_human_confirmed",
+    "source_type": "operator_confirmation",
+    "source_reference": "execution_attempt:29",
+    "actor_type": "operator",
+    "actor_reference": "test_console:operator",
+    "occurred_at": "2026-10-09T11:05:19.615902+00:00",
+    "recorded_at": "2026-10-09T11:05:19.615902+00:00",
+    "structured_payload": {
+      "subject": "Studio seating update",
+      "recipient": "serinya@whennaturecalls.nl",
+      "confirmation": "recipient_received_intended_message",
+      "content_hash": "19190064e3592e96219ce81efc672841db03d7636a0360b7f58af7250a30c8f9",
+      "context_hash": "3bcabeaaf783ffb6489657e9dff510bab0c1c42b5fb7d7d7e9ae221f52d8eb2f",
+      "evidence_note": "Authorized synthetic operator receipt confirmation for Case 586 only. No human inbox observation is asserted. Bounded read-only Microsoft Graph verification matched the exact approved subject/body/sole recipient in both sent and Inbox copies, with identical Internet message ID and conversation. Inbox message AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bfAAA was received at 2026-10-09T11:00:28Z; Internet message ID <VI2PR07MB11032EAB82D557725CD2787B8D1922@VI2PR07MB11032.eurprd07.prod.outlook.com>. Original attempt 29 ambiguity and retry prohibition remain unchanged. No resend, new attempt, commercial commitment, or production effect.",
+      "delivery_outcome": "human_confirmed_delivered",
+      "resend_performed": false,
+      "draft_revision_id": 387,
+      "workflow_action_id": 1640,
+      "approval_request_id": 466,
+      "execution_attempt_id": 29,
+      "governed_context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+      "reconciliation_source": "human_operator_confirmation",
+      "provider_call_performed": false,
+      "original_execution_attempt": {
+        "id": 29,
+        "status": "failed",
+        "created_at": "2026-10-09T11:00:24.006621+00:00",
+        "started_at": "2026-10-09T11:00:23.875567+00:00",
+        "adapter_code": "outlook",
+        "completed_at": "2026-10-09T11:00:26.98376+00:00",
+        "failure_code": "adapter_outcome_ambiguous",
+        "attempt_number": 1,
+        "rental_case_id": 586,
+        "retry_eligible": false,
+        "response_snapshot": {
+          "stage": "verify_sent_message",
+          "reason": "send_verification_inconclusive",
+          "provider": "microsoft_graph_outlook",
+          "http_status": 200
+        },
+        "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+        "workflow_action_id": 1640,
+        "workflow_execution_attempt_uuid": "59e86c18-91e5-40f3-a3b7-602b98cbc74f"
+      }
+    },
+    "event_identity_key": "outlook_human_confirmed_delivery:1640:29",
+    "origin_metadata": {
+      "phase": "8",
+      "mechanism": "human_delivery_reconciliation_v1"
+    },
+    "created_at": "2026-10-09T11:05:19.608461+00:00"
+  }
+]

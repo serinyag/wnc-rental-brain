@@ -1,0 +1,66 @@
+{
+  "projection": {
+    "case_revision": 7,
+    "case_uuid": "c6097b9d-55c3-4602-b17c-64ec0eb2617e",
+    "custom_fields": {},
+    "marker": "WNC reference: RC-20261009091754581 / 0966d3a2c200",
+    "master": {
+      "completed": false,
+      "name": "Client not yet identified \u2014 team workshop \u2014 12 November 2026",
+      "notes": "CLIENT\nClient not yet identified\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: studio space\nGuests: 24\n\nCURRENT STATUS\nNew inquiry\nReview the next client response in WNC Rental Brain.\n\nOPEN ITEMS\nNo unresolved operational items.\n\nNEXT ACTIONS\nReview the case and prepare the next appropriate client response.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200"
+    },
+    "project_gid": "1217642260793817",
+    "rental_case_id": 586,
+    "version": "asana_rental_projection_v1",
+    "work": [
+      {
+        "completed": true,
+        "key": "item:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00",
+        "members": [
+          {
+            "key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00",
+            "resolved": true,
+            "summary": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+            "workflow_action_id": 1634
+          }
+        ],
+        "name": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+        "notes": "WNC internal check\n\nDone: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n\nRecord the outcome for governed review before treating it as confirmed.",
+        "owner": "WNC_INTERNAL"
+      },
+      {
+        "completed": true,
+        "key": "item:blocker:2384",
+        "members": [
+          {
+            "key": "blocker:2384",
+            "resolved": true,
+            "summary": "Confirm: Confirm the requested room layout against capacity requirements",
+            "workflow_action_id": 1632
+          }
+        ],
+        "name": "Confirm: Confirm the requested room layout against capacity requirements",
+        "notes": "WNC internal check\n\nDone: Confirm: Confirm the requested room layout against capacity requirements\n\nRecord the outcome for governed review before treating it as confirmed.",
+        "owner": "WNC_INTERNAL"
+      },
+      {
+        "completed": true,
+        "key": "item:blocker:2385",
+        "members": [
+          {
+            "key": "blocker:2385",
+            "resolved": true,
+            "summary": "Confirm: Confirm event-specific technical setup",
+            "workflow_action_id": 1633
+          }
+        ],
+        "name": "Confirm: Confirm event-specific technical setup",
+        "notes": "WNC internal check\n\nDone: Confirm: Confirm event-specific technical setup\n\nRecord the outcome for governed review before treating it as confirmed.",
+        "owner": "WNC_INTERNAL"
+      }
+    ],
+    "workspace_gid": "1208455784737302"
+  },
+  "provider_called": false,
+  "workflow_action_id": 1639
+}

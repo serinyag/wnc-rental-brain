@@ -66,3 +66,12 @@ Asana master **1219351043478952** and three subtasks were created by action **16
 Final drafting/approval/send remain **not reached**. Current blocker **2386** is missing layout/configuration authority, still projected as blocking internal work. The frozen approval guard does not admit an approval-ready clarification response in this state. No client layout was invented and no internal annotation was bypassed.
 
 All execution gates are disabled. No Graph call, send, OpenAI call or production change occurred in this continuation. Original inbound evidence and protected cases 424/584/585 remain unchanged. See [authority certification and remaining boundary](../operational_resolution/OPERATIONAL_RESOLUTION_REPORT.md).
+
+
+## Final autonomous closure — 9 October 2026
+
+The historical stops above are resolved. Case 586 reached revision 7 through real same-conversation synthetic inbound source 3106, governed client layout fact 1060, and separate synthetic capacity acceptance event 17160 / fact 1061. Asana action 1639 / attempt 28 completed the existing capacity subtask without new tasks. DraftRevision 387 received exact approval 466. Final action 1640 executed once as attempt 29; provider receipt was verified, and event 17175 reconciled the original ambiguity without retry or rewriting the attempt. All provider gates are disabled. Protected cases 424/584/585 and original evidence remain unchanged.
+
+**WNC_FULL_RENTAL_STAGING_END_TO_END_CERTIFIED**
+
+See the [single final closure report](../case586_closure/FINAL_CLOSURE_REPORT.md) for the complete timeline, provider IDs, authority, approval, receipt, replay, tests, and isolation evidence. No production-pilot work was started.

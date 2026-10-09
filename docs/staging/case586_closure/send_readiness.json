@@ -1,0 +1,33 @@
+{
+  "clock": {
+    "current_time": "2026-10-09T11:00:22.113159Z",
+    "real_current_time": "2026-10-09T11:00:22.113148Z",
+    "simulated": false
+  },
+  "clock_controls_enabled": false,
+  "environment": "staging",
+  "ok": true,
+  "report": {
+    "failure_codes": [],
+    "lines": [
+      "Read mode: provider-free",
+      "Graph operations: 0",
+      "Workflow action id: 1640",
+      "Draft revision id: 387",
+      "Approval request id: 466",
+      "Exact approval target: workflow_action:1640:draft_revision:387",
+      "Exact approval required: no",
+      "Canonical payload validation: PASS",
+      "Execution-input validation: PASS",
+      "Pre-send governance input validation: PASS",
+      "Send gate: enabled",
+      "Exact revision integrity: pass",
+      "Current case/context: pass",
+      "Recipient allowlist: pass",
+      "Readiness: final_integrity_check_required",
+      "Outlook send performed: no"
+    ],
+    "success": true,
+    "title": "Governed Outlook Send Readiness Verified"
+  }
+}

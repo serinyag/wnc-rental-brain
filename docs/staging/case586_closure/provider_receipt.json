@@ -1,0 +1,19 @@
+{
+  "action_id": 1640,
+  "approval_id": 466,
+  "attempt_id": 29,
+  "case_id": 586,
+  "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAKoQcs4iJg9MnvK6wvCDv7I=",
+  "exact_content_match": true,
+  "inbox_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bfAAA",
+  "internet_message_id": "<VI2PR07MB11032EAB82D557725CD2787B8D1922@VI2PR07MB11032.eurprd07.prod.outlook.com>",
+  "provider_mutations": 0,
+  "provider_reads": 2,
+  "receipt_verified": true,
+  "received_at": "2026-10-09T11:00:28Z",
+  "recipient": "serinya@whennaturecalls.nl",
+  "revision_id": 387,
+  "sent_at": "2026-10-09T11:00:26Z",
+  "sent_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+  "subject": "Studio seating update"
+}

@@ -1,0 +1,63 @@
+{
+  "source_record_id": 3106,
+  "provider_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bcQAA",
+  "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+  "source_hash": "6663a37fa6e3e66533a2776ba5df31e9b55e1d191e783f042abd68252a4a18bb",
+  "observation": {
+    "inbound_observation_id": 2729,
+    "inbound_source_record_id": 3106,
+    "reported_field_code": "layout_requirements",
+    "observation_type": "fact_candidate",
+    "claim_kind": "new_information",
+    "candidate_value_payload": {
+      "style": "theatre",
+      "configuration_type": "seated"
+    },
+    "source_evidence_reference": "outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bcQAA",
+    "status": "validated",
+    "observation_identity_key": "layout_requirements|fact_candidate|new_information|outlook_message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bcQAA|{\"configuration_type\":\"seated\",\"style\":\"theatre\"}|",
+    "created_at": "2026-10-09 10:49:11.988912+00",
+    "reported_domain_code": "layout",
+    "target_field_code": "layout_requirements",
+    "target_domain_code": "layout",
+    "rental_case_id": 586,
+    "asserted_by_party_type": "client",
+    "asserted_by_reference": "serinya@whennaturecalls.nl",
+    "source_excerpt": "STAGING SYNTHETIC CLIENT EVIDENCE \u2014 Case 586 only.\n\nThanks. We would prefer theatre-style seated seating for our existing 24 guests in the Studio. All other details of our synthetic enquiry remain unchanged.\n\nSynthetic client",
+    "observed_against_case_revision": null,
+    "extraction_confidence": 1.0,
+    "ambiguity_flags": [],
+    "supersedes_inbound_observation_id": null,
+    "updated_at": "2026-10-09 10:49:11.988912+00"
+  },
+  "effect": {
+    "inbound_observation_effect_id": 2729,
+    "inbound_observation_id": 2729,
+    "rental_case_id": 586,
+    "disposition_code": "no_workflow_effect",
+    "revalidation_required": true,
+    "stale_observation": false,
+    "reason_codes": [
+      "new_information_candidate",
+      "no_direct_truth_mutation"
+    ],
+    "created_at": "2026-10-09 10:49:11.988912+00",
+    "linked_open_question_id": null,
+    "linked_requirement_id": null,
+    "linked_proposed_change_id": null,
+    "linked_case_decision_id": null,
+    "linked_reschedule_request_id": null,
+    "workflow_event_id": 17158
+  },
+  "fact_mutation": {
+    "rental_case_id": 586,
+    "previous_case_revision": 5,
+    "new_case_revision": 6,
+    "workflow_event_id": 17159,
+    "rental_case_fact_id": 1060
+  },
+  "value": {
+    "configuration_type": "seated",
+    "style": "theatre"
+  }
+}

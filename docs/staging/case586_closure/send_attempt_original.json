@@ -1,0 +1,21 @@
+{
+  "id": 29,
+  "workflow_execution_attempt_uuid": "59e86c18-91e5-40f3-a3b7-602b98cbc74f",
+  "workflow_action_id": 1640,
+  "rental_case_id": 586,
+  "attempt_number": 1,
+  "adapter_code": "outlook",
+  "started_at": "2026-10-09T11:00:23.875567+00:00",
+  "completed_at": "2026-10-09T11:00:26.98376+00:00",
+  "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+  "status": "failed",
+  "failure_code": "adapter_outcome_ambiguous",
+  "retry_eligible": false,
+  "response_snapshot": {
+    "stage": "verify_sent_message",
+    "reason": "send_verification_inconclusive",
+    "provider": "microsoft_graph_outlook",
+    "http_status": 200
+  },
+  "created_at": "2026-10-09T11:00:24.006621+00:00"
+}

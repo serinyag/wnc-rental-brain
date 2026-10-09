@@ -1,0 +1,50 @@
+[
+  17167,
+  {
+    "model": "gpt-5.6-sol",
+    "provider": "openai",
+    "content_hash": "7c4d476c3d0876e5ce2bec88422a7efd84c4ba9241498f39466f8d13b07df9be",
+    "context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+    "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+    "generation_audit": {
+      "policy": "required_realization_single_correction_v1",
+      "attempts": [
+        {
+          "candidate_hash": "7c4d476c3d0876e5ce2bec88422a7efd84c4ba9241498f39466f8d13b07df9be",
+          "generation_attempt": 1,
+          "provider_request_id": "req_b7d2600e1511478fae30d8002c9d6199",
+          "realization_results": [],
+          "provider_response_id": "resp_0862638d4c6223de016ac8c7a541ac87d28238767f535efcca",
+          "safety_failure_codes": [
+            "governed_operational_outcome_not_realized",
+            "governed_operational_outcome_not_realized",
+            "governed_operational_outcome_not_realized",
+            "unsupported_availability_or_confirmation",
+            "unsupported_operational_scope_expansion"
+          ],
+          "failed_realization_item_ids": []
+        }
+      ],
+      "context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+      "plan_identity": "79b6593af4ef713b824410559423213d701e7f3117cc7f38726aa479171f6f5b",
+      "contract_identity": "0c0650919f9b30ff421bff8367185e5236bb9e9480aada33b579123b5c66018f",
+      "source_case_revision": 7,
+      "corrective_retry_count": 0,
+      "initial_candidate_hash": "7c4d476c3d0876e5ce2bec88422a7efd84c4ba9241498f39466f8d13b07df9be",
+      "final_realization_results": []
+    },
+    "validation_codes": [
+      "governed_operational_outcome_not_realized",
+      "governed_operational_outcome_not_realized",
+      "governed_operational_outcome_not_realized",
+      "unsupported_availability_or_confirmation",
+      "unsupported_operational_scope_expansion"
+    ],
+    "validation_result": "rejected",
+    "provider_request_id": "req_b7d2600e1511478fae30d8002c9d6199",
+    "provider_response_id": "resp_0862638d4c6223de016ac8c7a541ac87d28238767f535efcca",
+    "source_case_revision": 7,
+    "provider_response_status": "completed",
+    "provider_incomplete_reason": null
+  }
+]

@@ -1,0 +1,35 @@
+{
+  "workflow_action_id": 1632,
+  "expected_case_revision": 6,
+  "contract": {
+    "version": "operational_resolution_v1",
+    "workflow_action_id": 1632,
+    "resolution_item_key": "blocker:2384",
+    "kind": "CAPACITY_LAYOUT_CONFIRMATION",
+    "scope": {
+      "rental_case_id": 586,
+      "venue": "studio_space",
+      "start": "2026-11-12T13:00:00+00:00",
+      "end": "2026-11-12T17:00:00+00:00"
+    },
+    "subjects": [
+      "capacity_layout"
+    ],
+    "inputs": {
+      "configuration_type": "seated",
+      "guest_count": 24,
+      "layout_requirements": {
+        "style": "theatre",
+        "configuration_type": "seated"
+      }
+    }
+  },
+  "outcomes": {
+    "capacity_layout": "FEASIBLE"
+  },
+  "evidence_reference": "synthetic:case586:operator:seated24:practical-check:v1",
+  "evidence_text": "STAGING SYNTHETIC WNC OPERATOR EVIDENCE \u2014 Case 586 only. Independently checked the theatre-style seated configuration for 24 guests in the Studio on 12 November 2026 14:00\u201318:00 Europe/Amsterdam. Published seated maximum 40 (CAPACITY_STUDIO_SEATED); synthetic practical check confirms 24 chairs, clear access routes and projection sightlines for this workshop. Layout is feasible. No booking, commercial commitment, fee decision or policy exception.",
+  "occurred_at": "2026-10-09T10:49:18.108704+00:00",
+  "idempotency_key": "case586:capacity-layout:seated24:v1",
+  "synthetic": true
+}

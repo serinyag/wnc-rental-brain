@@ -1,0 +1,629 @@
+{
+  "marker": "WNC_FULL_RENTAL_STAGING_END_TO_END_CERTIFIED",
+  "case_id": 586,
+  "case_revision": 7,
+  "source_ids": [
+    3104,
+    3105,
+    3106
+  ],
+  "facts": [
+    {
+      "rental_case_fact_id": 1056,
+      "rental_case_id": 586,
+      "field_code": "guest_count",
+      "domain_code": "event_profile",
+      "value_payload": 24,
+      "source_reference": "inbound_observation:2724",
+      "established_case_revision": 3,
+      "created_at": "2026-10-09 09:44:58.628789+00",
+      "updated_at": "2026-10-09 09:44:58.628789+00"
+    },
+    {
+      "rental_case_fact_id": 1057,
+      "rental_case_id": 586,
+      "field_code": "event_type",
+      "domain_code": "event_profile",
+      "value_payload": "team_workshop",
+      "source_reference": "inbound_observation:2726",
+      "established_case_revision": 3,
+      "created_at": "2026-10-09 09:44:58.628789+00",
+      "updated_at": "2026-10-09 09:44:58.628789+00"
+    },
+    {
+      "rental_case_fact_id": 1058,
+      "rental_case_id": 586,
+      "field_code": "operational_resolution:4a7d0eb2c7be7b012cf0db59d82f91624f511de7bfcb3b0d8b0cceb0b5ac7ae5",
+      "domain_code": "operations",
+      "value_payload": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "AVAILABILITY_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "studio_space"
+          ],
+          "workflow_action_id": 1634,
+          "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00"
+        },
+        "event_id": 17144,
+        "outcomes": {
+          "studio_space": "AVAILABLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:13:47.846874+00:00",
+        "evidence_text": "staging synthetic operator evidence: Studio is AVAILABLE for 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. This does not confirm a booking, capacity, catering, fees or any other date.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586-synthetic-operational-1634-v1",
+        "evidence_reference": "staging:case586:authorized-synthetic-operator:1634:v1",
+        "workflow_action_id": 1634,
+        "accepted_case_revision": 4,
+        "expected_case_revision": 3
+      },
+      "source_reference": "workflow_event:17144",
+      "established_case_revision": 4,
+      "created_at": "2026-10-09 10:19:19.703752+00",
+      "updated_at": "2026-10-09 10:19:19.703752+00"
+    },
+    {
+      "rental_case_fact_id": 1059,
+      "rental_case_id": 586,
+      "field_code": "operational_resolution:423b45d93af97be240c95124abf6897551aaedb8f72393da2026041ef9479916",
+      "domain_code": "operations",
+      "value_payload": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "TECHNICAL_CAPABILITY_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "projection_display"
+          ],
+          "workflow_action_id": 1633,
+          "resolution_item_key": "blocker:2385"
+        },
+        "event_id": 17145,
+        "outcomes": {
+          "projection_display": "FEASIBLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:19:18.949933+00:00",
+        "evidence_text": "staging synthetic operator evidence: The specifically requested projection_display setup is FEASIBLE for the Studio team workshop on 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. No microphone, technician, fee waiver or wider AV approval is confirmed.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586-synthetic-operational-1633-v1",
+        "evidence_reference": "staging:case586:authorized-synthetic-operator:1633:v1",
+        "workflow_action_id": 1633,
+        "accepted_case_revision": 5,
+        "expected_case_revision": 4
+      },
+      "source_reference": "workflow_event:17145",
+      "established_case_revision": 5,
+      "created_at": "2026-10-09 10:19:21.50487+00",
+      "updated_at": "2026-10-09 10:19:21.50487+00"
+    },
+    {
+      "rental_case_fact_id": 1060,
+      "rental_case_id": 586,
+      "field_code": "layout_requirements",
+      "domain_code": "layout",
+      "value_payload": {
+        "style": "theatre",
+        "configuration_type": "seated"
+      },
+      "source_reference": "inbound_observation:2729",
+      "established_case_revision": 6,
+      "created_at": "2026-10-09 10:49:12.184519+00",
+      "updated_at": "2026-10-09 10:49:12.184519+00"
+    },
+    {
+      "rental_case_fact_id": 1061,
+      "rental_case_id": 586,
+      "field_code": "operational_resolution:6b851805276ad124ec0e1dcdfa8c874ce1b7ec4b0a67c62b4242a05528b5d31a",
+      "domain_code": "operations",
+      "value_payload": {
+        "actor": "SerinyaWNCstage",
+        "version": "operational_resolution_v1",
+        "contract": {
+          "kind": "CAPACITY_LAYOUT_CONFIRMATION",
+          "scope": {
+            "end": "2026-11-12T17:00:00+00:00",
+            "start": "2026-11-12T13:00:00+00:00",
+            "venue": "studio_space",
+            "rental_case_id": 586
+          },
+          "inputs": {
+            "guest_count": 24,
+            "configuration_type": "seated",
+            "layout_requirements": {
+              "style": "theatre",
+              "configuration_type": "seated"
+            }
+          },
+          "version": "operational_resolution_v1",
+          "subjects": [
+            "capacity_layout"
+          ],
+          "workflow_action_id": 1632,
+          "resolution_item_key": "blocker:2384"
+        },
+        "event_id": 17160,
+        "outcomes": {
+          "capacity_layout": "FEASIBLE"
+        },
+        "synthetic": true,
+        "provenance": "staging synthetic operator evidence",
+        "occurred_at": "2026-10-09T10:49:18.108704+00:00",
+        "evidence_text": "STAGING SYNTHETIC WNC OPERATOR EVIDENCE \u2014 Case 586 only. Independently checked the theatre-style seated configuration for 24 guests in the Studio on 12 November 2026 14:00\u201318:00 Europe/Amsterdam. Published seated maximum 40 (CAPACITY_STUDIO_SEATED); synthetic practical check confirms 24 chairs, clear access routes and projection sightlines for this workshop. Layout is feasible. No booking, commercial commitment, fee decision or policy exception.",
+        "authority_class": "WNC_INTERNAL_OPERATOR",
+        "idempotency_key": "case586:capacity-layout:seated24:v1",
+        "evidence_reference": "synthetic:case586:operator:seated24:practical-check:v1",
+        "workflow_action_id": 1632,
+        "accepted_case_revision": 7,
+        "expected_case_revision": 6
+      },
+      "source_reference": "workflow_event:17160",
+      "established_case_revision": 7,
+      "created_at": "2026-10-09 10:49:19.885781+00",
+      "updated_at": "2026-10-09 10:49:19.885781+00"
+    }
+  ],
+  "operational_assertions": [
+    {
+      "topic": "operational_confirmation",
+      "fact_state": "known",
+      "subject": "studio_space",
+      "outcome": "AVAILABLE",
+      "scope": {
+        "end": "2026-11-12T17:00:00+00:00",
+        "start": "2026-11-12T13:00:00+00:00",
+        "venue": "studio_space"
+      },
+      "assertion": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam)."
+    },
+    {
+      "topic": "operational_confirmation",
+      "fact_state": "known",
+      "subject": "projection_display",
+      "outcome": "FEASIBLE",
+      "scope": {
+        "end": "2026-11-12T17:00:00+00:00",
+        "start": "2026-11-12T13:00:00+00:00",
+        "venue": "studio_space"
+      },
+      "assertion": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam)."
+    },
+    {
+      "topic": "operational_confirmation",
+      "fact_state": "known",
+      "subject": "capacity_layout",
+      "outcome": "FEASIBLE",
+      "scope": {
+        "end": "2026-11-12T17:00:00+00:00",
+        "start": "2026-11-12T13:00:00+00:00",
+        "venue": "studio_space"
+      },
+      "assertion": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam)."
+    }
+  ],
+  "revision": {
+    "inquiry_response_draft_revision_id": 387,
+    "inquiry_response_draft_revision_uuid": "530e0730-cd49-4967-9031-9b2711bbc560",
+    "rental_case_id": 586,
+    "workflow_action_id": 1640,
+    "conversation_key": "governed_client_response:586",
+    "source_case_revision": 7,
+    "draft_status": "human_confirmed_delivered",
+    "draft_source": "generated",
+    "is_current": true,
+    "subject": "Studio seating update",
+    "salutation": "Hello,",
+    "intro_text": "Governed client response.",
+    "question_lines": [],
+    "closing_text": "Warm regards,",
+    "signoff_text": "WNC Rentals",
+    "body_text": "Hi there,\n\nThanks for clarifying that you would prefer theatre-style seating for 24 guests.\n\nThe Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam). The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam). The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+    "context_payload": {
+      "sender_email": "wnc-rentals-simulated@example.test",
+      "sender_label": "WNC Rentals (Simulated)",
+      "contact_label": null,
+      "current_facts": [
+        {
+          "field_code": "guest_count",
+          "domain_code": "event_profile",
+          "value_payload": 24
+        },
+        {
+          "field_code": "event_type",
+          "domain_code": "event_profile",
+          "value_payload": "team_workshop"
+        },
+        {
+          "field_code": "operational_resolution:4a7d0eb2c7be7b012cf0db59d82f91624f511de7bfcb3b0d8b0cceb0b5ac7ae5",
+          "domain_code": "operations",
+          "value_payload": {
+            "actor": "SerinyaWNCstage",
+            "version": "operational_resolution_v1",
+            "contract": {
+              "kind": "AVAILABILITY_CONFIRMATION",
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space",
+                "rental_case_id": 586
+              },
+              "version": "operational_resolution_v1",
+              "subjects": [
+                "studio_space"
+              ],
+              "workflow_action_id": 1634,
+              "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00"
+            },
+            "event_id": 17144,
+            "outcomes": {
+              "studio_space": "AVAILABLE"
+            },
+            "synthetic": true,
+            "provenance": "staging synthetic operator evidence",
+            "occurred_at": "2026-10-09T10:13:47.846874+00:00",
+            "evidence_text": "staging synthetic operator evidence: Studio is AVAILABLE for 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. This does not confirm a booking, capacity, catering, fees or any other date.",
+            "authority_class": "WNC_INTERNAL_OPERATOR",
+            "idempotency_key": "case586-synthetic-operational-1634-v1",
+            "evidence_reference": "staging:case586:authorized-synthetic-operator:1634:v1",
+            "workflow_action_id": 1634,
+            "accepted_case_revision": 4,
+            "expected_case_revision": 3
+          }
+        },
+        {
+          "field_code": "operational_resolution:423b45d93af97be240c95124abf6897551aaedb8f72393da2026041ef9479916",
+          "domain_code": "operations",
+          "value_payload": {
+            "actor": "SerinyaWNCstage",
+            "version": "operational_resolution_v1",
+            "contract": {
+              "kind": "TECHNICAL_CAPABILITY_CONFIRMATION",
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space",
+                "rental_case_id": 586
+              },
+              "version": "operational_resolution_v1",
+              "subjects": [
+                "projection_display"
+              ],
+              "workflow_action_id": 1633,
+              "resolution_item_key": "blocker:2385"
+            },
+            "event_id": 17145,
+            "outcomes": {
+              "projection_display": "FEASIBLE"
+            },
+            "synthetic": true,
+            "provenance": "staging synthetic operator evidence",
+            "occurred_at": "2026-10-09T10:19:18.949933+00:00",
+            "evidence_text": "staging synthetic operator evidence: The specifically requested projection_display setup is FEASIBLE for the Studio team workshop on 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. No microphone, technician, fee waiver or wider AV approval is confirmed.",
+            "authority_class": "WNC_INTERNAL_OPERATOR",
+            "idempotency_key": "case586-synthetic-operational-1633-v1",
+            "evidence_reference": "staging:case586:authorized-synthetic-operator:1633:v1",
+            "workflow_action_id": 1633,
+            "accepted_case_revision": 5,
+            "expected_case_revision": 4
+          }
+        },
+        {
+          "field_code": "layout_requirements",
+          "domain_code": "layout",
+          "value_payload": {
+            "style": "theatre",
+            "configuration_type": "seated"
+          }
+        },
+        {
+          "field_code": "operational_resolution:6b851805276ad124ec0e1dcdfa8c874ce1b7ec4b0a67c62b4242a05528b5d31a",
+          "domain_code": "operations",
+          "value_payload": {
+            "actor": "SerinyaWNCstage",
+            "version": "operational_resolution_v1",
+            "contract": {
+              "kind": "CAPACITY_LAYOUT_CONFIRMATION",
+              "scope": {
+                "end": "2026-11-12T17:00:00+00:00",
+                "start": "2026-11-12T13:00:00+00:00",
+                "venue": "studio_space",
+                "rental_case_id": 586
+              },
+              "inputs": {
+                "guest_count": 24,
+                "configuration_type": "seated",
+                "layout_requirements": {
+                  "style": "theatre",
+                  "configuration_type": "seated"
+                }
+              },
+              "version": "operational_resolution_v1",
+              "subjects": [
+                "capacity_layout"
+              ],
+              "workflow_action_id": 1632,
+              "resolution_item_key": "blocker:2384"
+            },
+            "event_id": 17160,
+            "outcomes": {
+              "capacity_layout": "FEASIBLE"
+            },
+            "synthetic": true,
+            "provenance": "staging synthetic operator evidence",
+            "occurred_at": "2026-10-09T10:49:18.108704+00:00",
+            "evidence_text": "STAGING SYNTHETIC WNC OPERATOR EVIDENCE \u2014 Case 586 only. Independently checked the theatre-style seated configuration for 24 guests in the Studio on 12 November 2026 14:00\u201318:00 Europe/Amsterdam. Published seated maximum 40 (CAPACITY_STUDIO_SEATED); synthetic practical check confirms 24 chairs, clear access routes and projection sightlines for this workshop. Layout is feasible. No booking, commercial commitment, fee decision or policy exception.",
+            "authority_class": "WNC_INTERNAL_OPERATOR",
+            "idempotency_key": "case586:capacity-layout:seated24:v1",
+            "evidence_reference": "synthetic:case586:operator:seated24:practical-check:v1",
+            "workflow_action_id": 1632,
+            "accepted_case_revision": 7,
+            "expected_case_revision": 6
+          }
+        }
+      ],
+      "open_questions": [],
+      "rental_case_id": 586,
+      "recipient_email": "serinya@whennaturecalls.nl",
+      "recipient_label": null,
+      "conversation_key": "governed_client_response:586",
+      "resolution_items": [],
+      "workflow_action_id": 1640,
+      "contextual_guidance": [
+        {
+          "topic": "catering_kitchen",
+          "source_reference": "SERV-003",
+          "client_safe_guidance": "WNC can support catering, but the kitchen is best suited to ready-made food, warming, plating and easy on-site assembly rather than large-scale food production. Share the catering format and equipment needs before the event."
+        },
+        {
+          "topic": "catering_kitchen",
+          "source_reference": "SERV-003",
+          "client_safe_guidance": "Client and caterer must work within WNC kitchen and delivery limitations. Ready-made or easy-to-assemble food works best. External caterer / client is responsible for cleaning its working area and leaving the venue as found. Large-scale events may require professional cleaning."
+        },
+        {
+          "topic": "external_supplier_setup",
+          "source_reference": "SERV-004",
+          "client_safe_guidance": "Supplier / client removes packaging and rental-related waste Venue-rule acknowledgement: Required before delivery"
+        },
+        {
+          "topic": "external_supplier_setup",
+          "source_reference": "SERV-004",
+          "client_safe_guidance": "Supplier / client removes all packaging, cable waste and equipment materials Venue-rule acknowledgement: Required before load-in"
+        },
+        {
+          "topic": "capacity",
+          "semantic_values": {
+            "scope": "studio space",
+            "topic": "capacity",
+            "status": "within_limits",
+            "near_limit": false,
+            "requested_guests": 24
+          },
+          "source_reference": "phase4:capacity_studio_within_capacity",
+          "client_safe_guidance": "The requested 24 guests are within the current capacity rules for studio space. The applicable maximum is 40 guests. "
+        },
+        {
+          "topic": "operational_confirmation",
+          "semantic_values": {
+            "scope": {
+              "end": "2026-11-12T17:00:00+00:00",
+              "start": "2026-11-12T13:00:00+00:00",
+              "venue": "studio_space"
+            },
+            "topic": "operational_confirmation",
+            "outcome": "AVAILABLE",
+            "subject": "studio_space",
+            "assertion": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+            "fact_state": "known"
+          },
+          "source_reference": "governed_operational_resolution",
+          "client_safe_guidance": "The Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam)."
+        },
+        {
+          "topic": "operational_confirmation",
+          "semantic_values": {
+            "scope": {
+              "end": "2026-11-12T17:00:00+00:00",
+              "start": "2026-11-12T13:00:00+00:00",
+              "venue": "studio_space"
+            },
+            "topic": "operational_confirmation",
+            "outcome": "FEASIBLE",
+            "subject": "projection_display",
+            "assertion": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+            "fact_state": "known"
+          },
+          "source_reference": "governed_operational_resolution",
+          "client_safe_guidance": "The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam)."
+        },
+        {
+          "topic": "operational_confirmation",
+          "semantic_values": {
+            "scope": {
+              "end": "2026-11-12T17:00:00+00:00",
+              "start": "2026-11-12T13:00:00+00:00",
+              "venue": "studio_space"
+            },
+            "topic": "operational_confirmation",
+            "outcome": "FEASIBLE",
+            "subject": "capacity_layout",
+            "assertion": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+            "fact_state": "known"
+          },
+          "source_reference": "governed_operational_resolution",
+          "client_safe_guidance": "The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam)."
+        }
+      ],
+      "guidance_references": [
+        "WF-003",
+        "WF-004"
+      ],
+      "operator_annotations": [],
+      "source_case_revision": 7,
+      "metadata_summary_lines": [
+        "Governed response intent: PENDING_INTERNAL_CONFIRMATION",
+        "Contract hash: 510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff"
+      ],
+      "allow_empty_open_questions": true
+    },
+    "context_hash": "3bcabeaaf783ffb6489657e9dff510bab0c1c42b5fb7d7d7e9ae221f52d8eb2f",
+    "content_hash": "19190064e3592e96219ce81efc672841db03d7636a0360b7f58af7250a30c8f9",
+    "recipient_email": "serinya@whennaturecalls.nl",
+    "sender_email": "wnc-rentals-simulated@example.test",
+    "sender_label": "WNC Rentals (Simulated)",
+    "created_by_reference": "test_console:operator",
+    "created_at": "2026-10-09 10:57:28.400549+00",
+    "updated_at": "2026-10-09 11:05:19.615902+00",
+    "recipient_label": null,
+    "approval_request_id": 466,
+    "sender_display_name": null,
+    "supersedes_draft_revision_id": null,
+    "delivered_at": "2026-10-09 11:00:27.301093+00",
+    "delivery_external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+    "delivery_failure_code": "adapter_outcome_ambiguous",
+    "approved_at": "2026-10-09 10:58:51.920636+00",
+    "rejected_at": null
+  },
+  "approval": {
+    "approval_request_id": 466,
+    "rental_case_id": 586,
+    "target_entity_type": "workflow_action",
+    "approval_type": "client_communication_send",
+    "reason_text": "Approve inquiry response draft revision 387 before simulated send.",
+    "status": "approved",
+    "created_at": "2026-10-09 10:57:28.793523+00",
+    "target_entity_id": 1640,
+    "target_entity_reference": "workflow_action:1640:draft_revision:387",
+    "evidence_reference_keys": [
+      "workflow_action:1640",
+      "inquiry_response_draft:387"
+    ],
+    "required_approver_role": "client_communication_review",
+    "required_approver_reference": "semantic:approval:workflow_action:1640:draft_revision:387",
+    "decision_payload": {
+      "decision": "approved"
+    },
+    "decided_at": "2026-10-09 10:58:51.792518+00",
+    "decided_by_reference": "test_console:operator",
+    "decision_notes": null,
+    "supersedes_approval_request_id": null,
+    "updated_at": "2026-10-09 10:58:51.904623+00"
+  },
+  "action": {
+    "workflow_action_id": 1640,
+    "workflow_action_uuid": "0604d576-12fa-41f8-aa8e-59b45e908e08",
+    "rental_case_id": 586,
+    "action_type": "SEND_INQUIRY_RESPONSE",
+    "action_category": "communication",
+    "target_adapter_code": "outlook",
+    "reason_entity_type": "rental_case",
+    "approval_posture": "approval_required",
+    "status": "succeeded",
+    "semantic_subject_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+    "source_case_revision": 7,
+    "idempotency_key": "governed_outlook_v1:7488f04c338ca8cc25a461c6d711ca581b0c1424f8bde6f03f58c270df937264",
+    "structured_payload": {
+      "body": "Hi there,\n\nThanks for clarifying that you would prefer theatre-style seating for 24 guests.\n\nThe Studio is available for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam). The requested projection setup is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam). The requested seated layout for 24 guests in the Studio is feasible for 12 November 2026 from 14:00 to 18:00 (Europe/Amsterdam).",
+      "reason": "operator_requested_governed_client_response",
+      "purpose": "governed_client_response_draft",
+      "subject": "Studio seating update",
+      "body_type": "text",
+      "provenance": "governed_model",
+      "action_type": "SEND_INQUIRY_RESPONSE",
+      "context_hash": "3bcabeaaf783ffb6489657e9dff510bab0c1c42b5fb7d7d7e9ae221f52d8eb2f",
+      "message_mode": "new",
+      "plan_identity": "governed_outlook_reservation_v1:586:f1b98539d1cdd69b992ec7fc5d4b0a9bb04b61273b5e71b8713a121ecea6917c",
+      "provider_type": "microsoft_graph_outlook",
+      "rental_case_id": 586,
+      "approval_target": "workflow_action:1640:draft_revision:387",
+      "recipient_email": "serinya@whennaturecalls.nl",
+      "response_intent": "PENDING_INTERNAL_CONFIRMATION",
+      "contract_version": "governed_outlook_v1",
+      "conversation_key": "governed_client_response:586",
+      "graph_message_id": null,
+      "draft_revision_id": 387,
+      "draft_content_hash": "19190064e3592e96219ce81efc672841db03d7636a0360b7f58af7250a30c8f9",
+      "recipient_reference": "inquiry_response_draft:387",
+      "source_case_revision": 7,
+      "governed_context_hash": "510e8d0f7ba66a4c0eff05570be10fa1deac98e2185ec97ba289d2b5df4b93ff",
+      "recipient_identity_hash": "4bf9851f0c57ac4ad59825c1d506f91b035a9f4bd621448d07f2b717824c9137",
+      "recovery_draft_revision_id": null,
+      "recovery_predecessor_action_id": null,
+      "draft_origin_workflow_action_id": 1640,
+      "recovery_origin_workflow_action_id": null
+    },
+    "reason_entity_id": null,
+    "reason_entity_reference": "governed_client_response:586",
+    "target_scope_key": null,
+    "due_at": null,
+    "supersedes_workflow_action_id": null,
+    "created_at": "2026-10-09 10:57:28.304994+00",
+    "updated_at": "2026-10-09 11:05:19.608461+00"
+  },
+  "attempt": {
+    "id": 29,
+    "workflow_execution_attempt_uuid": "59e86c18-91e5-40f3-a3b7-602b98cbc74f",
+    "workflow_action_id": 1640,
+    "rental_case_id": 586,
+    "attempt_number": 1,
+    "adapter_code": "outlook",
+    "started_at": "2026-10-09T11:00:23.875567+00:00",
+    "completed_at": "2026-10-09T11:00:26.98376+00:00",
+    "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+    "status": "failed",
+    "failure_code": "adapter_outcome_ambiguous",
+    "retry_eligible": false,
+    "response_snapshot": {
+      "stage": "verify_sent_message",
+      "reason": "send_verification_inconclusive",
+      "provider": "microsoft_graph_outlook",
+      "http_status": 200
+    },
+    "created_at": "2026-10-09T11:00:24.006621+00:00"
+  },
+  "final_send_attempts": 1,
+  "final_graph_send_calls": 1,
+  "synthetic_input_graph_send_calls": 1,
+  "replay_preflight_failure": "action_already_succeeded",
+  "adapter_retry_guard": {
+    "message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+    "external_reference": "outlook:message:AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8bdgAA",
+    "failure_code": "adapter_outcome_ambiguous",
+    "reason": "prior_outlook_attempt_requires_manual_reconciliation",
+    "stage": "retry_preflight"
+  },
+  "second_final_execution_invoked": false,
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "provider_gates": {
+    "asana": "configured_but_disabled",
+    "outlook": "configured_draft_only"
+  },
+  "tests": {
+    "focused": 24,
+    "phase8": 708,
+    "repository": 925
+  },
+  "production_changes": 0
+}
