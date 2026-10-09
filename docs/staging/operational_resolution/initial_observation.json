@@ -1,0 +1,62 @@
+{
+  "canonical_truth_changed": false,
+  "differences": [],
+  "observed": {
+    "item:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00": {
+      "completed": false,
+      "gid": "1219350621402939",
+      "name": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+      "notes": "WNC internal check\n\nTo do: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 98802667f266",
+      "parent": {
+        "gid": "1219351043478952"
+      },
+      "projects": [],
+      "workspace": {
+        "gid": "1208455784737302"
+      }
+    },
+    "item:blocker:2384": {
+      "completed": false,
+      "gid": "1219350621444728",
+      "name": "Confirm: Confirm the requested room layout against capacity requirements",
+      "notes": "WNC internal check\n\nTo do: Confirm: Confirm the requested room layout against capacity requirements\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work 3653e2b33d8b",
+      "parent": {
+        "gid": "1219351043478952"
+      },
+      "projects": [],
+      "workspace": {
+        "gid": "1208455784737302"
+      }
+    },
+    "item:blocker:2385": {
+      "completed": false,
+      "gid": "1219350811582361",
+      "name": "Confirm: Confirm event-specific technical setup",
+      "notes": "WNC internal check\n\nTo do: Confirm: Confirm event-specific technical setup\n\nRecord the outcome for governed review before treating it as confirmed.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200 / work a652c9ce4de9",
+      "parent": {
+        "gid": "1219351043478952"
+      },
+      "projects": [],
+      "workspace": {
+        "gid": "1208455784737302"
+      }
+    },
+    "master": {
+      "completed": false,
+      "gid": "1219351043478952",
+      "name": "Client not yet identified \u2014 team workshop \u2014 12 November 2026",
+      "notes": "CLIENT\nClient not yet identified\n\nEVENT\nteam workshop\nRequested timing: 12 November 2026, 14:00 CET to 12 November 2026, 18:00 CET\nRequested venue / scope: Scope to be confirmed\nGuests: 24\n\nCURRENT STATUS\nInternal checks\nClient response is waiting on internal work.\n\nOPEN ITEMS\n- WNC internal check: Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00\n- WNC internal check: Confirm: Confirm the requested room layout against capacity requirements\n- WNC internal check: Confirm: Confirm event-specific technical setup\n- Current authority must be resolved before consequential workflow commitment.\n- Structured confirmation or review must be completed before commitment.\n\nNEXT ACTIONS\nComplete the checks below and record their outcomes for review.\n\nOUTLOOK\nNo verified conversation link is available for this case.\n\nWNC reference: RC-20261009091754581 / 0966d3a2c200",
+      "parent": null,
+      "projects": [
+        {
+          "gid": "1217642260793817"
+        }
+      ],
+      "workspace": {
+        "gid": "1208455784737302"
+      }
+    }
+  },
+  "retry_fence_released": false,
+  "status": "matches_projection"
+}

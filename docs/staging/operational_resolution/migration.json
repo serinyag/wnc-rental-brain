@@ -1,0 +1,4 @@
+{
+  "migration": "20261009000100_phase_08_operational_resolution.sql",
+  "production": false
+}

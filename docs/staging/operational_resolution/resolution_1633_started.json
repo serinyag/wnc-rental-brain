@@ -1,0 +1,27 @@
+{
+  "workflow_action_id": 1633,
+  "expected_case_revision": 4,
+  "contract": {
+    "version": "operational_resolution_v1",
+    "workflow_action_id": 1633,
+    "resolution_item_key": "blocker:2385",
+    "kind": "TECHNICAL_CAPABILITY_CONFIRMATION",
+    "scope": {
+      "rental_case_id": 586,
+      "venue": "studio_space",
+      "start": "2026-11-12T13:00:00+00:00",
+      "end": "2026-11-12T17:00:00+00:00"
+    },
+    "subjects": [
+      "projection_display"
+    ]
+  },
+  "outcomes": {
+    "projection_display": "FEASIBLE"
+  },
+  "evidence_reference": "staging:case586:authorized-synthetic-operator:1633:v1",
+  "evidence_text": "staging synthetic operator evidence: The specifically requested projection_display setup is FEASIBLE for the Studio team workshop on 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. No microphone, technician, fee waiver or wider AV approval is confirmed.",
+  "occurred_at": "2026-10-09T10:19:18.949933+00:00",
+  "idempotency_key": "case586-synthetic-operational-1633-v1",
+  "synthetic": true
+}

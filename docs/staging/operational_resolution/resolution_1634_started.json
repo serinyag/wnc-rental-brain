@@ -1,0 +1,27 @@
+{
+  "workflow_action_id": 1634,
+  "expected_case_revision": 3,
+  "contract": {
+    "version": "operational_resolution_v1",
+    "workflow_action_id": 1634,
+    "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00",
+    "kind": "AVAILABILITY_CONFIRMATION",
+    "scope": {
+      "rental_case_id": 586,
+      "venue": "studio_space",
+      "start": "2026-11-12T13:00:00+00:00",
+      "end": "2026-11-12T17:00:00+00:00"
+    },
+    "subjects": [
+      "studio_space"
+    ]
+  },
+  "outcomes": {
+    "studio_space": "AVAILABLE"
+  },
+  "evidence_reference": "staging:case586:authorized-synthetic-operator:1634:v1",
+  "evidence_text": "staging synthetic operator evidence: Studio is AVAILABLE for 12 November 2026 14:00\u201318:00 Europe/Amsterdam only. This does not confirm a booking, capacity, catering, fees or any other date.",
+  "occurred_at": "2026-10-09T10:13:47.846874+00:00",
+  "idempotency_key": "case586-synthetic-operational-1634-v1",
+  "synthetic": true
+}

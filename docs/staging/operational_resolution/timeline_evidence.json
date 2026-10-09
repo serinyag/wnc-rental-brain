@@ -1,0 +1,121 @@
+[
+  [
+    17138,
+    "2026-10-09 10:13:01.066878+00:00",
+    "2026-10-09 10:13:01.066878+00:00",
+    "workflow_action_execution_started",
+    "workflow_action:1635"
+  ],
+  [
+    17139,
+    "2026-10-09 10:13:08.563116+00:00",
+    "2026-10-09 10:13:08.563116+00:00",
+    "workflow_action_execution_completed",
+    "workflow_action:1635"
+  ],
+  [
+    17140,
+    "2026-10-09 10:13:08.563116+00:00",
+    "2026-10-09 10:13:08.563116+00:00",
+    "workflow_action_superseded",
+    "context_aware_resolution:586:blocker:2384:REQUIRED:revision:3"
+  ],
+  [
+    17141,
+    "2026-10-09 10:13:08.563116+00:00",
+    "2026-10-09 10:13:08.563116+00:00",
+    "workflow_action_superseded",
+    "context_aware_resolution:586:blocker:2385:REQUIRED:revision:3"
+  ],
+  [
+    17142,
+    "2026-10-09 10:13:08.563116+00:00",
+    "2026-10-09 10:13:08.563116+00:00",
+    "workflow_action_superseded",
+    "context_aware_resolution:586:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00:REQUIRED:revision:3"
+  ],
+  [
+    17143,
+    "2026-10-09 10:13:24.675463+00:00",
+    "2026-10-09 10:13:24.675463+00:00",
+    "asana_projection_observed",
+    "workflow_action:1635"
+  ],
+  [
+    17144,
+    "2026-10-09 10:13:47.846874+00:00",
+    "2026-10-09 10:19:19.738734+00:00",
+    "operational_resolution_accepted",
+    "staging:case586:authorized-synthetic-operator:1634:v1"
+  ],
+  [
+    17145,
+    "2026-10-09 10:19:18.949933+00:00",
+    "2026-10-09 10:19:21.509219+00:00",
+    "operational_resolution_accepted",
+    "staging:case586:authorized-synthetic-operator:1633:v1"
+  ],
+  [
+    17146,
+    "2026-10-09 10:19:55.300578+00:00",
+    "2026-10-09 10:19:55.300578+00:00",
+    "orchestration_blocker_created",
+    "RULE_AUTHORITY_GAP_BLOCK"
+  ],
+  [
+    17147,
+    "2026-10-09 10:19:55.300578+00:00",
+    "2026-10-09 10:19:55.300578+00:00",
+    "workflow_action_created",
+    "RULE_AUTHORITY_GAP_BLOCK"
+  ],
+  [
+    17148,
+    "2026-10-09 10:19:55.300578+00:00",
+    "2026-10-09 10:19:55.300578+00:00",
+    "blocker_resolved",
+    "blocker:authority:missing:test-console-projection:e347093c59688a0b3579c6ca0374e73d74517fa5b1172a999c09fd37bd961634"
+  ],
+  [
+    17149,
+    "2026-10-09 10:19:55.300578+00:00",
+    "2026-10-09 10:19:55.300578+00:00",
+    "blocker_resolved",
+    "blocker:authority:confirmation:test-console-projection:208387bd2d10d8e947b97d53adaf47e3d1bc2056e15b626194d1ea9567330732"
+  ],
+  [
+    17150,
+    "2026-10-09 10:19:55.300578+00:00",
+    "2026-10-09 10:19:55.300578+00:00",
+    "workflow_action_superseded",
+    "action:CREATE_INTERNAL_TASK_ITEM:722cff81d7554a1502386a1f1a896b92f8ccc98c952aeac47592cbc242850cd1:3"
+  ],
+  [
+    17151,
+    "2026-10-09 10:19:55.300578+00:00",
+    "2026-10-09 10:19:55.300578+00:00",
+    "workflow_action_superseded",
+    "action:CREATE_INTERNAL_TASK_ITEM:72594a38dbffd970c62b7a35f5f4bd469a674bbbb136a5dd3dea276246241341:3"
+  ],
+  [
+    17152,
+    "2026-10-09 10:20:10.508678+00:00",
+    "2026-10-09 10:20:10.508678+00:00",
+    "workflow_action_execution_started",
+    "workflow_action:1637"
+  ],
+  [
+    17153,
+    "2026-10-09 10:20:15.470932+00:00",
+    "2026-10-09 10:20:15.470932+00:00",
+    "workflow_action_execution_completed",
+    "workflow_action:1637"
+  ],
+  [
+    17154,
+    "2026-10-09 10:20:38.266642+00:00",
+    "2026-10-09 10:20:38.266642+00:00",
+    "asana_projection_observed",
+    "workflow_action:1637"
+  ]
+]
