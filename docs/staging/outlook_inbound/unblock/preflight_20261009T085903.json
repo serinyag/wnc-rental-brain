@@ -1,0 +1,19 @@
+{
+  "type": "OperatorHarnessError",
+  "error": "Operator request failed with HTTP 409: INBOUND_STOPPED: inbound_cursor_scope_forbidden",
+  "diagnostics": {
+    "diagnostics": {
+      "cursor_values_redacted": true,
+      "expected_origin": "https://graph.microsoft.com",
+      "expected_path": "/v1.0/users/Serinya%40whennaturecalls.nl/mailFolders/inbox/messages/delta",
+      "query_parameter_names": [
+        "$deltatoken"
+      ],
+      "returned_origin": "https://graph.microsoft.com",
+      "returned_path": "/v1.0/users/Serinya@whennaturecalls.nl/mailFolders('inbox')/messages/delta"
+    },
+    "failure_code": "INBOUND_STOPPED",
+    "message": "inbound_cursor_scope_forbidden",
+    "status": 409
+  }
+}

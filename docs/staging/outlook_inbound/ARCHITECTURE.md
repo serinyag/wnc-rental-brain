@@ -46,3 +46,9 @@ Microsoft references:
 ## Deliberate limits
 
 Staging-only; one configured mailbox and synthetic admission contract. No webhook, background worker, general enquiry classifier, attachment-content ingestion, arbitrary mailbox selection, permission widening, automatic send, automatic Asana execution, or silent resolution of unknown associations. The ready-for-human marker concerns this bounded synthetic certification, not production readiness or completed real inbound certification.
+
+## Cursor compatibility correction (2026-10-09)
+
+The live staging provider returns `/v1.0/users/Serinya@whennaturecalls.nl/mailFolders('inbox')/messages/delta` rather than the initial slash-form Inbox path. The adapter accepts only these two equivalent Inbox paths for the configured mailbox, with the exact HTTPS Graph origin and API version. It preserves the complete opaque query string unchanged. Other mailboxes, folders, endpoint families, origins, userinfo and fragments remain rejected before fetch. No identity aliases or permission changes are needed.
+
+Read-only preflight now follows the returned cursor once (two bounded delta pages total) without persisting a checkpoint or message. Each page remains limited to ten metadata records. Certification of real message ingestion is separate from this read-only verification.

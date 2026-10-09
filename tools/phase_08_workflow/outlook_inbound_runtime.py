@@ -68,14 +68,18 @@ def preflight():
     # Initialize no durable checkpoint and return no message contents. The narrow
     # query starts now; the later authorized ingestion window remains separate.
     adapter.config=replace(adapter.config,since=datetime.now(timezone.utc).isoformat())
-    records,_,status=adapter.read_page()
-    for record in records:
+    records,cursor,status=adapter.read_page()
+    # A second bounded read proves that the provider-returned opaque cursor
+    # is usable, without writing a checkpoint or ingesting either page.
+    replay_records,_,replay_status=adapter.read_page(cursor)
+    for record in records + replay_records:
         if '@removed' not in record and not all(record.get(k) for k in ('id','conversationId','receivedDateTime')):
             raise ValueError('inbound_preflight_metadata_shape_invalid')
     return {'mailbox':adapter.config.mailbox,'folder':'inbox','folder_id':folder['id'],
         'read_only':True,'ingested':0,'bounded_records':len(records),'response_shape_valid':True,
         'checkpoint_persisted':False,'provider_scope_negative_test':'application guard only; no unauthorized mailbox accessed',
-        'status':status}
+        'status':status,'cursor_replay_valid':True,'replay_status':replay_status,
+        'replay_bounded_records':len(replay_records),'delta_pages_read':2}
 
 
 def synchronize():

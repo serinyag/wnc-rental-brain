@@ -247,3 +247,57 @@ def test_cursor_rejection_reports_path_without_tokens():
     assert details['returned_path'].startswith('/v1.0/users/unexpected/')
     assert details['cursor_values_redacted'] and 'SECRET-CURSOR' not in json.dumps(details)
     assert not a.transport.calls
+
+
+@pytest.mark.parametrize('link_key', ['@odata.nextLink', '@odata.deltaLink'])
+@pytest.mark.parametrize('odata_path', [False, True])
+def test_provider_cursor_alias_and_opaque_state_round_trip(link_key, odata_path):
+    a=adapter([])
+    path=a.delta_path.replace('/mailFolders/inbox', "/mailFolders('inbox')") if odata_path else a.delta_path
+    cursor=path.replace('%40','@')+'?'+('$skiptoken' if link_key.endswith('nextLink') else '$deltatoken')+'=opaque%2B%2F%3D&state=a%252Fb'
+    a.transport.request=lambda **kw:(a.transport.calls.append(kw) or (200,json.dumps({'value':[],link_key:cursor}),{}))
+    _,returned,status=a.read_page()
+    assert returned==cursor and status==('paging' if link_key.endswith('nextLink') else 'ready')
+    a.read_page(returned)
+    assert a.transport.calls[-1]['url']==cursor
+
+
+@pytest.mark.parametrize('path', [
+    "/v1.0/users/other@example.test/mailFolders('inbox')/messages/delta",
+    "/v1.0/users/staging@example.test/mailFolders('sentitems')/messages/delta",
+    "/v1.0/users/staging@example.test/mailFolders/inbox/messages",
+    "/v1.0/users/staging@example.test/mailFolders('inbox')/messages/delta/extra",
+    "/v1.0/users/staging@example.test/mailFolders('inbox')/../messages/delta",
+    "/v1.0/users/staging@example.test/mailFolders('inbox')/messages/%252e%252e/delta",
+    "/beta/users/staging@example.test/mailFolders('inbox')/messages/delta",
+    "/v1.0/me/mailFolders('inbox')/messages/delta",
+])
+def test_odata_cursor_other_scope_rejected_without_fetch(path):
+    a=adapter([])
+    with pytest.raises(ValueError,match='cursor_scope_forbidden'):
+        a.read_page('https://graph.microsoft.com'+path+'?$deltatoken=opaque')
+    assert not a.transport.calls
+
+
+@pytest.mark.parametrize('origin', ['http://graph.microsoft.com','https://graph.microsoft.com.evil.test',
+    'https://graph.microsoft.com:444','https://user@graph.microsoft.com'])
+def test_odata_cursor_wrong_origin_rejected(origin):
+    a=adapter([])
+    path="/v1.0/users/staging@example.test/mailFolders('inbox')/messages/delta"
+    with pytest.raises(ValueError,match='cursor_scope_forbidden'):a.read_page(origin+path+'?$deltatoken=opaque')
+    assert not a.transport.calls
+
+
+def test_preflight_replays_cursor_without_ingestion():
+    from tools.phase_08_workflow import outlook_inbound_runtime as runtime
+    a=adapter([]);original=a.transport.request
+    def request(**kw):
+        if '/mailFolders/inbox?' in kw['url']:
+            a.transport.calls.append(kw);return 200,json.dumps({'id':'verified-inbox'}),{}
+        return original(**kw)
+    a.transport.request=request
+    with patch.object(runtime,'build_adapter',return_value=a),patch.object(runtime,'sync_page') as ingest:
+        r=runtime.preflight()
+        ingest.assert_not_called()
+    assert r['cursor_replay_valid'] and r['delta_pages_read']==2 and r['ingested']==0 and not r['checkpoint_persisted']
+    assert len(a.transport.calls)==3 and all(c['method']=='GET' for c in a.transport.calls)

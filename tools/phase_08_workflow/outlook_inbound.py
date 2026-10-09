@@ -56,7 +56,11 @@ class OutlookInboundAdapter:
 
     def validate_cursor(self, url):
         a, b = urlsplit(url), urlsplit(self.delta_path)
-        if a.scheme != b.scheme or a.netloc != b.netloc or unquote(a.path) != unquote(b.path) or a.fragment or a.username:
+        # Graph returns the Inbox key using OData key syntax in delta links.
+        # Accept only this exact equivalent resource, never a generic path
+        # prefix or arbitrary user/folder alias. Preserve opaque query bytes.
+        allowed_paths = {unquote(b.path), unquote(urlsplit(self.base).path) + "/mailFolders('inbox')/messages/delta"}
+        if a.scheme != b.scheme or a.netloc != b.netloc or unquote(a.path) not in allowed_paths or a.fragment or a.username:
             raise InboundCursorScopeError(a, b)
         return url
 
