@@ -166,5 +166,6 @@ def client_results(snapshot):
             state = {'AVAILABLE': 'available', 'UNAVAILABLE': 'unavailable', 'FEASIBLE': 'feasible', 'NOT_FEASIBLE': 'not feasible'}[outcome]
             sentence = f'{label} is {state} for {interval}.'
             results.append({'topic': 'operational_confirmation', 'fact_state': 'known',
-                'subject': subject, 'outcome': outcome, 'scope': c['scope'], 'assertion': sentence})
+                'subject': subject, 'outcome': outcome,
+                'scope': {k: v for k, v in c['scope'].items() if k != 'rental_case_id'}, 'assertion': sentence})
     return tuple(results)

@@ -69,6 +69,7 @@ def test_accept_fact_revision_scope_pending_and_drafting(resolution,outcome):
     assert r['contract']['resolution_item_key'] not in {i.proposition_key for i in derive_resolution_items(s)}
     contract=build_draft_contract(snapshot=s,recipient_label='Avery',latest_client_message='Please confirm availability.')
     assertion=client_results(s)[0]['assertion']
+    assert 'rental_case_id' not in json.dumps(contract.to_provider_payload())
     assert any(i.value.get('assertion')==assertion and i.included for i in contract.editorial_plan.items)
     draft=ClientResponseDraft('Studio availability','Hi Avery,\n\nThanks for the timing. '+assertion)
     validation=validate_client_response_draft(contract=contract,draft=draft,current_case_revision=s.rental_case.case_revision,current_context_hash=contract.context_hash)
