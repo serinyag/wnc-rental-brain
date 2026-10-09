@@ -36,6 +36,21 @@ def normalize_body(body_type, raw):
     return '\n'.join(re.sub(r'[\t \xa0]+', ' ', line).strip() for line in ''.join(parser.parts).splitlines()).strip()
 
 
+def timing_evidence_body(envelope):
+    """Use authored text above Outlook's explicit reply boundary for timing.
+
+    Keep the immutable envelope/raw body intact. Without reply headers and one
+    recognized HTML boundary, retain the full text and its ambiguity checks.
+    """
+    if envelope.body_type == 'html' and envelope.reply_references:
+        boundaries=list(re.finditer(r'''<div\b[^>]*\bid\s*=\s*(["'])divRplyFwdMsg\1[^>]*>''',
+                                    envelope.raw_body,re.IGNORECASE))
+        if len(boundaries)==1:
+            authored=normalize_body('html',envelope.raw_body[:boundaries[0].start()])
+            if authored.strip(): return authored
+    return envelope.normalized_body
+
+
 @dataclass(frozen=True)
 class InboundEmailEnvelope:
     provider: str

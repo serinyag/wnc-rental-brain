@@ -326,3 +326,56 @@ def test_staging_database_rejects_routing_changes_before_provider(dsn):
     with patch.object(runtime,'configuration'),patch.object(runtime,'load_env_value',return_value=dsn),patch.object(runtime,'build_adapter') as build:
         with pytest.raises(ValueError,match='database_scope_forbidden'):runtime.synchronize()
         build.assert_not_called()
+
+
+def outlook_reply():
+    m=message('m2',body='unused');m['subject']='Re: '+m['subject']
+    m['internetMessageHeaders']=[{'name':'In-Reply-To','value':'<m1@test>'}]
+    m['body']={'contentType':'html','content':'<p>Please use 14:00 to 18:00 on 12 November 2026.</p><div id="divRplyFwdMsg">From: client<br>Sent: Friday, October 9, 2026</div><p>Original enquiry for 12 November 2026.</p>'}
+    return m
+
+
+def test_outlook_quoted_reply_excludes_header_date_only_for_timing(db):
+    first=sync_page(db,adapter([message(body='12 November 2026')]))['results'][0]
+    a=adapter([outlook_reply()]);r=sync_page(db,a)['results'][0]
+    assert r['case_id']==first['case_id']
+    obs=db.execute('select candidate_value_payload,status from public.inbound_observations where inbound_source_record_id=%s',(r['source_id'],)).fetchone()
+    assert obs[1]=='validated' and obs[0]['start_time']=='14:00' and obs[0]['finish_time']=='18:00'
+    raw,env=db.execute('select raw_provider_payload,envelope from public.outlook_inbound_messages where source_record_id=%s',(r['source_id'],)).fetchone()
+    assert raw==outlook_reply() and 'October 9' in env['normalized_body']
+
+
+def test_reply_boundary_requires_reply_headers_and_single_marker():
+    from tools.phase_08_workflow.inbound_email import timing_evidence_body
+    m=outlook_reply();m['internetMessageHeaders']=[];e=adapter([]).envelope(m)
+    assert timing_evidence_body(e)==e.normalized_body
+    m=outlook_reply();m['body']['content']+='<div id="divRplyFwdMsg">second</div>';e=adapter([]).envelope(m)
+    assert timing_evidence_body(e)==e.normalized_body
+
+
+def test_quarantined_reply_reprocessing_is_append_only_and_idempotent(db):
+    from tools.phase_08_workflow.outlook_inbound_service import reprocess_quarantined_reply
+    first=sync_page(db,adapter([message(body='12 November 2026')]))['results'][0]
+    with patch('tools.phase_08_workflow.outlook_inbound_service.timing_evidence_body',side_effect=lambda e:e.normalized_body):
+        reply=sync_page(db,adapter([outlook_reply()]))['results'][0]
+    before=db.execute('select row_to_json(m) from public.outlook_inbound_messages m order by message_id').fetchall()
+    checkpoint=db.execute('select * from public.outlook_inbound_checkpoints').fetchall()
+    revision=db.execute('select case_revision from public.rental_cases where id=%s',(first['case_id'],)).fetchone()[0]
+    result=reprocess_quarantined_reply(db,CONFIG,'m2')
+    after_revision=db.execute('select case_revision from public.rental_cases where id=%s',(first['case_id'],)).fetchone()[0]
+    assert after_revision>revision and result['source_id']==reply['source_id']
+    assert db.execute('select status from public.inbound_observations where inbound_source_record_id=%s order by id',(reply['source_id'],)).fetchall()==[('quarantined',),('validated',)]
+    assert reprocess_quarantined_reply(db,CONFIG,'m2')==result
+    assert db.execute('select case_revision from public.rental_cases where id=%s',(first['case_id'],)).fetchone()[0]==after_revision
+    assert db.execute('select row_to_json(m) from public.outlook_inbound_messages m order by message_id').fetchall()==before
+    assert db.execute('select * from public.outlook_inbound_checkpoints').fetchall()==checkpoint
+    assert db.execute('select count(*) from public.inbound_source_records where id=any(%s)',([first['source_id'],reply['source_id']],)).fetchone()[0]==2
+    with pytest.raises(ValueError,match='binding_missing'):reprocess_quarantined_reply(db,CONFIG,'unknown')
+    with pytest.raises(ValueError,match='gate_disabled'):reprocess_quarantined_reply(db,replace(CONFIG,enabled=False),'m2')
+
+
+def test_authored_reply_with_two_event_dates_remains_quarantined(db):
+    sync_page(db,adapter([message(body='12 November 2026')]))
+    m=outlook_reply();m['body']['content']=m['body']['content'].replace('Please use','13 November 2026 or please use')
+    r=sync_page(db,adapter([m]))['results'][0]
+    assert db.execute('select status from public.inbound_observations where inbound_source_record_id=%s',(r['source_id'],)).fetchone()[0]=='quarantined'

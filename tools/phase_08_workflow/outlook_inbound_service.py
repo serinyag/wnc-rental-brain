@@ -6,7 +6,7 @@ No outbound adapter or reasoning provider is invoked here.
 """
 import json
 from datetime import datetime, timezone
-from .inbound_email import evidence_hash
+from .inbound_email import evidence_hash, timing_evidence_body
 from .observation_types import InboundSourceRecordInput, CaseAssociationInput, CaseAssociationResult, StructuredObservationCandidate, StructuredObservationIngestionRequest
 from .observations import ingest_structured_observations
 from .inquiry_intake import apply_inquiry_intake
@@ -94,12 +94,13 @@ def sync_page(connection, adapter, *, before_checkpoint=None):
             else:
                 association, basis = 'needs_review', 'unbound_conversation_no_safe_new_enquiry_admission'
             candidates = ()
-            timing = timing_components(env.normalized_body) if case_id else None
+            timing_body = timing_evidence_body(env)
+            timing = timing_components(timing_body) if case_id else None
             if timing:
                 candidates = (StructuredObservationCandidate(reported_field_code='active_event_window', observation_type='fact_candidate',
                     claim_kind='new_information', candidate_value_payload=timing,
                     source_evidence_reference='outlook_message:' + env.provider_message_id, asserted_by_party_type='client',
-                    asserted_by_reference=env.from_address, source_excerpt=env.normalized_body[:500], extraction_confidence=1.0),)
+                    asserted_by_reference=env.from_address, source_excerpt=timing_body[:500], extraction_confidence=1.0),)
             source = InboundSourceRecordInput(source_system_code='email',source_record_type='message',occurred_at=env.received_at,
                 received_at=env.received_at,dedupe_key='outlook:' + env.identity,source_hash='sha256:' + evidence_hash(raw),
                 external_source_id=env.provider_message_id,conversation_reference=env.provider_conversation_id,
@@ -134,3 +135,49 @@ def sync_page(connection, adapter, *, before_checkpoint=None):
             status=excluded.status,last_successful_sync_at=excluded.last_successful_sync_at''',(mailbox,next_cursor,config.since,version,status,now))
         connection.execute('insert into public.outlook_inbound_sync_events(mailbox,checkpoint_version,record_count,duplicate_count,removed_message_ids) values(%s,%s,%s,%s,%s::jsonb)',(mailbox,version,len(records),duplicates,json.dumps(removed)))
     return {'results':results,'checkpoint_version':version,'checkpoint_status':status,'outbound_calls':0}
+
+
+def reprocess_quarantined_reply(connection, config, message_id):
+    """Append corrected timing evidence through existing governance, no new source.
+
+    Explicit staging remediation only; preserves the original quarantined
+    observation, provider payload, checkpoint and all message identities.
+    """
+    from .inbound_email import InboundEmailEnvelope
+    from .observations import _ingest_one_candidate
+    config.validate()
+    if not config.enabled: raise ValueError('inbound_gate_disabled')
+    with connection.transaction():
+        mailbox=config.mailbox.casefold()
+        connection.execute('select pg_advisory_xact_lock(hashtextextended(%s,0))',('outlook-inbound:'+mailbox,))
+        row=connection.execute('''select m.source_record_id,m.rental_case_id,m.envelope,m.raw_provider_payload,m.source_hash
+            from public.outlook_inbound_messages m join public.outlook_inbound_conversations c
+            on c.mailbox=m.mailbox and c.conversation_id=m.conversation_id and c.rental_case_id=m.rental_case_id
+            where m.mailbox=%s and m.message_id=%s and m.association_status='resolved' ''',(mailbox,message_id)).fetchone()
+        if not row: raise ValueError('reply_reprocessing_binding_missing')
+        sid,cid,payload,raw,stored_hash=row
+        if evidence_hash(raw)!=stored_hash: raise ValueError('reply_reprocessing_evidence_changed')
+        env=InboundEmailEnvelope(**payload)
+        if env.from_address not in config.allowed_senders or mailbox not in env.to_addresses:
+            raise ValueError('reply_reprocessing_scope_forbidden')
+        body=timing_evidence_body(env)
+        if body==env.normalized_body: raise ValueError('reply_reprocessing_boundary_missing')
+        runner=connection_runner(connection);repository=SupabaseObservationRepository(query_runner=runner)
+        existing=repository.list_observations_for_source(sid)
+        if not any(o.status=='quarantined' and o.candidate_value_payload=={'normalization_error':'multiple_calendar_dates_require_clarification'} for o in existing):
+            raise ValueError('reply_reprocessing_quarantine_missing')
+        timing=timing_components(body)
+        if not timing or 'normalization_error' in timing: raise ValueError('reply_reprocessing_still_ambiguous')
+        source=next(s for s in repository.list_source_records_for_case(cid) if s.inbound_source_record_id==sid)
+        now=datetime.now(timezone.utc).isoformat()
+        candidate=StructuredObservationCandidate(reported_field_code='active_event_window',observation_type='fact_candidate',
+            claim_kind='new_information',candidate_value_payload=timing,source_evidence_reference='outlook_message:'+message_id,
+            asserted_by_party_type='client',asserted_by_reference=env.from_address,source_excerpt=body[:500],extraction_confidence=1.0)
+        result=_ingest_one_candidate(candidate=candidate,source_record=source,
+            case_association=CaseAssociationResult(status='resolved',rental_case_id=cid,association_basis='exact_provider_conversation'),
+            case_snapshot=repository.load_case_snapshot(cid),repository=repository,created_at=now)
+        if result.observation.status!='validated': raise ValueError('reply_reprocessing_not_validated')
+        intake=apply_inquiry_intake(repository,rental_case_id=cid,actor_reference='outlook_inbound_reply_reprocessing',actor_type='system',now=lambda:now)
+        if intake.failure_codes: raise ValueError('governed_intake_failed')
+        return {'case_id':cid,'source_id':sid,'observation_id':result.observation.inbound_observation_id,
+                'original_quarantine_preserved':True,'provider_calls':0}
