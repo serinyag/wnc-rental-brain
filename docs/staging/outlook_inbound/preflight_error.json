@@ -1,0 +1,4 @@
+{
+  "type": "OperatorHarnessError",
+  "error": "Operator request failed with HTTP 409: INBOUND_STOPPED: inbound_cursor_scope_forbidden"
+}

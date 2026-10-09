@@ -1,0 +1,26 @@
+{
+  "focused": {
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "phase8": {
+    "tests": 629,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "full_suite": {
+    "tests": 846,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "runtime_commit": "1c5a21361ee0e4b75d7f6a9d6229d1f3566c12e9",
+  "deployment": "dep-db4aijd9fdbs73bbv1dg",
+  "ready_for_ingestion": false,
+  "reason": "inbound_cursor_scope_forbidden",
+  "preflight_invocations": 1,
+  "ingested_messages": 0
+}

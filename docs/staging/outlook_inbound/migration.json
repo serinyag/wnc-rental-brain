@@ -1,0 +1,15 @@
+{
+  "version": "20261009000100",
+  "sha256": "fd5fc4b65c15cb5a15c9479d8c4af67c0fc8718424774c566d2d5f62c65e2d7a",
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "inbound_counts": {
+    "outlook_inbound_messages": 0,
+    "outlook_inbound_conversations": 0,
+    "outlook_inbound_checkpoints": 0,
+    "outlook_inbound_sync_events": 0
+  }
+}
