@@ -191,6 +191,9 @@ class TestConsoleApp:
                 return self._respond_json_error(start_response, status=HTTPStatus.CONFLICT,
                     message=str(exc), failure_code="INBOUND_STOPPED", diagnostics=getattr(exc, "diagnostics", None))
             return self._respond_json(start_response, result)
+        if path == "/api/operator/cases/586/final-receipt" and method == "GET":
+            from .staging_layout_reply import receipt
+            return self._respond_json(start_response, receipt())
         if path == "/api/operator/cases/586/synthetic-layout-reply" and method == "POST":
             if self._parse_json(environ):
                 return self._respond_json_error(start_response, status=HTTPStatus.BAD_REQUEST,
