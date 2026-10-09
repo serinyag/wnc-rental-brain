@@ -5,7 +5,7 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 from dataclasses import replace
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 import certifi
 from tools.phase_05_search.semantic_common import load_env_value
 from .outlook_adapter import OutlookAdapterConfig, OutlookExecutionAdapter
@@ -82,13 +82,24 @@ def preflight():
         'replay_bounded_records':len(replay_records),'delta_pages_read':2}
 
 
+def validate_staging_database(dsn):
+    parts=urlparse(dsn)
+    # Render uses the project's Supabase session pooler. Its username routes
+    # the connection to a project, so host validation alone is insufficient.
+    direct=(parts.hostname=='db.mspcopnsbounmdpivkvq.supabase.co' and parts.username=='postgres')
+    pooler=(parts.hostname=='aws-0-eu-central-1.pooler.supabase.com' and
+            unquote(parts.username or '')=='postgres.mspcopnsbounmdpivkvq')
+    if (parts.scheme not in ('postgres','postgresql') or parts.port not in (None,5432)
+            or parts.path!='/postgres' or parts.query or parts.fragment or not (direct or pooler)):
+        raise ValueError('inbound_staging_database_scope_forbidden')
+
+
 def synchronize():
     import psycopg
     # Check both runtime and database destination before token or Graph access.
     configuration()
     dsn=load_env_value('DATABASE_URL') or ''
-    host=urlparse(dsn).hostname
-    if host!='db.mspcopnsbounmdpivkvq.supabase.co': raise ValueError('inbound_staging_database_scope_forbidden')
+    validate_staging_database(dsn)
     adapter=build_adapter()
     with psycopg.connect(dsn,autocommit=True,connect_timeout=15) as connection:
         return sync_page(connection,adapter)

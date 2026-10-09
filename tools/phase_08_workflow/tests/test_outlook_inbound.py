@@ -301,3 +301,28 @@ def test_preflight_replays_cursor_without_ingestion():
         ingest.assert_not_called()
     assert r['cursor_replay_valid'] and r['delta_pages_read']==2 and r['ingested']==0 and not r['checkpoint_persisted']
     assert len(a.transport.calls)==3 and all(c['method']=='GET' for c in a.transport.calls)
+
+
+@pytest.mark.parametrize('dsn',[
+    'postgresql://postgres:fake@db.mspcopnsbounmdpivkvq.supabase.co:5432/postgres',
+    'postgresql://postgres.mspcopnsbounmdpivkvq:fake@aws-0-eu-central-1.pooler.supabase.com:5432/postgres',
+])
+def test_staging_database_accepts_verified_direct_and_pooler(dsn):
+    from tools.phase_08_workflow.outlook_inbound_runtime import validate_staging_database
+    validate_staging_database(dsn)
+
+
+@pytest.mark.parametrize('dsn',[
+    'postgresql://postgres.otherproject:fake@aws-0-eu-central-1.pooler.supabase.com:5432/postgres',
+    'postgresql://postgres:fake@aws-0-eu-central-1.pooler.supabase.com:5432/postgres',
+    'postgresql://postgres.mspcopnsbounmdpivkvq:fake@evil.test:5432/postgres',
+    'postgresql://postgres:fake@db.otherproject.supabase.co:5432/postgres',
+    'postgresql://postgres:fake@db.mspcopnsbounmdpivkvq.supabase.co:5432/other',
+    'postgresql://postgres:fake@db.mspcopnsbounmdpivkvq.supabase.co:5432/postgres?host=evil.test',
+    'postgresql://postgres.mspcopnsbounmdpivkvq:fake@aws-0-eu-central-1.pooler.supabase.com:6543/postgres',
+])
+def test_staging_database_rejects_routing_changes_before_provider(dsn):
+    from tools.phase_08_workflow import outlook_inbound_runtime as runtime
+    with patch.object(runtime,'configuration'),patch.object(runtime,'load_env_value',return_value=dsn),patch.object(runtime,'build_adapter') as build:
+        with pytest.raises(ValueError,match='database_scope_forbidden'):runtime.synchronize()
+        build.assert_not_called()
