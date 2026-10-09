@@ -189,7 +189,7 @@ class TestConsoleApp:
                 result = preflight() if path.endswith("/preflight") else synchronize()
             except ValueError as exc:
                 return self._respond_json_error(start_response, status=HTTPStatus.CONFLICT,
-                    message=str(exc), failure_code="INBOUND_STOPPED")
+                    message=str(exc), failure_code="INBOUND_STOPPED", diagnostics=getattr(exc, "diagnostics", None))
             return self._respond_json(start_response, result)
         if parts[:3] != ["api", "operator", "cases"]:
             return self._respond_json_error(

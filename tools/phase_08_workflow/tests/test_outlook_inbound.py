@@ -237,3 +237,13 @@ def test_metadata_delta_fetches_only_admitted_body(db):
     assert result['results'][0]['case_id'] and result['results'][1]['association_status']=='out_of_scope'
     assert len(a.transport.calls)==2 and all('/messages/unrelated' not in c['url'] for c in a.transport.calls)
     assert db.execute('select count(*) from public.outlook_inbound_messages').fetchone()[0]==1
+
+
+def test_cursor_rejection_reports_path_without_tokens():
+    a=adapter([])
+    with pytest.raises(ValueError) as caught:
+        a.validate_cursor('https://graph.microsoft.com/v1.0/users/unexpected/mailFolders/inbox/messages/delta?$deltatoken=SECRET-CURSOR')
+    details=caught.value.diagnostics
+    assert details['returned_path'].startswith('/v1.0/users/unexpected/')
+    assert details['cursor_values_redacted'] and 'SECRET-CURSOR' not in json.dumps(details)
+    assert not a.transport.calls

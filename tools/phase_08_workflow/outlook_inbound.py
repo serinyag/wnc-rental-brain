@@ -2,9 +2,24 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from urllib.parse import quote, urlencode, urlsplit, unquote
+from urllib.parse import quote, urlencode, urlsplit, unquote, parse_qs
 
 from .inbound_email import InboundEmailEnvelope, evidence_hash, normalize_body
+
+class InboundCursorScopeError(ValueError):
+    def __init__(self, actual, expected):
+        super().__init__('inbound_cursor_scope_forbidden')
+        # Preserve resource identity for operator reconciliation; never retain
+        # opaque delta/skip tokens, credentials or arbitrary query values.
+        self.diagnostics = {
+            'expected_origin': expected.scheme + '://' + expected.netloc,
+            'expected_path': expected.path[:2048],
+            'returned_origin': actual.scheme + '://' + (actual.hostname or ''),
+            'returned_path': actual.path[:2048],
+            'query_parameter_names': sorted(parse_qs(actual.query))[:20],
+            'cursor_values_redacted': True,
+        }
+
 
 GRAPH = 'https://graph.microsoft.com/v1.0'
 SELECT = 'id,internetMessageId,conversationId,receivedDateTime,from,toRecipients,ccRecipients,subject,hasAttachments,internetMessageHeaders,isDraft'
@@ -42,7 +57,7 @@ class OutlookInboundAdapter:
     def validate_cursor(self, url):
         a, b = urlsplit(url), urlsplit(self.delta_path)
         if a.scheme != b.scheme or a.netloc != b.netloc or unquote(a.path) != unquote(b.path) or a.fragment or a.username:
-            raise ValueError('inbound_cursor_scope_forbidden')
+            raise InboundCursorScopeError(a, b)
         return url
 
     def _get(self, url):
