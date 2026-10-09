@@ -1,0 +1,95 @@
+{
+  "marker": "OUTLOOK_REAL_INBOUND_STAGING_CERTIFIED",
+  "case_id": 586,
+  "case_revision": 2,
+  "source_ids": [
+    3104,
+    3105
+  ],
+  "observation_ids": {
+    "initial_validated": 2721,
+    "preserved_quarantine": 2722,
+    "followup_validated": 2723
+  },
+  "followup_timing": {
+    "day": 12,
+    "year": 2026,
+    "month": 11,
+    "start_time": "14:00",
+    "finish_time": "18:00",
+    "resolved_date": "2026-11-12",
+    "date_provenance": {
+      "rule": "next_calendar_occurrence_v1",
+      "timezone": "Europe/Amsterdam",
+      "year_source": "client_explicit",
+      "resolved_year": 2026,
+      "source_reference": "inbound_source_record:3105",
+      "client_components": {
+        "day": 12,
+        "year": 2026,
+        "month": 11,
+        "start_time": "14:00",
+        "finish_time": "18:00"
+      },
+      "reference_timestamp": "2026-10-09 09:21:38+00",
+      "explicit_client_year": 2026
+    },
+    "active_event_end": "2026-11-12T17:00:00+00:00",
+    "active_event_start": "2026-11-12T13:00:00+00:00"
+  },
+  "messages": [
+    {
+      "message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA",
+      "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "source_record_id": 3104,
+      "rental_case_id": 586,
+      "source_hash": "73e89912fd10e944c347dd3f53173184923223afb3ada5011f3b97f094d71730"
+    },
+    {
+      "message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZmgAA",
+      "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      "source_record_id": 3105,
+      "rental_case_id": 586,
+      "source_hash": "6ce2395a812c9bb55207af47ef5f62b9eb2433c2212c97d11860a431460848f2"
+    }
+  ],
+  "message_count": 2,
+  "source_count": 2,
+  "case_count": 1,
+  "conversation_count": 1,
+  "authoritative_facts_created": 0,
+  "real_original_message_redelivered_and_deduplicated": true,
+  "checkpoint_version": 4,
+  "checkpoint_status": "ready",
+  "replay_business_and_evidence_unchanged": true,
+  "correction_idempotent": true,
+  "correction_provider_calls": 0,
+  "all_four_gates_disabled": true,
+  "hosted_disabled_gate_rejection": true,
+  "hosted_mailbox_override_rejection": true,
+  "provider_negative_RBAC_audit": "not independently repeated; no unauthorized mailbox accessed",
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "runtime_commit": "5cf64d975e8779040674bbc1488028d51288a758",
+  "runtime_deploy": "dep-db4b6vdg1s2s738sj7tg",
+  "closure_deploy": "dep-db4b7u7lot8c738eptgg",
+  "provider_free_tests": {
+    "focused": 69,
+    "phase8": 659,
+    "repository": 876
+  },
+  "followup_turn_activity": {
+    "successful_syncs": 2,
+    "graph_gets_inferred": 3,
+    "token_requests_inferred": 2,
+    "sends": 0,
+    "graph_mutations": 0,
+    "openai_calls": 0,
+    "asana_executions": 0,
+    "new_execution_attempts": 0,
+    "production_changes": 0
+  }
+}

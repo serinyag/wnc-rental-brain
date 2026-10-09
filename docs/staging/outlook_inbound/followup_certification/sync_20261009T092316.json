@@ -1,0 +1,19 @@
+{
+  "checkpoint_status": "ready",
+  "checkpoint_version": 3,
+  "outbound_calls": 0,
+  "results": [
+    {
+      "association_status": "resolved",
+      "case_id": 586,
+      "duplicate": false,
+      "source_id": 3105
+    },
+    {
+      "association_status": "resolved",
+      "case_id": 586,
+      "duplicate": true,
+      "source_id": 3104
+    }
+  ]
+}

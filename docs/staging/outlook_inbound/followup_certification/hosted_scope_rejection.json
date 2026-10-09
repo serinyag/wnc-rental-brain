@@ -1,0 +1,5 @@
+{
+  "failure_code": "INBOUND_SCOPE_OVERRIDE_FORBIDDEN",
+  "message": "Inbound scope comes only from deployment configuration.",
+  "status": 400
+}

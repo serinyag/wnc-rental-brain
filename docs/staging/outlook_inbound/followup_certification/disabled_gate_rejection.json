@@ -1,0 +1,5 @@
+{
+  "failure_code": "INBOUND_STOPPED",
+  "message": "inbound_operation_not_authorized",
+  "status": 409
+}

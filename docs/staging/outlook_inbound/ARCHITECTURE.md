@@ -56,3 +56,9 @@ Read-only preflight now follows the returned cursor once (two bounded delta page
 ## Hosted staging database routing (2026-10-09)
 
 The first authorized sync stopped before token acquisition because Render uses the Supabase session pooler. Staging inbound now accepts either the exact direct staging database host with username `postgres`, or the observed `aws-0-eu-central-1.pooler.supabase.com:5432` with project-qualified username `postgres.mspcopnsbounmdpivkvq`. Both require PostgreSQL scheme, database `postgres`, and no query/fragment routing override. Other project usernames, hosts, databases and ports are rejected before provider access. No hosted credential or database configuration was changed.
+
+## Outlook reply timing boundary and governed remediation
+
+Real Outlook replies include the prior message's `Sent` timestamp in quoted HTML. Timing extraction now uses authored text above exactly one recognized `divRplyFwdMsg` boundary only when provider reply-reference headers exist. Raw provider JSON, original body and full normalized envelope remain unchanged. Absent or ambiguous boundaries retain full text and the existing ambiguity checks; multiple dates in the authored text still quarantine.
+
+The explicit staging remediation `reprocess_quarantined_reply` handles an already persisted reply with the specific multiple-calendar-dates quarantine. It validates the immutable evidence hash and exact mailbox/conversation/case binding, then appends a candidate to the existing source through the existing observation validation/routing function and normal inquiry intake. Original quarantine, raw evidence, sources and checkpoint remain untouched. Candidate identity makes a repeated correction idempotent. No provider call or direct authority write is involved. This is an explicit remediation function, not automatic reprocessing during duplicate-message sync.
