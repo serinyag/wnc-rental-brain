@@ -52,3 +52,7 @@ Staging-only; one configured mailbox and synthetic admission contract. No webhoo
 The live staging provider returns `/v1.0/users/Serinya@whennaturecalls.nl/mailFolders('inbox')/messages/delta` rather than the initial slash-form Inbox path. The adapter accepts only these two equivalent Inbox paths for the configured mailbox, with the exact HTTPS Graph origin and API version. It preserves the complete opaque query string unchanged. Other mailboxes, folders, endpoint families, origins, userinfo and fragments remain rejected before fetch. No identity aliases or permission changes are needed.
 
 Read-only preflight now follows the returned cursor once (two bounded delta pages total) without persisting a checkpoint or message. Each page remains limited to ten metadata records. Certification of real message ingestion is separate from this read-only verification.
+
+## Hosted staging database routing (2026-10-09)
+
+The first authorized sync stopped before token acquisition because Render uses the Supabase session pooler. Staging inbound now accepts either the exact direct staging database host with username `postgres`, or the observed `aws-0-eu-central-1.pooler.supabase.com:5432` with project-qualified username `postgres.mspcopnsbounmdpivkvq`. Both require PostgreSQL scheme, database `postgres`, and no query/fragment routing override. Other project usernames, hosts, databases and ports are rejected before provider access. No hosted credential or database configuration was changed.

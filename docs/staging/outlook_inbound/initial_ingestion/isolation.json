@@ -1,0 +1,13 @@
+{
+  "inbound_counts": {
+    "outlook_inbound_messages": 1,
+    "outlook_inbound_conversations": 1,
+    "outlook_inbound_checkpoints": 1,
+    "outlook_inbound_sync_events": 2
+  },
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "status": "uncertain_or_stopped",
+  "error": "Operator request failed with HTTP 409: INBOUND_STOPPED: inbound_staging_database_scope_forbidden",
+  "details": {
+    "failure_code": "INBOUND_STOPPED",
+    "message": "inbound_staging_database_scope_forbidden",
+    "status": 409
+  }
+}

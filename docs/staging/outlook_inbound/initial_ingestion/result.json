@@ -1,0 +1,49 @@
+{
+  "stage": "initial_email_verified_followup_pending",
+  "case_id": 586,
+  "case_revision": 1,
+  "source_id": 3104,
+  "observation_ids": [
+    2721
+  ],
+  "message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA",
+  "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+  "internet_message_id": "<VI2PR07MB110323B29255172A6227509BBD1922@VI2PR07MB11032.eurprd07.prod.outlook.com>",
+  "source_hash": "73e89912fd10e944c347dd3f53173184923223afb3ada5011f3b97f094d71730",
+  "raw_provenance_hash_verified": true,
+  "message_count": 1,
+  "source_count": 1,
+  "new_case_count": 1,
+  "authoritative_fact_count": 0,
+  "checkpoint_versions": [
+    1,
+    2
+  ],
+  "real_cursor_replay": "empty page; case/source/observation/evidence unchanged",
+  "same_message_redelivery": "provider-free tests cover duplicates; real replay returned no message",
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "runtime_commit": "deca4b889336a7912731ac341a154f3d21b1693d",
+  "runtime_deploy": "dep-db4b1pu7bikc73e5sga0",
+  "tests": {
+    "focused": 65,
+    "phase8": 655,
+    "repository": 872
+  },
+  "sync_invocations": 3,
+  "database_guard_stops_before_provider": 1,
+  "successful_syncs": 2,
+  "graph_gets_inferred": 3,
+  "oauth_token_requests_inferred": 2,
+  "sends": 0,
+  "asana_executions": 0,
+  "openai_calls": 0,
+  "new_execution_attempts": 0,
+  "production_changes": 0,
+  "permissions_or_credentials_changed": false,
+  "all_four_gates_disabled": true,
+  "closure_deploy": "dep-db4b34jl550s73b6h9c0"
+}
