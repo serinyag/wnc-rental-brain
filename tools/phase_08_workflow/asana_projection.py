@@ -59,7 +59,7 @@ def build_projection(snapshot, *, workspace_gid, project_gid):
     event = _text(facts.get("event_type"), "Rental inquiry").replace("_", " ")
     date = _timing(case.active_event_start)
     timing = date + (f" to {_timing(case.active_event_end)}" if case.active_event_end else "")
-    scope = _text(facts.get("requested_rental_scope"), "Scope to be confirmed").replace("_", " ")
+    scope = _text(facts.get("requested_rental_scope") or (case.rental_type_code if case.rental_type_code != "custom_scope" else None), "Scope to be confirmed").replace("_", " ")
     guests = _text(facts.get("guest_count"))
     latest = {}
     for action in sorted(snapshot.workflow_actions, key=lambda a: (a.source_case_revision, a.workflow_action_id)):
