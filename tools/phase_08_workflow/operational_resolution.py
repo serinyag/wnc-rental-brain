@@ -51,7 +51,9 @@ def obligation(snapshot, action, *, observed_fields=()):
     active_keys = {item.proposition_key for item in derive_resolution_items(snapshot, observed_fields=observed_fields)}
     accepted_keys = {p['contract']['resolution_item_key'] for p in current_resolutions(snapshot)
                      if p['contract']['workflow_action_id'] == action.workflow_action_id}
-    if key not in active_keys | accepted_keys:
+    capacity = capacity_inputs(snapshot)
+    capacity_action = is_capacity_action(snapshot, action)
+    if key not in active_keys | accepted_keys and not (capacity_action and capacity):
         raise ValueError('operational_obligation_no_longer_current')
     if key == f'availability:{c.active_event_start}:{c.active_event_end}':
         kind, subjects = 'AVAILABILITY_CONFIRMATION', [c.rental_type_code]
@@ -60,6 +62,13 @@ def obligation(snapshot, action, *, observed_fields=()):
         projection = next((r for r in snapshot.reasoning_projections if blocker and
             blocker.origin_entity_reference == f'reasoning_projection:{r.projection_identity_key}'), None)
         refs = getattr(projection, 'grounding_reference_keys', ())
+        if capacity_action and capacity:
+            if (c.rental_case_id != 586 or c.rental_type_code != 'studio_space'
+                    or capacity['guest_count'] != 24 or capacity['configuration_type'] != 'seated'):
+                raise ValueError('synthetic_capacity_case_scope_forbidden')
+            return {'version': VERSION, 'workflow_action_id': action.workflow_action_id,
+                    'resolution_item_key': key, 'kind': 'CAPACITY_LAYOUT_CONFIRMATION',
+                    'scope': current_scope, 'subjects': ['capacity_layout'], 'inputs': capacity}
         if projection is not None and getattr(projection, 'authority_outcome_classification', None) != 'REQUIRES_CONFIRMATION':
             raise ValueError('operational_resolution_cannot_override_policy_or_missing_authority')
         if not any(str(r).startswith('test_console:technical_') for r in refs):
@@ -74,6 +83,25 @@ def obligation(snapshot, action, *, observed_fields=()):
         kind = 'TECHNICAL_CAPABILITY_CONFIRMATION'
     return {'version': VERSION, 'workflow_action_id': action.workflow_action_id,
             'resolution_item_key': key, 'kind': kind, 'scope': current_scope, 'subjects': subjects}
+
+
+def capacity_inputs(snapshot):
+    facts = {f.field_code: f.value_payload for f in snapshot.rental_case_facts}
+    layout, guests = facts.get('layout_requirements'), facts.get('guest_count')
+    if not isinstance(layout, dict) or type(guests) is not int or guests < 1:
+        return None
+    configuration = layout.get('configuration_type')
+    if configuration not in {'seated', 'standing', 'movement', 'lying_down'}:
+        return None
+    return {'configuration_type': configuration, 'guest_count': guests, 'layout_requirements': layout}
+
+
+def is_capacity_action(snapshot, action):
+    key = action.structured_payload.get('resolution_item_key')
+    blocker = next((b for b in snapshot.blockers if key == f'blocker:{b.blocker_id}'), None)
+    return any(blocker and blocker.origin_entity_reference == f'reasoning_projection:{p.projection_identity_key}'
+               and any(str(r).startswith('test_console:capacity_') for r in p.grounding_reference_keys)
+               for p in snapshot.reasoning_projections)
 
 
 def validate_submission(contract, submission, *, actor):
@@ -115,6 +143,8 @@ def current_resolutions(snapshot):
         event = events.get(p.get('event_id')) if isinstance(p, dict) else None
         if (event is None or p.get('contract', {}).get('scope') != current_scope
                 or p.get('version') != VERSION or event.structured_payload.get('resolution') != {k: v for k, v in p.items() if k != 'event_id'}):
+            continue
+        if p['contract']['kind'] == 'CAPACITY_LAYOUT_CONFIRMATION' and p['contract'].get('inputs') != capacity_inputs(snapshot):
             continue
         result.append(p)
     identities = [digest([p['contract']['kind'], p['contract']['scope']]) for p in result]
@@ -165,7 +195,8 @@ def client_results(snapshot):
             label = {'studio_space': 'The Studio', 'entire_venue': 'The entire venue',
                      'projection_display': 'The requested projection setup', 'microphones': 'The requested microphones',
                      'audio_playback': 'The requested audio playback', 'dj_sound_booth': 'The requested DJ sound booth',
-                     'other_technical': 'The specifically requested technical equipment'}[subject]
+                     'other_technical': 'The specifically requested technical equipment',
+                     'capacity_layout': f"The requested {c.get('inputs', {}).get('configuration_type')} layout for {c.get('inputs', {}).get('guest_count')} guests in the Studio"}[subject]
             state = {'AVAILABLE': 'available', 'UNAVAILABLE': 'unavailable', 'FEASIBLE': 'feasible', 'NOT_FEASIBLE': 'not feasible'}[outcome]
             sentence = f'{label} is {state} for {interval}.'
             results.append({'topic': 'operational_confirmation', 'fact_state': 'known',

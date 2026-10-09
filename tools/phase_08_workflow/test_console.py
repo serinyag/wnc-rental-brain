@@ -191,6 +191,12 @@ class TestConsoleApp:
                 return self._respond_json_error(start_response, status=HTTPStatus.CONFLICT,
                     message=str(exc), failure_code="INBOUND_STOPPED", diagnostics=getattr(exc, "diagnostics", None))
             return self._respond_json(start_response, result)
+        if path == "/api/operator/cases/586/synthetic-layout-reply" and method == "POST":
+            if self._parse_json(environ):
+                return self._respond_json_error(start_response, status=HTTPStatus.BAD_REQUEST,
+                    message="Fixed synthetic fixture only.", failure_code="SYNTHETIC_SCOPE_OVERRIDE_FORBIDDEN")
+            from .staging_layout_reply import run
+            return self._respond_json(start_response, run())
         if parts[:3] != ["api", "operator", "cases"]:
             return self._respond_json_error(
                 start_response,
