@@ -1,4 +1,4 @@
-# Proposed bounded real inbound test — not sent or ingested
+# Authorized synthetic inbound test — awaiting human email
 
 Sender: `Serinya@whennaturecalls.nl` (human-operated synthetic sender)
 Recipient: `Serinya@whennaturecalls.nl` (the mailbox currently configured in staging)
@@ -19,7 +19,7 @@ Exact initial body:
 
 Expected: one provider message, one immutable source record, one new synthetic case at the normal initial lifecycle, and one exact mailbox/conversation binding. Existing timing extraction handles the requested date using provider receipt time. Missing times remain unknown. Other prose remains auditable evidence and does not become business truth directly. No external task or outbound email executes.
 
-After initial ingestion is separately authorized and verified, the human should reply in that same conversation with:
+After initial ingestion and replay are verified, the human should reply in that same conversation with:
 
 > Hi WNC,
 >

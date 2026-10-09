@@ -1,0 +1,16 @@
+{
+  "bounded_records": 0,
+  "checkpoint_persisted": false,
+  "cursor_replay_valid": true,
+  "delta_pages_read": 2,
+  "folder": "inbox",
+  "folder_id": "AAMkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAuAAAAAADpOZX2Ey4ORreo8HsDRDiYAQCukf8QUO6vToT-OXwy9T4eAAAAAAEMAAA=",
+  "ingested": 0,
+  "mailbox": "Serinya@whennaturecalls.nl",
+  "provider_scope_negative_test": "application guard only; no unauthorized mailbox accessed",
+  "read_only": true,
+  "replay_bounded_records": 0,
+  "replay_status": "ready",
+  "response_shape_valid": true,
+  "status": "ready"
+}

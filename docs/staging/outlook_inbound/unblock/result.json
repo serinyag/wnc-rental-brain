@@ -1,0 +1,32 @@
+{
+  "marker": "OUTLOOK_INBOUND_WAITING_FOR_SYNTHETIC_EMAIL",
+  "cursor_blocker_resolved": true,
+  "real_inbound_certified": false,
+  "runtime_commit": "39a487c605ba1e8fe5b0d22156099092b2958b18",
+  "code_deploy": "dep-db4aqje0tbcc73dor1m0",
+  "closure_deploy": "dep-db4arfp42hec73amtm30",
+  "tests": {
+    "focused": 56,
+    "phase8": 646,
+    "full_repository": 863
+  },
+  "preflight_invocations_this_task": 2,
+  "graph_gets_inferred_from_control_flow": 5,
+  "oauth_token_requests_inferred_from_control_flow": 2,
+  "graph_mutations": 0,
+  "sends": 0,
+  "ingested": 0,
+  "openai_calls": 0,
+  "asana_executions": 0,
+  "production_changes": 0,
+  "permissions_changed": false,
+  "scope_negative_evidence": "application guard tests only; provider RBAC not independently re-audited",
+  "all_four_gates_disabled": true,
+  "inbound_since": "2026-10-09T09:02:18Z",
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "remaining": "Human send initial synthetic email; then real normal-path ingestion, replay and same-conversation follow-up certification."
+}

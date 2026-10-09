@@ -1,5 +1,7 @@
 # Outlook inbound staging implementation and stopped preflight
 
+Historical report. The cursor blocker was subsequently resolved; see [the current unblock and handoff report](unblock/UNBLOCK_REPORT.md).
+
 9 October 2026. **Not ready for real ingestion.** Provider-free implementation and staging deployment are complete, but the one authorized real preflight stopped on `inbound_cursor_scope_forbidden`. The returned cursor resource identity must be reconciled before readiness can be claimed. No second preflight was attempted.
 
 ## Outlook Inbound Architecture
