@@ -50,6 +50,8 @@ def build_projection(snapshot, *, workspace_gid, project_gid):
     keeps its semantic identity and source WorkflowAction in the canonical plan.
     """
     case = snapshot.rental_case
+    from .operational_resolution import resolved_keys
+    governed_resolved = resolved_keys(snapshot)
     facts = {f.field_code: f.value_payload for f in snapshot.rental_case_facts}
     metadata = next((e.structured_payload for e in snapshot.workflow_events
                      if e.event_type_code == "test_console_case_registered"), {})
@@ -73,7 +75,8 @@ def build_projection(snapshot, *, workspace_gid, project_gid):
     for key, action in sorted(latest.items()):
         p = action.structured_payload
         owner = p["resolution_owner"]
-        closed = p.get("resolution_status") in RESOLVED
+        closed = (key in governed_resolved if p.get("governed_resolution_event_id")
+                  else p.get("resolution_status") in RESOLVED)
         summary = _text(p.get("summary"))
         if owner == "CLIENT":
             if not closed:

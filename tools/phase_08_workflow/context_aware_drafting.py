@@ -252,7 +252,9 @@ def derive_resolution_items(snapshot: Any, *, observed_fields: tuple[Any, ...] =
                 client_visibility=CLIENT_VISIBILITY_INTERNAL_ONLY,
                 blocking=True,
             ))
-    return tuple(items)
+    from .operational_resolution import resolved_keys
+    resolved = resolved_keys(snapshot)
+    return tuple(item for item in items if item.proposition_key not in resolved)
 
 
 def with_workflow_actions(

@@ -337,6 +337,18 @@ def build_draft_contract(
     prior_editorial_items: tuple[dict[str, str], ...] = (),
 ) -> DraftContract:
     intent = ResponseIntentResolver().resolve(snapshot)
+    from .operational_resolution import client_results
+    operational = client_results(snapshot)
+    confirmed_subjects = {item['subject'] for item in operational}
+    if any(g.semantic_values and g.semantic_values.get('topic') in confirmed_subjects
+           and g.semantic_values.get('status') == 'not_supported'
+           and any(item['subject'] == g.semantic_values.get('topic') and item['outcome'] == 'FEASIBLE' for item in operational)
+           for g in contextual_guidance):
+        raise ValueError('governed_resolution_conflicts_with_current_policy')
+    contextual_guidance = tuple(g for g in contextual_guidance
+        if not (g.semantic_values and g.semantic_values.get('topic') in confirmed_subjects))
+    contextual_guidance += tuple(ContextualGuidance('operational_confirmation', item['assertion'],
+        'governed_operational_resolution', item) for item in operational)
     rental_case = snapshot.rental_case
     facts = tuple(
         f"{getattr(fact, 'field_code')}: {_format_value(getattr(fact, 'value_payload', None))}"
@@ -392,7 +404,7 @@ def build_draft_contract(
         if getattr(item, "status", None) not in {"cancelled", "superseded", "closed", "accepted", "rejected"}
     )
     forbidden = [
-        "Do not confirm venue availability or booking.",
+        "Do not confirm booking. State availability only using the exact supplied scoped operational assertion; no broader confirmation." if operational else "Do not confirm venue availability or booking.",
         "Do not describe a pending internal confirmation as completed.",
         "Do not describe a pending decision or fee adjustment as approved.",
         "Do not use historical precedent as current policy.",
@@ -627,8 +639,24 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
         failures.append(DRAFT_VALIDATION_DANGLING_SIGNOFF)
     if "wnc rental brain" in combined.lower():
         failures.append(DRAFT_VALIDATION_SYSTEM_SENDER)
+    # Remove only the exact admitted assertion before the existing unsupported
+    # confirmation check. An additional booking/date/venue claim still fails.
+    confirmation_body = body
+    for guide in contract.contextual_guidance:
+        if guide.source_reference == 'governed_operational_resolution':
+            confirmation_body = confirmation_body.replace(guide.semantic_values['assertion'].lower(), '')
+            if guide.semantic_values['assertion'].lower() not in body:
+                failures.append('governed_operational_outcome_not_realized')
+    operational_guides = [g for g in contract.contextual_guidance if g.source_reference == 'governed_operational_resolution']
+    if any(g.semantic_values['subject'] in {'studio_space', 'entire_venue'} for g in operational_guides):
+        if re.search(r'\b(?:available|availability|unavailable|booking confirmed)\b', confirmation_body):
+            failures.append(DRAFT_VALIDATION_UNSUPPORTED_AVAILABILITY_OR_CONFIRMATION)
+    if operational_guides and re.search(
+        r'\b(?:projector|projection|microphones?|technical setup|equipment|technician)\b.{0,50}'
+        r'\b(?:confirmed|available|feasible|included)\b', confirmation_body):
+        failures.append('unsupported_operational_scope_expansion')
     confirmation_text = re.sub(
-        r"\b(?:booking|venue|date) (?:is|has been) (?:not|not yet) (?:confirmed|available)\b", "", body
+        r"\b(?:booking|venue|date) (?:is|has been) (?:not|not yet) (?:confirmed|available)\b", "", confirmation_body
     )
     # Remove only the embedded proposition of a prospective check, never a
     # whole sentence: a following independent confirmation must still fail.

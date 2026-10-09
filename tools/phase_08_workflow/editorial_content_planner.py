@@ -201,7 +201,7 @@ def normalized_guidance(guide: Any) -> tuple[tuple[str, str, dict[str, Any]], ..
     """Project only recognized current source values; no broad document rewrite."""
     values = getattr(guide, 'semantic_values', None)
     if values:
-        return ((values['topic'], values['topic'], {k: v for k, v in values.items() if k != 'topic'}),)
+        return ((values['topic'] + ':' + values['subject'] if values['topic'] == 'operational_confirmation' else values['topic'], values['topic'], {k: v for k, v in values.items() if k != 'topic'}),)
     text = guide.client_safe_guidance
     lower = text.lower()
     # Narrow projections of current governed service guidance. Unrecognized
@@ -216,6 +216,8 @@ def normalized_guidance(guide: Any) -> tuple[tuple[str, str, dict[str, Any]], ..
 
 
 def communication_evidence(item: EditorialContentItem, body: str) -> bool:
+    if item.topic == 'operational_confirmation':
+        return item.value['assertion'].casefold() in body.casefold()
     """Conservative realization witness, not a claim that an email was sent.
 
     Stable item identity/value fingerprint drive novelty. This small check avoids
@@ -327,7 +329,9 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
             if value.get('status') == 'not_supported' and client_acknowledges_restriction(topic, earlier + '\n' + latest) and not asked_again(topic, latest):
                 add('fact:' + key, topic, value, EditorialRole.DEFER, 'client_already_acknowledges_restriction', guide.source_reference)
                 continue
-            if topic in {'audio_playback', 'projection_display', 'microphones', 'other_technical', 'dj_sound_booth'}:
+            if topic == 'operational_confirmation':
+                role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'new_governed_operational_answer', 0
+            elif topic in {'audio_playback', 'projection_display', 'microphones', 'other_technical', 'dj_sound_booth'}:
                 if topic in current_topics or (topic in requested_topics and (not contract.prior_client_drafts or
                         (topic == 'audio_playback' and value.get('status') == 'supported' and 'fact:' + key not in prior))):
                     role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'requested_technical_capability', 1

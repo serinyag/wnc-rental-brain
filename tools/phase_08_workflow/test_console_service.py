@@ -1776,7 +1776,8 @@ limit 1;
                         in {WORKFLOW_SEMANTIC_STATE_KNOWN_YES, WORKFLOW_SEMANTIC_STATE_KNOWN_NO}
                         else (f"{issue.domain_code}|{issue.reasoning_state_code}",)
                     ),
-                    grounding_reference_keys=(f"test_console:{issue.issue_code}",),
+                    grounding_reference_keys=(f"test_console:{issue.issue_code}",) + tuple(
+                        f"workflow_event:{eid}" for eid in issue.source_snapshot.get("governed_resolution_event_ids", ())),
                 )
             )
 
@@ -1819,6 +1820,22 @@ limit 1;
             issues.append(capacity_issue)
         technical_issue = self._technical_authority_issue(observed_by_field=observed_by_field)
         if technical_issue is not None:
+            from .operational_resolution import current_resolutions
+            confirmations = [p for p in current_resolutions(snapshot)
+                if p['contract']['kind'] == 'TECHNICAL_CAPABILITY_CONFIRMATION']
+            outcomes = {k: v for p in confirmations for k, v in p['outcomes'].items()}
+            requested = observed_by_field.get('technical_requirements')
+            covered = (requested is not None and isinstance(requested.value_payload, list)
+                and bool(requested.value_payload) and set(requested.value_payload) <= set(outcomes))
+            # An event-specific operator answer can discharge a confirmation,
+            # never a published prohibition or absent policy authority.
+            if covered and technical_issue.authority_outcome_classification == AUTHORITY_OUTCOME_REQUIRES_CONFIRMATION:
+                negative = any(outcomes[k] == 'NOT_FEASIBLE' for k in requested.value_payload)
+                technical_issue = replace(technical_issue,
+                    semantic_state_code=WORKFLOW_SEMANTIC_STATE_KNOWN_NO if negative else WORKFLOW_SEMANTIC_STATE_KNOWN_YES,
+                    authority_outcome_classification=AUTHORITY_OUTCOME_DETERMINISTIC_CURRENT,
+                    reasoning_state_code=PHASE_7_REASONING_STATE_RESOLVED,
+                    source_snapshot={'governed_resolution_event_ids': [p['event_id'] for p in confirmations]})
             issues.append(technical_issue)
         facilitator_issue = self._facilitator_authority_issue(observed_by_field=observed_by_field)
         if facilitator_issue is not None:
@@ -4961,6 +4978,19 @@ limit 1;
     @staticmethod
     def _draft_action_content_hash(content: InquiryResponseDraftContent) -> str:
         return _json_digest(json.loads(content_hash_payload(content)))
+
+    def submit_operational_resolution(self, *, rental_case_id: int, submission: dict) -> dict:
+        """Authenticated staging operator path; actor authority is server-derived."""
+        from .operational_resolution import submit
+        if self.config.runtime.app_env.value != "staging":
+            raise TestConsoleError("Operational resolution is staging-only.")
+        actor = self.config.runtime.staging_basic_auth_username
+        if not actor:
+            raise TestConsoleError("Configured staging operator identity required.")
+        detail = self.load_case_detail(rental_case_id)
+        return submit(self.orchestration_repository, rental_case_id=rental_case_id,
+            submission=submission, actor=actor,
+            observed_fields=self._build_observed_field_candidates(detail.evidence_bundles))
 
     def _ensure_resolution_workflow_actions(
         self,
