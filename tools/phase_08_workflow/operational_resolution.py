@@ -117,6 +117,9 @@ def current_resolutions(snapshot):
                 or p.get('version') != VERSION or event.structured_payload.get('resolution') != {k: v for k, v in p.items() if k != 'event_id'}):
             continue
         result.append(p)
+    identities = [digest([p['contract']['kind'], p['contract']['scope']]) for p in result]
+    if len(identities) != len(set(identities)):
+        raise ValueError('conflicting_current_operational_authority')
     return tuple(result)
 
 
@@ -139,7 +142,7 @@ def submit(repository, *, rental_case_id, submission, actor, observed_fields=())
         raise ValueError('resolution_action_not_in_case')
     contract = obligation(snapshot, action, observed_fields=observed_fields)
     evidence = validate_submission(contract, submission, actor=actor)
-    field = 'operational_resolution:' + digest([contract['workflow_action_id'], contract['scope']])
+    field = 'operational_resolution:' + digest([contract['kind'], contract['scope']])
     rows = repository.query_runner(
         'select public.accept_operational_resolution(' + ','.join((
             str(int(rental_case_id)), str(int(action.workflow_action_id)),

@@ -46,11 +46,22 @@ begin
      (v_contract->>'kind'='AVAILABILITY_CONFIRMATION' and x.value not in ('AVAILABLE','UNAVAILABLE')) or
      (v_contract->>'kind'='TECHNICAL_CAPABILITY_CONFIRMATION' and x.value not in ('FEASIBLE','NOT_FEASIBLE')))
     then raise exception 'invalid_resolution_outcome'; end if;
- select * into old from public.rental_case_facts where rental_case_id=p_case and field_code=p_field for update;
+ -- One current authority state per operational kind and event scope, even if
+ -- reconciliation replaced the WorkflowAction. This also reads v1 legacy keys.
+ if (select count(*) from public.rental_case_facts where rental_case_id=p_case
+     and field_code like 'operational_resolution:%'
+     and value_payload->'contract'->>'kind'=v_contract->>'kind'
+     and value_payload->'contract'->'scope'=v_contract->'scope') > 1
+   then raise exception 'conflicting_current_operational_authority'; end if;
+ select * into old from public.rental_case_facts where rental_case_id=p_case
+   and field_code like 'operational_resolution:%'
+   and value_payload->'contract'->>'kind'=v_contract->>'kind'
+   and value_payload->'contract'->'scope'=v_contract->'scope' for update;
  if found and coalesce((p_evidence->>'supersedes_event_id')::bigint,0) <> (old.value_payload->>'event_id')::bigint
    then raise exception 'conflicting_resolution_requires_explicit_correction'; end if;
  if old.id is null and p_evidence->>'supersedes_event_id' is not null
    then raise exception 'correction_target_not_current'; end if;
+ if old.id is not null then p_field := old.field_code; end if;
  -- Corrections state the complete new result. Omitted components become pending.
  v_outcomes := p_evidence->'outcomes';
  v_revision := c.case_revision + 1;

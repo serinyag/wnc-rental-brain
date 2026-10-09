@@ -239,3 +239,19 @@ def test_superseded_lifecycle_can_report_only_still_current_obligation(resolutio
     conn.execute("update public.rental_cases set active_event_start=active_event_start+interval '1 day',active_event_end=active_event_end+interval '1 day',case_revision=case_revision+1 where id=%s",(cid,))
     changed={**r,'idempotency_key':'different-current-obligation','expected_case_revision':first['case_revision']+1}
     with pytest.raises(ValueError,match='no_longer_current'):accept(changed)
+
+
+def test_replacement_action_cannot_silently_contradict_current_claim(resolution):
+    conn,repo,cid,a,r,accept=resolution
+    first=accept()
+    replacement=repo.create_workflow_action(replace(a,workflow_action_id=1,idempotency_key=str(uuid4()),
+        source_case_revision=first['case_revision']))
+    # Current truth already satisfies this obligation: a different action alone
+    # cannot manufacture a competing confirmation or take over its provenance.
+    changed=copy.deepcopy(r)
+    changed.update(workflow_action_id=replacement.workflow_action_id,idempotency_key=str(uuid4()),
+        expected_case_revision=first['case_revision'])
+    changed['contract']['workflow_action_id']=replacement.workflow_action_id
+    changed['outcomes']={r['contract']['scope']['venue']:'UNAVAILABLE'}
+    with pytest.raises(ValueError,match='no_longer_current'):accept(changed)
+    assert current_resolutions(repo.load_case_snapshot(cid))[0]['outcomes']==r['outcomes']
