@@ -1,0 +1,261 @@
+{
+  "case_revision": 3,
+  "actual_resolution_items": [
+    {
+      "proposition_key": "blocker:2384",
+      "message": "Confirm the requested room layout against capacity requirements",
+      "resolution_owner": "WNC_INTERNAL",
+      "resolution_status": "REQUIRED",
+      "client_visibility": "INTERNAL_ONLY",
+      "blocking": true,
+      "workflow_action_id": null
+    },
+    {
+      "proposition_key": "blocker:2385",
+      "message": "Confirm event-specific technical setup",
+      "resolution_owner": "WNC_INTERNAL",
+      "resolution_status": "REQUIRED",
+      "client_visibility": "INTERNAL_ONLY",
+      "blocking": true,
+      "workflow_action_id": null
+    },
+    {
+      "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00",
+      "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+      "resolution_owner": "WNC_INTERNAL",
+      "resolution_status": "REQUIRED",
+      "client_visibility": "INTERNAL_ONLY",
+      "blocking": true,
+      "workflow_action_id": null
+    }
+  ],
+  "hypothetical_resolved_actions_still_pending": [
+    {
+      "proposition_key": "blocker:2384",
+      "message": "Confirm the requested room layout against capacity requirements",
+      "resolution_owner": "WNC_INTERNAL",
+      "resolution_status": "ACTION_CREATED",
+      "client_visibility": "INTERNAL_ONLY",
+      "blocking": true,
+      "workflow_action_id": 1632
+    },
+    {
+      "proposition_key": "blocker:2385",
+      "message": "Confirm event-specific technical setup",
+      "resolution_owner": "WNC_INTERNAL",
+      "resolution_status": "ACTION_CREATED",
+      "client_visibility": "INTERNAL_ONLY",
+      "blocking": true,
+      "workflow_action_id": 1633
+    },
+    {
+      "proposition_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00",
+      "message": "Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+      "resolution_owner": "WNC_INTERNAL",
+      "resolution_status": "ACTION_CREATED",
+      "client_visibility": "INTERNAL_ONLY",
+      "blocking": true,
+      "workflow_action_id": 1634
+    }
+  ],
+  "observation_registry_fields": {
+    "guest_count": "rental_case_facts.guest_count",
+    "active_event_window": "rental_cases.active_event_start|active_event_end",
+    "requested_rental_scope": "rental_cases.rental_type_code",
+    "event_type": "rental_case_facts.event_type",
+    "catering_arrangement": "rental_case_facts.catering_arrangement",
+    "facilitator_arrangement": "rental_case_facts.facilitator_arrangement",
+    "technical_requirements": "rental_case_facts.technical_requirements",
+    "supplier_details": "rental_case_requirements.supplier_details_required",
+    "event_day_contact": "rental_case_facts.event_day_contact",
+    "layout_requirements": "rental_case_facts.layout_requirements",
+    "booking_fee_override": "phase4:booking_fee",
+    "proposal_acceptance": "workflow_event.confirmation_evidence"
+  },
+  "workflow_actions": [
+    {
+      "workflow_action_id": 1630,
+      "workflow_action_uuid": "65ba3c72-2e14-4b35-8acf-b0191a94fb5c",
+      "rental_case_id": 586,
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "action_category": "coordination",
+      "target_adapter_code": "internal",
+      "reason_entity_type": "review_item",
+      "approval_posture": "automatic_allowed",
+      "status": "ready_to_execute",
+      "semantic_subject_hash": "722cff81d7554a1502386a1f1a896b92f8ccc98c952aeac47592cbc242850cd1",
+      "source_case_revision": 3,
+      "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:722cff81d7554a1502386a1f1a896b92f8ccc98c952aeac47592cbc242850cd1:3",
+      "structured_payload": {
+        "reason": "Current authority is missing for the requested workflow scope.",
+        "summary": "Current authority is missing for the requested workflow scope.",
+        "task_kind": "authority_review"
+      },
+      "reason_entity_id": null,
+      "reason_entity_reference": "reasoning_projection:test-console-projection:e347093c59688a0b3579c6ca0374e73d74517fa5b1172a999c09fd37bd961634",
+      "target_scope_key": null,
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-10-09 09:46:01.557105+00",
+      "updated_at": "2026-10-09 09:46:01.557105+00"
+    },
+    {
+      "workflow_action_id": 1631,
+      "workflow_action_uuid": "f4628d50-60f7-4b63-b611-94ecb86055ab",
+      "rental_case_id": 586,
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "action_category": "coordination",
+      "target_adapter_code": "internal",
+      "reason_entity_type": "review_item",
+      "approval_posture": "automatic_allowed",
+      "status": "ready_to_execute",
+      "semantic_subject_hash": "72594a38dbffd970c62b7a35f5f4bd469a674bbbb136a5dd3dea276246241341",
+      "source_case_revision": 3,
+      "idempotency_key": "action:CREATE_INTERNAL_TASK_ITEM:72594a38dbffd970c62b7a35f5f4bd469a674bbbb136a5dd3dea276246241341:3",
+      "structured_payload": {
+        "reason": "Structured confirmation is required before progressing.",
+        "summary": "Structured confirmation is required before progressing.",
+        "task_kind": "confirmation_review"
+      },
+      "reason_entity_id": null,
+      "reason_entity_reference": "reasoning_projection:test-console-projection:208387bd2d10d8e947b97d53adaf47e3d1bc2056e15b626194d1ea9567330732",
+      "target_scope_key": null,
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-10-09 09:46:01.557105+00",
+      "updated_at": "2026-10-09 09:46:01.557105+00"
+    },
+    {
+      "workflow_action_id": 1632,
+      "workflow_action_uuid": "598b7c20-31d9-45ac-b0ee-e2f578d6f486",
+      "rental_case_id": 586,
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "action_category": "coordination",
+      "target_adapter_code": "task_surface",
+      "reason_entity_type": "resolution_item",
+      "approval_posture": "automatic_allowed",
+      "status": "ready_to_execute",
+      "semantic_subject_hash": "e1ce57ea40eca57979900f2bb8148b6447b07ca1351419aceb7ad6638a39a2a4",
+      "source_case_revision": 3,
+      "idempotency_key": "context_aware_resolution:586:blocker:2384:REQUIRED:revision:3",
+      "structured_payload": {
+        "reason": "context_aware_governed_draft_resolution",
+        "summary": "Confirm: Confirm the requested room layout against capacity requirements",
+        "task_kind": "wnc_internal_confirmation",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "REQUIRED",
+        "resolution_item_key": "blocker:2384"
+      },
+      "reason_entity_id": null,
+      "reason_entity_reference": "blocker:2384",
+      "target_scope_key": null,
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-10-09 09:46:01.557105+00",
+      "updated_at": "2026-10-09 09:46:01.557105+00"
+    },
+    {
+      "workflow_action_id": 1633,
+      "workflow_action_uuid": "48d1a338-6420-4ace-99e7-41112ed75776",
+      "rental_case_id": 586,
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "action_category": "coordination",
+      "target_adapter_code": "task_surface",
+      "reason_entity_type": "resolution_item",
+      "approval_posture": "automatic_allowed",
+      "status": "ready_to_execute",
+      "semantic_subject_hash": "fc74cc8234ea41210315b9eea5036c1b196468286dd99be33791d5f265cae919",
+      "source_case_revision": 3,
+      "idempotency_key": "context_aware_resolution:586:blocker:2385:REQUIRED:revision:3",
+      "structured_payload": {
+        "reason": "context_aware_governed_draft_resolution",
+        "summary": "Confirm: Confirm event-specific technical setup",
+        "task_kind": "wnc_internal_confirmation",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "REQUIRED",
+        "resolution_item_key": "blocker:2385"
+      },
+      "reason_entity_id": null,
+      "reason_entity_reference": "blocker:2385",
+      "target_scope_key": null,
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-10-09 09:46:01.557105+00",
+      "updated_at": "2026-10-09 09:46:01.557105+00"
+    },
+    {
+      "workflow_action_id": 1634,
+      "workflow_action_uuid": "5330435c-6e87-42f8-881f-f700c774feda",
+      "rental_case_id": 586,
+      "action_type": "CREATE_INTERNAL_TASK_ITEM",
+      "action_category": "coordination",
+      "target_adapter_code": "task_surface",
+      "reason_entity_type": "resolution_item",
+      "approval_posture": "automatic_allowed",
+      "status": "ready_to_execute",
+      "semantic_subject_hash": "08131e9f209230083919389312da78134c610bece703dd36c4e3c9405638c40c",
+      "source_case_revision": 3,
+      "idempotency_key": "context_aware_resolution:586:availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00:REQUIRED:revision:3",
+      "structured_payload": {
+        "reason": "context_aware_governed_draft_resolution",
+        "summary": "Confirm: Confirm studio space availability for 2026-11-12 13:00:00+00 to 2026-11-12 17:00:00+00",
+        "task_kind": "wnc_internal_confirmation",
+        "resolution_owner": "WNC_INTERNAL",
+        "resolution_status": "REQUIRED",
+        "resolution_item_key": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00"
+      },
+      "reason_entity_id": null,
+      "reason_entity_reference": "availability:2026-11-12 13:00:00+00:2026-11-12 17:00:00+00",
+      "target_scope_key": null,
+      "due_at": null,
+      "supersedes_workflow_action_id": null,
+      "created_at": "2026-10-09 09:46:01.557105+00",
+      "updated_at": "2026-10-09 09:46:01.557105+00"
+    }
+  ],
+  "current_facts": [
+    {
+      "rental_case_fact_id": 1056,
+      "rental_case_id": 586,
+      "field_code": "guest_count",
+      "domain_code": "event_profile",
+      "value_payload": 24,
+      "source_reference": "inbound_observation:2724",
+      "established_case_revision": 3,
+      "created_at": "2026-10-09 09:44:58.628789+00",
+      "updated_at": "2026-10-09 09:44:58.628789+00"
+    },
+    {
+      "rental_case_fact_id": 1057,
+      "rental_case_id": 586,
+      "field_code": "event_type",
+      "domain_code": "event_profile",
+      "value_payload": "team_workshop",
+      "source_reference": "inbound_observation:2726",
+      "established_case_revision": 3,
+      "created_at": "2026-10-09 09:44:58.628789+00",
+      "updated_at": "2026-10-09 09:44:58.628789+00"
+    }
+  ],
+  "inbound_bindings": [
+    [
+      "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZeAAA",
+      "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      3104,
+      "73e89912fd10e944c347dd3f53173184923223afb3ada5011f3b97f094d71730"
+    ],
+    [
+      "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABoZ8ZmgAA",
+      "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQAG4fYoUqabVKl4lpz9tZa3A=",
+      3105,
+      "6ce2395a812c9bb55207af47ef5f62b9eb2433c2212c97d11860a431460848f2"
+    ]
+  ],
+  "inbound_source_count": 2,
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "decision": "Governed operational resolution admission and consumption are missing; no provider mutation performed."
+}

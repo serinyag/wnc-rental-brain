@@ -1,0 +1,44 @@
+{
+  "status": "stopped_at_governed_operational_resolution_boundary",
+  "case_id": 586,
+  "case_revision": 3,
+  "source_ids": [
+    3104,
+    3105
+  ],
+  "new_observation_ids": [
+    2724,
+    2725,
+    2726,
+    2727,
+    2728
+  ],
+  "reasoning_projection_id": 603,
+  "workflow_action_ids": [
+    1630,
+    1631,
+    1632,
+    1633,
+    1634
+  ],
+  "asana_master_id": null,
+  "draft_revision_id": null,
+  "approval_request_id": null,
+  "sends": 0,
+  "graph_calls": 0,
+  "asana_mutations": 0,
+  "production_changes": 0,
+  "runtime_changes": 0,
+  "all_gates_disabled": true,
+  "tests": {
+    "focused": 32,
+    "phase8": 659
+  },
+  "protected_cases_unchanged": [
+    424,
+    584,
+    585
+  ],
+  "final_approval_marker_emitted": false,
+  "end_to_end_certified": false
+}
