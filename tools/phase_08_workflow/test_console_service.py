@@ -783,6 +783,8 @@ class TestConsoleService:
             status="ok",
             detail="WSGI application responded.",
             metrics={
+                "outlook_inbound_gate": "enabled" if _env_flag("STAGING_ALLOW_REAL_OUTLOOK_INBOUND") else "disabled",
+                "outlook_inbound_preflight_gate": "enabled" if _env_flag("STAGING_ALLOW_OUTLOOK_INBOUND_PREFLIGHT") else "disabled",
                 "outlook_human_edit_identity_policy": (
                     "trusted_configured_mailbox_and_bound_graph_id; "
                     "provided_smtp_fields_must_match; absent_identity_fields_allowed"
@@ -6295,8 +6297,9 @@ select
   structured_payload
 from public.workflow_events
 where rental_case_id = {rental_case_id}
-  and event_type_code = {sql_text(TEST_CONSOLE_RAW_EVIDENCE_EVENT)}
-  and source_type = {sql_text(TEST_CONSOLE_SOURCE_TYPE)}
+  and ((event_type_code = {sql_text(TEST_CONSOLE_RAW_EVIDENCE_EVENT)}
+        and source_type = {sql_text(TEST_CONSOLE_SOURCE_TYPE)})
+       or (event_type_code = 'outlook_inbound_evidence_recorded' and source_type = 'outlook_inbound'))
 order by occurred_at desc, id desc;
 """.strip()
         result: dict[int, RawEvidenceRecord] = {}

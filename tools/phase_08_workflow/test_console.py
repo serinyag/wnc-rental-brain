@@ -170,6 +170,27 @@ class TestConsoleApp:
         path: str,
     ) -> list[bytes]:
         parts = [part for part in path.split("/") if part]
+        if path == "/api/operator/outlook-inbound/review" and method == "GET":
+            if not self.config.runtime.is_staging:
+                return self._respond_json_error(start_response, status=HTTPStatus.FORBIDDEN,
+                    message="Inbound review is staging-only.", failure_code="INBOUND_SCOPE_FORBIDDEN")
+            rows = self.service.query_runner("""select source_record_id, rental_case_id, association_status,
+                association_basis, envelope->>'subject' as subject, envelope->>'from_address' as sender,
+                retrieved_at::text from public.outlook_inbound_messages
+                where association_status <> 'resolved' order by retrieved_at desc limit 25""", expect_json=True)["rows"]
+            return self._respond_json(start_response, {"review_items": rows, "automatic_reply": False})
+        if path in ("/api/operator/outlook-inbound/preflight", "/api/operator/outlook-inbound/sync") and method == "POST":
+            from .outlook_inbound_runtime import preflight, synchronize
+            payload = self._parse_json(environ)
+            if payload:
+                return self._respond_json_error(start_response, status=HTTPStatus.BAD_REQUEST,
+                    message="Inbound scope comes only from deployment configuration.", failure_code="INBOUND_SCOPE_OVERRIDE_FORBIDDEN")
+            try:
+                result = preflight() if path.endswith("/preflight") else synchronize()
+            except ValueError as exc:
+                return self._respond_json_error(start_response, status=HTTPStatus.CONFLICT,
+                    message=str(exc), failure_code="INBOUND_STOPPED")
+            return self._respond_json(start_response, result)
         if parts[:3] != ["api", "operator", "cases"]:
             return self._respond_json_error(
                 start_response,
