@@ -1,0 +1,24 @@
+provider = "oidc"
+provider_display_name = "WNC Microsoft sign-in"
+oidc_issuer_url = "https://login.microsoftonline.com/REPLACE_TENANT_UUID/v2.0"
+client_id = "REPLACE_PROXY_CLIENT_UUID"
+redirect_url = "https://REPLACE_PRODUCTION_HOST/oauth2/callback"
+scope = "openid profile email offline_access api://REPLACE_API_AUDIENCE_UUID/access_as_user"
+email_domains = ["whennaturecalls.nl"]
+upstreams = ["http://127.0.0.1:8081/"]
+reverse_proxy = true
+pass_access_token = true
+pass_authorization_header = false
+set_authorization_header = false
+cookie_secure = true
+cookie_httponly = true
+cookie_samesite = "lax"
+cookie_expire = "1h"
+cookie_refresh = "5m"
+code_challenge_method = "S256"
+skip_auth_routes = ["^/healthz$"]
+auth_logging = false
+request_logging = false
+standard_logging = true
+# OAUTH2_PROXY_CLIENT_SECRET and OAUTH2_PROXY_COOKIE_SECRET: Render secret values.
+# Backend validates the delegated access token independently on every request.

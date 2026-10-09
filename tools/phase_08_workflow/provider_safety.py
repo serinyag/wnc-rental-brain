@@ -27,6 +27,8 @@ class EnvironmentGuardedExecutionAdapter:
     guard: Callable[[WorkflowAction], bool]
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
+        if not self.guard(action):
+            return EXECUTION_FAILURE_ADAPTER_FORBIDDEN
         delegated_failure = self.delegate.availability_failure_code(action=action)
         if delegated_failure is not None:
             return delegated_failure
@@ -58,7 +60,7 @@ def guard_outlook_execution_adapter(
     return EnvironmentGuardedExecutionAdapter(
         delegate=adapter,
         runtime=runtime,
-        guard=lambda action: _is_outlook_action_allowed(action, runtime=runtime, provider_enabled=provider_enabled),
+        guard=lambda action: _outlook_identity_allowed(adapter,runtime) and _is_outlook_action_allowed(action, runtime=runtime, provider_enabled=provider_enabled),
     )
 
 
@@ -71,7 +73,7 @@ def guard_asana_execution_adapter(
     return EnvironmentGuardedExecutionAdapter(
         delegate=adapter,
         runtime=runtime,
-        guard=lambda action: _is_asana_action_allowed(
+        guard=lambda action: _asana_identity_allowed(adapter,runtime) and _is_asana_action_allowed(
             action,
             runtime=runtime,
             default_project_gid=adapter.config.default_project_gid,
@@ -86,6 +88,15 @@ def _is_outlook_action_allowed(
     runtime: AppRuntimeConfig,
     provider_enabled: bool,
 ) -> bool:
+    # Production runtime/authentication and identity policy are not certified.
+    # Direct adapter callers must not bypass the server's startup refusal.
+    if runtime.is_production:
+        if runtime.production is None or not runtime.production.lane("outlook_send"):
+            return False
+        try:
+            return runtime.is_email_recipient_allowed(_parse_outlook_email_payload(action.structured_payload).recipient_email)
+        except OutlookActionInputError:
+            return False
     if not runtime.is_staging:
         return True
     if not provider_enabled:
@@ -104,6 +115,13 @@ def _is_asana_action_allowed(
     default_project_gid: str | None,
     provider_enabled: bool,
 ) -> bool:
+    if runtime.is_production:
+        if runtime.production is None or not runtime.production.lane("asana_mutations"):
+            return False
+        try:
+            return runtime.is_asana_project_allowed(_resolve_project_gid(action, default_project_gid=default_project_gid))
+        except AsanaActionInputError:
+            return False
     if not runtime.is_staging:
         return True
     if not provider_enabled:
@@ -115,3 +133,20 @@ def _is_asana_action_allowed(
     if project_gid is None:
         return True
     return runtime.is_asana_project_allowed(project_gid)
+
+
+def _outlook_identity_allowed(adapter,runtime):
+    if not runtime.is_production:return True
+    if runtime.production is None:return False
+    m=runtime.production.manifest['outlook'];c=adapter.config
+    return (c.tenant_id==m['tenant_id'] and c.client_id==m['client_id'] and
+            c.sender_mailbox.casefold()==m['mailbox'].casefold() and
+            c.graph_base_url=='https://graph.microsoft.com/v1.0' and c.authority_base_url=='https://login.microsoftonline.com')
+
+
+def _asana_identity_allowed(adapter,runtime):
+    if not runtime.is_production:return True
+    if runtime.production is None:return False
+    m=runtime.production.manifest['asana'];c=adapter.config
+    return (c.workspace_gid==m['workspace_gid'] and c.default_project_gid==m['project_gid'] and
+            c.api_base_url=='https://app.asana.com/api/1.0')

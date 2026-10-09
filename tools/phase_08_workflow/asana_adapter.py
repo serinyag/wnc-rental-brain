@@ -6,7 +6,7 @@ import ssl
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from typing import Any, Mapping, Protocol
+from typing import Any, Callable, Mapping, Protocol
 
 import certifi
 
@@ -57,22 +57,45 @@ class AsanaAdapterConfig:
     default_project_gid: str | None
     api_base_url: str = DEFAULT_ASANA_API_BASE_URL
     timeout_seconds: int = DEFAULT_ASANA_TIMEOUT_SECONDS
+    token_provider: Callable[[], str] | None = None
+
+    def has_credentials(self) -> bool:
+        return bool(self.access_token or self.token_provider)
+
+    def authorization_token(self) -> str:
+        token=self.token_provider() if self.token_provider else self.access_token
+        if not token:raise ValueError('asana_authorization_unavailable')
+        return token
 
     @classmethod
     def from_env(cls) -> AsanaAdapterConfig:
+        if load_env_value("APP_ENV") == "production":
+            import os
+            from tools.production_runtime.config import ProductionContract
+            m=ProductionContract.from_env().manifest['asana']
+            if os.environ.get('PRODUCTION_ASANA_OAUTH_REFRESH_TOKEN'):
+                from tools.production_runtime.asana_oauth import CLIENT_ID,environment_token_provider
+                if m.get('oauth_client_id') != CLIENT_ID:
+                    raise ValueError('production_asana_oauth_identity_mismatch')
+                return cls(None,m['workspace_gid'],m['project_gid'],token_provider=environment_token_provider())
+            return cls(os.environ['PRODUCTION_ASANA_ACCESS_TOKEN'],m['workspace_gid'],m['project_gid'])
         timeout_seconds = _parse_timeout_seconds(load_env_value("ASANA_TIMEOUT_SECONDS"))
-        return cls(
+        config = cls(
             access_token=_normalize_optional_text(load_env_value("ASANA_ACCESS_TOKEN")),
             workspace_gid=_normalize_optional_text(load_env_value("ASANA_WORKSPACE_GID")),
             default_project_gid=_normalize_optional_text(load_env_value("ASANA_DEFAULT_PROJECT_GID")),
             api_base_url=_normalize_optional_text(load_env_value("ASANA_API_BASE_URL")) or DEFAULT_ASANA_API_BASE_URL,
             timeout_seconds=timeout_seconds,
         )
+        if load_env_value("APP_ENV") == "staging":
+            from tools.production_runtime.config import validate_staging_target
+            validate_staging_target(provider="asana",config=config)
+        return config
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         if action.action_type != ACTION_TYPE_CREATE_INTERNAL_TASK_ITEM:
             return EXECUTION_FAILURE_ADAPTER_REQUEST_INVALID
-        if not self.access_token or not self.workspace_gid:
+        if not self.has_credentials() or not self.workspace_gid:
             return EXECUTION_FAILURE_ADAPTER_CONFIGURATION_INVALID
         if _resolve_project_gid(action, default_project_gid=self.default_project_gid) is None:
             return EXECUTION_FAILURE_ADAPTER_CONFIGURATION_INVALID
@@ -99,7 +122,12 @@ class UrllibAsanaTransport:
             method=method,
         )
         try:
-            with urllib.request.urlopen(request, timeout=timeout_seconds, context=self.ssl_context) as response:
+            import os
+            opener=urllib.request.urlopen
+            if os.environ.get("APP_ENV")=="production":
+                from tools.production_runtime.network import open_provider
+                opener=open_provider
+            with opener(request, timeout=timeout_seconds, context=self.ssl_context) as response:
                 return (
                     response.status,
                     response.read().decode("utf-8"),
@@ -158,7 +186,7 @@ class AsanaExecutionAdapter:
                 method="POST",
                 url=f"{self.config.api_base_url.rstrip('/')}/tasks",
                 headers={
-                    "Authorization": f"Bearer {self.config.access_token}",
+                    "Authorization": f"Bearer {self.config.authorization_token()}",
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                 },

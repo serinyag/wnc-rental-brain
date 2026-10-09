@@ -569,6 +569,10 @@ class OpenAIClientResponseProvider:
 
 
 def build_client_response_provider_from_env() -> GovernedClientResponseProvider:
+    if os.environ.get("APP_ENV") == "production":
+        from tools.production_runtime.config import ProductionContract
+        m=ProductionContract.from_env().manifest['model']
+        return OpenAIClientResponseProvider(api_key=os.environ['PRODUCTION_OPENAI_API_KEY'],model_code=m['model'],timeout_seconds=m['timeout_seconds'])
     provider = os.environ.get(CLIENT_DRAFT_PROVIDER_ENV, "deterministic_fake").strip().lower()
     if provider in {"", "deterministic_fake", "fake"}:
         return DeterministicFakeClientResponseProvider()

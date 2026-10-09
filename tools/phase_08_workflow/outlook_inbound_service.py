@@ -5,6 +5,10 @@ commit together. A crash rolls back the whole page; replay is provider-ID based.
 No outbound adapter or reasoning provider is invoked here.
 """
 import json
+import hashlib
+
+def tombstone(value):
+    return "sha256:"+hashlib.sha256(str(value).encode()).hexdigest()
 from datetime import datetime, timezone
 from .inbound_email import evidence_hash, timing_evidence_body
 from .observation_types import InboundSourceRecordInput, CaseAssociationInput, CaseAssociationResult, StructuredObservationCandidate, StructuredObservationIngestionRequest
@@ -35,6 +39,8 @@ def sync_page(connection, adapter, *, before_checkpoint=None):
     with connection.transaction():
         connection.execute("select pg_advisory_xact_lock(hashtextextended(%s,0))", ('outlook-inbound:' + config.mailbox.casefold(),))
         mailbox = config.mailbox.casefold()
+        if config.environment=='production':
+            config.production_contract.verify_database_marker(connection_runner(connection))
         checkpoint = connection.execute('select cursor,version,initial_since from public.outlook_inbound_checkpoints where mailbox=%s for update', (mailbox,)).fetchone()
         cursor = checkpoint[0] if checkpoint else adapter.initial_cursor()
         if checkpoint and checkpoint[2].isoformat() != datetime.fromisoformat(config.since.replace('Z','+00:00')).isoformat():
@@ -42,23 +48,24 @@ def sync_page(connection, adapter, *, before_checkpoint=None):
         records, next_cursor, status = adapter.read_page(cursor)
         runner = connection_runner(connection)
         repository = SupabaseObservationRepository(query_runner=runner)
-        service = TestConsoleService(query_runner=runner, config=TestConsoleConfig(runtime=AppRuntimeConfig(app_env=AppEnvironment.STAGING), allow_real_providers=False))
+        service = TestConsoleService(query_runner=runner, config=TestConsoleConfig(runtime=AppRuntimeConfig(app_env=AppEnvironment(config.environment),production=config.production_contract), allow_real_providers=False))
         results, removed, duplicates = [], [], 0
         for raw in records:
             if not isinstance(raw, dict) or not isinstance(raw.get('id'),str) or not raw['id']: raise ValueError('missing_provider_identity')
             if '@removed' in raw:
                 removed.append(raw['id']); continue  # Loss from Inbox is not business deletion.
-            existing = connection.execute('select source_record_id,rental_case_id,association_status from public.outlook_inbound_messages where mailbox=%s and message_id=%s',(mailbox,raw['id'])).fetchone()
+            existing = connection.execute('select source_record_id,rental_case_id,association_status from public.outlook_inbound_messages where mailbox=%s and message_id in (%s,%s)',(mailbox,raw['id'],tombstone(raw['id']))).fetchone()
             if existing:
                 duplicates += 1
                 results.append({'source_id':existing[0], 'case_id':existing[1], 'association_status':existing[2], 'duplicate':True})
                 continue
             # Delta supplies metadata only. Never fetch unrelated mailbox bodies.
             sender = raw.get('from', {}).get('emailAddress', {}).get('address', '').casefold()
+            sender_role = config.production_contract.manifest['outlook']['sender_roles'].get(sender,'unknown') if config.environment=='production' else 'client'
             recipients = [r.get('emailAddress', {}).get('address', '').casefold() for r in raw.get('toRecipients', [])]
             conversation = raw.get('conversationId')
-            bound = connection.execute('select rental_case_id from public.outlook_inbound_conversations where mailbox=%s and conversation_id=%s', (mailbox,conversation)).fetchone()
-            synthetic_subject = config.new_enquiry_subject in str(raw.get('subject',''))
+            bound = connection.execute('select rental_case_id from public.outlook_inbound_conversations where mailbox=%s and conversation_id in (%s,%s)', (mailbox,conversation,tombstone(conversation))).fetchone()
+            synthetic_subject = config.environment=='production' or config.new_enquiry_subject in str(raw.get('subject',''))
             if sender not in config.allowed_senders or mailbox not in recipients or not (bound or synthetic_subject):
                 results.append({'source_id':None,'case_id':None,'association_status':'out_of_scope','duplicate':False})
                 continue
@@ -72,30 +79,32 @@ def sync_page(connection, adapter, *, before_checkpoint=None):
             env = adapter.envelope(raw)
             if datetime.fromisoformat(env.received_at.replace('Z','+00:00')) < datetime.fromisoformat(config.since.replace('Z','+00:00')):
                 raise ValueError('provider_returned_before_authorized_window')
-            bound = connection.execute('select rental_case_id from public.outlook_inbound_conversations where mailbox=%s and conversation_id=%s',(mailbox,env.provider_conversation_id)).fetchone()
+            bound = connection.execute('select rental_case_id from public.outlook_inbound_conversations where mailbox=%s and conversation_id in (%s,%s)',(mailbox,env.provider_conversation_id,tombstone(env.provider_conversation_id))).fetchone()
             case_id = None
             # Synthetic admission is explicit and separate from conversation routing.
             admitted = env.from_address in config.allowed_senders and mailbox in env.to_addresses
             if not admitted:
                 association, basis = 'out_of_scope', 'sender_or_recipient_not_in_synthetic_scope'
             elif bound:
+                if config.environment=='production' and not connection.execute('select is_active from public.rental_cases where id=%s',(bound[0],)).fetchone()[0]:
+                    raise ValueError('inactive_case_requires_association_review')
                 case_id, association, basis = bound[0], 'resolved', 'exact_provider_conversation'
-            elif env.subject == config.new_enquiry_subject and not env.reply_references:
+            elif sender_role=='client' and (config.environment=='production' or env.subject == config.new_enquiry_subject) and not env.reply_references:
                 # Reuse the application's normal synthetic staging creation path,
                 # never the test-only source injection path. It starts revision 0,
                 # custom_scope/unknown; it does not infer business facts.
-                report = service.create_test_case(label='Real Outlook inbound synthetic enquiry', client_label=None,
+                report = service.create_test_case(label=('Production Outlook enquiry' if config.environment=='production' else 'Real Outlook inbound synthetic enquiry'), client_label=None,
                     contact_email=env.from_address, event_reference='outlook-inbound:' + env.identity)
                 if not report.success: raise ValueError('case_creation_failed')
                 reference = next(line.split(': ',1)[1] for line in report.lines if line.startswith('RentalCase: '))
                 case_id = connection.execute('select id from public.rental_cases where case_reference_code=%s',(reference,)).fetchone()[0]
                 connection.execute('insert into public.outlook_inbound_conversations(mailbox,conversation_id,rental_case_id) values(%s,%s,%s)',(mailbox,env.provider_conversation_id,case_id))
-                association, basis = 'resolved', 'explicit_synthetic_new_enquiry_admission'
+                association, basis = 'resolved', ('explicit_pilot_sender_new_enquiry_admission' if config.environment=='production' else 'explicit_synthetic_new_enquiry_admission')
             else:
                 association, basis = 'needs_review', 'unbound_conversation_no_safe_new_enquiry_admission'
             candidates = ()
             timing_body = timing_evidence_body(env)
-            timing = timing_components(timing_body) if case_id else None
+            timing = timing_components(timing_body) if case_id and sender_role=='client' else None
             if timing:
                 candidates = (StructuredObservationCandidate(reported_field_code='active_event_window', observation_type='fact_candidate',
                     claim_kind='new_information', candidate_value_payload=timing,
@@ -104,7 +113,7 @@ def sync_page(connection, adapter, *, before_checkpoint=None):
             source = InboundSourceRecordInput(source_system_code='email',source_record_type='message',occurred_at=env.received_at,
                 received_at=env.received_at,dedupe_key='outlook:' + env.identity,source_hash='sha256:' + evidence_hash(raw),
                 external_source_id=env.provider_message_id,conversation_reference=env.provider_conversation_id,
-                sender_actor_type='client',sender_actor_reference=env.from_address,source_location_reference='outlook-inbox:' + mailbox,
+                sender_actor_type=sender_role,sender_actor_reference=env.from_address,source_location_reference='outlook-inbox:' + mailbox,
                 evidence_excerpt=env.normalized_body[:500] or env.subject or '(empty email)')
             if candidates:
                 ingested = ingest_structured_observations(request=StructuredObservationIngestionRequest(source_record=source,

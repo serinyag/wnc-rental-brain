@@ -1,0 +1,776 @@
+{
+  "migrations": [
+    {
+      "version": "20260803000100",
+      "filename": "20260803000100_phase_04_foundation.sql",
+      "purpose": "phase 04 foundation",
+      "schema_effect": [
+        "private.enforce_rule_provenance_for_link",
+        "private.enforce_rule_provenance_for_rule",
+        "private.normalize_rental_duration_hours",
+        "private.touch_updated_at",
+        "private.validate_rule_supersession",
+        "public.rental_types",
+        "public.rule_catalogue",
+        "public.rule_source_links",
+        "public.source_registry",
+        "public.venue_spaces"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "169e21078623596985bbada15f2c67f23a27f23bf11a98bb130925be1150716c"
+    },
+    {
+      "version": "20260803000200",
+      "filename": "20260803000200_booking_fee_rules.sql",
+      "purpose": "booking fee rules",
+      "schema_effect": [
+        "api.get_booking_fee_rule",
+        "private.assert_booking_fee_rule_integrity",
+        "private.date_windows_overlap",
+        "private.validate_booking_fee_rule_catalogue",
+        "private.validate_booking_fee_rule_row",
+        "public.booking_fee_rules",
+        "public.current_booking_fee_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "dc99f7a7fad3d014f99dc1e22ce8c254c1db83add0cbf18fb788b7faafbb5915"
+    },
+    {
+      "version": "20260803000300",
+      "filename": "20260803000300_payment_rules.sql",
+      "purpose": "payment rules",
+      "schema_effect": [
+        "api.get_payment_rules",
+        "private.assert_payment_rule_integrity",
+        "private.validate_payment_rule_catalogue",
+        "private.validate_payment_rule_row",
+        "public.current_payment_rules",
+        "public.payment_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "b550e7b0e80139a37a27ccdfa6e2f66fe2a603da13a3ed2fe5f920460ce3a1a7"
+    },
+    {
+      "version": "20260803000400",
+      "filename": "20260803000400_expedited_surcharge_rules.sql",
+      "purpose": "expedited surcharge rules",
+      "schema_effect": [
+        "api.get_expedited_surcharge_rule",
+        "private.assert_expedited_surcharge_rule_integrity",
+        "private.calculate_calendar_lead_time_days",
+        "private.validate_expedited_surcharge_rule_catalogue",
+        "private.validate_expedited_surcharge_rule_row",
+        "public.current_expedited_surcharge_rules",
+        "public.expedited_surcharge_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "f3db60d3da19b1ad432b558a072f48b7c2cee1ab7b35b14190dc87983a37e667"
+    },
+    {
+      "version": "20260805000500",
+      "filename": "20260805000500_cancellation_rules.sql",
+      "purpose": "cancellation rules",
+      "schema_effect": [
+        "api.get_cancellation_rules",
+        "private.assert_cancellation_rule_integrity",
+        "private.validate_cancellation_rule_catalogue",
+        "private.validate_cancellation_rule_row",
+        "public.cancellation_rules",
+        "public.current_cancellation_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "fbce352c110cb706160ae564665e58699eeedbe97b67a2e8c04f222a6e4f2998"
+    },
+    {
+      "version": "20260805000600",
+      "filename": "20260805000600_capacity_rules.sql",
+      "purpose": "capacity rules",
+      "schema_effect": [
+        "api.evaluate_capacity",
+        "api.get_capacity_rule",
+        "private.assert_capacity_rule_integrity",
+        "private.validate_capacity_rule_catalogue",
+        "private.validate_capacity_rule_row",
+        "public.capacity_rules",
+        "public.current_capacity_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "fa71e9986d6042672a54b16d6b4a74bbd11f1126cb613cb9b2c028df67303afb"
+    },
+    {
+      "version": "20260805000700",
+      "filename": "20260805000700_space_access_rules.sql",
+      "purpose": "space access rules",
+      "schema_effect": [
+        "api.evaluate_space_access",
+        "api.get_space_access_rule",
+        "private.assert_space_access_rule_integrity",
+        "private.validate_space_access_rule_catalogue",
+        "private.validate_space_access_rule_row",
+        "public.current_space_access_rules",
+        "public.space_access_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "f6cc70d2847e3a3d21c469c13f4d0f07cf9d5705d043e8c019fe0cbdaa79526e"
+    },
+    {
+      "version": "20260805000800",
+      "filename": "20260805000800_operational_requirements.sql",
+      "purpose": "operational requirements",
+      "schema_effect": [
+        "api.get_operational_requirements",
+        "private.assert_operational_requirement_integrity",
+        "private.validate_operational_requirement_catalogue",
+        "private.validate_operational_requirement_row",
+        "public.current_operational_requirements",
+        "public.operational_requirements"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "361956cd9846a73a59301895b01b7051d5debf9c866e2b0224a2621e0dc4fd06"
+    },
+    {
+      "version": "20260805000900",
+      "filename": "20260805000900_catering_supplier_rules.sql",
+      "purpose": "catering supplier rules",
+      "schema_effect": [
+        "api.get_catering_supplier_rules",
+        "private.assert_catering_supplier_rule_integrity",
+        "private.validate_catering_supplier_rule_catalogue",
+        "private.validate_catering_supplier_rule_row",
+        "public.catering_supplier_rules",
+        "public.current_catering_supplier_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "e6590810363ac440700785971e5824ed136b4b25d512e6391224e1734f41b2c8"
+    },
+    {
+      "version": "20260805001000",
+      "filename": "20260805001000_technical_capability_rules.sql",
+      "purpose": "technical capability rules",
+      "schema_effect": [
+        "api.evaluate_technical_equipment_quantity",
+        "api.evaluate_technical_requirement",
+        "api.get_technical_capability",
+        "api.get_technical_equipment_inventory",
+        "private.assert_technical_capability_rule_integrity",
+        "private.validate_technical_capability_rule_catalogue",
+        "private.validate_technical_capability_rule_row",
+        "public.current_technical_capability_rules",
+        "public.current_technical_equipment_inventory",
+        "public.technical_capability_rules",
+        "public.technical_equipment_inventory"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "0ba84fc600bb963316577686b6700d9b6d2529e9d00b3854f7ebc4d11ba48700"
+    },
+    {
+      "version": "20260805001100",
+      "filename": "20260805001100_service_facilitator_rules.sql",
+      "purpose": "service facilitator rules",
+      "schema_effect": [
+        "api.get_facilitator_requirements",
+        "api.get_service_rules",
+        "private.assert_facilitator_requirement_rule_integrity",
+        "private.assert_service_rule_integrity",
+        "private.validate_facilitator_requirement_rule_catalogue",
+        "private.validate_facilitator_requirement_rule_row",
+        "private.validate_service_rule_catalogue",
+        "private.validate_service_rule_row",
+        "public.current_facilitator_requirement_rules",
+        "public.current_service_rules",
+        "public.facilitator_requirement_rules",
+        "public.service_rules"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "48b56102675b9f1dea354cb8a2944bd49310a49674084b374bda985a6c283f31"
+    },
+    {
+      "version": "20260806000100",
+      "filename": "20260806000100_phase_05_core_governance_foundation.sql",
+      "purpose": "phase 05 core governance foundation",
+      "schema_effect": [
+        "private.validate_knowledge_document_version_supersession",
+        "private.validate_rule_catalogue_logical_rule_domain",
+        "public.knowledge_audiences",
+        "public.knowledge_categories",
+        "public.knowledge_confidentiality_levels",
+        "public.knowledge_document_corpus_states",
+        "public.knowledge_document_version_audiences",
+        "public.knowledge_document_version_rental_types",
+        "public.knowledge_document_versions",
+        "public.knowledge_documents",
+        "public.logical_rules",
+        "public.rule_catalogue"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "6b995b3f795c84b832c49a0231391ebab7b6833b27f2164d311db0856e7bc9af"
+    },
+    {
+      "version": "20260806000200",
+      "filename": "20260806000200_phase_05_security_hardening.sql",
+      "purpose": "phase 05 security hardening",
+      "schema_effect": [
+        "public.booking_fee_rules",
+        "public.cancellation_rules",
+        "public.capacity_rules",
+        "public.catering_supplier_rules",
+        "public.expedited_surcharge_rules",
+        "public.facilitator_requirement_rules",
+        "public.knowledge_audiences",
+        "public.knowledge_categories",
+        "public.knowledge_confidentiality_levels",
+        "public.knowledge_document_corpus_states",
+        "public.knowledge_document_version_audiences",
+        "public.knowledge_document_version_rental_types",
+        "public.knowledge_document_versions",
+        "public.knowledge_documents",
+        "public.logical_rules",
+        "public.operational_requirements",
+        "public.payment_rules",
+        "public.rental_types",
+        "public.rule_catalogue",
+        "public.rule_source_links",
+        "public.service_rules",
+        "public.source_registry",
+        "public.space_access_rules",
+        "public.technical_capability_rules",
+        "public.technical_equipment_inventory",
+        "public.venue_spaces"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "71fee546ff07b947ebf3a10fcc4de919bd6ef3678734d67705c366590de7221f"
+    },
+    {
+      "version": "20260806000300",
+      "filename": "20260806000300_phase_05_source_provenance_rule_connectivity.sql",
+      "purpose": "phase 05 source provenance rule connectivity",
+      "schema_effect": [
+        "private.validate_knowledge_rule_relationship_target_kind",
+        "public.knowledge_document_version_logical_rules",
+        "public.knowledge_document_version_rule_versions",
+        "public.knowledge_document_version_source_objects",
+        "public.knowledge_rule_relationship_types",
+        "public.knowledge_source_object_roles",
+        "public.knowledge_source_objects"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "437b610669b019436df2b3a2bb5afac5f79ad83e206636929961b9cf6973d801"
+    },
+    {
+      "version": "20260806000400",
+      "filename": "20260806000400_phase_05_semantic_chunking_foundation.sql",
+      "purpose": "phase 05 semantic chunking foundation",
+      "schema_effect": [
+        "private.assert_current_chunk_set_has_sources",
+        "private.enforce_current_chunk_set_has_sources_from_chunk_set",
+        "private.enforce_current_chunk_set_has_sources_from_chunk_set_source",
+        "private.knowledge_chunk_set_sources",
+        "private.knowledge_chunk_sets",
+        "private.knowledge_chunk_sources",
+        "private.knowledge_chunks",
+        "private.knowledge_document_version_processing",
+        "private.validate_knowledge_chunk_set_source",
+        "private.validate_knowledge_chunk_source"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "19b143b251f9057c79957927142d87168cd1f0899be689f4d94089cc256eebca"
+    },
+    {
+      "version": "20260806000500",
+      "filename": "20260806000500_phase_05_chunk_rule_connectivity.sql",
+      "purpose": "phase 05 chunk rule connectivity",
+      "schema_effect": [
+        "private.knowledge_chunk_logical_rules",
+        "private.knowledge_chunk_rule_versions",
+        "private.validate_knowledge_chunk_logical_rule_parent_scope",
+        "private.validate_knowledge_chunk_rule_version_parent_scope"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "a949496680b0bb98575f279b5cd76ac392b8d4597ef66627394c88c46c327c65"
+    },
+    {
+      "version": "20260807000100",
+      "filename": "20260807000100_phase_05_full_text_search_foundation.sql",
+      "purpose": "phase 05 full text search foundation",
+      "schema_effect": [
+        "private.current_knowledge_chunks",
+        "private.knowledge_chunks",
+        "private.search_knowledge_chunks"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "125f011041d077a29dbcf7c1900cb0873b179e04ee927d3b7a58f82a3964f6a4"
+    },
+    {
+      "version": "20260807000200",
+      "filename": "20260807000200_phase_05_semantic_embedding_foundation.sql",
+      "purpose": "phase 05 semantic embedding foundation",
+      "schema_effect": [
+        "private.build_knowledge_chunk_embedding_input",
+        "private.build_knowledge_chunk_embedding_input_hash",
+        "private.current_knowledge_chunk_embedding_inputs",
+        "private.knowledge_embedding_models",
+        "private.knowledge_embeddings",
+        "private.search_knowledge_chunks_semantic",
+        "private.validate_knowledge_embedding"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "ce8d85f5e22e162fe484acfbb74b8ded5e2f5e6c408c1673a3d03d4fe7c5c327"
+    },
+    {
+      "version": "20260807000300",
+      "filename": "20260807000300_phase_05_hybrid_retrieval_surface.sql",
+      "purpose": "phase 05 hybrid retrieval surface",
+      "schema_effect": [
+        "private.hybrid_retrieval_policy_modifier",
+        "private.hybrid_retrieval_rrf_score",
+        "private.search_knowledge_chunks_hybrid"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "2c07162fd39949537c84a048c5019ad37a91b405f9ad0d69a759fa287257a738"
+    },
+    {
+      "version": "20260807000400",
+      "filename": "20260807000400_phase_06_historical_case_core_governance_foundation.sql",
+      "purpose": "phase 06 historical case core governance foundation",
+      "schema_effect": [
+        "private.enforce_historical_case_version_lifecycle",
+        "private.normalize_historical_case_alias_text",
+        "private.validate_historical_case_version_supersession",
+        "public.historical_case_aliases",
+        "public.historical_case_versions",
+        "public.historical_cases"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "850a0b8f2e4504f1bdf04b5c27fa72e524bab54264eb1fa441f5a68bc34ca871"
+    },
+    {
+      "version": "20260807000500",
+      "filename": "20260807000500_phase_06_historical_case_evidence_provenance_foundation.sql",
+      "purpose": "phase 06 historical case evidence provenance foundation",
+      "schema_effect": [
+        "private.enforce_historical_case_version_source_object_editability",
+        "private.historical_case_evidence_support_dimensions_valid",
+        "private.normalize_historical_case_source_locator",
+        "public.historical_case_evidence_roles",
+        "public.historical_case_version_source_objects"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "2c4f1a728b083aa20e0e9c8a8b590ae9557cc0da62fff6642851d29b61afec27"
+    },
+    {
+      "version": "20260807000600",
+      "filename": "20260807000600_phase_06_historical_case_classification_scope_foundation.sql",
+      "purpose": "phase 06 historical case classification scope foundation",
+      "schema_effect": [
+        "private.enforce_historical_case_version_classification_editability",
+        "public.historical_case_version_rental_types",
+        "public.historical_case_version_spaces",
+        "public.historical_case_version_topics",
+        "public.historical_precedent_topics"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "d7992ef2fb1182167b88c3045b811e0bda69ae6adc605f7f2eb714bdafe466cd"
+    },
+    {
+      "version": "20260807000700",
+      "filename": "20260807000700_phase_06_historical_precedent_statement_contamination_foundation.sql",
+      "purpose": "phase 06 historical precedent statement contamination foundation",
+      "schema_effect": [
+        "private.assert_historical_case_version_statement_provenance_complete",
+        "private.enforce_historical_case_version_lifecycle",
+        "private.enforce_historical_case_version_statement_editability",
+        "private.historical_case_statement_contamination_metadata_valid",
+        "private.historical_case_version_contains_historical_value_only_content",
+        "private.sync_historical_case_version_historical_value_summary",
+        "private.validate_historical_case_statement_source_link_dimension",
+        "public.historical_case_version_decision_sources",
+        "public.historical_case_version_decisions",
+        "public.historical_case_version_lesson_sources",
+        "public.historical_case_version_lessons",
+        "public.historical_case_version_responsibilities",
+        "public.historical_case_version_responsibility_sources"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "c6e0fd2539af9e8f68d032dd23eb3fc11cddadc164ccb4d78a9427e1ddc89391"
+    },
+    {
+      "version": "20260807000800",
+      "filename": "20260807000800_phase_06_current_authority_connectivity_foundation.sql",
+      "purpose": "phase 06 current authority connectivity foundation",
+      "schema_effect": [
+        "private.assert_hcv_current_authority_connectivity_valid",
+        "private.assert_hcv_doc_version_parent_scope_complete",
+        "private.assert_hcv_rule_version_parent_scope_complete",
+        "private.enforce_hcv_authority_connectivity_editability",
+        "private.enforce_hcv_doc_version_parent_scope",
+        "private.enforce_hcv_rule_version_parent_scope",
+        "private.enforce_historical_case_version_lifecycle",
+        "public.historical_case_knowledge_relationship_types",
+        "public.historical_case_rule_relationship_types",
+        "public.historical_case_version_knowledge_document_versions",
+        "public.historical_case_version_knowledge_documents",
+        "public.historical_case_version_logical_rules",
+        "public.historical_case_version_rule_versions"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "b5571c576337561a333369ca40a089f4cbc6bb2e704b388bd9853c6157472c5d"
+    },
+    {
+      "version": "20260807000900",
+      "filename": "20260807000900_phase_06_historical_search_unit_provenance_foundation.sql",
+      "purpose": "phase 06 historical search unit provenance foundation",
+      "schema_effect": [
+        "private.assert_historical_case_search_unit_has_sources",
+        "private.current_historical_case_search_units",
+        "private.enforce_historical_case_search_unit_has_sources_from_unit",
+        "private.enforce_historical_case_search_unit_has_sources_from_unit_source",
+        "private.historical_case_search_unit_expected_source_key",
+        "private.historical_case_search_units",
+        "private.historical_case_unit_sources",
+        "private.historical_case_version_processing",
+        "private.rebuild_current_historical_case_search_units",
+        "private.rebuild_historical_case_search_units_for_version",
+        "private.strictest_knowledge_confidentiality_level_id",
+        "private.strictest_personal_information_status",
+        "private.validate_historical_case_search_unit",
+        "private.validate_historical_case_unit_source"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "7dadbafa16a7860f06ec976a247e82d271224413035664fa4652f13ca28c5077"
+    },
+    {
+      "version": "20260807001000",
+      "filename": "20260807001000_phase_06_historical_full_text_search_foundation.sql",
+      "purpose": "phase 06 historical full text search foundation",
+      "schema_effect": [
+        "private.historical_case_search_units",
+        "private.search_historical_case_units"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "986d8e8dbfa6491ab2674f83b3e967dcdd36541fca112aee91f9c7e895363250"
+    },
+    {
+      "version": "20260807001100",
+      "filename": "20260807001100_phase_06_historical_semantic_retrieval_foundation.sql",
+      "purpose": "phase 06 historical semantic retrieval foundation",
+      "schema_effect": [
+        "private.build_historical_case_search_unit_embedding_input",
+        "private.build_historical_case_search_unit_embedding_input_hash",
+        "private.current_historical_case_embedding_coverage",
+        "private.current_historical_case_embedding_inputs",
+        "private.historical_case_embedding_models",
+        "private.historical_case_embeddings",
+        "private.search_historical_case_units_semantic",
+        "private.validate_historical_case_embedding"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "2672c7c97a61b051b0910fb0d3e1da8cfb1b39e470789696f29d04693581bebc"
+    },
+    {
+      "version": "20260808000100",
+      "filename": "20260808000100_phase_06_historical_hybrid_retrieval.sql",
+      "purpose": "phase 06 historical hybrid retrieval",
+      "schema_effect": [
+        "private.historical_hybrid_rrf_score",
+        "private.search_historical_case_units_hybrid"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "d2e6d4e58c9b314304ccedafe3d3fb2066dcbb8faeeba4542059a3c70a19a07f"
+    },
+    {
+      "version": "20260809000100",
+      "filename": "20260809000100_phase_08_workflow_persistence_foundation.sql",
+      "purpose": "phase 08 workflow persistence foundation",
+      "schema_effect": [
+        "private.workflow_append_only_guard",
+        "private.workflow_text_array_values_allowed",
+        "private.workflow_text_array_values_nonempty",
+        "public.rental_case_approval_requests",
+        "public.rental_case_artifacts",
+        "public.rental_case_blockers",
+        "public.rental_case_decisions",
+        "public.rental_case_follow_ups",
+        "public.rental_case_lifecycle_transitions",
+        "public.rental_case_milestones",
+        "public.rental_case_open_questions",
+        "public.rental_case_proposed_changes",
+        "public.rental_case_reasoning_projections",
+        "public.rental_case_requirements",
+        "public.rental_case_reschedule_requests",
+        "public.rental_cases",
+        "public.workflow_actions",
+        "public.workflow_events",
+        "public.workflow_execution_attempts"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "af2568aaa58a3f5e976e113728fc262107f8465ce9a9fb3ccb2af9b683e97f2f"
+    },
+    {
+      "version": "20260809000200",
+      "filename": "20260809000200_phase_08_lifecycle_engine_support.sql",
+      "purpose": "phase 08 lifecycle engine support",
+      "schema_effect": [
+        "private.commit_rental_case_lifecycle_transition"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "7b51a1b3af9529e110f83c6c3c530fd25bc6306592cc7c6d9a42ef20bf5ad465"
+    },
+    {
+      "version": "20260810000100",
+      "filename": "20260810000100_phase_08_inbound_observation_foundation.sql",
+      "purpose": "phase 08 inbound observation foundation",
+      "schema_effect": [
+        "public.inbound_observation_effects",
+        "public.inbound_observations",
+        "public.inbound_source_records",
+        "public.rental_case_facts"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "32e5e50d4f1f4e5fb0e69114dc7c4e7a1d50076d947386425032ca1c8c4b82f2"
+    },
+    {
+      "version": "20260810000200",
+      "filename": "20260810000200_phase_08_phase7_workflow_consumption_runtime.sql",
+      "purpose": "phase 08 phase7 workflow consumption runtime",
+      "schema_effect": [
+        "public.rental_case_reasoning_projections"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "b19cf9d078697f35376c1ff7fe81f51ab12aa46210947f1c1c6272d4a1f12877"
+    },
+    {
+      "version": "20260813000100",
+      "filename": "20260813000100_phase_08_orchestration_identity_guards.sql",
+      "purpose": "phase 08 orchestration identity guards",
+      "schema_effect": [],
+      "risk_classification": "ADDITIVE_REVIEW",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "827acaf3cd93d161a547d904980dafcb0c3c1e6d36736bd2e7b4249378b386e0"
+    },
+    {
+      "version": "20260813000200",
+      "filename": "20260813000200_phase_08_orchestration_atomicity_remediation.sql",
+      "purpose": "phase 08 orchestration atomicity remediation",
+      "schema_effect": [
+        "private.commit_phase8_case_decision_approval",
+        "private.commit_phase8_proposed_case_change_resolution",
+        "private.commit_phase8_workflow_action_approval",
+        "private.phase8_reference_id"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "27b667b65045be81aae88ee6d34a8bf12541cabde5d194c3605496d83fefc6c5"
+    },
+    {
+      "version": "20260813000300",
+      "filename": "20260813000300_phase_08_execution_follow_up_runtime.sql",
+      "purpose": "phase 08 execution follow up runtime",
+      "schema_effect": [
+        "private.commit_phase8_follow_up_status_update",
+        "private.commit_phase8_workflow_action_execution_complete",
+        "private.commit_phase8_workflow_action_execution_start",
+        "private.workflow_execution_attempt_update_guard"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "2fbc232fe7861423a5a62264e82dd2ca89806ff9e2f7e67e2162512120d00a92"
+    },
+    {
+      "version": "20260813000400",
+      "filename": "20260813000400_phase_08_asana_external_reference_guardrails.sql",
+      "purpose": "phase 08 asana external reference guardrails",
+      "schema_effect": [
+        "private.commit_phase8_workflow_action_execution_complete"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "4e52cc498d5e4a1b1d5ece091c25f73bfbd0f47df0dd9067d9d43977c7deabed"
+    },
+    {
+      "version": "20260814000100",
+      "filename": "20260814000100_phase_08_inquiry_waiting_follow_up_slice.sql",
+      "purpose": "phase 08 inquiry waiting follow up slice",
+      "schema_effect": [
+        "public.rental_case_follow_ups"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "3dd94553917b13ef914c25bda55133e55b49990a21edcd1c575263adc2c833a5"
+    },
+    {
+      "version": "20260815000100",
+      "filename": "20260815000100_phase_08_inquiry_response_drafting_slice.sql",
+      "purpose": "phase 08 inquiry response drafting slice",
+      "schema_effect": [
+        "private.guard_inquiry_response_draft_revision_write",
+        "public.inquiry_response_draft_revisions"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "34d88b40e9d2680e78e913ef0ea3bf1830881e6c572058301c228bc753733711"
+    },
+    {
+      "version": "20260829000100",
+      "filename": "20260829000100_phase_08_general_governed_client_response_drafting.sql",
+      "purpose": "phase 08 general governed client response drafting",
+      "schema_effect": [
+        "public.inquiry_response_draft_revisions"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "c739d96b34a281249c22c83b1fd9256b95262d674de6448d164ec78638145291"
+    },
+    {
+      "version": "20260907000100",
+      "filename": "20260907000100_phase_08_governed_client_response_action_type.sql",
+      "purpose": "phase 08 governed client response action type",
+      "schema_effect": [
+        "public.workflow_actions"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "b9f32fb7a2019a5c64f14f8df3263fdfbed03333046186dd855a2076c7cdd924"
+    },
+    {
+      "version": "20260913000100",
+      "filename": "20260913000100_phase_08_outlook_canonical_plan_identity.sql",
+      "purpose": "phase 08 outlook canonical plan identity",
+      "schema_effect": [],
+      "risk_classification": "ADDITIVE_REVIEW",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "5483861fd83392c642828bbda547cf9580e95501f92e1b5e53b51e615c7af3ac"
+    },
+    {
+      "version": "20261003000100",
+      "filename": "20261003000100_phase_08_human_delivery_reconciliation.sql",
+      "purpose": "phase 08 human delivery reconciliation",
+      "schema_effect": [
+        "public.inquiry_response_draft_revisions",
+        "public.reconcile_outlook_human_delivery"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "6626f30e6ad641ddfd364f0091a3c228f285ac3ccd833d00922feb151b4e11c1"
+    },
+    {
+      "version": "20261003000200",
+      "filename": "20261003000200_phase_08_asana_projection_fences.sql",
+      "purpose": "phase 08 asana projection fences",
+      "schema_effect": [
+        "private.guard_asana_projection_action",
+        "private.guard_asana_projection_attempt"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "3010b4d1c557c91189cc879df558db56e032513f7837c80dfeac4c6db2ff5072"
+    },
+    {
+      "version": "20261009000100",
+      "filename": "20261009000100_phase_08_operational_resolution.sql",
+      "purpose": "phase 08 operational resolution",
+      "schema_effect": [
+        "public.accept_operational_resolution"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "05527c333f1aaf4a396e3f904263eebc2d72dd7b2f19f163b548c8ca4ba9c0ca"
+    },
+    {
+      "version": "20261009000200",
+      "filename": "20261009000200_phase_08_synthetic_capacity_resolution.sql",
+      "purpose": "phase 08 synthetic capacity resolution",
+      "schema_effect": [
+        "public.accept_operational_resolution"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "56354bd3af73643e6be333aea9c8eb47ba5dc1483d8281f215223f137c1c7623"
+    },
+    {
+      "version": "20261009000300",
+      "filename": "20261009000300_phase_08_outlook_inbound.sql",
+      "purpose": "phase 08 outlook inbound",
+      "schema_effect": [
+        "public.outlook_inbound_checkpoints",
+        "public.outlook_inbound_conversations",
+        "public.outlook_inbound_messages",
+        "public.outlook_inbound_sync_events",
+        "public.reject_outlook_inbound_evidence_mutation",
+        "public.validate_outlook_inbound_source_binding"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "fd5fc4b65c15cb5a15c9479d8c4af67c0fc8718424774c566d2d5f62c65e2d7a"
+    },
+    {
+      "version": "20261009000400",
+      "filename": "20261009000400_phase_08_production_authority.sql",
+      "purpose": "phase 08 production authority",
+      "schema_effect": [
+        "public.accept_operational_resolution",
+        "public.reject_environment_identity_mutation",
+        "public.runtime_environment_identity"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "91992bb6dd924fb08182f9814bbb86aef806f609f774e4551e696172622a35db"
+    },
+    {
+      "version": "20261009000500",
+      "filename": "20261009000500_phase_08_data_lifecycle.sql",
+      "purpose": "phase 08 data lifecycle",
+      "schema_effect": [
+        "public.anonymize_closed_rental_case",
+        "public.case_data_lifecycle_events",
+        "public.case_data_lifecycle_holds"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "8ba840a96d40fdfce1082f9c62338fc4896f03d43bd948410ab575e7ceed0b26"
+    },
+    {
+      "version": "20261009000600",
+      "filename": "20261009000600_phase_08_historical_lifecycle.sql",
+      "purpose": "phase 08 historical lifecycle",
+      "schema_effect": [
+        "public.anonymize_retired_historical_case",
+        "public.historical_data_lifecycle_events"
+      ],
+      "risk_classification": "REVIEW_LOCKS_AND_AUTHORITY",
+      "expected_production_status": "PENDING_PROVISIONING_VERIFY_BEFORE_APPLY",
+      "sha256": "177fa22409cf13642447620d66ae0b7492d0090747148947be75024ce51d5acd"
+    }
+  ]
+}

@@ -71,6 +71,7 @@ class AppRuntimeConfig:
     staging_allow_real_outlook: bool = False
     staging_allow_real_outlook_send: bool = False
     staging_allow_real_asana: bool = False
+    production: object | None = None
 
     @classmethod
     def local_default(cls) -> AppRuntimeConfig:
@@ -79,7 +80,18 @@ class AppRuntimeConfig:
     @classmethod
     def from_env(cls) -> AppRuntimeConfig:
         app_env, explicit = AppEnvironment.parse(load_env_value(APP_ENV_ENV))
+        production = None
+        if app_env is AppEnvironment.STAGING:
+            from urllib.parse import urlsplit
+            dsn=load_env_value(DATABASE_URL_ENV) or ''
+            if (urlsplit(dsn).hostname or '').endswith('.supabase.co') or (urlsplit(dsn).hostname or '').endswith('.supabase.com'):
+                from tools.phase_08_workflow.outlook_inbound_runtime import validate_staging_database
+                validate_staging_database(dsn)
+        if app_env is AppEnvironment.PRODUCTION:
+            from tools.production_runtime.config import ProductionContract
+            production = ProductionContract.from_env()
         return cls(
+            production=production,
             app_env=app_env,
             app_env_explicit=explicit,
             database_url=_normalize_optional_text(load_env_value(DATABASE_URL_ENV)),
@@ -128,6 +140,8 @@ class AppRuntimeConfig:
         return len(self.staging_allowed_email_recipients) + len(self.staging_allowed_email_domains)
 
     def is_email_recipient_allowed(self, recipient_email: str) -> bool:
+        if self.is_production:
+            return self.production is not None and recipient_email.casefold() in self.production.manifest["outlook"]["allowed_recipients"]
         normalized_email = _normalize_optional_text(recipient_email)
         if normalized_email is None:
             return False
@@ -140,6 +154,8 @@ class AppRuntimeConfig:
         return domain in self.staging_allowed_email_domains
 
     def is_asana_project_allowed(self, project_gid: str) -> bool:
+        if self.is_production:
+            return self.production is not None and project_gid == self.production.manifest["asana"]["project_gid"]
         normalized_gid = _normalize_optional_text(project_gid)
         if normalized_gid is None:
             return False
@@ -158,10 +174,11 @@ def validate_test_console_startup(
     allow_real_providers: bool,
 ) -> None:
     if runtime.is_production:
-        raise RuntimeConfigurationError(
-            "APP_ENV=production is not supported for Test Console startup in S1B. "
-            "Approved production auth and runtime policy are still pending."
-        )
+        if runtime.production is None:
+            raise RuntimeConfigurationError("production configuration contract required")
+        import os
+        runtime.production.validate(os.environ, initial=True)
+        return
 
     host_is_local = is_local_host(host)
     if not host_is_local and not runtime.app_env_explicit:

@@ -37,7 +37,7 @@ def scope(snapshot):
             'start': timestamp(c.active_event_start), 'end': timestamp(c.active_event_end)}
 
 
-def obligation(snapshot, action, *, observed_fields=()):
+def obligation(snapshot, action, *, observed_fields=(), environment="staging"):
     """Derive the allowlist from the actual typed obligation, never task prose."""
     c = snapshot.rental_case
     p = action.structured_payload
@@ -62,8 +62,10 @@ def obligation(snapshot, action, *, observed_fields=()):
         projection = next((r for r in snapshot.reasoning_projections if blocker and
             blocker.origin_entity_reference == f'reasoning_projection:{r.projection_identity_key}'), None)
         refs = getattr(projection, 'grounding_reference_keys', ())
+        if environment == 'production' and projection is not None and getattr(projection,'authority_outcome_classification',None) != 'REQUIRES_CONFIRMATION':
+            raise ValueError('operational_resolution_cannot_override_policy_or_missing_authority')
         if capacity_action and capacity:
-            if (c.rental_case_id != 586 or c.rental_type_code != 'studio_space'
+            if environment != 'production' and (c.rental_case_id != 586 or c.rental_type_code != 'studio_space'
                     or capacity['guest_count'] != 24 or capacity['configuration_type'] != 'seated'):
                 raise ValueError('synthetic_capacity_case_scope_forbidden')
             return {'version': VERSION, 'workflow_action_id': action.workflow_action_id,
@@ -71,7 +73,7 @@ def obligation(snapshot, action, *, observed_fields=()):
                     'scope': current_scope, 'subjects': ['capacity_layout'], 'inputs': capacity}
         if projection is not None and getattr(projection, 'authority_outcome_classification', None) != 'REQUIRES_CONFIRMATION':
             raise ValueError('operational_resolution_cannot_override_policy_or_missing_authority')
-        if not any(str(r).startswith('test_console:technical_') for r in refs):
+        if not any(str(r).startswith(('test_console:technical_','production_operator:technical_')) for r in refs):
             raise ValueError('resolution_kind_not_allowlisted')
         values = [f.value_payload for f in snapshot.rental_case_facts if f.field_code == 'technical_requirements']
         values += [f.value_payload for f in observed_fields if f.field_code == 'technical_requirements'
@@ -100,18 +102,24 @@ def is_capacity_action(snapshot, action):
     key = action.structured_payload.get('resolution_item_key')
     blocker = next((b for b in snapshot.blockers if key == f'blocker:{b.blocker_id}'), None)
     return any(blocker and blocker.origin_entity_reference == f'reasoning_projection:{p.projection_identity_key}'
-               and any(str(r).startswith('test_console:capacity_') for r in p.grounding_reference_keys)
+               and any(str(r).startswith(('test_console:capacity_','production_operator:capacity_')) for r in p.grounding_reference_keys)
                for p in snapshot.reasoning_projections)
 
 
-def validate_submission(contract, submission, *, actor):
+def validate_submission(contract, submission, *, actor, environment="staging"):
     required = {'workflow_action_id', 'expected_case_revision', 'contract', 'outcomes',
                 'evidence_reference', 'evidence_text', 'occurred_at', 'idempotency_key', 'synthetic'}
     if set(submission) - (required | {'supersedes_event_id'}) or not required <= set(submission):
         raise ValueError('invalid_resolution_submission_shape')
     if not actor or submission['contract'] != contract or submission['workflow_action_id'] != contract['workflow_action_id']:
         raise ValueError('resolution_subject_or_authority_mismatch')
-    if submission['synthetic'] is not True:
+    if environment == 'production':
+        from tools.production_runtime.auth import CURRENT
+        principal=CURRENT.get()
+        if principal is None or principal.actor != actor: raise ValueError('authenticated_operator_evidence_required')
+        principal.require('OPERATOR')
+        if submission['synthetic'] is not False:raise ValueError('production_synthetic_evidence_forbidden')
+    elif environment != 'staging' or submission['synthetic'] is not True:
         raise ValueError('staging_synthetic_operator_evidence_required')
     outcomes = submission['outcomes']
     allowed = {'AVAILABLE', 'UNAVAILABLE'} if contract['kind'] == 'AVAILABILITY_CONFIRMATION' else {'FEASIBLE', 'NOT_FEASIBLE'}
@@ -124,7 +132,7 @@ def validate_submission(contract, submission, *, actor):
     if datetime.fromisoformat(occurred) > datetime.now(timezone.utc):
         raise ValueError('future_resolution_evidence')
     return {**submission, 'actor': actor, 'authority_class': 'WNC_INTERNAL_OPERATOR',
-            'provenance': 'staging synthetic operator evidence', 'version': VERSION}
+            'provenance': ('authenticated production operator evidence' if environment=='production' else 'staging synthetic operator evidence'), 'version': VERSION}
 
 
 def current_resolutions(snapshot):
@@ -158,20 +166,20 @@ def resolved_keys(snapshot):
             if set(p['outcomes']) == set(p['contract']['subjects'])}
 
 
-def submit(repository, *, rental_case_id, submission, actor, observed_fields=()):
+def submit(repository, *, rental_case_id, submission, actor, observed_fields=(), environment="staging"):
     snapshot = repository.load_case_snapshot(rental_case_id)
     prior = next((e for e in snapshot.workflow_events if e.event_type_code == 'operational_resolution_accepted'
         and e.event_identity_key == 'operational_resolution:' + str(submission.get('idempotency_key'))), None)
     if prior:
-        evidence = validate_submission(prior.structured_payload['submission']['contract'], submission, actor=actor)
+        evidence = validate_submission(prior.structured_payload['submission']['contract'], submission, actor=actor, environment=environment)
         if evidence != prior.structured_payload['submission']:
             raise ValueError('resolution_replay_payload_conflict')
         return {**prior.structured_payload['result'], 'replayed': True}
     action = next((a for a in snapshot.workflow_actions if a.workflow_action_id == submission.get('workflow_action_id')), None)
     if action is None:
         raise ValueError('resolution_action_not_in_case')
-    contract = obligation(snapshot, action, observed_fields=observed_fields)
-    evidence = validate_submission(contract, submission, actor=actor)
+    contract = obligation(snapshot, action, observed_fields=observed_fields, environment=environment)
+    evidence = validate_submission(contract, submission, actor=actor, environment=environment)
     field = 'operational_resolution:' + digest([contract['kind'], contract['scope']])
     rows = repository.query_runner(
         'select public.accept_operational_resolution(' + ','.join((
@@ -196,7 +204,7 @@ def client_results(snapshot):
                      'projection_display': 'The requested projection setup', 'microphones': 'The requested microphones',
                      'audio_playback': 'The requested audio playback', 'dj_sound_booth': 'The requested DJ sound booth',
                      'other_technical': 'The specifically requested technical equipment',
-                     'capacity_layout': f"The requested {c.get('inputs', {}).get('configuration_type')} layout for {c.get('inputs', {}).get('guest_count')} guests in the Studio"}[subject]
+                     'capacity_layout': f"The requested {c.get('inputs', {}).get('configuration_type')} layout for {c.get('inputs', {}).get('guest_count')} guests in the requested venue"}[subject]
             state = {'AVAILABLE': 'available', 'UNAVAILABLE': 'unavailable', 'FEASIBLE': 'feasible', 'NOT_FEASIBLE': 'not feasible'}[outcome]
             sentence = f'{label} is {state} for {interval}.'
             results.append({'topic': 'operational_confirmation', 'fact_state': 'known',

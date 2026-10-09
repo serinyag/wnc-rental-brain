@@ -12,7 +12,7 @@ health=build_client(ROOT/'Staging Authentications.txt',timeout_seconds=120).get_
 assert health['environment']=='staging' and health['providers']=={'asana':'configured_but_disabled','outlook':'configured_draft_only'}
 (OUT/'health_before.json').write_text(json.dumps(health,indent=2)+'\n')
 protected=json.loads((ROOT/'docs/staging/outlook_reconciled_closure/raw_after.json').read_text())
-migration=ROOT/'supabase/migrations/20261009000100_phase_08_outlook_inbound.sql'
+migration=ROOT/'supabase/migrations/20261009000300_phase_08_outlook_inbound.sql'
 with psycopg.connect(host='db.mspcopnsbounmdpivkvq.supabase.co',dbname='postgres',user='postgres',password=load_env_value('SUPABASE_DB_PASSWORD'),sslmode='require',connect_timeout=15) as c:
  def rows(t,cid):return c.execute(f"select coalesce(json_agg(row_to_json(r) order by r.id),'[]') from public.{t} r where rental_case_id=%s",(cid,)).fetchone()[0]
  assert {cid:{t:rows(t,int(cid)) for t in ts} for cid,ts in protected.items()}==protected

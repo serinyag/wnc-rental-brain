@@ -35,13 +35,19 @@ class OutlookInboundConfig:
     enabled: bool = False
     environment: str = 'staging'
     page_size: int = 10
+    production_contract: object | None = None
 
     def validate(self):
-        if self.environment != 'staging' or not self.allowed_mailbox or self.mailbox.casefold() != self.allowed_mailbox.casefold():
+        if self.environment not in ('staging','production') or not self.allowed_mailbox or self.mailbox.casefold() != self.allowed_mailbox.casefold():
             raise ValueError('inbound_staging_mailbox_scope_forbidden')
+        if self.environment=='production':
+            if self.production_contract is None or self.mailbox.casefold()!=self.production_contract.manifest['outlook']['mailbox'].casefold():
+                raise ValueError('production_inbound_identity_invalid')
         if not 1 <= self.page_size <= 25: raise ValueError('invalid_page_bound')
         if datetime.fromisoformat(self.since.replace('Z', '+00:00')).tzinfo is None: raise ValueError('initial_window_requires_timezone')
-        if not self.allowed_senders or not self.new_enquiry_subject: raise ValueError('synthetic_scope_required')
+        if self.environment=='production' and not self.allowed_senders:
+            if self.enabled or self.production_contract.lane('outlook_inbound'):raise ValueError('production_pilot_sender_scope_missing')
+        elif not self.allowed_senders or (self.environment=='staging' and not self.new_enquiry_subject): raise ValueError('synthetic_scope_required')
 
 
 class OutlookInboundAdapter:
@@ -66,7 +72,7 @@ class OutlookInboundAdapter:
 
     def _get(self, url):
         self.config.validate()
-        if not self.config.enabled: raise ValueError('inbound_gate_disabled')
+        if not self.config.enabled or (self.config.environment=='production' and not self.config.production_contract.lane('outlook_inbound')): raise ValueError('inbound_gate_disabled')
         # Redirects must be rejected by the real transport as well as cursor URLs.
         status, body, _ = self.transport.request(method='GET', url=url,
             headers={'Authorization': 'Bearer ' + self.access_token, 'Accept': 'application/json',

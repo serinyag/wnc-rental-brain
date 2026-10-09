@@ -735,7 +735,23 @@ def _combine_health_statuses(*statuses: str) -> str:
     return "ok"
 
 
+def _operator_reference(service):
+    runtime=getattr(getattr(service,"config",None),"runtime",None)
+    if getattr(runtime,"is_production",False) is True:
+        from tools.production_runtime.auth import actor
+        return actor()
+    return TEST_CONSOLE_OPERATOR_REFERENCE
+
+
 class TestConsoleService:
+    @property
+    def case_registered_event(self):
+        return "production_case_registered" if self.config.runtime.is_production else TEST_CONSOLE_CASE_REGISTERED_EVENT
+
+    @property
+    def source_type(self):
+        return "production_operator" if self.config.runtime.is_production else TEST_CONSOLE_SOURCE_TYPE
+
     def __init__(
         self,
         *,
@@ -1046,6 +1062,8 @@ left join stale_units su on true;
             return "configured_but_disabled"
         if runtime.is_staging and not allowlist_configured:
             return "misconfigured"
+        if fully_configured and runtime.is_production and not runtime.production.lane("outlook_send"):
+            return "configured_draft_only"
         if fully_configured and runtime.is_staging and not runtime.staging_allow_real_outlook_send:
             return "configured_draft_only"
         return "configured" if fully_configured else "misconfigured"
@@ -1054,7 +1072,7 @@ left join stale_units su on true;
         runtime = self.config.runtime
         allowlist_configured = bool(runtime.staging_allowed_asana_project_gids)
         fully_configured = bool(
-            config.access_token
+            config.has_credentials()
             and config.workspace_gid
             and config.default_project_gid
         )
@@ -1062,6 +1080,7 @@ left join stale_units su on true;
             value is not None
             for value in (
                 config.access_token,
+                config.token_provider,
                 config.workspace_gid,
                 config.default_project_gid,
             )
@@ -1069,6 +1088,8 @@ left join stale_units su on true;
         if not any_configuration:
             return "disabled"
         if not self.config.allow_real_providers:
+            return "configured_but_disabled"
+        if runtime.is_production and fully_configured and not runtime.production.lane("asana_mutations"):
             return "configured_but_disabled"
         if runtime.is_staging and not runtime.staging_allow_real_asana:
             return "configured_but_disabled"
@@ -1111,8 +1132,8 @@ with marker as (
     rental_case_id,
     structured_payload
   from public.workflow_events
-  where event_type_code = {sql_text(TEST_CONSOLE_CASE_REGISTERED_EVENT)}
-    and source_type = {sql_text(TEST_CONSOLE_SOURCE_TYPE)}
+  where event_type_code = {sql_text(self.case_registered_event)}
+    and source_type = {sql_text(self.source_type)}
   order by rental_case_id, id asc
 )
 select
@@ -1194,13 +1215,13 @@ order by last_activity desc, rc.id desc;
         case_reference_code = _generate_case_reference(self.now)
         created_at = self.now()
         payload = {
-            "test_case": True,
+            "test_case": not self.config.runtime.is_production,
             "label": _normalize_optional_text(label),
             "client_label": _normalize_optional_text(client_label),
             "contact_email": _normalize_optional_text(contact_email),
             "event_reference": _normalize_optional_text(event_reference),
         }
-        event_identity_key = f"test-console:case:{case_reference_code}"
+        event_identity_key = f"{self.source_type}:case:{case_reference_code}"
         insert_sql = f"""
 with inserted_case as (
   insert into public.rental_cases (
@@ -1267,16 +1288,16 @@ inserted_event as (
   )
   select
     rental_case_id,
-    {sql_text(TEST_CONSOLE_CASE_REGISTERED_EVENT)},
-    {sql_text(TEST_CONSOLE_SOURCE_TYPE)},
-    {sql_text('test_console:create_case')},
+    {sql_text(self.case_registered_event)},
+    {sql_text(self.source_type)},
+    {sql_text(self.source_type + ':create_case')},
     {sql_text(TEST_CONSOLE_OPERATOR_TYPE)},
-    {sql_text(TEST_CONSOLE_OPERATOR_REFERENCE)},
+    {sql_text(_operator_reference(self))},
     {_sql_timestamptz(created_at)},
     {_sql_timestamptz(created_at)},
     {_sql_json(payload)},
     {sql_text(event_identity_key)},
-    {_sql_json({"phase": "8.8a", "surface": "test_console"})}
+    {_sql_json({"phase": "8.8a", "surface": self.source_type})}
   from inserted_case
 )
 select rental_case_id
@@ -1401,7 +1422,7 @@ limit 1;
             ),
             human_work_preview=build_human_work_preview(snapshot),
             asana_master_task_reference=infer_asana_master_task_reference(snapshot),
-            provider_mode_lines=_local_provider_lines(self.config.allow_real_providers),
+            provider_mode_lines=(tuple("%s: %s" % (lane, "ENABLED" if self.config.runtime.production.lane(lane) else "OFF") for lane in ("outlook_inbound","outlook_send","asana_mutations")) if self.config.runtime.is_production else _local_provider_lines(self.config.allow_real_providers)),
             workflow_event_total_count=workflow_event_total_count,
             workflow_event_limit=self.config.workflow_event_limit,
             evidence_notice=evidence_notice,
@@ -1481,7 +1502,7 @@ limit 1;
             source_reference=f"inbound_source_record:{source_record.inbound_source_record_id}",
             occurred_at=payload["received_at"],
             structured_payload={**payload, "inbound_source_record_id": source_record.inbound_source_record_id},
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
@@ -1507,6 +1528,14 @@ limit 1;
         external_test_reference: str | None,
     ) -> OperationReport:
         self._load_test_case_metadata(rental_case_id)
+        if self.config.runtime.is_production:
+            from tools.production_runtime.auth import CURRENT
+            principal=CURRENT.get()
+            if principal is None: raise TestConsoleError("Named operator required.")
+            principal.require("OPERATOR")
+            self._require_case_snapshot(rental_case_id)
+            if not source_excerpt or not external_test_reference:raise TestConsoleError("Explicit real evidence source required.")
+            sender_reference=principal.actor
         field_definition = get_field_definition(field_code)
         if field_definition is None:
             raise TestConsoleError(f"Unknown observation field code: {field_code}")
@@ -1532,7 +1561,7 @@ limit 1;
                     source_hash=f"sha256:{_json_digest(dedupe_payload)}",
                     external_source_id=_normalize_optional_text(external_test_reference),
                     sender_actor_type="operator",
-                    sender_actor_reference=_normalize_optional_text(sender_reference) or TEST_CONSOLE_OPERATOR_REFERENCE,
+                    sender_actor_reference=_normalize_optional_text(sender_reference) or _operator_reference(self),
                     received_at=now_value,
                     evidence_excerpt=_normalize_optional_text(source_excerpt),
                 ),
@@ -1544,9 +1573,9 @@ limit 1;
                         observation_type=observation_type,
                         claim_kind=claim_kind,
                         candidate_value_payload=candidate_value,
-                        source_evidence_reference=f"test_console:{field_code}",
+                        source_evidence_reference=f"{self.source_type}:{field_code}",
                         asserted_by_party_type="operator",
-                        asserted_by_reference=_normalize_optional_text(sender_reference) or TEST_CONSOLE_OPERATOR_REFERENCE,
+                        asserted_by_reference=_normalize_optional_text(sender_reference) or _operator_reference(self),
                         source_excerpt=_normalize_optional_text(source_excerpt),
                         observed_against_case_revision=self.orchestration_repository.load_case_snapshot(rental_case_id).rental_case.case_revision,
                         extraction_confidence=1.0,
@@ -1576,8 +1605,8 @@ limit 1;
 
     def prepare_asana_rental_projection(self, *, rental_case_id: int) -> dict:
         from .asana_projection import prepare_projection
-        if not self.config.runtime.is_staging:
-            raise TestConsoleError("Asana rental projection certification is staging-only.")
+        if not (self.config.runtime.is_staging or self.config.runtime.is_production):
+            raise TestConsoleError("Hosted environment required.")
         self._load_test_case_metadata(rental_case_id)
         config = AsanaAdapterConfig.from_env()
         if not config.workspace_gid or not config.default_project_gid or not self.config.runtime.is_asana_project_allowed(config.default_project_gid):
@@ -1599,7 +1628,11 @@ limit 1;
             self.orchestration_repository, self.config.runtime).observe(action=action)
         self._create_console_event(rental_case_id=rental_case_id, event_type_code="asana_projection_observed",
             source_reference=f"workflow_action:{workflow_action_id}", occurred_at=self.now(), structured_payload=evidence,
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE, actor_type=TEST_CONSOLE_OPERATOR_TYPE)
+            actor_reference=_operator_reference(self), actor_type=TEST_CONSOLE_OPERATOR_TYPE)
+        if self.config.runtime.is_production:
+            from tools.production_runtime.alerts import emit
+            if evidence.get("status") != "matches_projection":
+                emit(self.config.runtime.production,"ASANA_MISMATCH",case_id=rental_case_id,actor=_operator_reference(self))
         return evidence
 
     def create_task_surface_test_action(
@@ -1684,7 +1717,7 @@ limit 1;
                 "project_gid_override": normalized_project_gid,
                 "external_test_reference": normalized_reference,
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
@@ -1704,7 +1737,7 @@ limit 1;
         result = reconcile_workflow_orchestration(
             self.orchestration_repository,
             rental_case_id=rental_case_id,
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             now=self.now,
         )
@@ -1776,7 +1809,7 @@ limit 1;
                         in {WORKFLOW_SEMANTIC_STATE_KNOWN_YES, WORKFLOW_SEMANTIC_STATE_KNOWN_NO}
                         else (f"{issue.domain_code}|{issue.reasoning_state_code}",)
                     ),
-                    grounding_reference_keys=(f"test_console:{issue.issue_code}",) + tuple(
+                    grounding_reference_keys=(f"{self.source_type}:{issue.issue_code}",) + tuple(
                         f"workflow_event:{eid}" for eid in issue.source_snapshot.get("governed_resolution_event_ids", ())),
                 )
             )
@@ -2370,7 +2403,7 @@ limit 1;
         result = reconcile_inquiry_waiting(
             self.orchestration_repository,
             rental_case_id=rental_case_id,
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             expected_case_revision=snapshot.rental_case.case_revision,
             now=self.now,
@@ -2411,7 +2444,7 @@ limit 1;
             self.observation_repository,
             rental_case_id=rental_case_id,
             expected_revision=snapshot.rental_case.case_revision,
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             now=self.now,
         )
@@ -2474,7 +2507,7 @@ limit 1;
                 if latest_revision is None
                 else INQUIRY_DRAFT_SOURCE_REGENERATED
             ),
-            created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            created_by_reference=_operator_reference(self),
             supersedes_draft_revision_id=None if latest_revision is None else latest_revision.inquiry_response_draft_revision_id,
         )
         approval = self._replace_draft_approval(
@@ -2501,7 +2534,7 @@ limit 1;
                 "draft_source": revision.draft_source,
                 "approval_request_id": approval.approval_request_id,
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
@@ -2626,7 +2659,7 @@ limit 1;
                     occurred_at=self.now(),
                     structured_payload={"generation_audit": exc.diagnostics["generation_audit"],
                                         "failure_category": exc.failure_category},
-                    actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                    actor_reference=_operator_reference(self),
                     actor_type=TEST_CONSOLE_OPERATOR_TYPE,
                 )
             raise TestConsoleError(
@@ -2678,7 +2711,7 @@ limit 1;
                         }
                     ),
                 },
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
             raise TestConsoleError(
@@ -2709,7 +2742,7 @@ limit 1;
                 structured_payload={"generation_audit": result.audit,
                                     "draft_revision_id": action.structured_payload['draft_revision_id'],
                                     "context_hash": contract.context_hash},
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
             return OperationReport(title="Governed Client Response Draft Exists", success=True,
@@ -2735,7 +2768,7 @@ limit 1;
                 if latest_revision is None
                 else INQUIRY_DRAFT_SOURCE_REGENERATED
             ),
-            created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            created_by_reference=_operator_reference(self),
             supersedes_draft_revision_id=(
                 None
                 if latest_revision is None
@@ -2783,7 +2816,7 @@ limit 1;
                 "client_generation_payload": contract.to_provider_payload(),
                 "communicated_editorial_items": communicated_items(contract.editorial_plan, generated.body),
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
@@ -3061,7 +3094,7 @@ limit 1;
                     "context_hash": revision.context_hash,
                     "recipient_email": revision.recipient_email,
                 },
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
         return OperationReport(
@@ -3087,13 +3120,13 @@ limit 1;
     ) -> OperationReport:
         """Read one approved staging draft from Graph without mutating either system."""
         runtime = self.config.runtime
-        if not runtime.is_staging:
+        if not (runtime.is_staging or runtime.is_production):
             raise TestConsoleError(
                 "Outlook draft inspection is available only in staging.",
                 failure_code="OUTLOOK_DRAFT_READ_STAGING_ONLY",
                 status=HTTPStatus.FORBIDDEN,
             )
-        if not self.config.allow_real_providers or not runtime.staging_allow_real_outlook:
+        if not self.config.allow_real_providers or (runtime.is_staging and not runtime.staging_allow_real_outlook):
             raise TestConsoleError(
                 "Outlook draft inspection requires the global and Outlook-specific staging authorizations.",
                 failure_code="OUTLOOK_DRAFT_READ_DISABLED",
@@ -3194,7 +3227,9 @@ limit 1;
             raise TestConsoleError(reason, failure_code="OUTLOOK_AMBIGUOUS_RECONCILIATION_BLOCKED")
 
         runtime = self.config.runtime
-        if not runtime.is_staging or runtime.staging_allow_real_outlook_send:
+        if (not (runtime.is_staging or runtime.is_production) or
+                (runtime.is_staging and runtime.staging_allow_real_outlook_send) or
+                (runtime.is_production and runtime.production.lane("outlook_send"))):
             blocked("Human delivery reconciliation requires staging with the send gate disabled.")
         if not evidence_note.strip():
             blocked("Human recipient confirmation evidence is required.")
@@ -3213,7 +3248,7 @@ limit 1;
                 or approval.status != "approved" or approval.target_entity_type != "workflow_action"
                 or approval.target_entity_id != workflow_action_id or approval.target_entity_reference != target
                 or recipient != revision.recipient_email or subject != revision.subject
-                or recipient.casefold() not in runtime.staging_allowed_email_recipients
+                or not runtime.is_email_recipient_allowed(recipient)
                 or attempt.workflow_action_id != workflow_action_id
                 or len([t for t in snapshot.execution_attempts if t.workflow_action_id == workflow_action_id]) != 1
                 or attempt.failure_code != "adapter_outcome_ambiguous" or attempt.retry_eligible
@@ -3230,7 +3265,7 @@ limit 1;
             draft_revision_id=draft_revision_id, approval_request_id=approval_request_id,
             execution_attempt_id=execution_attempt_id, expected_payload=value.to_payload(),
             recipient=recipient, subject=subject, evidence_note=evidence_note,
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE)
+            actor_reference=_operator_reference(self))
         return OperationReport(title="Outlook Human Delivery Reconciled", success=True, lines=(
             f"Workflow event id: {result['workflow_event_id']}",
             f"Already reconciled: {result['already_reconciled']}",
@@ -3311,7 +3346,7 @@ limit 1;
                 "body_matches": True,
                 "send_enabled": False,
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
@@ -3600,7 +3635,7 @@ limit 1;
                 context=context,
                 content=content,
                 draft_source=INQUIRY_DRAFT_SOURCE_HUMAN_EDITED,
-                created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                created_by_reference=_operator_reference(self),
                 supersedes_draft_revision_id=prior_revision.inquiry_response_draft_revision_id,
             ),
         )
@@ -3725,10 +3760,10 @@ limit 1;
         """Load and verify every governed fact required before the sole Graph read."""
         runtime = self.config.runtime
         if (
-            not runtime.is_staging
+            not (runtime.is_staging or runtime.is_production)
             or not self.config.allow_real_providers
-            or not runtime.staging_allow_real_outlook
-            or runtime.staging_allow_real_outlook_send
+            or (runtime.is_staging and (not runtime.staging_allow_real_outlook or runtime.staging_allow_real_outlook_send))
+            or (runtime.is_production and runtime.production.lane("outlook_send"))
         ):
             return self._outlook_human_edit_safety_blocked(
                 "Staging requires Outlook draft-only authorization with sending disabled."
@@ -3854,7 +3889,7 @@ limit 1;
                 source_reference=source_reference,
                 occurred_at=occurred_at,
                 structured_payload=structured_payload,
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             ),
         )
@@ -4151,7 +4186,7 @@ limit 1;
             context=context,
             content=content,
             draft_source=INQUIRY_DRAFT_SOURCE_HUMAN_EDITED,
-            created_by_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            created_by_reference=_operator_reference(self),
             supersedes_draft_revision_id=prior_revision.inquiry_response_draft_revision_id,
         )
         approval = self._replace_draft_approval(
@@ -4178,7 +4213,7 @@ limit 1;
                 "supersedes_draft_revision_id": prior_revision.inquiry_response_draft_revision_id,
                 "approval_request_id": approval.approval_request_id,
             },
-            actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+            actor_reference=_operator_reference(self),
             actor_type=TEST_CONSOLE_OPERATOR_TYPE,
         )
         return OperationReport(
@@ -4199,6 +4234,12 @@ limit 1;
 
     def execute_action(self, *, rental_case_id: int, workflow_action_id: int, execution_mode: str) -> OperationReport:
         snapshot = self._require_case_snapshot(rental_case_id)
+        if self.config.runtime.is_production:
+            from tools.production_runtime.auth import CURRENT
+            principal=CURRENT.get()
+            if principal is None: raise TestConsoleError("Named operator required.")
+            principal.require("OPERATOR")
+            if execution_mode != "real":raise TestConsoleError("Production simulation forbidden.")
         self._invalidate_stale_drafts(snapshot)
         snapshot = self._require_case_snapshot(rental_case_id)
         action = snapshot.find_workflow_action(workflow_action_id)
@@ -4221,13 +4262,20 @@ limit 1;
             WorkflowActionExecutionRequest(
                 rental_case_id=rental_case_id,
                 workflow_action_id=workflow_action_id,
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
                 started_at=self.now(),
             ),
             adapter_registry=registry,
             now=self.now,
         )
+        if self.config.runtime.is_production and result.failure_codes:
+            from tools.production_runtime.alerts import emit
+            codes = " ".join(result.failure_codes).lower()
+            alert = ("PROVIDER_AMBIGUITY" if "ambiguous" in codes else "UNEXPECTED_RECIPIENT" if "recipient" in codes
+                     else "SCOPE_DENIED" if "scope" in codes or "identity" in codes or "forbidden" in codes else "STALE_DRAFT" if "stale" in codes
+                     else "ASANA_FAILURE" if "asana" in action.target_adapter_code or action.target_adapter_code=="task_surface" else "OUTLOOK_FAILURE")
+            emit(self.config.runtime.production,alert,case_id=rental_case_id,actor=_operator_reference(self))
         lines = [
             f"Action status before: {result.action_status_before}",
             f"Action status after: {result.action_status_after}",
@@ -4255,7 +4303,7 @@ limit 1;
             self.orchestration_repository,
             FollowUpEvaluationRequest(
                 rental_case_id=rental_case_id,
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
                 now=self.now(),
             ),
@@ -4401,6 +4449,14 @@ limit 1;
 
     def _decide_approval(self, *, rental_case_id: int, approval_request_id: int, decision: str) -> OperationReport:
         snapshot = self._require_case_snapshot(rental_case_id)
+        if self.config.runtime.is_production:
+            from tools.production_runtime.auth import CURRENT
+            principal=CURRENT.get()
+            if principal is None: raise TestConsoleError("Named operator required.")
+            principal.require("APPROVER")
+            target=snapshot.find_approval_request(approval_request_id)
+            action=snapshot.find_workflow_action(target.target_entity_id) if target and target.target_entity_type=="workflow_action" else None
+            if action is None or action.action_category != "communication":principal.require("DECISION_AUTHORITY")
         self._invalidate_stale_drafts(snapshot)
         snapshot = self._require_case_snapshot(rental_case_id)
         approval_request = snapshot.find_approval_request(approval_request_id)
@@ -4471,7 +4527,7 @@ limit 1;
                 approval_request_id=approval_request_id,
                 decision=decision,
                 expected_case_revision=snapshot.rental_case.case_revision,
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
                 decided_at=self.now(),
             ),
@@ -4504,7 +4560,7 @@ limit 1;
                     "draft_revision_id": linked_draft.inquiry_response_draft_revision_id,
                     "workflow_action_id": linked_draft.workflow_action_id,
                 },
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
         return OperationReport(
@@ -4910,7 +4966,7 @@ limit 1;
             contact_label=metadata.client_label,
             recipient_email=self._simulated_recipient_email(snapshot.rental_case.rental_case_id, metadata),
             recipient_label=metadata.client_label,
-            sender_email="wnc-rentals-simulated@example.test",
+            sender_email=(self.config.runtime.production.manifest["outlook"]["mailbox"] if self.config.runtime.is_production else "wnc-rentals-simulated@example.test"),
             sender_label="WNC Rentals (Simulated)",
             open_questions=questions,
             current_facts=current_facts,
@@ -4982,14 +5038,14 @@ limit 1;
     def submit_operational_resolution(self, *, rental_case_id: int, submission: dict) -> dict:
         """Authenticated staging operator path; actor authority is server-derived."""
         from .operational_resolution import submit
-        if self.config.runtime.app_env.value != "staging":
-            raise TestConsoleError("Operational resolution is staging-only.")
-        actor = self.config.runtime.staging_basic_auth_username
+        if self.config.runtime.app_env.value not in {"staging","production"}:
+            raise TestConsoleError("Hosted operator evidence required.")
+        actor = _operator_reference(self) if self.config.runtime.is_production else self.config.runtime.staging_basic_auth_username
         if not actor:
             raise TestConsoleError("Configured staging operator identity required.")
         detail = self.load_case_detail(rental_case_id)
         return submit(self.orchestration_repository, rental_case_id=rental_case_id,
-            submission=submission, actor=actor,
+            submission=submission, actor=actor, environment=self.config.runtime.app_env.value,
             observed_fields=self._build_observed_field_candidates(detail.evidence_bundles))
 
     def _ensure_resolution_workflow_actions(
@@ -5062,7 +5118,7 @@ limit 1;
             contact_label=metadata.client_label,
             recipient_email=self._simulated_recipient_email(snapshot.rental_case.rental_case_id, metadata),
             recipient_label=metadata.client_label,
-            sender_email="wnc-rentals-simulated@example.test",
+            sender_email=(self.config.runtime.production.manifest["outlook"]["mailbox"] if self.config.runtime.is_production else "wnc-rentals-simulated@example.test"),
             sender_label="WNC Rentals (Simulated)",
             allow_empty_open_questions=True,
             open_questions=tuple(
@@ -5670,6 +5726,8 @@ returning
     def _outlook_send_enabled_at_transport_boundary(self) -> bool:
         """Keep the send switch evaluated at the exact outbound transport boundary."""
         runtime = self.config.runtime
+        if runtime.is_production:
+            return runtime.production is not None and runtime.production.lane("outlook_send")
         send_enabled = (
             _env_flag(STAGING_ALLOW_REAL_OUTLOOK_SEND_ENV)
             if STAGING_ALLOW_REAL_OUTLOOK_SEND_ENV in os.environ
@@ -5864,7 +5922,7 @@ where rental_case_id = {rental_case_id}
                     "source_case_revision": revision.source_case_revision,
                     "current_case_revision": snapshot.rental_case.case_revision,
                 },
-                actor_reference=TEST_CONSOLE_OPERATOR_REFERENCE,
+                actor_reference=_operator_reference(self),
                 actor_type=TEST_CONSOLE_OPERATOR_TYPE,
             )
 
@@ -6011,6 +6069,10 @@ where rental_case_id = {rental_case_id}
         metadata: TestConsoleCaseMetadata,
     ) -> str:
         contact_email = _normalize_optional_text(metadata.contact_email)
+        if getattr(self.config.runtime,"is_production",False):
+            if not contact_email or not self.config.runtime.is_email_recipient_allowed(contact_email):
+                raise TestConsoleError("Production recipient scope mismatch.")
+            return contact_email
         if contact_email and (
             _is_safe_test_email(contact_email)
             or (
@@ -6297,8 +6359,8 @@ select
   occurred_at::text as occurred_at
 from public.workflow_events
 where rental_case_id = {rental_case_id}
-  and event_type_code = {sql_text(TEST_CONSOLE_CASE_REGISTERED_EVENT)}
-  and source_type = {sql_text(TEST_CONSOLE_SOURCE_TYPE)}
+  and event_type_code = {sql_text(self.case_registered_event)}
+  and source_type = {sql_text(self.source_type)}
 order by id asc
 limit 1;
 """.strip()
@@ -6328,7 +6390,7 @@ select
 from public.workflow_events
 where rental_case_id = {rental_case_id}
   and ((event_type_code = {sql_text(TEST_CONSOLE_RAW_EVIDENCE_EVENT)}
-        and source_type = {sql_text(TEST_CONSOLE_SOURCE_TYPE)})
+        and source_type = {sql_text(self.source_type)})
        or (event_type_code = 'outlook_inbound_evidence_recorded' and source_type = 'outlook_inbound'))
 order by occurred_at desc, id desc;
 """.strip()
@@ -6410,7 +6472,7 @@ insert into public.workflow_events (
 values (
   {rental_case_id},
   {sql_text(event_type_code)},
-  {sql_text(TEST_CONSOLE_SOURCE_TYPE)},
+  {sql_text(self.source_type)},
   {sql_text(source_reference)},
   {sql_text(actor_type)},
   {sql_text(actor_reference)},
@@ -6418,7 +6480,7 @@ values (
   {_sql_timestamptz(occurred_at)},
   {_sql_json(structured_payload)},
   {sql_text(f'{event_type_code}:{rental_case_id}:{_json_digest(structured_payload)}')},
-  {_sql_json({"phase": "8.8a", "surface": "test_console"})}
+  {_sql_json({"phase": "8.8a", "surface": self.source_type})}
 )
 on conflict (rental_case_id, event_identity_key) do nothing;
 """.strip()
@@ -6439,6 +6501,8 @@ on conflict (rental_case_id, event_identity_key) do nothing;
         snapshot = repository.load_case_snapshot(rental_case_id)
         if snapshot is None:
             raise TestConsoleError(f"RentalCase {rental_case_id} was not found.")
+        if self.config.runtime.is_production and not snapshot.rental_case.is_active:
+            raise TestConsoleError("Inactive production case cannot be processed.")
         return snapshot
 
     def _parse_observation_value(self, value_type_code: str, raw_value: str) -> Any:

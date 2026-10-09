@@ -100,8 +100,13 @@ class OutlookAdapterConfig:
 
     @classmethod
     def from_env(cls) -> OutlookAdapterConfig:
+        if load_env_value("APP_ENV") == "production":
+            import os
+            from tools.production_runtime.config import ProductionContract
+            m=ProductionContract.from_env().manifest['outlook']
+            return cls(m['tenant_id'],m['client_id'],os.environ['PRODUCTION_MICROSOFT_CLIENT_SECRET'],m['mailbox'])
         timeout_seconds = _parse_timeout_seconds(load_env_value("OUTLOOK_TIMEOUT_SECONDS"))
-        return cls(
+        config = cls(
             tenant_id=_normalize_optional_text(load_env_value("MICROSOFT_TENANT_ID")),
             client_id=_normalize_optional_text(load_env_value("MICROSOFT_CLIENT_ID")),
             client_secret=_normalize_optional_text(load_env_value("MICROSOFT_CLIENT_SECRET")),
@@ -112,6 +117,10 @@ class OutlookAdapterConfig:
             or DEFAULT_MICROSOFT_AUTHORITY_BASE_URL,
             timeout_seconds=timeout_seconds,
         )
+        if load_env_value("APP_ENV") == "staging":
+            from tools.production_runtime.config import validate_staging_target
+            validate_staging_target(provider="outlook",config=config)
+        return config
 
     def availability_failure_code(self, *, action: WorkflowAction) -> str | None:
         if action.action_type not in OUTLOOK_SUPPORTED_ACTION_TYPES:
@@ -154,7 +163,12 @@ class UrllibOutlookTransport:
             method=method,
         )
         try:
-            with urllib.request.urlopen(request, timeout=timeout_seconds, context=self.ssl_context) as response:
+            import os
+            opener=urllib.request.urlopen
+            if os.environ.get("APP_ENV")=="production":
+                from tools.production_runtime.network import open_provider
+                opener=open_provider
+            with opener(request, timeout=timeout_seconds, context=self.ssl_context) as response:
                 return (
                     response.status,
                     response.read().decode("utf-8"),

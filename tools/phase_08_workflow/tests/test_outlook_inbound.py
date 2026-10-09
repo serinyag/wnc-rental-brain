@@ -38,7 +38,7 @@ def db():
     if not dsn: pytest.skip('Explicit local PostgreSQL required')
     assert urlparse(dsn).hostname in ('127.0.0.1','localhost','::1')
     with psycopg.connect(dsn) as conn, conn.transaction(force_rollback=True), patch('urllib.request.urlopen',side_effect=AssertionError('Provider HTTP forbidden')):
-        for migration in ('20260907000100_phase_08_governed_client_response_action_type.sql','20260913000100_phase_08_outlook_canonical_plan_identity.sql','20261003000100_phase_08_human_delivery_reconciliation.sql','20261003000200_phase_08_asana_projection_fences.sql','20261009000100_phase_08_outlook_inbound.sql'):
+        for migration in ('20260907000100_phase_08_governed_client_response_action_type.sql','20260913000100_phase_08_outlook_canonical_plan_identity.sql','20261003000100_phase_08_human_delivery_reconciliation.sql','20261003000200_phase_08_asana_projection_fences.sql','20261009000300_phase_08_outlook_inbound.sql'):
             conn.execute((ROOT/'supabase/migrations'/migration).read_text())
         yield conn
 

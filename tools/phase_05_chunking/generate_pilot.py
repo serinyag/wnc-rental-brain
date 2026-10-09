@@ -774,6 +774,9 @@ def _direct_postgres_connect(database_url: str, *, timeout_seconds: float | None
     if timeout_seconds is not None:
         connect_kwargs["connect_timeout"] = max(1, int(math.ceil(timeout_seconds)))
         connect_kwargs["options"] = f"-c statement_timeout={max(1, int(timeout_seconds * 1000))}"
+    if load_env_value('APP_ENV') == 'production':
+        from tools.production_runtime.database import connect
+        return connect(database_url, **connect_kwargs)
     return psycopg.connect(database_url, **connect_kwargs)
 
 

@@ -1,0 +1,17 @@
+**
+!tools/
+!tools/**
+!supabase/
+!supabase/seed.sql
+!supabase/migrations/
+!supabase/migrations/**
+!docs/
+!docs/production_pilot_remediation/
+!docs/production_pilot_remediation/**
+!pyproject.toml
+!README.md
+**/__pycache__
+**/*.pyc
+**/*.log
+**/*.xml
+**/.env*

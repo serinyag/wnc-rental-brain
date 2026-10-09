@@ -59,6 +59,13 @@ class TestConsoleApp:
         status = HTTPStatus.OK
         failure_code = "OK"
         try:
+            from tools.production_runtime.auth import CURRENT
+            if self.config.runtime.is_production and (self.config.runtime.production is None or CURRENT.get() is None):
+                status = HTTPStatus.SERVICE_UNAVAILABLE
+                failure_code = "PRODUCTION_RUNTIME_NOT_APPROVED"
+                return self._respond_json_error(start_response, status=status,
+                    message="Production operator runtime is not approved.",
+                    failure_code=failure_code)
             if method == "GET" and path == "/healthz":
                 report = self._get_health_report()
                 status = report.http_status
@@ -106,6 +113,9 @@ class TestConsoleApp:
             status = error.status
             failure_code = error.failure_code
             if error.diagnostics:
+                if self.config.runtime.is_production:
+                    from tools.production_runtime.privacy import redact_diagnostic
+                    error.diagnostics=redact_diagnostic(error.diagnostics)
                 LOGGER.warning(
                     "test_console_safe_diagnostics method=%s path=%s failure_code=%s diagnostics=%s",
                     method,
@@ -132,10 +142,13 @@ class TestConsoleApp:
                 ),
                 status=error.status,
             )
-        except Exception:
+        except Exception as error:
             status = HTTPStatus.INTERNAL_SERVER_ERROR
             failure_code = "UNEXPECTED_SERVER_ERROR"
-            LOGGER.exception("test_console_http_unexpected_error method=%s path=%s", method, path)
+            # Exception messages (including SQL/provider failures) can contain
+            # client evidence or credentials. Keep content out of shared logs.
+            LOGGER.error("test_console_http_unexpected_error method=%s path=%s error_type=%s",
+                         method, path, type(error).__name__)
             if api_request:
                 return self._respond_json_error(
                     start_response,
@@ -171,7 +184,7 @@ class TestConsoleApp:
     ) -> list[bytes]:
         parts = [part for part in path.split("/") if part]
         if path == "/api/operator/outlook-inbound/review" and method == "GET":
-            if not self.config.runtime.is_staging:
+            if not (self.config.runtime.is_staging or self.config.runtime.is_production):
                 return self._respond_json_error(start_response, status=HTTPStatus.FORBIDDEN,
                     message="Inbound review is staging-only.", failure_code="INBOUND_SCOPE_FORBIDDEN")
             rows = self.service.query_runner("""select source_record_id, rental_case_id, association_status,
@@ -464,7 +477,7 @@ class TestConsoleApp:
             report = self.service.execute_action(
                 rental_case_id=rental_case_id,
                 workflow_action_id=workflow_action_id,
-                execution_mode=str(payload.get("execution_mode", "success")),
+                execution_mode=str(payload.get("execution_mode", "real" if self.config.runtime.is_production else "success")),
             )
             return self._respond_json(start_response, self._operator_case_payload(rental_case_id, report))
         return self._respond_json_error(
@@ -571,7 +584,7 @@ class TestConsoleApp:
             report = self.service.execute_action(
                 rental_case_id=rental_case_id,
                 workflow_action_id=workflow_action_id,
-                execution_mode=form.get("execution_mode", "success"),
+                execution_mode=form.get("execution_mode", "real" if self.config.runtime.is_production else "success"),
             )
             return self._respond_html(start_response, self._render_case_detail(rental_case_id, report))
         return self._respond_text(start_response, HTTPStatus.NOT_FOUND, "Not found.")
@@ -652,6 +665,9 @@ class TestConsoleApp:
   </form>
 </section>
 """
+        if self.config.runtime.is_production:
+            disabled="" if self.config.runtime.production.lane("outlook_inbound") else "disabled"
+            create_form = f'<p>Production enquiries enter through the scoped Inbox. All provider lanes start off.</p><form method="post" action="/operator/inbox-sync"><button {disabled}>Check authorized Inbox page</button></form>'
         rows = "".join(
             f"""
 <tr>
@@ -694,8 +710,8 @@ class TestConsoleApp:
 </section>
 """
         return self._render_layout(
-            title="Rental Workflow Test Console",
-            body="".join(filter(None, [self._render_report(report), create_form, cases_table])),
+            title="WNC Rental Operations" if self.config.runtime.is_production else "Rental Workflow Test Console",
+            body="".join(filter(None, [self._render_report(report), create_form, cases_table.replace("Test RentalCases","Rental cases").replace("No test cases yet.","No cases yet.") if self.config.runtime.is_production else cases_table])),
             current_path=current_path,
         )
 
@@ -861,6 +877,9 @@ class TestConsoleApp:
 """
 
     def _render_test_controls(self, rental_case_id: int) -> str:
+        if self.config.runtime.is_production:
+            from tools.production_runtime.operator_ui import controls
+            return controls(self.service,rental_case_id)
         field_options = "".join(
             f'<option value="{h(value)}">{h(value)}</option>' for value in (
                 "guest_count",
@@ -879,7 +898,7 @@ class TestConsoleApp:
         )
         observation_type_options = "".join(f'<option value="{h(value)}">{h(value)}</option>' for value in STRUCTURED_OBSERVATION_TYPE_OPTIONS)
         claim_kind_options = "".join(f'<option value="{h(value)}">{h(value)}</option>' for value in STRUCTURED_OBSERVATION_CLAIM_KIND_OPTIONS)
-        return f"""
+        panel = f"""
 <section class="panel">
   <h2>Runtime Controls</h2>
   <div class="grid two">
@@ -931,6 +950,12 @@ class TestConsoleApp:
 </section>
 """
 
+        if self.config.runtime.is_production:
+            import re
+            panel=re.sub(r'<form[^>]+action="[^"]+/(?:raw-evidence|followups/evaluate)".*?</form>', '', panel, flags=re.S)
+            panel=panel.replace('Inject Structured Test Observation','Record sourced observation').replace('External test reference','Source reference').replace('test_console:operator','Authenticated operator')
+        return panel
+
     def _render_simulated_outlook_panel(self, rental_case_id: int, detail: CaseConsoleSnapshot) -> str:
         inbound_rows = []
         for bundle in detail.evidence_bundles:
@@ -969,7 +994,7 @@ class TestConsoleApp:
                     f'<button type="submit">Approve Exact Revision</button></form>{reject_form}'
                 )
             simulate_send = ""
-            if thread.can_simulate_send and thread.workflow_action_id is not None:
+            if thread.can_simulate_send and thread.workflow_action_id is not None and not self.config.runtime.is_production:
                 simulate_send = (
                     f'<form method="post" action="/cases/{rental_case_id}/actions/{thread.workflow_action_id}/execute" class="inline">'
                     '<select name="execution_mode">'
@@ -1150,6 +1175,8 @@ class TestConsoleApp:
                             action.target_adapter_code == "outlook"
                             and action.structured_payload.get("contract_version") == CONTRACT_VERSION)):
                         options.append('<option value="real">Real provider</option>')
+                if self.config.runtime.is_production:
+                    options = ['<option value="real">Execute approved provider action</option>']
                 actions = (
                     f'<form method="post" action="/cases/{rental_case_id}/actions/{action.workflow_action_id}/execute" class="inline">'
                     f'<select name="execution_mode">{"".join(options)}</select>'
@@ -1817,7 +1844,19 @@ def build_test_console_app(*, config: TestConsoleConfig | None = None, service: 
     resolved_config.validate()
     if service is None:
         service = TestConsoleService(config=resolved_config)
-    return TestConsoleApp(service)
+    app = TestConsoleApp(service)
+    if resolved_config.runtime.is_production:
+        from pathlib import Path
+        from tools.production_runtime.middleware import ProductionOperatorApp
+        contract=resolved_config.runtime.production
+        contract.verify_baseline(Path(__file__).resolve().parents[2])
+        contract.verify_database_marker(service.query_runner)
+        from tools.production_runtime.config import verify_knowledge
+        verify_knowledge(contract,service.query_runner)
+        if service.get_health_report().overall_status != "ok":
+            raise RuntimeError("production_dependencies_not_ready")
+        return ProductionOperatorApp(app,contract)
+    return app
 
 
 def main() -> int:
@@ -1827,6 +1866,8 @@ def main() -> int:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
     config = TestConsoleConfig.from_env()
+    if config.runtime.is_production:
+        raise RuntimeError("production_requires_gunicorn_entrypoint")
     if args.host is not None:
         config = replace(config, host=args.host)
     if args.port is not None:

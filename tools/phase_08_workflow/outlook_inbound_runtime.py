@@ -39,6 +39,17 @@ def enabled(name): return (load_env_value(name) or '').lower() == 'true'
 
 def configuration(*, preflight=False):
     env = load_env_value('APP_ENV')
+    if env == 'production':
+        from tools.production_runtime.config import ProductionContract
+        from tools.production_runtime.auth import CURRENT
+        principal=CURRENT.get()
+        if principal is None:raise ValueError('named_operator_required')
+        principal.require('OPERATOR')
+        contract=ProductionContract.from_env();m=contract.manifest['outlook']
+        if not contract.lane('outlook_inbound'):raise ValueError('inbound_operation_not_authorized')
+        config=OutlookInboundConfig(m['mailbox'],m['mailbox'],m['since'],tuple(m['allowed_senders']),'',True,'production',10,contract)
+        config.validate()
+        return config,OutlookAdapterConfig.from_env()
     gate = 'STAGING_ALLOW_OUTLOOK_INBOUND_PREFLIGHT' if preflight else 'STAGING_ALLOW_REAL_OUTLOOK_INBOUND'
     if env != 'staging' or not enabled(gate): raise ValueError('inbound_operation_not_authorized')
     mailbox=load_env_value('OUTLOOK_SENDER_MAILBOX') or ''
@@ -86,9 +97,9 @@ def validate_staging_database(dsn):
     parts=urlparse(dsn)
     # Render uses the project's Supabase session pooler. Its username routes
     # the connection to a project, so host validation alone is insufficient.
-    direct=(parts.hostname=='db.mspcopnsbounmdpivkvq.supabase.co' and parts.username=='postgres')
+    direct=(parts.hostname=='db.mspcopnsbounmdpivkvq.supabase.co' and parts.username in ('postgres','wnc_staging_runtime'))
     pooler=(parts.hostname=='aws-0-eu-central-1.pooler.supabase.com' and
-            unquote(parts.username or '')=='postgres.mspcopnsbounmdpivkvq')
+            unquote(parts.username or '') in ('postgres.mspcopnsbounmdpivkvq','wnc_staging_runtime.mspcopnsbounmdpivkvq'))
     if (parts.scheme not in ('postgres','postgresql') or parts.port not in (None,5432)
             or parts.path!='/postgres' or parts.query or parts.fragment or not (direct or pooler)):
         raise ValueError('inbound_staging_database_scope_forbidden')
@@ -99,7 +110,21 @@ def synchronize():
     # Check both runtime and database destination before token or Graph access.
     configuration()
     dsn=load_env_value('DATABASE_URL') or ''
-    validate_staging_database(dsn)
+    if load_env_value("APP_ENV")=="production":
+        from tools.production_runtime.config import ProductionContract
+        ProductionContract.from_env().validate_database(dsn)
+    else:
+        validate_staging_database(dsn)
     adapter=build_adapter()
-    with psycopg.connect(dsn,autocommit=True,connect_timeout=15) as connection:
-        return sync_page(connection,adapter)
+    if load_env_value("APP_ENV")=="production":
+        from tools.production_runtime.database import connect
+    else:
+        connect=psycopg.connect
+    with connect(dsn,autocommit=True,connect_timeout=15) as connection:
+        try:return sync_page(connection,adapter)
+        except Exception:
+            if adapter.config.environment=='production':
+                from tools.production_runtime.alerts import emit
+                emit(adapter.config.production_contract,'INBOUND_FAILURE')
+                emit(adapter.config.production_contract,'CHECKPOINT_FAILURE')
+            raise

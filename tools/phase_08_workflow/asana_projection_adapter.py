@@ -31,8 +31,16 @@ class AsanaProjectionAdapter:
     def _scope(self, *, mutation):
         # This certification rollout cannot execute in local/production or use a
         # caller-controlled API host/project. Tokens are never placed in evidence.
+        if self.runtime.is_production:
+            contract=self.runtime.production
+            if (contract is None or (mutation and not contract.lane("asana_mutations")) or
+                self.config.workspace_gid != contract.manifest['asana']['workspace_gid'] or
+                self.config.default_project_gid != contract.manifest['asana']['project_gid'] or
+                self.config.api_base_url != DEFAULT_ASANA_API_BASE_URL or not self.config.has_credentials()):
+                raise ProjectionFailure("production_scope_or_gate_invalid")
+            return
         if (not self.runtime.is_staging or (mutation and not self.runtime.staging_allow_real_asana)
-                or not self.config.access_token or not self.config.workspace_gid
+                or not self.config.has_credentials() or not self.config.workspace_gid
                 or not self.config.default_project_gid
                 or not self.runtime.is_asana_project_allowed(self.config.default_project_gid)
                 or self.config.api_base_url != DEFAULT_ASANA_API_BASE_URL):
@@ -67,7 +75,7 @@ class AsanaProjectionAdapter:
         try:
             status, body, _ = self.transport.send_json(method=method,
                 url=self.config.api_base_url + path,
-                headers={"Authorization": f"Bearer {self.config.access_token}", "Accept": "application/json",
+                headers={"Authorization": f"Bearer {self.config.authorization_token()}", "Accept": "application/json",
                          "Content-Type": "application/json"},
                 payload={} if payload is None else {"data": payload}, timeout_seconds=self.config.timeout_seconds)
         except Exception as exc:
