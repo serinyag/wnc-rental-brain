@@ -43,10 +43,16 @@ def obligation(snapshot, action, *, observed_fields=()):
     p = action.structured_payload
     if (action.rental_case_id != c.rental_case_id or action.action_type != 'CREATE_INTERNAL_TASK_ITEM'
             or p.get('resolution_owner') != 'WNC_INTERNAL'
-            or action.status in {'cancelled', 'superseded', 'failed'}):
+            or action.status in {'cancelled', 'failed'}):
         raise ValueError('ineligible_operational_action')
     key = p.get('resolution_item_key', '')
     current_scope = scope(snapshot)
+    from .context_aware_drafting import derive_resolution_items
+    active_keys = {item.proposition_key for item in derive_resolution_items(snapshot, observed_fields=observed_fields)}
+    accepted_keys = {p['contract']['resolution_item_key'] for p in current_resolutions(snapshot)
+                     if p['contract']['workflow_action_id'] == action.workflow_action_id}
+    if key not in active_keys | accepted_keys:
+        raise ValueError('operational_obligation_no_longer_current')
     if key == f'availability:{c.active_event_start}:{c.active_event_end}':
         kind, subjects = 'AVAILABILITY_CONFIRMATION', [c.rental_type_code]
     else:

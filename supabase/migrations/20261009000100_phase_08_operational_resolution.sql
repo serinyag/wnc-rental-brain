@@ -21,7 +21,7 @@ begin
  if c.case_revision <> p_revision then raise exception 'stale_case_revision'; end if;
  select * into a from public.workflow_actions where id=p_action and rental_case_id=p_case for update;
  if not found or a.semantic_subject_hash <> p_action_hash or a.action_type <> 'CREATE_INTERNAL_TASK_ITEM'
-   or a.status in ('cancelled','superseded','failed')
+   or a.status in ('cancelled','failed')
    or a.structured_payload->>'resolution_owner' <> 'WNC_INTERNAL'
    or a.structured_payload->>'resolution_item_key' is distinct from v_contract->>'resolution_item_key'
    then raise exception 'resolution_action_mismatch'; end if;

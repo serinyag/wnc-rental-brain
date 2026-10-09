@@ -127,7 +127,7 @@ def test_technical_partial_resolution_contract_is_narrow(resolution):
     conn,repo,cid,a,r,accept=resolution
     s=repo.load_case_snapshot(cid)
     technical=replace(a,structured_payload={**a.structured_payload,'resolution_item_key':'blocker:7'})
-    s=replace(s,blockers=(NS(blocker_id=7,origin_entity_reference='reasoning_projection:technical'),),
+    s=replace(s,blockers=(NS(blocker_id=7,origin_entity_reference='reasoning_projection:technical',status='open',blocker_type='technical_confirmation',resolution_condition_text='Confirm technical setup'),),
         reasoning_projections=(NS(projection_identity_key='technical',authority_outcome_classification='REQUIRES_CONFIRMATION',grounding_reference_keys=('test_console:technical_projection',)),))
     observed=(NS(field_code='technical_requirements',value_payload=['projection_display','microphones'],observation_status='validated'),)
     c=obligation(s,technical,observed_fields=observed)
@@ -227,3 +227,14 @@ def test_no_actor_and_external_evidence_require_authority(resolution):
     with pytest.raises(ValueError):validate_submission(r['contract'],r,actor='')
     for extra in ({'source':'external_party'},{'source':'llm'},{'source':'asana','completed':True}):
         with pytest.raises(ValueError):validate_submission(r['contract'],{**r,**extra},actor='operator')
+
+
+def test_superseded_lifecycle_can_report_only_still_current_obligation(resolution):
+    conn,repo,cid,a,r,accept=resolution
+    conn.execute("update public.workflow_actions set status='superseded' where id=%s",(a.workflow_action_id,))
+    first=accept()
+    assert current_resolutions(repo.load_case_snapshot(cid))
+    assert accept()=={**first,'replayed':True}
+    conn.execute("update public.rental_cases set active_event_start=active_event_start+interval '1 day',active_event_end=active_event_end+interval '1 day',case_revision=case_revision+1 where id=%s",(cid,))
+    changed={**r,'idempotency_key':'different-current-obligation','expected_case_revision':first['case_revision']+1}
+    with pytest.raises(ValueError,match='no_longer_current'):accept(changed)
