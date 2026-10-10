@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable
 
 from .contracts import CHANGE_IMPACT_MATERIAL, RESCHEDULE_URGENCY_NORMAL
@@ -843,6 +843,8 @@ def _normalize_iso_timestamp(value: str) -> str | None:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone(timezone.utc)
     return parsed.isoformat().replace("+00:00", "Z")
 
 
