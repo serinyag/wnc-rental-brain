@@ -9,6 +9,8 @@ from .config import ProductionContract,LANES
 from .alerts import atomic_json,emit
 
 def main():
+    from .mounted_config import materialize_render_configuration
+    materialize_render_configuration()
     c=ProductionContract.from_env()
     from . import state_store
     if state_store.enabled(c):state_store.disable(c)

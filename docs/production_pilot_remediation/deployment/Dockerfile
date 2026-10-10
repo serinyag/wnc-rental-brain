@@ -9,7 +9,7 @@ COPY supabase/migrations /app/supabase/migrations
 COPY supabase/seed.sql /app/supabase/seed.sql
 COPY docs/production_pilot_remediation/MIGRATION_LEDGER.json /app/docs/production_pilot_remediation/MIGRATION_LEDGER.json
 COPY pyproject.toml README.md /app/
-RUN useradd --uid 10001 --create-home wnc
+RUN groupadd --gid 1000 render-secrets && useradd --uid 10001 --create-home --groups render-secrets wnc
 USER wnc
 ENV APP_ENV=production PYTHONUNBUFFERED=1
 CMD ["python", "-m", "tools.production_runtime.supervisor"]
