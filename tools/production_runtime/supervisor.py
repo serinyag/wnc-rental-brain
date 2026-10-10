@@ -13,6 +13,7 @@ def main():
     from . import state_store
     if state_store.enabled(c):state_store.disable(c)
     c.validate(os.environ,initial=True)
+    c.verify_baseline(Path(__file__).resolve().parents[2])
     for name in ('spool_path','lifecycle_spool_path'):
         p=Path(c.manifest['alerting'][name]);p.mkdir(parents=True,exist_ok=True,mode=0o700)
     children=[]

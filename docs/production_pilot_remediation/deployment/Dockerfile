@@ -2,8 +2,8 @@ FROM quay.io/oauth2-proxy/oauth2-proxy:v7.15.0 AS auth
 FROM python:3.13-slim-bookworm
 COPY --from=auth /bin/oauth2-proxy /usr/local/bin/oauth2-proxy
 WORKDIR /app
-COPY docs/production_pilot_remediation/deployment/requirements.lock /app/requirements.lock
-RUN pip install --no-cache-dir -r requirements.lock
+COPY docs/production_pilot_remediation/deployment/requirements.lock /app/docs/production_pilot_remediation/deployment/requirements.lock
+RUN pip install --no-cache-dir -r docs/production_pilot_remediation/deployment/requirements.lock
 COPY tools /app/tools
 COPY supabase/migrations /app/supabase/migrations
 COPY supabase/seed.sql /app/supabase/seed.sql
