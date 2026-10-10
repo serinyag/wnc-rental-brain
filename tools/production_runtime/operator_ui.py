@@ -8,6 +8,7 @@ def controls(service,case_id):
     from datetime import datetime,timezone
     snapshot=service._require_case_snapshot(case_id)
     cards=['<section class="panel"><h2>Operational review</h2><p>Verify the case, client facts, internal work and decisions before approving the exact final email. Stop on any ambiguous outcome.</p>']
+    cards.append(f'<p><a href="/cases/{case_id}/live-proposal">Live details and working proposal</a></p>')
     for endpoint,label in [('inquiry-intake','Review and apply sourced client facts'),('reconcile','Reconcile case work'),('mailbox','Prepare governed client reply'),('asana-projection','Prepare internal work')]:
         cards.append(f'<form method="post" action="/cases/{case_id}/{endpoint}"><button>{label}</button></form>')
     for action in snapshot.workflow_actions:

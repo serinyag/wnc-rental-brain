@@ -503,6 +503,9 @@ class TestConsoleApp:
             return self._respond_text(start_response, HTTPStatus.NOT_FOUND, "Not found.")
         if len(parts) == 2 and method == "GET":
             return self._respond_html(start_response, self._render_case_detail(rental_case_id))
+        if len(parts) == 3 and parts[2] == "live-proposal" and method == "GET":
+            from .live_proposal import render_live_proposal
+            return self._respond_html(start_response, render_live_proposal(self.service._require_case_snapshot(rental_case_id)))
         if len(parts) == 3 and parts[2] == "inquiry-intake" and method == "POST":
             report = self.service.run_inquiry_intake(rental_case_id=rental_case_id)
             return self._respond_html(start_response, self._render_case_detail(rental_case_id, report))

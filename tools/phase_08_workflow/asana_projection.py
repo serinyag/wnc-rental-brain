@@ -15,6 +15,8 @@ from .contracts import WorkflowAction
 
 ADAPTER = "asana_projection"
 VERSION = "asana_rental_projection_v1"
+DEPARTMENT_VERSION = "asana_rental_projection_departments_v2"
+DEPARTMENTS = ("Admin", "Logistics", "Experience", "Post-event")
 OWNERS = {"CLIENT", "WNC_INTERNAL", "EXTERNAL_PARTY", "GOVERNED_DECISION"}
 RESOLVED = {"resolved", "completed", "cancelled", "superseded"}
 
@@ -43,7 +45,7 @@ def _timing(value):
     return parsed.astimezone(ZoneInfo("Europe/Amsterdam")).strftime("%d %B %Y, %H:%M %Z")
 
 
-def build_projection(snapshot, *, workspace_gid, project_gid):
+def _build_flat_projection(snapshot, *, workspace_gid, project_gid):
     """Read existing facts and resolution actions; omission never means resolved.
 
     Explicit resolution_group_key/title permit same-owner grouping. Each member
@@ -163,11 +165,56 @@ def build_projection(snapshot, *, workspace_gid, project_gid):
     return value
 
 
-def prepare_projection(repository, *, rental_case_id, workspace_gid, project_gid, now=None):
+def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, application_origin=None):
+    value = _build_flat_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid)
+    if version == VERSION:
+        return value  # Preserve the exact certified plans and their replay keys.
+    if version != DEPARTMENT_VERSION:
+        raise ValueError("Unknown Asana projection version")
+    # Keep the action/attempt envelope and its database fence at v1. The optional
+    # layout has its own version and participates in the complete content hash.
+    value["layout_version"] = version
+    categories = {name: [] for name in DEPARTMENTS}
+    actions = {a.workflow_action_id: a for a in snapshot.workflow_actions}
+    for item in value["work"]:
+        explicit = {actions[m["workflow_action_id"]].structured_payload.get("resolution_department")
+                    for m in item["members"]} - {None}
+        if len(explicit) > 1 or explicit - set(DEPARTMENTS):
+            raise ValueError("Conflicting operational department; review required")
+        keys = " ".join([item["key"], *(m["key"] for m in item["members"])]).lower()
+        department = next(iter(explicit), None)
+        if department is None:
+            department = ("Post-event" if any(k in keys for k in ("post-event", "post_event", "debrief")) else
+                          "Experience" if any(k in keys for k in ("catering", "facilitator", "hospitality")) else
+                          "Logistics" if any(k in keys for k in ("technical", "tech", "logistics", "staff", "layout", "loading", "handover")) else "Admin")
+        item["parent_key"] = "department:" + department.lower()
+        categories[department].append(item)
+    work = []
+    for name, items in categories.items():
+        work.append({"key": "department:" + name.lower(), "name": name, "owner": "WNC_INTERNAL",
+                     "parent_key": "master", "kind": "department", "members": [],
+                     "completed": bool(items) and all(i["completed"] for i in items),
+                     "notes": "Operational work for this rental.\n" +
+                     ("Open each subtask to review its evidence and next action." if items else
+                      "No applicable governed work is recorded yet. This category is not confirmed complete.")})
+        work.extend(items)
+    value["work"] = work
+    if application_origin:
+        from urllib.parse import urlsplit
+        parsed = urlsplit(application_origin)
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment:
+            raise ValueError("Live details require the trusted HTTPS application origin")
+        value["master"]["notes"] += "\n\nLIVE DETAILS / WORKING PROPOSAL\n" + application_origin + f"/cases/{snapshot.rental_case.rental_case_id}/live-proposal"
+    if len(value["work"]) > 29 or len(value["master"]["notes"]) > 10000:
+        raise ValueError("Projection needs operator review: too much work")
+    return value
+
+
+def prepare_projection(repository, *, rental_case_id, workspace_gid, project_gid, now=None, version=VERSION, application_origin=None):
     snapshot = repository.load_case_snapshot(rental_case_id)
     if snapshot is None:
         raise ValueError("Case not found")
-    value = build_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid)
+    value = build_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid, version=version, application_origin=application_origin)
     key = f"{VERSION}:{rental_case_id}:{digest(value)}"
     timestamp = now or datetime.now(timezone.utc).isoformat()
     action = WorkflowAction(workflow_action_id=1, workflow_action_uuid="pending",
@@ -182,8 +229,12 @@ def prepare_projection(repository, *, rental_case_id, workspace_gid, project_gid
     return repository.create_workflow_action(action)
 
 
-def validate_projection(action, snapshot, config):
-    expected = build_projection(snapshot, workspace_gid=config.workspace_gid, project_gid=config.default_project_gid)
+def validate_projection(action, snapshot, config, *, application_origin=None):
+    if action.structured_payload.get("task_kind") != VERSION:
+        raise ValueError("Unknown Asana action envelope")
+    version = action.structured_payload.get("projection", {}).get("layout_version", VERSION)
+    expected = build_projection(snapshot, workspace_gid=config.workspace_gid, project_gid=config.default_project_gid,
+                                version=version, application_origin=application_origin)
     if (action.target_adapter_code != ADAPTER or action.action_type != "CREATE_INTERNAL_TASK_ITEM"
             or action.structured_payload.get("projection") != expected
             or action.semantic_subject_hash != digest(expected)

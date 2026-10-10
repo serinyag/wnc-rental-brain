@@ -28,6 +28,12 @@ class AsanaProjectionAdapter:
     repository: object
     runtime: object
 
+    def _origin(self):
+        return self.runtime.production.manifest['application_origin'] if self.runtime.is_production and self.runtime.production else None
+
+    def _validate_plan(self, action, snapshot):
+        return validate_projection(action, snapshot, self.config, application_origin=self._origin())
+
     def _scope(self, *, mutation):
         # This certification rollout cannot execute in local/production or use a
         # caller-controlled API host/project. Tokens are never placed in evidence.
@@ -53,7 +59,7 @@ class AsanaProjectionAdapter:
         try:
             self._scope(mutation=True)
             snapshot = self.repository.load_case_snapshot(action.rental_case_id)
-            validate_projection(action, snapshot, self.config)
+            self._validate_plan(action, snapshot)
             if any(a.status == "started" or (a.status != "succeeded" and not a.retry_eligible)
                    for a in projection_attempts(snapshot)):
                 return "adapter_outcome_ambiguous"
@@ -149,7 +155,7 @@ class AsanaProjectionAdapter:
         try:
             self._scope(mutation=True)
             snapshot = self.repository.load_case_snapshot(action.rental_case_id)
-            plan = validate_projection(action, snapshot, self.config)
+            plan = self._validate_plan(action, snapshot)
             project = self._request("GET", f"/projects/{self.config.default_project_gid}?opt_fields=gid,workspace.gid,archived")["data"]
             if (not isinstance(project, dict) or project.get("gid") != self.config.default_project_gid
                     or project.get("workspace", {}).get("gid") != self.config.workspace_gid
@@ -160,8 +166,11 @@ class AsanaProjectionAdapter:
                 raise ProjectionFailure("prior_projection_requires_reconciliation", ambiguous=True)
             bindings = prior_bindings(snapshot)
             desired = self._desired(plan)
+            parents = {w['key']: w.get('parent_key', 'master') for w in plan['work']}
             desired_members = {m["key"]: w["key"] for w in plan["work"] for m in w["members"]}
             for key, binding in bindings.items():
+                if key in parents and binding.get('parent_key', 'master') != parents[key]:
+                    raise ProjectionFailure("existing_hierarchy_requires_explicit_migration")
                 if key != "master" and not binding["projected"]["completed"]:
                     if key not in desired or any(desired_members.get(m["key"]) != key for m in binding["members"]):
                         raise ProjectionFailure("open_work_requires_explicit_resolution_before_regrouping")
@@ -170,7 +179,7 @@ class AsanaProjectionAdapter:
             for key, binding in bindings.items():
                 self._validate_binding_scope(binding, action.rental_case_id)
                 self._verify(self._read(binding["gid"]), binding["projected"],
-                             parent=None if key == "master" else bindings["master"]["gid"])
+                             parent=None if key == "master" else bindings[binding.get('parent_key', 'master')]["gid"])
             if "master" not in bindings:
                 candidates = self._list(f"/projects/{self.config.default_project_gid}/tasks")
                 if any(plan["marker"] in str(t.get("notes", "")).splitlines() for t in candidates):
@@ -182,9 +191,11 @@ class AsanaProjectionAdapter:
                         old["members"] = next(w["members"] for w in plan["work"] if w["key"] == key)
                     continue
                 # Do not create a historical work item that is already resolved.
-                if not old and key != "master" and fields["completed"]:
+                if not old and key != "master" and fields["completed"] and not key.startswith('department:'):
                     continue
-                parent = bindings.get("master", {}).get("gid") if key != "master" else None
+                parent = bindings.get(parents[key], {}).get("gid") if key != "master" else None
+                if key != 'master' and not parent:
+                    raise ProjectionFailure('parent_binding_missing')
                 if old:
                     method, path, payload = "PUT", f"/tasks/{old['gid']}", fields
                 elif key == "master":
@@ -193,7 +204,7 @@ class AsanaProjectionAdapter:
                                "projects": [self.config.default_project_gid]}
                 else:
                     method, path, payload = "POST", f"/tasks/{parent}/subtasks", fields
-                validate_projection(action, self.repository.load_case_snapshot(action.rental_case_id), self.config)
+                self._validate_plan(action, self.repository.load_case_snapshot(action.rental_case_id))
                 mutation_requests += 1
                 response = self._request(method, path, payload)["data"]
                 mutations += 1
@@ -202,6 +213,7 @@ class AsanaProjectionAdapter:
                     raise ProjectionFailure("mutation_identity_unverifiable", ambiguous=True)
                 # Capture accepted provider identity before bounded verification.
                 bindings[key] = {"gid": gid, "rental_case_id": action.rental_case_id,
+                    "parent_key": parents.get(key),
                     "workspace_gid": self.config.workspace_gid, "project_gid": self.config.default_project_gid,
                     "workflow_action_id": action.workflow_action_id, "execution_attempt_id": idempotency.execution_attempt_id,
                     "semantic_key": key, "projected": fields,
@@ -241,17 +253,26 @@ class AsanaProjectionAdapter:
             return {"status": "inconclusive", "master_candidates": len(masters), "canonical_truth_changed": False}
         master = masters[0]
         observed = {"master": master}
-        children = self._list(f"/tasks/{master['gid']}/subtasks")
+        children_by_parent = {}
+        parents = {w['key']: w.get('parent_key', 'master') for w in plan['work']}
         differences = []
         for key, expected in self._desired(plan).items():
-            candidates = [master] if key == "master" else [t for t in children
-                if expected["notes"].splitlines()[-1] in str(t.get("notes", "")).splitlines()]
+            parent = observed.get(parents.get(key, 'master'), {}).get('gid')
+            if key == 'master':
+                candidates = [master]
+            elif not parent:
+                candidates = []
+            else:
+                if parent not in children_by_parent:
+                    children_by_parent[parent] = self._list(f'/tasks/{parent}/subtasks')
+                candidates = [t for t in children_by_parent[parent]
+                              if expected['notes'].splitlines()[-1] in str(t.get('notes', '')).splitlines()]
             if len(candidates) != 1:
                 differences.append({"key": key, "reason": "missing_or_duplicate", "count": len(candidates)})
                 continue
             observed[key] = candidates[0]
             try:
-                self._verify(candidates[0], expected, parent=None if key == "master" else master["gid"])
+                self._verify(candidates[0], expected, parent=None if key == "master" else parent)
             except ProjectionFailure as exc:
                 differences.append({"key": key, "reason": exc.reason})
         return {"status": "review_required" if differences else "matches_projection",

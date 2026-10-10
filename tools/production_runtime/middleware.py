@@ -97,7 +97,7 @@ class ProductionOperatorApp:
                 raise PermissionError('production_fixture_path_forbidden')
             if method in ('GET','HEAD'):
                 if not (path in ('/','/cases','/api/operator/cases','/api/operator/outlook-inbound/review') or
-                        re.fullmatch(r'/(?:api/operator/)?cases/\d+(?:/mailbox/(?:revalidation-read|drafts/\d+/outlook-read|actions/\d+/outlook-send-readiness))?',path)):
+                        re.fullmatch(r'/(?:api/operator/)?cases/\d+(?:/live-proposal|/mailbox/(?:revalidation-read|drafts/\d+/outlook-read|actions/\d+/outlook-send-readiness))?',path)):
                     raise PermissionError('unapproved_production_read_path')
                 if not principal.roles & {'OPERATOR','APPROVER','DECISION_AUTHORITY'}:raise PermissionError('case_read_denied')
             else:
