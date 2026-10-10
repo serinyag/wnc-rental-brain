@@ -108,18 +108,22 @@ def receipt(scenario=None):
     with psycopg.connect(dsn) as conn:
         conn.execute('set transaction read only')
         if scenario is not None:
-            rows=conn.execute('''select t.external_reference,r.subject,r.body_text,r.recipient_email,t.started_at,t.id
+            rows=conn.execute('''select t.external_reference,r.subject,r.body_text,r.recipient_email,t.started_at,t.id,
+                t.workflow_action_id,r.id,a.id
                 from public.workflow_execution_attempts t
                 join public.inquiry_response_draft_revisions r on r.workflow_action_id=t.workflow_action_id
                 join public.rental_case_approval_requests a on a.id=r.approval_request_id
+                join public.workflow_actions w on w.id=t.workflow_action_id
                 join public.rental_cases c on c.id=t.rental_case_id
-                where t.rental_case_id=%s and t.workflow_action_id=%s and r.id=%s and r.is_current
-                and a.id=%s and a.status='approved' and t.retry_eligible=false
+                where t.rental_case_id=%s and r.is_current
+                and a.status='approved' and t.retry_eligible=false
+                and w.structured_payload->>'provenance'='deterministic_fixture'
                 and c.case_reference_code like 'RC-202610101536%%'
                 and (t.failure_code='adapter_outcome_ambiguous' or t.status='succeeded')''',
-                (case_id,action_id,revision_id,approval_id)).fetchall()
+                (case_id,)).fetchall()
             if len(rows)!=1:raise ValueError('receipt_read_exact_lineage_missing')
             row=rows[0][:5];attempt_id=rows[0][5]
+            action_id,revision_id,approval_id=rows[0][6:9]
         else:
             row=conn.execute('''select t.external_reference,r.subject,r.body_text,r.recipient_email,t.started_at
             from public.workflow_execution_attempts t

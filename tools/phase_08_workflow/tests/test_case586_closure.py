@@ -79,8 +79,9 @@ def test_receipt_verification_rejects_production_or_open_send_gate(environment,s
         with pytest.raises(ValueError,match='receipt_read_scope_forbidden'):receipt()
 
 
+@pytest.mark.parametrize('scenario',[None,'A','B','C'])
 @pytest.mark.parametrize('mismatch',[None,'recipient','body','message_id','old_receipt','duplicate'])
-def test_receipt_requires_exact_received_copy_and_never_mutates(mismatch):
+def test_receipt_requires_exact_received_copy_and_never_mutates(mismatch,scenario):
     from datetime import datetime,timezone
     from tools.phase_08_workflow.staging_layout_reply import receipt
     from tools.phase_08_workflow.outlook_adapter import OutlookAdapterConfig
@@ -89,6 +90,7 @@ def test_receipt_requires_exact_received_copy_and_never_mutates(mismatch):
         def __exit__(self,*a):pass
         def execute(self,*a):return self
         def fetchone(self):return ('outlook:message:sent-id','Approved subject','Approved body',MAILBOX,datetime(2026,10,9,11,tzinfo=timezone.utc))
+        def fetchall(self):return [self.fetchone()+(51,1682,388,467)]
     sent={'id':'sent-id','internetMessageId':'<exact@example.test>','isDraft':False,'sentDateTime':'2026-10-09T11:00:01Z',
         'subject':'Approved subject','body':{'content':'Approved body'},'toRecipients':[{'emailAddress':{'address':MAILBOX}}],
         'conversationId':'final-conversation'}
@@ -112,9 +114,9 @@ def test_receipt_requires_exact_received_copy_and_never_mutates(mismatch):
         'tools.phase_08_workflow.outlook_adapter.OutlookExecutionAdapter._acquire_access_token',return_value=NS(result=None,access_token='fake')),patch(
         'tools.phase_08_workflow.outlook_inbound_runtime.ReadOnlyGraphTransport',return_value=Transport()):
         if mismatch:
-            with pytest.raises(ValueError):receipt()
+            with pytest.raises(ValueError):receipt(scenario)
         else:
-            result=receipt();assert result['receipt_verified'] and result['provider_mutations']==0
+            result=receipt(scenario);assert result['receipt_verified'] and result['provider_mutations']==0
     assert len(calls)==2
 
 
