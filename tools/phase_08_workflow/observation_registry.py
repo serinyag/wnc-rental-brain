@@ -299,6 +299,45 @@ OBSERVATION_FIELD_DEFINITIONS = (
     ),
 )
 
+OBSERVATION_FIELD_DEFINITIONS += (
+    ObservationFieldDefinition(
+        field_code="production_scope", domain_code="rental_scope", display_label="Production scope",
+        value_type_code=OBSERVATION_VALUE_TYPE_ENUM,
+        allowed_observation_types=(OBSERVATION_TYPE_FACT_CANDIDATE, OBSERVATION_TYPE_CHANGE_CANDIDATE,
+                                   OBSERVATION_TYPE_REQUEST_CANDIDATE),
+        allowed_enum_values=("venue_only", "none", "production_coordination", "full_production", "custom_scope", "under_consideration", "unknown"),
+        materiality_default=CHANGE_IMPACT_MATERIAL, client_input_allowed=True,
+        human_validation_required=True, canonical_target_kind=OBSERVATION_TARGET_KIND_RENTAL_CASE_FACT,
+        canonical_target_reference="rental_case_facts.production_scope",
+        related_open_question_types=("production_scope_confirmation",),
+        default_review_posture=APPROVAL_POSTURE_HUMAN_ONLY,
+        notes="Production service scope is distinct from the requested venue. Do not infer it from an event being a shoot.",
+    ),
+)
+
+# Timing details are separate from the booking interval and require validation.
+# Email agents can propose them through the existing observation boundary.
+OBSERVATION_FIELD_DEFINITIONS += tuple(
+    ObservationFieldDefinition(
+        field_code=code, domain_code="timing", display_label=label,
+        value_type_code=OBSERVATION_VALUE_TYPE_JSON_OBJECT,
+        allowed_observation_types=(OBSERVATION_TYPE_FACT_CANDIDATE, OBSERVATION_TYPE_CHANGE_CANDIDATE,
+                                   OBSERVATION_TYPE_REQUEST_CANDIDATE),
+        materiality_default=CHANGE_IMPACT_MATERIAL, client_input_allowed=True,
+        human_validation_required=True,
+        canonical_target_kind=OBSERVATION_TARGET_KIND_RENTAL_CASE_FACT,
+        canonical_target_reference="rental_case_facts." + code,
+        related_open_question_types=(code + "_confirmation",),
+        default_review_posture=APPROVAL_POSTURE_HUMAN_ONLY,
+        notes="Preserve explicit dates, day count, times and timezone. Do not infer missing days or mark confirmed from a request.",
+    ) for code, label in (
+        ("event_schedule", "Event days and schedule"),
+        ("production_schedule", "Production days and schedule"),
+        ("load_in_schedule", "Load in window"),
+        ("load_out_schedule", "Load out window"),
+    )
+)
+
 OBSERVATION_FIELD_DEFINITIONS_BY_CODE = {definition.field_code: definition for definition in OBSERVATION_FIELD_DEFINITIONS}
 
 

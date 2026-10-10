@@ -118,6 +118,7 @@ class WorkingProposalProjection:
     next_actions: tuple[ProjectionItem, ...]
     proposal_freshness: tuple[ProjectionItem, ...]
     warnings: tuple[ProjectionItem, ...] = ()
+    rental_proposal: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -169,8 +170,10 @@ def build_working_proposal_projection(
     booking_fee_context: BookingFeeRuleContext | None = None,
     additional_warnings: tuple[str, ...] = (),
 ) -> WorkingProposalProjection:
+    from .working_proposal import build_rental_working_proposal
     observed_by_field = _observed_candidates_by_field(observed_field_candidates)
     return WorkingProposalProjection(
+        rental_proposal=build_rental_working_proposal(snapshot),
         rental_snapshot=_build_rental_snapshot(snapshot, metadata, observed_by_field),
         commercial_snapshot=_build_commercial_snapshot(snapshot, booking_fee_context),
         feasibility_snapshot=_build_feasibility_snapshot(snapshot),

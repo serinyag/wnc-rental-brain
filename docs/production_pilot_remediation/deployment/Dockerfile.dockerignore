@@ -1,4 +1,9 @@
 **
+!sources/
+!sources/phase-01-03/
+!sources/phase-01-03/Checklists + Templates/
+!sources/phase-01-03/Checklists + Templates/Proposal Templates/
+!sources/phase-01-03/Checklists + Templates/Proposal Templates/*.docx
 !tools/
 !tools/**
 !supabase/

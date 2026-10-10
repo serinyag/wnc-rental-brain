@@ -5,6 +5,7 @@ WORKDIR /app
 COPY docs/production_pilot_remediation/deployment/requirements.lock /app/docs/production_pilot_remediation/deployment/requirements.lock
 RUN pip install --no-cache-dir -r docs/production_pilot_remediation/deployment/requirements.lock
 COPY tools /app/tools
+COPY ["sources/phase-01-03/Checklists + Templates/Proposal Templates/", "/app/sources/phase-01-03/Checklists + Templates/Proposal Templates/"]
 COPY supabase/migrations /app/supabase/migrations
 COPY supabase/seed.sql /app/supabase/seed.sql
 COPY docs/production_pilot_remediation/MIGRATION_LEDGER.json /app/docs/production_pilot_remediation/MIGRATION_LEDGER.json

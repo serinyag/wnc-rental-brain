@@ -16,6 +16,7 @@ from .contracts import WorkflowAction
 ADAPTER = "asana_projection"
 VERSION = "asana_rental_projection_v1"
 DEPARTMENT_VERSION = "asana_rental_projection_departments_v2"
+NUANCED_VERSION = "asana_rental_projection_nuanced_v3"
 DEPARTMENTS = ("Admin", "Logistics", "Experience", "Post-event")
 OWNERS = {"CLIENT", "WNC_INTERNAL", "EXTERNAL_PARTY", "GOVERNED_DECISION"}
 RESOLVED = {"resolved", "completed", "cancelled", "superseded"}
@@ -45,7 +46,7 @@ def _timing(value):
     return parsed.astimezone(ZoneInfo("Europe/Amsterdam")).strftime("%d %B %Y, %H:%M %Z")
 
 
-def _build_flat_projection(snapshot, *, workspace_gid, project_gid):
+def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limits=True):
     """Read existing facts and resolution actions; omission never means resolved.
 
     Explicit resolution_group_key/title permit same-owner grouping. Each member
@@ -160,7 +161,7 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid):
              "workspace_gid": str(workspace_gid), "project_gid": str(project_gid),
              "master": {"name": f"{client} — {event} — {date.split(',')[0]}",
                         "notes": notes, "completed": closed_case}, "work": work, "custom_fields": {}, "marker": marker}
-    if len(notes) > 10000 or len(work) > 25:
+    if enforce_limits and (len(notes) > 10000 or len(work) > 25):
         raise ValueError("Projection needs operator review: too much work for a concise task")
     return value
 
@@ -169,7 +170,7 @@ def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, a
     value = _build_flat_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid)
     if version == VERSION:
         return value  # Preserve the exact certified plans and their replay keys.
-    if version != DEPARTMENT_VERSION:
+    if version not in {DEPARTMENT_VERSION, NUANCED_VERSION}:
         raise ValueError("Unknown Asana projection version")
     # Keep the action/attempt envelope and its database fence at v1. The optional
     # layout has its own version and participates in the complete content hash.
@@ -191,6 +192,8 @@ def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, a
         categories[department].append(item)
     work = []
     for name, items in categories.items():
+        if version == NUANCED_VERSION and not items:
+            continue
         work.append({"key": "department:" + name.lower(), "name": name, "owner": "WNC_INTERNAL",
                      "parent_key": "master", "kind": "department", "members": [],
                      "completed": bool(items) and all(i["completed"] for i in items),

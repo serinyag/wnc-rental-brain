@@ -1604,7 +1604,7 @@ limit 1;
         )
 
     def prepare_asana_rental_projection(self, *, rental_case_id: int) -> dict:
-        from .asana_projection import prepare_projection, DEPARTMENT_VERSION
+        from .asana_projection import prepare_projection, NUANCED_VERSION
         if not (self.config.runtime.is_staging or self.config.runtime.is_production):
             raise TestConsoleError("Hosted environment required.")
         self._load_test_case_metadata(rental_case_id)
@@ -1613,7 +1613,7 @@ limit 1;
             raise TestConsoleError("An allowlisted Asana staging project and workspace are required.")
         action = prepare_projection(self.orchestration_repository, rental_case_id=rental_case_id,
             workspace_gid=config.workspace_gid, project_gid=config.default_project_gid, now=self.now(),
-            version=DEPARTMENT_VERSION,
+            version=NUANCED_VERSION,
             application_origin=self.config.runtime.production.manifest['application_origin'] if self.config.runtime.is_production else None)
         return {"workflow_action_id": action.workflow_action_id, "projection": action.structured_payload["projection"],
                 "provider_called": False}
