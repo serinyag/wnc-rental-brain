@@ -136,6 +136,24 @@ def test_operator_cannot_revoke_or_erase(production,path):
     assert responses==['403 Forbidden'] and json.loads(result[0])=={'error':'access_denied'}
 
 
+@pytest.mark.parametrize('accept',['text/html','application/json'])
+def test_whoami_is_readable_without_exposing_credentials(production,accept):
+    from tools.production_runtime.middleware import ProductionOperatorApp
+    c,p,_=production;v,key,claims=signed_operator(c,p)
+    token=jwt.encode(claims,key,algorithm='RS256');responses=[]
+    app=ProductionOperatorApp(lambda *_:pytest.fail('must not reach application'),c,verifier=v)
+    body=b''.join(app({'PATH_INFO':'/api/operator/whoami','REQUEST_METHOD':'GET',
+        'HTTP_AUTHORIZATION':'Bearer '+token,'HTTP_ACCEPT':accept},
+        lambda status,headers:responses.append((status,dict(headers))))).decode()
+    assert responses[0][0]=='200 OK' and responses[0][1]['Cache-Control']=='no-store'
+    assert p.actor in body and token not in body
+    if accept=='text/html':
+        assert '<li>Operator</li>' in body and '<li>Approver</li>' in body
+        assert responses[0][1]['Content-Type'].startswith('text/html')
+    else:
+        assert json.loads(body)=={'actor':p.actor,'roles':sorted(p.roles)}
+
+
 def test_middleware_roles_origin_and_gate_shutdown(production):
     from tools.production_runtime.middleware import ProductionOperatorApp
     c,p,_=production;v,key,claims=signed_operator(c,p);calls=[]

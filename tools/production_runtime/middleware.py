@@ -1,5 +1,5 @@
 """Fail-closed production boundary around existing operator surfaces."""
-import json, re, time, os, fcntl
+import json, re, time, os, fcntl, html
 from pathlib import Path
 from .auth import CURRENT, EntraVerifier
 from .alerts import emit, atomic_json
@@ -35,7 +35,17 @@ class ProductionOperatorApp:
                 if environ.get('HTTP_ORIGIN')!=self.contract.manifest['application_origin']:
                     if environ.get('HTTP_ORIGIN') or environ.get('HTTP_X_WNC_API')!='1':raise PermissionError('request_origin_denied')
             if path=='/api/operator/whoami' and method=='GET':
-                return self.reply(start,'200 OK',{'actor':principal.actor,'roles':sorted(principal.roles)})
+                identity={'actor':principal.actor,'roles':sorted(principal.roles)}
+                if 'text/html' in environ.get('HTTP_ACCEPT',''):
+                    labels={'OPERATOR':'Operator','APPROVER':'Approver','DECISION_AUTHORITY':'Decision Authority','ADMIN':'Admin'}
+                    body=('<!doctype html><meta charset="utf-8"><title>Production access</title>'
+                          '<h1>Production access</h1><p>Verified actor: <code>'+html.escape(identity['actor'])+'</code></p>'
+                          '<h2>Capabilities</h2><ul>'+''.join('<li>'+html.escape(labels[r])+'</li>' for r in identity['roles'])+
+                          '</ul><p><a href="/">Return to rental console</a></p>').encode()
+                    start('200 OK',[('Content-Type','text/html; charset=utf-8'),('Cache-Control','no-store'),
+                                    ('X-Content-Type-Options','nosniff'),('Referrer-Policy','no-referrer')])
+                    return [body]
+                return self.reply(start,'200 OK',identity)
             if path=='/api/operator/access/revoke' and method=='POST':
                 principal.require('ADMIN')
                 n=int(environ.get('CONTENT_LENGTH','0'))
