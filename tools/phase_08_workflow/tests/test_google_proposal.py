@@ -285,3 +285,28 @@ def test_google_transport_uses_verified_tls_and_never_retries_unknown_mutation()
         with pytest.raises(GoogleFailure) as result:
             transport._http('POST', 'https://www.googleapis.com/upload/drive/v3/files', auth=False)
         assert result.value.ambiguous and request.call_count == 1
+
+
+def test_native_conversion_empty_table_separators_preserved_through_update():
+    repo, provider, adapter = harness()
+    original_create = provider.create
+    def import_with_separators(plan, docx):
+        result = original_create(plan, docx)
+        texts = [p[2] for p in paragraphs(provider.documents[result['id']])]
+        expanded = []
+        for text in texts:
+            expanded.extend([text, ''])
+        provider.documents[result['id']] = native(expanded)
+        return result
+    provider.create = import_with_separators
+    action = prepare(repo, adapter)
+    assert execute(repo, adapter, action).action_status_after == 'succeeded'
+    assert adapter.observe(action=action)['status'] == 'MATCHES_PROJECTION'
+    blanks = sum(p[2] == '' for p in paragraphs(provider.documents['doc_001']))
+    repo.rental_cases[1] = replace(repo.rental_cases[1], case_revision=1)
+    add_fact(repo, 'guest_count', 30, 1)
+    updated = prepare(repo, adapter)
+    assert execute(repo, adapter, updated).action_status_after == 'succeeded'
+    assert sum(p[2] == '' for p in paragraphs(provider.documents['doc_001'])) == blanks
+    assert '30 (TBC)' in str(provider.documents['doc_001'])
+    assert provider.mutations == [('create','doc_001'),('update','doc_001')]

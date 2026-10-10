@@ -12,6 +12,7 @@ from .microsoft_provisioning import Keychain
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--service',required=True);parser.add_argument('--account',required=True)
     parser.add_argument('--replace-existing',action='store_true',help='Store a user-authorized credential rotation')
+    parser.add_argument('--label',default='production',help='Display label for the credential environment')
     args=parser.parse_args();keychain=Keychain(args.account,service=args.service)
     nonce=secrets.token_urlsafe(32);stored=False
     class Handler(BaseHTTPRequestHandler):
@@ -20,7 +21,7 @@ def main():
             raw=body.encode();self.send_response(status);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
         def do_GET(self):
             if self.path!='/'+nonce:return self.reply(404,'Not found')
-            self.reply(200,'<!doctype html><title>Secure production credential storage</title><h1>Store production credential</h1><p>Destination: macOS Keychain. The value is never shown in logs or reports.</p><p>Service: '+html.escape(args.service)+'</p><p>Account: '+html.escape(args.account)+'</p><form method="post"><label>Production credential <input name="credential" type="password" autocomplete="off" required></label><button type="submit">Store in Keychain</button></form>')
+            self.reply(200,'<!doctype html><title>Secure credential storage</title><h1>Store '+html.escape(args.label)+' credential</h1><p>Destination: macOS Keychain. The value is never shown in logs or reports.</p><p>Service: '+html.escape(args.service)+'</p><p>Account: '+html.escape(args.account)+'</p><form method="post"><label>Credential <input name="credential" type="password" autocomplete="off" required></label><button type="submit">Store in Keychain</button></form>')
         def do_POST(self):
             nonlocal stored
             origin='http://127.0.0.1:'+str(server.server_port)

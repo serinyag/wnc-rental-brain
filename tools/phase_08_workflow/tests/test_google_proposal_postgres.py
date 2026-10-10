@@ -17,6 +17,7 @@ from tools.phase_08_workflow.tests.test_operational_resolution import resolution
 def google_pg(pg):
     conn, repo, cid, *_ = pg
     conn.execute((ROOT/'supabase/migrations/20261010000100_google_proposal_projection_fences.sql').read_text())
+    conn.execute((ROOT/'supabase/migrations/20261010000200_google_proposal_known_receipt_reconciliation.sql').read_text())
     _, provider, local = harness()
     adapter = GoogleProposalAdapter(local.config, provider, repo, local.runtime)
     def prepare():
@@ -85,12 +86,14 @@ def test_http_google_routes_require_staging_authentication():
         staging_basic_auth_username='operator', staging_basic_auth_password='test-password')))
     service.prepare_google_proposal = Mock(return_value={'provider_called': False})
     service.observe_google_proposal = Mock(return_value={'business_truth_changed': False})
+    service.reconcile_google_proposal = Mock(return_value={'business_truth_changed': False})
     app = TestConsoleApp(service)
     for path, method in (('/api/operator/cases/1/google-proposal', service.prepare_google_proposal),
-                         ('/api/operator/cases/1/actions/2/observe-google', service.observe_google_proposal)):
+                         ('/api/operator/cases/1/actions/2/observe-google', service.observe_google_proposal),
+                         ('/api/operator/cases/1/actions/2/reconcile-google', service.reconcile_google_proposal)):
         assert call_app(app, 'POST', path)[0] == '401 Unauthorized'
         method.assert_not_called()
-        assert call_app(app, 'POST', path, headers=_basic_auth_header('operator', 'test-password'))[0] == '200 OK'
+        assert call_app(app, 'POST', path, body=b'{"expected_document_id":"doc_001"}', headers=_basic_auth_header('operator', 'test-password'))[0] == '200 OK'
         method.assert_called_once()
 
 
@@ -121,3 +124,64 @@ def test_scoped_confirmation_updates_doc_and_matches_client_drafting_authority(r
     assert run().action_status_after == 'succeeded'
     assert assertion not in '\n'.join(p[2] for p in paragraphs(provider.get('doc_001')))
     assert len(provider.documents) == 1
+
+
+def test_known_failed_receipt_reconciles_without_retry_or_canonical_change(google_pg):
+    from tools.phase_08_workflow.google_proposal_adapter import GoogleFailure
+    conn, repo, cid, provider, adapter, prepare, execute = google_pg
+    action = prepare()
+    original_get = provider.get
+    first = True
+    def interrupted_get(doc_id):
+        nonlocal first
+        if first:
+            first = False
+            raise GoogleFailure('google_transport_unknown')
+        return original_get(doc_id)
+    provider.get = interrupted_get
+    assert execute(action).action_status_after == 'failed'
+    before = conn.execute('select status,response_snapshot,retry_eligible from public.workflow_execution_attempts where workflow_action_id=%s',(action.workflow_action_id,)).fetchone()
+    revision = repo.load_case_snapshot(cid).rental_case.case_revision
+    service = TestConsoleService(query_runner=repo.query_runner, config=TestConsoleConfig(runtime=adapter.runtime,allow_real_providers=False))
+    with patch.object(service,'_load_test_case_metadata',return_value=None), \
+         patch('tools.phase_08_workflow.google_proposal_adapter.GoogleProposalConfig.from_env',return_value=adapter.config), \
+         patch('tools.phase_08_workflow.google_proposal_adapter.GoogleTransport',return_value=provider):
+        result = service.reconcile_google_proposal(rental_case_id=cid,workflow_action_id=action.workflow_action_id,expected_document_id='doc_001')
+        assert result['status']=='MATCHES_PROJECTION' and result['provider_mutations']==0
+        assert service.reconcile_google_proposal(rental_case_id=cid,workflow_action_id=action.workflow_action_id,expected_document_id='doc_001')['replayed']
+        assert service.observe_google_proposal(rental_case_id=cid,workflow_action_id=action.workflow_action_id)['status']=='MATCHES_PROJECTION'
+        with pytest.raises(Exception,match='identity conflict'):
+            service.reconcile_google_proposal(rental_case_id=cid,workflow_action_id=action.workflow_action_id,expected_document_id='wrong_doc')
+    assert conn.execute('select status,response_snapshot,retry_eligible from public.workflow_execution_attempts where workflow_action_id=%s',(action.workflow_action_id,)).fetchone()==before
+    assert repo.load_case_snapshot(cid).rental_case.case_revision==revision
+    assert conn.execute("select count(*) from public.workflow_events where rental_case_id=%s and event_type_code='google_proposal_reconciled'",(cid,)).fetchone()[0]==1
+    with pytest.raises(Exception,match='google_reconciliation_immutable'),conn.transaction():
+        conn.execute("update public.workflow_events set structured_payload='{}' where rental_case_id=%s and event_type_code='google_proposal_reconciled'",(cid,))
+    conn.execute('update public.rental_cases set case_revision=case_revision+1 where id=%s',(cid,))
+    conn.execute("update public.rental_case_facts set value_payload='30' where rental_case_id=%s and field_code='guest_count'",(cid,))
+    result = execute(prepare())
+    assert result.action_status_after=='succeeded', [a.response_snapshot for a in repo.load_case_snapshot(cid).execution_attempts]
+    assert provider.mutations==[('create','doc_001'),('update','doc_001')]
+
+
+def test_known_receipt_cannot_accept_manual_drift_or_orphan(google_pg):
+    conn, repo, cid, provider, adapter, prepare, execute = google_pg
+    action=prepare();provider.failure='timeout_create'
+    assert execute(action).action_status_after=='failed'
+    with pytest.raises(Exception,match='known_binding_required'):
+        adapter.reconcile(action=action,expected_document_id='doc_001')
+
+
+def test_known_receipt_reconciliation_refuses_changed_content(google_pg):
+    from tools.phase_08_workflow.google_proposal_adapter import GoogleFailure
+    conn, repo, cid, provider, adapter, prepare, execute = google_pg
+    action = prepare()
+    original_get = provider.get
+    provider.get = Mock(side_effect=GoogleFailure('google_transport_unknown'))
+    assert execute(action).action_status_after == 'failed'
+    provider.get = original_get
+    document = provider.documents['doc_001']
+    document['body']['content'][0]['paragraph']['elements'][0]['textRun']['content'] = 'Unreviewed human edit\n'
+    with pytest.raises(GoogleFailure, match='google_reconciliation_content_mismatch'):
+        adapter.reconcile(action=action,expected_document_id='doc_001')
+    assert provider.mutations == [('create','doc_001')]

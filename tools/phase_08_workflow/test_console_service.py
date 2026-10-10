@@ -1648,6 +1648,30 @@ limit 1;
             actor_reference=_operator_reference(self), actor_type=TEST_CONSOLE_OPERATOR_TYPE)
         return evidence
 
+    def reconcile_google_proposal(self, *, rental_case_id: int, workflow_action_id: int, expected_document_id: str) -> dict:
+        from .google_proposal import reconciled_attempts
+        from .google_proposal_adapter import GoogleProposalAdapter, GoogleProposalConfig, GoogleTransport
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError('Google reconciliation is staging-only.')
+        self._load_test_case_metadata(rental_case_id)
+        snapshot = self._require_case_snapshot(rental_case_id)
+        action = snapshot.find_workflow_action(workflow_action_id)
+        if action is None or action.target_adapter_code != 'google_proposal':
+            raise TestConsoleError('A canonical Google proposal action is required.')
+        previous = next((p for p in reconciled_attempts(snapshot).values()
+            if p['workflow_action_id'] == workflow_action_id), None)
+        if previous:
+            if previous['binding']['document_id'] != expected_document_id:
+                raise TestConsoleError('Reconciliation document identity conflict.')
+            return dict(previous, replayed=True)
+        config = GoogleProposalConfig.from_env()
+        evidence = GoogleProposalAdapter(config, GoogleTransport(config), self.orchestration_repository,
+            self.config.runtime).reconcile(action=action, expected_document_id=expected_document_id)
+        self._create_console_event(rental_case_id=rental_case_id, event_type_code='google_proposal_reconciled',
+            source_reference=f'workflow_action:{workflow_action_id}', occurred_at=self.now(), structured_payload=evidence,
+            actor_reference=_operator_reference(self), actor_type=TEST_CONSOLE_OPERATOR_TYPE)
+        return evidence
+
     def prepare_asana_rental_projection(self, *, rental_case_id: int) -> dict:
         from .asana_projection import prepare_projection, NUANCED_VERSION
         if not (self.config.runtime.is_staging or self.config.runtime.is_production):
@@ -4446,7 +4470,7 @@ limit 1;
             elif action.target_adapter_code == 'google_proposal':
                 from .google_proposal_adapter import GoogleProposalAdapter, GoogleProposalConfig, GoogleTransport
                 rows = self.orchestration_repository.query_runner(
-                    "select exists(select 1 from pg_trigger where tgname = 'google_proposal_attempt_fence' and tgenabled = 'O') as installed",
+                    "select count(*) = 2 as installed from pg_trigger where tgname in ('google_proposal_attempt_fence', 'google_proposal_reconciliation_fence') and tgenabled = 'O'",
                     expect_json=True)['rows']
                 if not rows or not rows[0]['installed']:
                     raise TestConsoleError('Google proposal migration must be applied before real execution.')

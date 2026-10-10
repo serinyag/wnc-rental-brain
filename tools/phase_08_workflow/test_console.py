@@ -320,6 +320,11 @@ class TestConsoleApp:
         if len(parts) == 7 and parts[4] == 'actions' and parts[6] == 'observe-google' and method == 'POST':
             return self._respond_json(start_response, self.service.observe_google_proposal(
                 rental_case_id=rental_case_id, workflow_action_id=int(parts[5])))
+        if len(parts) == 7 and parts[4] == 'actions' and parts[6] == 'reconcile-google' and method == 'POST':
+            payload = self._parse_json(environ)
+            return self._respond_json(start_response, self.service.reconcile_google_proposal(
+                rental_case_id=rental_case_id, workflow_action_id=int(parts[5]),
+                expected_document_id=self._required_json_field(payload, 'expected_document_id')))
         if len(parts) == 7 and parts[4] == "actions" and parts[6] == "observe-asana" and method == "POST":
             return self._respond_json(start_response, self.service.observe_asana_rental_projection(
                 rental_case_id=rental_case_id, workflow_action_id=int(parts[5])))

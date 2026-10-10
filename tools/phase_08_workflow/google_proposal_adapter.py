@@ -15,7 +15,7 @@ from urllib.request import Request, urlopen
 from tools.phase_05_search.semantic_common import load_env_value
 from .asana_projection import digest
 from .execution_types import NormalizedExecutionResult
-from .google_proposal import ADAPTER, VERSION, attempts, binding, render_template, validate_projection
+from .google_proposal import ADAPTER, VERSION, attempts, binding, render_template, validate_projection, unresolved_attempts
 
 DOC_MIME = 'application/vnd.google-apps.document'
 ID = re.compile(r'^[A-Za-z0-9_-]{3,200}$')
@@ -150,6 +150,16 @@ def fingerprint(document):
     return digest({k: v for k, v in document.items() if k not in {'documentId', 'revisionId'}})
 
 
+def managed_paragraphs(document):
+    # Native Word conversion adds empty paragraphs around tables. Preserve
+    # those provider layout separators; compare all substantive text exactly.
+    return [p for p in paragraphs(document) if p[2] != '']
+
+
+def managed_text(desired):
+    return [text for text in desired if text != '']
+
+
 @dataclass
 class GoogleProposalAdapter:
     config: GoogleProposalConfig
@@ -173,7 +183,7 @@ class GoogleProposalAdapter:
         try:
             self._scope(True)
             snapshot, _ = self._plan(action)
-            if any(a.status == 'started' or (a.status != 'succeeded' and not a.retry_eligible) for a in attempts(snapshot)):
+            if unresolved_attempts(snapshot):
                 return 'adapter_outcome_ambiguous'
         except (GoogleFailure, ValueError, AttributeError, KeyError):
             return 'adapter_forbidden'
@@ -207,8 +217,7 @@ class GoogleProposalAdapter:
             self._scope(True)
             snapshot, plan = self._plan(action)
             existing = copy.deepcopy(binding(snapshot))
-            if any(a.execution_attempt_id != idempotency.execution_attempt_id and
-                    (a.status == 'started' or (a.status != 'succeeded' and not a.retry_eligible)) for a in attempts(snapshot)):
+            if any(a.execution_attempt_id != idempotency.execution_attempt_id for a in unresolved_attempts(snapshot)):
                 raise GoogleFailure('google_requires_reconciliation', ambiguous=True)
             folder = self.transport.metadata(plan['folder_id'])
             if (folder.get('id') != plan['folder_id'] or folder.get('mimeType') != 'application/vnd.google-apps.folder'
@@ -236,7 +245,8 @@ class GoogleProposalAdapter:
                 document = self.transport.get(existing['document_id'])
                 if document.get('documentId') != existing['document_id'] or fingerprint(document) != existing.get('document_fingerprint'):
                     raise GoogleFailure('google_manual_drift_review_required')
-                actual = paragraphs(document)
+                actual = managed_paragraphs(document)
+                desired = managed_text(desired)
                 if len(actual) != len(desired): raise GoogleFailure('google_layout_requires_review')
                 requests = []
                 tab_id = document.get('tabs', [{}])[0].get('tabProperties', {}).get('tabId')
@@ -254,7 +264,7 @@ class GoogleProposalAdapter:
                     document = self.transport.get(existing['document_id'])
                     if document.get('revisionId') != updated.get('writeControl', {}).get('requiredRevisionId'):
                         raise GoogleFailure('google_post_write_revision_unverifiable', ambiguous=True)
-            if document.get('documentId') != existing['document_id'] or [p[2] for p in paragraphs(document)] != desired:
+            if document.get('documentId') != existing['document_id'] or [p[2] for p in managed_paragraphs(document)] != managed_text(desired):
                 raise GoogleFailure('google_content_verification_failed', ambiguous=mutation_started)
             existing.update(projection_hash=plan['projection_hash'], source_case_revision=plan['source_case_revision'],
                 document_fingerprint=fingerprint(document), provider_revision=document.get('revisionId'),
@@ -283,7 +293,7 @@ class GoogleProposalAdapter:
             document = self.transport.get(metadata['id'])
             _, desired = render_template(plan)
             matches = (document.get('documentId') == metadata['id'] and
-                [p[2] for p in paragraphs(document)] == desired and existing is not None and
+                [p[2] for p in managed_paragraphs(document)] == managed_text(desired) and existing is not None and
                 fingerprint(document) == existing.get('document_fingerprint') and
                 existing.get('projection_hash') == plan['projection_hash'])
             return {'status': 'MATCHES_PROJECTION' if matches else 'DRIFT_DETECTED' if existing else 'AMBIGUOUS',
@@ -294,3 +304,30 @@ class GoogleProposalAdapter:
                     'business_truth_changed': False, 'rebound': False}
         except (ValueError, AttributeError, KeyError):
             return {'status': 'DRIFT_DETECTED', 'reason': 'proposal_stale_or_invalid', 'business_truth_changed': False}
+
+    def reconcile(self, *, action, expected_document_id):
+        """Verify a known post-write binding without retrying or rebinding an orphan."""
+        self._scope()
+        snapshot, plan = self._plan(action)
+        failed = [a for a in attempts(snapshot) if a.workflow_action_id == action.workflow_action_id and a.status == 'failed']
+        if len(failed) != 1 or any(a.status == 'started' for a in attempts(snapshot)):
+            raise GoogleFailure('google_reconciliation_attempt_invalid')
+        attempt = failed[0]
+        existing = attempt.response_snapshot.get('binding')
+        if not existing or existing.get('document_id') != expected_document_id:
+            raise GoogleFailure('google_reconciliation_known_binding_required')
+        if attempt.response_snapshot.get('reason') not in {
+                'google_content_verification_failed','google_post_write_revision_unverifiable','google_http_503','google_transport_unknown'}:
+            raise GoogleFailure('google_reconciliation_manual_drift_forbidden')
+        self._locate(plan, existing)
+        document = self.transport.get(expected_document_id)
+        _, desired = render_template(plan)
+        if document.get('documentId') != expected_document_id or [p[2] for p in managed_paragraphs(document)] != managed_text(desired) or not document.get('revisionId'):
+            raise GoogleFailure('google_reconciliation_content_mismatch')
+        self._plan(action)
+        recovered = dict(existing, projection_hash=plan['projection_hash'], source_case_revision=plan['source_case_revision'],
+            document_fingerprint=fingerprint(document), provider_revision=document['revisionId'],
+            last_synchronized_at=datetime.now(timezone.utc).isoformat())
+        return {'status':'MATCHES_PROJECTION','execution_attempt_id':attempt.execution_attempt_id,
+            'workflow_action_id':action.workflow_action_id,'binding':recovered,'provider_mutations':0,
+            'business_truth_changed':False,'rebound':False,'original_attempt_preserved':True}

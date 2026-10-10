@@ -42,7 +42,36 @@ def binding(snapshot):
     for attempt in attempts(snapshot):
         if isinstance(attempt.response_snapshot, dict) and attempt.response_snapshot.get('binding'):
             result = attempt.response_snapshot['binding']
+        recovered = reconciled_attempts(snapshot).get(attempt.execution_attempt_id)
+        if recovered:
+            result = recovered['binding']
     return result
+
+
+def reconciled_attempts(snapshot):
+    """Separate evidence records preserve the original failed attempt unchanged."""
+    result = {}
+    for event in snapshot.workflow_events:
+        if event.event_type_code != 'google_proposal_reconciled': continue
+        p = event.structured_payload
+        a = next((a for a in attempts(snapshot) if a.execution_attempt_id == p.get('execution_attempt_id')), None)
+        original = a.response_snapshot.get('binding') if a and isinstance(a.response_snapshot, dict) else None
+        b = p.get('binding')
+        if (a and a.status == 'failed' and original and isinstance(b, dict)
+                and p.get('workflow_action_id') == a.workflow_action_id
+                and p.get('status') == 'MATCHES_PROJECTION' and p.get('provider_mutations') == 0
+                and p.get('business_truth_changed') is False
+                and all(b.get(k) == original.get(k) for k in (
+                    'rental_case_id','document_id','file_id','folder_id','provider_identity','proposal_identity'))
+                and b.get('document_fingerprint') and b.get('projection_hash')):
+            result[a.execution_attempt_id] = p
+    return result
+
+
+def unresolved_attempts(snapshot):
+    recovered = reconciled_attempts(snapshot)
+    return [a for a in attempts(snapshot) if a.status == 'started' or
+            (a.status != 'succeeded' and not a.retry_eligible and a.execution_attempt_id not in recovered)]
 
 
 def identity(snapshot):
@@ -248,13 +277,14 @@ def proposal_send_block(snapshot):
     """Opt-in required proposal actions must be current and successfully synced."""
     actions = [a for a in snapshot.workflow_actions if a.target_adapter_code == ADAPTER]
     if not actions: return None  # Existing certified cases retain their contract.
-    if any(a.status == 'started' or (a.status != 'succeeded' and not a.retry_eligible) for a in attempts(snapshot)):
+    if unresolved_attempts(snapshot):
         return 'proposal_requires_reconciliation'
     latest = max(actions, key=lambda a: a.workflow_action_id)
     b = binding(snapshot)
-    if (latest.status != 'succeeded' or not b or b.get('source_case_revision') != snapshot.rental_case.case_revision):
+    recovered_actions = {p['workflow_action_id'] for p in reconciled_attempts(snapshot).values()}
+    if (latest.status != 'succeeded' and latest.workflow_action_id not in recovered_actions or not b or b.get('source_case_revision') != snapshot.rental_case.case_revision):
         return 'proposal_not_current'
-    observations = [e for e in snapshot.workflow_events if e.event_type_code == 'google_proposal_observed']
+    observations = [e for e in snapshot.workflow_events if e.event_type_code in {'google_proposal_observed','google_proposal_reconciled'}]
     if observations and observations[-1].structured_payload.get('status') != 'MATCHES_PROJECTION':
         return 'proposal_requires_review'
     return None
