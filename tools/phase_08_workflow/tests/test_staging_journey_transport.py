@@ -23,3 +23,15 @@ def test_authenticated_fixed_route_rejects_arbitrary_payload():
   assert call_app(app,'POST',path)[0]=='401 Unauthorized';run.assert_not_called()
   assert call_app(app,'POST',path,body=b'{"recipient":"customer@example.com"}',headers=_basic_auth_header('operator','test-password'))[0]=='400 Bad Request';run.assert_not_called()
   assert call_app(app,'POST',path,headers=_basic_auth_header('operator','test-password'))[0]=='200 OK';run.assert_called_once_with('A')
+
+
+def test_prior_start_blocks_replay_before_transport():
+ from types import SimpleNamespace
+ from unittest.mock import MagicMock
+ import psycopg
+ conn=MagicMock();conn.__enter__.return_value=conn;conn.transaction.return_value.__enter__.return_value=conn
+ conn.execute.return_value.fetchone.return_value=(1,)
+ config=SimpleNamespace(environment='staging',mailbox=fixture.MAILBOX,allowed_mailbox=fixture.MAILBOX,allowed_senders=(fixture.MAILBOX,),new_enquiry_subject='SYNTHETIC TEST')
+ def env(key):return {'APP_ENV':'staging','DATABASE_URL':'postgresql://postgres.mspcopnsbounmdpivkvq@aws-0-eu-central-1.pooler.supabase.com:5432/postgres'}.get(key)
+ with patch.object(fixture,'load_env_value',side_effect=env),patch.object(fixture,'configuration',return_value=(config,object())),patch.object(fixture,'enabled',return_value=True),patch.object(psycopg,'connect',return_value=conn),patch.object(fixture,'OutlookExecutionAdapter',side_effect=AssertionError('Replay must not touch provider')):
+  assert fixture.run('A')=={'replay_blocked':True,'provider_calls':0}
