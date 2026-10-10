@@ -212,6 +212,9 @@ class TestConsoleApp:
         if path == "/api/operator/cases/586/final-receipt" and method == "GET":
             from .staging_layout_reply import receipt
             return self._respond_json(start_response, receipt())
+        if path.startswith('/api/operator/cases/587/synthetic-journey-receipt/') and method == 'GET':
+            from .staging_layout_reply import receipt
+            return self._respond_json(start_response, receipt(path.rsplit('/', 1)[-1]))
         if path == "/api/operator/cases/586/synthetic-layout-reply" and method == "POST":
             if self._parse_json(environ):
                 return self._respond_json_error(start_response, status=HTTPStatus.BAD_REQUEST,

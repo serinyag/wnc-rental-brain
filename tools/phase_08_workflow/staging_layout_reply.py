@@ -86,7 +86,7 @@ def run():
         return proof
 
 
-def receipt():
+def receipt(scenario=None):
     """Read-only exact approved Case 586 send/Inbox correlation after gate closure.
 
     No ingestion, retry, approval mutation or inferred receipt. Both provider
@@ -96,13 +96,32 @@ def receipt():
     from urllib.parse import urlencode
     from .outlook_adapter import OutlookAdapterConfig
     from .outlook_inbound_runtime import ReadOnlyGraphTransport
-    if (load_env_value('APP_ENV') != 'staging' or enabled('STAGING_ALLOW_REAL_OUTLOOK_SEND')
+    journeys = {'A': (590, 1682, 388, 467), 'B': (589, 1687, 391, 470), 'C': (588, 1688, 392, 471)}
+    if scenario is not None and scenario not in journeys:
+        raise ValueError('receipt_synthetic_scenario_invalid')
+    case_id, action_id, revision_id, approval_id = journeys.get(scenario, (586, 1640, 387, 466))
+    attempt_id = 29
+    if (load_env_value('APP_ENV') != 'staging' or (scenario is None and enabled('STAGING_ALLOW_REAL_OUTLOOK_SEND'))
             or not enabled('STAGING_ALLOW_REAL_OUTLOOK') or not enabled('WORKFLOW_TEST_CONSOLE_ALLOW_REAL_PROVIDERS')):
         raise ValueError('receipt_read_scope_forbidden')
     dsn=load_env_value('DATABASE_URL') or ''; validate_staging_database(dsn)
     with psycopg.connect(dsn) as conn:
         conn.execute('set transaction read only')
-        row=conn.execute('''select t.external_reference,r.subject,r.body_text,r.recipient_email,t.started_at
+        if scenario is not None:
+            rows=conn.execute('''select t.external_reference,r.subject,r.body_text,r.recipient_email,t.started_at,t.id
+                from public.workflow_execution_attempts t
+                join public.inquiry_response_draft_revisions r on r.workflow_action_id=t.workflow_action_id
+                join public.rental_case_approval_requests a on a.id=r.approval_request_id
+                join public.rental_cases c on c.id=t.rental_case_id
+                where t.rental_case_id=%s and t.workflow_action_id=%s and r.id=%s and r.is_current
+                and a.id=%s and a.status='approved' and t.retry_eligible=false
+                and c.case_reference_code like 'RC-202610101536%%'
+                and (t.failure_code='adapter_outcome_ambiguous' or t.status='succeeded')''',
+                (case_id,action_id,revision_id,approval_id)).fetchall()
+            if len(rows)!=1:raise ValueError('receipt_read_exact_lineage_missing')
+            row=rows[0][:5];attempt_id=rows[0][5]
+        else:
+            row=conn.execute('''select t.external_reference,r.subject,r.body_text,r.recipient_email,t.started_at
             from public.workflow_execution_attempts t
             join public.inquiry_response_draft_revisions r on r.workflow_action_id=t.workflow_action_id
             join public.rental_case_approval_requests a on a.id=r.approval_request_id
@@ -146,8 +165,8 @@ def receipt():
         raise ValueError('receipt_predates_exact_attempt')
     if received['internetMessageId']!=sent['internetMessageId'] or sent.get('conversationId')!=received.get('conversationId'):
         raise ValueError('receipt_read_message_correlation_mismatch')
-    return {'provider_reads':2,'provider_mutations':0,'case_id':586,'action_id':1640,'attempt_id':29,
-        'revision_id':387,'approval_id':466,'recipient':recipient,'subject':subject,'exact_content_match':True,
+    return {'provider_reads':2,'provider_mutations':0,'case_id':case_id,'action_id':action_id,'attempt_id':attempt_id,
+        'revision_id':revision_id,'approval_id':approval_id,'recipient':recipient,'subject':subject,'exact_content_match':True,
         'sent_message_id':mid,'inbox_message_id':received['id'],'internet_message_id':sent['internetMessageId'],
         'sent_at':sent['sentDateTime'],'received_at':received['receivedDateTime'],
         'conversation_id':sent.get('conversationId'),'receipt_verified':True}

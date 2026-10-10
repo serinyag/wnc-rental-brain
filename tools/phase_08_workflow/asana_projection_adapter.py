@@ -255,6 +255,7 @@ class AsanaProjectionAdapter:
         observed = {"master": master}
         children_by_parent = {}
         parents = {w['key']: w.get('parent_key', 'master') for w in plan['work']}
+        bindings = prior_bindings(self.repository.load_case_snapshot(action.rental_case_id))
         differences = []
         for key, expected in self._desired(plan).items():
             parent = observed.get(parents.get(key, 'master'), {}).get('gid')
@@ -267,6 +268,10 @@ class AsanaProjectionAdapter:
                     children_by_parent[parent] = self._list(f'/tasks/{parent}/subtasks')
                 candidates = [t for t in children_by_parent[parent]
                               if expected['notes'].splitlines()[-1] in str(t.get('notes', '')).splitlines()]
+            if not candidates and key not in bindings and expected['completed'] and key != 'master' and not key.startswith('department:'):
+                # Execution intentionally omits already-retired work that has
+                # never had a provider binding. A missing bound task still fails.
+                continue
             if len(candidates) != 1:
                 differences.append({"key": key, "reason": "missing_or_duplicate", "count": len(candidates)})
                 continue

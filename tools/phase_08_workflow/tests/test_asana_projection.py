@@ -336,3 +336,14 @@ def test_changed_window_and_resolved_blocker_retire_bound_work_without_resolving
     assert work['item:blocker:123']['completed']
     assert not work['item:'+new]['completed']
     assert not work['item:blocker:124']['completed']
+
+
+def test_observe_omits_unbound_completed_work_but_detects_missing_bound_history():
+    repo,transport,adapter=harness()
+    repo.create_workflow_action(work_action(11,'retired','Historical check',status='superseded'))
+    action=prepare(repo);assert execute(repo,adapter,action).action_status_after=='succeeded'
+    assert adapter.observe(action=action)['status']=='matches_projection'
+    update_case(repo);action=prepare(repo);assert execute(repo,adapter,action).action_status_after=='succeeded'
+    gid=next(g for g,t in transport.tasks.items() if t['name'].startswith('Confirm studio'))
+    del transport.tasks[gid]
+    assert adapter.observe(action=action)['status']=='review_required'

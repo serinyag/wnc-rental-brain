@@ -116,3 +116,17 @@ def test_receipt_requires_exact_received_copy_and_never_mutates(mismatch):
         else:
             result=receipt();assert result['receipt_verified'] and result['provider_mutations']==0
     assert len(calls)==2
+
+
+@pytest.mark.parametrize('scenario',['D','A/anything','586'])
+def test_journey_receipt_rejects_unapproved_lineage_before_provider(scenario):
+    from tools.phase_08_workflow.staging_layout_reply import receipt
+    with patch('tools.phase_08_workflow.staging_layout_reply.load_env_value',side_effect=AssertionError('No config access')):
+        with pytest.raises(ValueError,match='receipt_synthetic_scenario_invalid'):receipt(scenario)
+
+
+@pytest.mark.parametrize('scenario',['A','B','C'])
+def test_journey_receipt_never_reads_production(scenario):
+    from tools.phase_08_workflow.staging_layout_reply import receipt
+    with patch('tools.phase_08_workflow.staging_layout_reply.load_env_value',return_value='production'),patch('psycopg.connect',side_effect=AssertionError('No database access')):
+        with pytest.raises(ValueError,match='receipt_read_scope_forbidden'):receipt(scenario)
