@@ -183,6 +183,10 @@ def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, a
         if len(explicit) > 1 or explicit - set(DEPARTMENTS):
             raise ValueError("Conflicting operational department; review required")
         keys = " ".join([item["key"], *(m["key"] for m in item["members"])]).lower()
+        if version == NUANCED_VERSION:
+            # Real governed blockers have opaque keys (blocker:123). Their
+            # canonical action title supplies the operational category.
+            keys += " " + item["name"].lower()
         department = next(iter(explicit), None)
         if department is None:
             department = ("Post-event" if any(k in keys for k in ("post-event", "post_event", "debrief")) else

@@ -135,3 +135,13 @@ def test_nuanced_layout_preserves_the_ambiguity_fence():
     mutations=len(provider.mutations);update_case(repo)
     assert execute(repo,adapter,nuanced(repo)).failure_codes==('adapter_outcome_ambiguous',)
     assert len(provider.mutations)==mutations
+
+
+def test_opaque_governed_technical_blocker_is_grouped_under_logistics():
+    repo=synthetic_repo()
+    repo.workflow_actions[1]=[work_action(1,'blocker:2388','Confirm event-specific technical setup'),work_action(2,'availability:window','Confirm Studio availability')]
+    plan=build_projection(repo.load_case_snapshot(1),workspace_gid='111',project_gid='222',version=NUANCED_VERSION)
+    work={w['key']:w for w in plan['work']}
+    assert work['item:blocker:2388']['parent_key']=='department:logistics'
+    assert work['item:availability:window']['parent_key']=='department:admin'
+    assert {w['name'] for w in plan['work'] if w.get('kind')=='department'}=={'Admin','Logistics'}
