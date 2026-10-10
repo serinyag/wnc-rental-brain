@@ -71,6 +71,8 @@ class AppRuntimeConfig:
     staging_allow_real_outlook: bool = False
     staging_allow_real_outlook_send: bool = False
     staging_allow_real_asana: bool = False
+    staging_allow_real_google: bool = False
+    staging_allowed_google_folder_ids: tuple[str, ...] = ()
     production: object | None = None
 
     @classmethod
@@ -103,6 +105,8 @@ class AppRuntimeConfig:
             staging_allow_real_outlook=_parse_env_flag(load_env_value(STAGING_ALLOW_REAL_OUTLOOK_ENV)),
             staging_allow_real_outlook_send=_parse_env_flag(load_env_value(STAGING_ALLOW_REAL_OUTLOOK_SEND_ENV)),
             staging_allow_real_asana=_parse_env_flag(load_env_value(STAGING_ALLOW_REAL_ASANA_ENV)),
+            staging_allow_real_google=_parse_env_flag(load_env_value('STAGING_ALLOW_REAL_GOOGLE')),
+            staging_allowed_google_folder_ids=_parse_generic_allowlist(load_env_value('STAGING_ALLOWED_GOOGLE_FOLDER_IDS')),
         )
 
     @property

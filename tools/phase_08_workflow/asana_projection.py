@@ -202,6 +202,16 @@ def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, a
                       "No applicable governed work is recorded yet. This category is not confirmed complete.")})
         work.extend(items)
     value["work"] = work
+    from .google_proposal import binding as proposal_binding, proposal_send_block
+    proposal = proposal_binding(snapshot)
+    if proposal:
+        import re
+        document_id = proposal.get('document_id', '')
+        if not re.fullmatch(r'[A-Za-z0-9_-]{3,200}', document_id):
+            raise ValueError('Invalid proposal document binding')
+        status = 'Current' if proposal_send_block(snapshot) is None else 'Needs review / synchronization'
+        value['master']['notes'] += ('\n\nRENTAL PROPOSAL\nhttps://docs.google.com/document/d/'
+            + document_id + '/edit\nStatus: ' + status + '\nNext action: Review confirmed details and remaining TBC items.')
     if application_origin:
         from urllib.parse import urlsplit
         parsed = urlsplit(application_origin)

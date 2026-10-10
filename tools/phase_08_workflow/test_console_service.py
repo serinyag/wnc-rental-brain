@@ -1031,10 +1031,19 @@ left join stale_units su on true;
     def _provider_health_statuses(self) -> dict[str, str]:
         outlook_config = OutlookAdapterConfig.from_env()
         asana_config = AsanaAdapterConfig.from_env()
-        return {
+        providers = {
             "outlook": self._resolve_outlook_provider_status(outlook_config),
             "asana": self._resolve_asana_provider_status(asana_config),
         }
+        if self.config.runtime.is_staging:
+            from .google_proposal_adapter import GoogleProposalConfig
+            google = GoogleProposalConfig.from_env()
+            configured = all((google.client_id, google.client_secret, google.refresh_token,
+                google.folder_id in self.config.runtime.staging_allowed_google_folder_ids))
+            providers['google_proposal'] = ('unconfigured' if not configured else
+                'configured_but_disabled' if not self.config.runtime.staging_allow_real_google or not self.config.allow_real_providers
+                else 'enabled_staging_only')
+        return providers
 
     def _resolve_outlook_provider_status(self, config: OutlookAdapterConfig) -> str:
         runtime = self.config.runtime
@@ -1602,6 +1611,37 @@ limit 1;
             lines=lines,
             failure_codes=result.failure_codes,
         )
+
+    def prepare_google_proposal(self, *, rental_case_id: int) -> dict:
+        from .google_proposal import prepare_projection
+        from .google_proposal_adapter import GoogleProposalConfig
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError('Google proposal certification is staging-only.')
+        self._load_test_case_metadata(rental_case_id)
+        config = GoogleProposalConfig.from_env()
+        if not config.client_id or config.folder_id not in self.config.runtime.staging_allowed_google_folder_ids:
+            raise TestConsoleError('A dedicated allowlisted Google staging identity and folder are required.')
+        action = prepare_projection(self.orchestration_repository, rental_case_id=rental_case_id,
+            folder_id=config.folder_id, provider_identity=config.provider_identity, now=self.now())
+        return {'workflow_action_id': action.workflow_action_id,
+                'projection': action.structured_payload['projection'], 'provider_called': False}
+
+    def observe_google_proposal(self, *, rental_case_id: int, workflow_action_id: int) -> dict:
+        from .google_proposal_adapter import GoogleProposalAdapter, GoogleProposalConfig, GoogleTransport
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError('Google proposal certification is staging-only.')
+        self._load_test_case_metadata(rental_case_id)
+        snapshot = self._require_case_snapshot(rental_case_id)
+        action = snapshot.find_workflow_action(workflow_action_id)
+        if action is None or action.target_adapter_code != 'google_proposal':
+            raise TestConsoleError('A canonical Google proposal action is required.')
+        config = GoogleProposalConfig.from_env()
+        evidence = GoogleProposalAdapter(config, GoogleTransport(config), self.orchestration_repository,
+            self.config.runtime).observe(action=action)
+        self._create_console_event(rental_case_id=rental_case_id, event_type_code='google_proposal_observed',
+            source_reference=f'workflow_action:{workflow_action_id}', occurred_at=self.now(), structured_payload=evidence,
+            actor_reference=_operator_reference(self), actor_type=TEST_CONSOLE_OPERATOR_TYPE)
+        return evidence
 
     def prepare_asana_rental_projection(self, *, rental_case_id: int) -> dict:
         from .asana_projection import prepare_projection, NUANCED_VERSION
@@ -4398,6 +4438,16 @@ limit 1;
                         projected_action=provider_action,
                     ),
                 )
+            elif action.target_adapter_code == 'google_proposal':
+                from .google_proposal_adapter import GoogleProposalAdapter, GoogleProposalConfig, GoogleTransport
+                rows = self.orchestration_repository.query_runner(
+                    "select exists(select 1 from pg_trigger where tgname = 'google_proposal_attempt_fence' and tgenabled = 'O') as installed",
+                    expect_json=True)['rows']
+                if not rows or not rows[0]['installed']:
+                    raise TestConsoleError('Google proposal migration must be applied before real execution.')
+                config = GoogleProposalConfig.from_env()
+                registry.register('google_proposal', GoogleProposalAdapter(config, GoogleTransport(config),
+                    self.orchestration_repository, self.config.runtime))
             elif action.target_adapter_code == "asana_projection":
                 from .asana_adapter import UrllibAsanaTransport
                 from .asana_projection_adapter import AsanaProjectionAdapter
@@ -5781,6 +5831,18 @@ returning
         try:
             value = validate_outlook_action(action)
             snapshot = self._require_case_snapshot(execution_context.rental_case_id)
+            from .google_proposal import proposal_send_block
+            proposal_failure = proposal_send_block(snapshot)
+            if proposal_failure:
+                return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, proposal_failure
+            proposals = [a for a in snapshot.workflow_actions if a.target_adapter_code == 'google_proposal']
+            if proposals:
+                from .google_proposal_adapter import GoogleProposalAdapter, GoogleProposalConfig, GoogleTransport
+                config = GoogleProposalConfig.from_env()
+                observed = GoogleProposalAdapter(config, GoogleTransport(config), self.orchestration_repository,
+                    self.config.runtime).observe(action=max(proposals, key=lambda a: a.workflow_action_id))
+                if observed['status'] != 'MATCHES_PROJECTION':
+                    return EXECUTION_FAILURE_OUTLOOK_SEND_GOVERNANCE_INVALID, 'proposal_provider_not_current'
             persisted_action = snapshot.find_workflow_action(action.workflow_action_id)
             if (persisted_action is None or persisted_action.structured_payload != action.structured_payload
                     or persisted_action.idempotency_key != action.idempotency_key
