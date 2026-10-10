@@ -10,6 +10,7 @@ from tools.phase_08_workflow.google_proposal_adapter import GoogleProposalAdapte
 from tools.phase_08_workflow.execution_runtime import execute_workflow_action, ExecutionAdapterRegistry
 from tools.phase_08_workflow.execution_types import WorkflowActionExecutionRequest
 from tools.phase_08_workflow.test_console_service import TestConsoleService, TestConsoleConfig
+from tools.phase_08_workflow.tests.test_operational_resolution import resolution
 
 
 @pytest.fixture
@@ -91,3 +92,32 @@ def test_http_google_routes_require_staging_authentication():
         method.assert_not_called()
         assert call_app(app, 'POST', path, headers=_basic_auth_header('operator', 'test-password'))[0] == '200 OK'
         method.assert_called_once()
+
+
+def test_scoped_confirmation_updates_doc_and_matches_client_drafting_authority(resolution):
+    from tools.phase_08_workflow.operational_resolution import client_results
+    from tools.phase_08_workflow.governed_client_response import build_draft_contract
+    conn, repo, cid, _, request, accept = resolution
+    conn.execute((ROOT/'supabase/migrations/20261010000100_google_proposal_projection_fences.sql').read_text())
+    _, provider, local = harness()
+    adapter = GoogleProposalAdapter(local.config, provider, repo, local.runtime)
+    def run():
+        action = prepare_projection(repo, rental_case_id=cid, folder_id=adapter.config.folder_id,
+                                    provider_identity=adapter.config.provider_identity)
+        return execute_workflow_action(repo, WorkflowActionExecutionRequest(cid, action.workflow_action_id, 'operator'),
+            adapter_registry=ExecutionAdapterRegistry({ADAPTER: adapter}))
+    assert run().action_status_after == 'succeeded'
+    accept()
+    assert run().action_status_after == 'succeeded'
+    from tools.phase_08_workflow.google_proposal_adapter import paragraphs
+    text = '\n'.join(p[2] for p in paragraphs(provider.get('doc_001')))
+    snapshot = repo.load_case_snapshot(cid)
+    assertion = client_results(snapshot)[0]['assertion']
+    contract = build_draft_contract(snapshot=snapshot, recipient_label='Synthetic Client',
+                                   latest_client_message='Is the Studio available?')
+    assert assertion in text
+    assert any(i.included and i.value.get('assertion') == assertion for i in contract.editorial_plan.items)
+    conn.execute("update public.rental_cases set active_event_start=active_event_start+interval '1 day', active_event_end=active_event_end+interval '1 day',case_revision=case_revision+1 where id=%s", (cid,))
+    assert run().action_status_after == 'succeeded'
+    assert assertion not in '\n'.join(p[2] for p in paragraphs(provider.get('doc_001')))
+    assert len(provider.documents) == 1

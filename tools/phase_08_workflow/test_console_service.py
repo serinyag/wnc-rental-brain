@@ -801,6 +801,11 @@ class TestConsoleService:
             metrics={
                 "outlook_inbound_gate": "enabled" if _env_flag("STAGING_ALLOW_REAL_OUTLOOK_INBOUND") else "disabled",
                 "outlook_inbound_preflight_gate": "enabled" if _env_flag("STAGING_ALLOW_OUTLOOK_INBOUND_PREFLIGHT") else "disabled",
+                "outlook_execution_gate": "enabled" if self.config.runtime.staging_allow_real_outlook else "disabled",
+                "outlook_send_gate": "enabled" if self.config.runtime.staging_allow_real_outlook_send else "disabled",
+                "asana_execution_gate": "enabled" if self.config.runtime.staging_allow_real_asana else "disabled",
+                "google_proposal_gate": "enabled" if self.config.runtime.staging_allow_real_google else "disabled",
+                "real_providers_gate": "enabled" if self.config.allow_real_providers else "disabled",
                 "outlook_human_edit_identity_policy": (
                     "trusted_configured_mailbox_and_bound_graph_id; "
                     "provided_smtp_fields_must_match; absent_identity_fields_allowed"
