@@ -131,7 +131,9 @@ class OpenAIEmbeddingsClient:
         api_key: str | None = None,
         timeout_seconds: int = 60,
     ) -> None:
-        raw_api_key = api_key or load_env_value("OPENAI_API_KEY")
+        key_name = "PRODUCTION_OPENAI_API_KEY" if os.environ.get("APP_ENV") == "production" else "OPENAI_API_KEY"
+        # Production must never discover a staging/local key from dotenv files.
+        raw_api_key = api_key or (os.environ.get(key_name) if key_name == "PRODUCTION_OPENAI_API_KEY" else load_env_value(key_name))
         if raw_api_key is None:
             self.api_key = None
         else:
@@ -140,7 +142,7 @@ class OpenAIEmbeddingsClient:
             self.api_key = raw_api_key.strip().split()[0] if raw_api_key.strip() else None
         if not self.api_key:
             raise SystemExit(
-                "OPENAI_API_KEY is required for live embedding generation and semantic evaluation."
+                f"{key_name} is required for live embedding generation and semantic evaluation."
             )
         self.timeout_seconds = timeout_seconds
         self.ssl_context = ssl.create_default_context(cafile=certifi.where())
