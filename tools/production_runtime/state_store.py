@@ -1,5 +1,7 @@
 """Durable controls and named-operator revocation for the free shared deployment."""
 import os
+import hashlib
+from contextlib import contextmanager
 import psycopg
 from psycopg.types.json import Jsonb
 from .database import CA
@@ -66,6 +68,21 @@ def pending_alerts(contract,limit):
         rows=c.execute("select event_id,payload from rental_production.runtime_alert_outbox where deployment_id=%s and status='pending' order by created_at,event_id limit %s",
                        (contract.manifest['deployment_id'],limit)).fetchall()
     return rows
+
+
+@contextmanager
+def alert_dispatch_lock(contract):
+    """Session ownership spans claim, provider call and durable receipt.
+
+    A competing deployment does not mistake the owner's active claim for an
+    abandoned send. A lost owner still leaves its claim fenced for reconciliation.
+    """
+    key=int.from_bytes(hashlib.sha256(('wnc-alerts:'+contract.manifest['deployment_id']).encode()).digest()[:8],signed=True)
+    with connection(contract) as c:
+        acquired=c.execute('select pg_try_advisory_lock(%s)',(key,)).fetchone()[0]
+        try:yield acquired
+        finally:
+            if acquired:c.execute('select pg_advisory_unlock(%s)',(key,))
 
 
 def claim_alert(contract,key):

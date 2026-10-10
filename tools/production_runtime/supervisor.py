@@ -45,6 +45,6 @@ def main():
         for p in children:
             if p.poll() is None:p.terminate()
         for p in children:
-            try:p.wait(timeout=10)
+            try:p.wait(timeout=25)
             except subprocess.TimeoutExpired:p.kill()
 if __name__=='__main__':main()

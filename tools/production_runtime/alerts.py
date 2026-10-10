@@ -21,7 +21,7 @@ def atomic_json(path,payload):
 
 def emit(contract,code,*,case_id=None,actor=None):
     if code not in CODES:raise ValueError('unknown_alert_code')
-    event={'deployment_id':contract.manifest['deployment_id'],'code':code,'timestamp':int(time.time()),
+    event={'deployment_id':contract.manifest['deployment_id'],'code':code,'timestamp':0 if code=='MONITOR_READY' else int(time.time()),
            'case_id':case_id if type(case_id) is int else None,'actor':actor}
     key=hashlib.sha256(json.dumps(event,sort_keys=True).encode()).hexdigest()
     from . import state_store
@@ -35,34 +35,47 @@ def emit(contract,code,*,case_id=None,actor=None):
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):raise ValueError('alert_redirect_forbidden')
 
-def dispatch(contract,*,opener=None,limit=25,sender=None):
+def dispatch(contract,*,opener=None,limit=25,sender=None,stop_requested=lambda:False):
     """Bounded worker; durable Graph alerts fence unknown outcomes before retry."""
     from .config import ProductionContract
     if not isinstance(contract,ProductionContract):raise ValueError('validated_contract_required')
     if type(limit) is not int or not 1<=limit<=25:raise ValueError('alert_dispatch_limit_invalid')
     from . import state_store
     if state_store.enabled(contract):
-        from .graph_alerts import GraphAlerts,AlertOutcomeAmbiguous
-        if state_store.unresolved_alerts(contract):
+        with state_store.alert_dispatch_lock(contract) as acquired:
+            if acquired:
+                return _durable_dispatch(contract,limit,sender,stop_requested)
+            atomic_json(Path(contract.manifest['alerting']['spool_path'])/'heartbeat.state',{'at':time.time(),'sent':0,'dispatch_owner':'other_worker'})
+            return 0
+    return _file_dispatch(contract,opener,limit)
+
+def _durable_dispatch(contract,limit,sender,stop_requested):
+    from . import state_store
+    from .graph_alerts import GraphAlerts,AlertOutcomeAmbiguous
+    if state_store.unresolved_alerts(contract):
+        state_store.disable(contract)
+        raise ValueError('administrative_alert_reconciliation_required')
+    sender=sender or GraphAlerts(contract)
+    sent=0
+    for key,event in state_store.pending_alerts(contract,limit):
+        if stop_requested():break
+        if not state_store.claim_alert(contract,key):continue
+        try:receipt=sender.send(event,key)
+        except AlertOutcomeAmbiguous:
+            state_store.alert_receipt(contract,key,'ambiguous',{'status':'reconciliation_required'})
             state_store.disable(contract)
-            raise ValueError('administrative_alert_reconciliation_required')
-        sender=sender or GraphAlerts(contract)
-        sent=0
-        for key,event in state_store.pending_alerts(contract,limit):
-            if not state_store.claim_alert(contract,key):continue
-            try:receipt=sender.send(event,key)
-            except AlertOutcomeAmbiguous:
-                state_store.alert_receipt(contract,key,'ambiguous',{'status':'reconciliation_required'})
-                state_store.disable(contract)
-                raise
-            except Exception:
-                state_store.alert_receipt(contract,key,'failed',{'status':'delivery_failed'})
-                state_store.disable(contract)
-                raise
-            state_store.alert_receipt(contract,key,'accepted',receipt);sent+=1
-        state_store.heartbeat(contract,sent)
-        atomic_json(Path(contract.manifest['alerting']['spool_path'])/'heartbeat.state',{'at':time.time(),'sent':sent})
-        return sent
+            raise
+        except Exception:
+            state_store.alert_receipt(contract,key,'failed',{'status':'delivery_failed'})
+            state_store.disable(contract)
+            raise
+        state_store.alert_receipt(contract,key,'accepted',receipt);sent+=1
+    state_store.heartbeat(contract,sent)
+    atomic_json(Path(contract.manifest['alerting']['spool_path'])/'heartbeat.state',{'at':time.time(),'sent':sent})
+    return sent
+
+
+def _file_dispatch(contract,opener,limit):
     opener=opener or urllib.request.build_opener(NoRedirect())
     sent=0
     for p in sorted(Path(contract.manifest['alerting']['spool_path']).glob('*.json'))[:limit]:

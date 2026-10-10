@@ -25,7 +25,7 @@ def check(contract,connection):
     if metrics.get('ambiguous_attempts'):emit(contract,'RECONCILIATION_REQUIRED')
     return metrics
 
-def run_once():
+def run_once(*,stop_requested=lambda:False):
     import os
     from .database import connect
     from .config import ProductionContract
@@ -35,7 +35,7 @@ def run_once():
         with connect(os.environ['DATABASE_URL'],autocommit=True,connect_timeout=5) as conn:metrics=check(contract,conn)
     except Exception:
         emit(contract,'APPLICATION_FAILURE');raise RuntimeError('monitoring_database_unavailable') from None
-    delivered=dispatch(contract)
+    delivered=dispatch(contract,stop_requested=stop_requested)
     from . import state_store
     if state_store.enabled(contract):state_store.heartbeat(contract,len(metrics))
     return {'signals':len(metrics),'alerts_delivered':delivered}
