@@ -145,3 +145,10 @@ def test_opaque_governed_technical_blocker_is_grouped_under_logistics():
     assert work['item:blocker:2388']['parent_key']=='department:logistics'
     assert work['item:availability:window']['parent_key']=='department:admin'
     assert {w['name'] for w in plan['work'] if w.get('kind')=='department'}=={'Admin','Logistics'}
+
+
+def test_improved_inference_preserves_existing_bound_department():
+    repo=synthetic_repo();repo.workflow_actions[1]=[work_action(1,'blocker:2388','Confirm event-specific technical setup')]
+    with patch('tools.phase_08_workflow.asana_projection.prior_bindings',return_value={'item:blocker:2388':{'parent_key':'department:admin'}}):
+        plan=build_projection(repo.load_case_snapshot(1),workspace_gid='111',project_gid='222',version=NUANCED_VERSION)
+    assert next(w for w in plan['work'] if w['key']=='item:blocker:2388')['parent_key']=='department:admin'

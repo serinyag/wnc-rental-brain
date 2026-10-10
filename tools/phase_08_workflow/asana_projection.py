@@ -188,6 +188,12 @@ def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, a
             # canonical action title supplies the operational category.
             keys += " " + item["name"].lower()
         department = next(iter(explicit), None)
+        if department is None and version == NUANCED_VERSION:
+            # Existing provider hierarchy stays bound. Improved inference is
+            # for new work; moving an existing task needs explicit migration.
+            existing_parent = prior_bindings(snapshot).get(item["key"], {}).get("parent_key")
+            department = next((name for name in DEPARTMENTS
+                if existing_parent == "department:" + name.lower()), None)
         if department is None:
             department = ("Post-event" if any(k in keys for k in ("post-event", "post_event", "debrief")) else
                           "Experience" if any(k in keys for k in ("catering", "facilitator", "hospitality")) else
