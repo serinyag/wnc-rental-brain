@@ -470,6 +470,9 @@ class DeterministicFakeClientResponseProvider:
     """Test-only provider that makes no network request."""
 
     def generate_client_response(self, contract: DraftContract) -> ClientResponseDraft:
+        planned = self._planned_operational_fixture(contract)
+        if planned is not None:
+            return planned
         draft = self._generate_client_response(contract)
         # Scoped operator outcomes remain mandatory in every response intent,
         # including a reschedule acknowledgement or an interim technical reply.
@@ -486,6 +489,45 @@ class DeterministicFakeClientResponseProvider:
                 body += "\n\n" + "\n".join(assertions)
             draft = ClientResponseDraft(draft.subject, body, draft.question_ids)
         return draft
+
+    def _planned_operational_fixture(self, contract: DraftContract) -> ClientResponseDraft | None:
+        """Render finite operational witnesses from the existing editorial plan.
+
+        This is a free staging fixture, not a substitute for model evaluation.
+        Unsupported shapes use the legacy fixture and still face normal safety
+        and completeness validation. Deferred facts never enter this rendering.
+        """
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from .required_realization import requirements
+        selected = requirements(contract.editorial_plan)
+        if not selected or contract.open_client_questions:
+            return None
+        paragraphs = []
+        for requirement in selected:
+            item = requirement.item
+            value = item.value
+            if item.topic == "operational_confirmation" and value.get("assertion"):
+                paragraphs.append(value["assertion"])
+            elif item.topic == "projection_display" and value.get("status") == "conditional" and value.get("available_equipment") and value.get("check_required"):
+                checks = ", ".join(value["check_required"])
+                paragraphs.append(f"For projection display, the supplied equipment is {value['available_equipment']}. We'll check the {checks} for your event before confirming that arrangement.")
+            elif item.topic == "next_step" and value.get("action") == "check" and value.get("subjects") == ["requested date and venue availability"]:
+                window = value.get("requested_event_window", [])
+                if len(window) != 2:
+                    return None
+                try:
+                    start, end = [datetime.fromisoformat(row.split(": ", 1)[1]).astimezone(ZoneInfo("Europe/Amsterdam")) for row in window]
+                except (ValueError, IndexError):
+                    return None
+                if start.date() != end.date() or start >= end:
+                    return None
+                paragraphs.append(f"We'll check venue availability for your requested date, {start:%d %B %Y} from {start:%H:%M} to {end:%H:%M} (Europe/Amsterdam), before confirming it.")
+            else:
+                return None
+        greeting = f"Hi {contract.recipient_label},"
+        acknowledgement = "Thanks for the update." if contract.prior_client_messages else "Thanks for your inquiry."
+        return ClientResponseDraft("Your WNC inquiry", greeting + "\n\n" + acknowledgement + "\n\n" + "\n\n".join(paragraphs))
 
     def _generate_client_response(self, contract: DraftContract) -> ClientResponseDraft:
         greeting = f"Hi {contract.recipient_label},"

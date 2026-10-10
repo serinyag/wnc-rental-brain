@@ -181,3 +181,16 @@ def test_client_question_normalization_retains_identity_and_information_need():
     c=contract('An offsite',snapshot=make_snapshot(open_questions=(q,)))
     assert c.to_provider_payload()['open_client_questions']==[{'topic':'client_information','open_question_id':9,'question':'Which space would you like?'}]
     assert c.open_client_questions[0][1]==q.human_question_text
+
+
+def test_free_operational_fixture_keeps_projection_conditional_and_omits_deferred_policy():
+    from tools.phase_08_workflow.governed_client_response import DeterministicFakeClientResponseProvider, validate_client_response_draft
+    from tools.phase_08_workflow.required_realization import validate_required_realization
+    c=contract('Can we use a projector?',contextual_guidance=(
+        guide('projection_display',capability='projection display',status='conditional',available_equipment='WNC projector',check_required=['practical projection setup']),
+        ContextualGuidance('external_supplier_setup','Supplier removes packaging','SERV-004')))
+    draft=DeterministicFakeClientResponseProvider().generate_client_response(c)
+    assert 'practical projection setup' in draft.body and "We'll check" in draft.body
+    assert 'Supplier removes packaging' not in draft.body
+    assert all(r['realized'] for r in validate_required_realization(c.editorial_plan,draft.body))
+    assert validate_client_response_draft(contract=c,draft=draft,current_case_revision=4,current_context_hash=c.context_hash).is_valid
