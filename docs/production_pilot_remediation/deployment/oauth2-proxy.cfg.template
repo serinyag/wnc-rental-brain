@@ -1,4 +1,6 @@
 provider = "oidc"
+# The delegated access token targets Rental Brain, not Microsoft Graph.
+skip_claims_from_profile_url = true
 provider_display_name = "WNC Microsoft sign-in"
 oidc_issuer_url = "https://login.microsoftonline.com/REPLACE_TENANT_UUID/v2.0"
 client_id = "REPLACE_PROXY_CLIENT_UUID"
