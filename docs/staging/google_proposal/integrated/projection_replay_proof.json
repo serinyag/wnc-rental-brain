@@ -1,0 +1,50 @@
+[
+  {
+    "scenario": "A",
+    "provider": "google",
+    "action_id": 1658,
+    "new_attempts": 0,
+    "provider_mutations": 0,
+    "replay": "already_succeeded"
+  },
+  {
+    "scenario": "A",
+    "provider": "asana",
+    "action_id": 1691,
+    "new_attempts": 0,
+    "provider_mutations": 0,
+    "replay": "already_succeeded"
+  },
+  {
+    "scenario": "B",
+    "provider": "google",
+    "action_id": 1694,
+    "new_attempts": 0,
+    "provider_mutations": 0,
+    "replay": "already_succeeded"
+  },
+  {
+    "scenario": "B",
+    "provider": "asana",
+    "action_id": 1695,
+    "new_attempts": 0,
+    "provider_mutations": 0,
+    "replay": "already_succeeded"
+  },
+  {
+    "scenario": "C",
+    "provider": "google",
+    "action_id": 1690,
+    "new_attempts": 0,
+    "provider_mutations": 0,
+    "replay": "already_succeeded"
+  },
+  {
+    "scenario": "C",
+    "provider": "asana",
+    "action_id": 1696,
+    "new_attempts": 0,
+    "provider_mutations": 0,
+    "replay": "already_succeeded"
+  }
+]

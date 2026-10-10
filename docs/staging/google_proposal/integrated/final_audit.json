@@ -1,0 +1,99 @@
+[
+  {
+    "scenario": "A",
+    "case_id": 590,
+    "case_revision": 4,
+    "action_id": 1682,
+    "draft_revision_id": 388,
+    "approval_id": 467,
+    "approval_unchanged": true,
+    "content_unchanged": true,
+    "attempt_id": 51,
+    "one_attempt": true,
+    "original_ambiguity_preserved": true,
+    "retry_eligible": false,
+    "delivery_reconciled": true,
+    "receipt_verified": true,
+    "event": "Workflow event id: 17444",
+    "confirmation_replay_same_event": true,
+    "send_replay": {
+      "status_code": 400,
+      "error": {
+        "failure_code": "INQUIRY_DRAFT_NOT_APPROVED",
+        "message": "Only the current approved inquiry-response draft can be sent.",
+        "status": 400
+      }
+    },
+    "replay_new_attempts": 0,
+    "provider_mutations": 0,
+    "inbound_sources": [
+      3114
+    ],
+    "one_inbound_case_conversation": true
+  },
+  {
+    "scenario": "B",
+    "case_id": 589,
+    "case_revision": 9,
+    "action_id": 1697,
+    "draft_revision_id": 393,
+    "approval_id": 472,
+    "approval_unchanged": true,
+    "content_unchanged": true,
+    "attempt_id": 55,
+    "one_attempt": true,
+    "original_ambiguity_preserved": true,
+    "retry_eligible": false,
+    "delivery_reconciled": true,
+    "receipt_verified": true,
+    "event": "Workflow event id: 17445",
+    "confirmation_replay_same_event": true,
+    "send_replay": {
+      "status_code": 400,
+      "error": {
+        "failure_code": "INQUIRY_DRAFT_NOT_APPROVED",
+        "message": "Only the current approved inquiry-response draft can be sent.",
+        "status": 400
+      }
+    },
+    "replay_new_attempts": 0,
+    "provider_mutations": 0,
+    "inbound_sources": [
+      3113
+    ],
+    "one_inbound_case_conversation": true
+  },
+  {
+    "scenario": "C",
+    "case_id": 588,
+    "case_revision": 10,
+    "action_id": 1698,
+    "draft_revision_id": 394,
+    "approval_id": 473,
+    "approval_unchanged": true,
+    "content_unchanged": true,
+    "attempt_id": 56,
+    "one_attempt": true,
+    "original_ambiguity_preserved": true,
+    "retry_eligible": false,
+    "delivery_reconciled": true,
+    "receipt_verified": true,
+    "event": "Workflow event id: 17446",
+    "confirmation_replay_same_event": true,
+    "send_replay": {
+      "status_code": 400,
+      "error": {
+        "failure_code": "INQUIRY_DRAFT_NOT_APPROVED",
+        "message": "Only the current approved inquiry-response draft can be sent.",
+        "status": 400
+      }
+    },
+    "replay_new_attempts": 0,
+    "provider_mutations": 0,
+    "inbound_sources": [
+      3112,
+      3115
+    ],
+    "one_inbound_case_conversation": true
+  }
+]

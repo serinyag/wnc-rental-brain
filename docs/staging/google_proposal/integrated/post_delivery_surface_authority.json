@@ -1,0 +1,29 @@
+[
+  {
+    "scenario": "A",
+    "case_id": 590,
+    "post_delivery_projection_unchanged": true,
+    "source_case_revision": 4,
+    "google_hash": "8bb290f483400500b327b9780a951dea21cf153741128c3c325684a224d6e6b6",
+    "asana_unchanged": true,
+    "provider_calls": 0
+  },
+  {
+    "scenario": "B",
+    "case_id": 589,
+    "post_delivery_projection_unchanged": true,
+    "source_case_revision": 9,
+    "google_hash": "16225a9235f82136243637714b3b49f79c1ed92ef35d9791b5e565f68a2569b8",
+    "asana_unchanged": true,
+    "provider_calls": 0
+  },
+  {
+    "scenario": "C",
+    "case_id": 588,
+    "post_delivery_projection_unchanged": true,
+    "source_case_revision": 10,
+    "google_hash": "666ba43be4df4a38d39795dd5918ad86715d960bbe9c350f9ab19b006ba12f0c",
+    "asana_unchanged": true,
+    "provider_calls": 0
+  }
+]

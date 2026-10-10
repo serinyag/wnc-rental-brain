@@ -1,0 +1,30 @@
+{
+  "closure_at": "2026-10-10T16:36:06.669821+00:00",
+  "runtime_commit": "c87b1c9068beeafb08d287086977aa7206d4d0fe",
+  "full_suite": {
+    "passed": 1089,
+    "warnings": 45,
+    "failures": 0
+  },
+  "live_google_certified": true,
+  "hosted_scenarios_certified": [
+    "A",
+    "B",
+    "C"
+  ],
+  "google_documents_created": 4,
+  "journey_asana_masters": 3,
+  "synthetic_internal_messages": 7,
+  "openai_calls": 0,
+  "new_paid_plans": 0,
+  "all_seven_gates_off": true,
+  "production_untouched": true,
+  "delivery_events": [
+    17444,
+    17445,
+    17446
+  ],
+  "original_ambiguities_preserved": true,
+  "drafting_mode": "explicit_deterministic_staging_fixture",
+  "report": "GOOGLE_PROPOSAL_STAGING_REPORT.md"
+}

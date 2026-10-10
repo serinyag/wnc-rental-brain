@@ -1,0 +1,19 @@
+{
+  "action_id": 1697,
+  "approval_id": 472,
+  "attempt_id": 55,
+  "case_id": 589,
+  "conversation_id": "AAQkADgwMGM0Y2JhLTg2M2EtNDkwNy05YWU1LTU1MmI0MGM4ODRkMwAQACn371DMfS5Ome8aT0nf73g=",
+  "exact_content_match": true,
+  "inbox_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABo_inSgAA",
+  "internet_message_id": "<VI2PR07MB11032500BF62C4A9CF7E8EB3CD1912@VI2PR07MB11032.eurprd07.prod.outlook.com>",
+  "provider_mutations": 0,
+  "provider_reads": 2,
+  "receipt_verified": true,
+  "received_at": "2026-10-10T16:22:30Z",
+  "recipient": "serinya@whennaturecalls.nl",
+  "revision_id": 393,
+  "sent_at": "2026-10-10T16:22:29Z",
+  "sent_message_id": "AAkALgAAAAAAHYQDEapmEc2byACqAC-EWg0ArpH-EFDur06E-zl8MvU_HgABo_inRAAA",
+  "subject": "Your WNC inquiry"
+}
