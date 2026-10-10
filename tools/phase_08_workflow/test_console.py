@@ -204,6 +204,11 @@ class TestConsoleApp:
                 return self._respond_json_error(start_response, status=HTTPStatus.CONFLICT,
                     message=str(exc), failure_code="INBOUND_STOPPED", diagnostics=getattr(exc, "diagnostics", None))
             return self._respond_json(start_response, result)
+        if path.startswith('/api/operator/cases/587/synthetic-journey/') and method == 'POST':
+            if self._parse_json(environ):
+                raise TestConsoleError('Fixed synthetic fixture only.')
+            from .staging_journey_transport import run
+            return self._respond_json(start_response, run(path.rsplit('/', 1)[-1]))
         if path == "/api/operator/cases/586/final-receipt" and method == "GET":
             from .staging_layout_reply import receipt
             return self._respond_json(start_response, receipt())
