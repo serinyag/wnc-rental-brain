@@ -2,7 +2,7 @@ from unittest.mock import patch
 import pytest
 from tools.phase_08_workflow import staging_journey_transport as fixture
 
-@pytest.mark.parametrize('scenario',['D','A/anything','C-followup'])
+@pytest.mark.parametrize('scenario',['D','A/anything','C-unapproved'])
 def test_only_three_fixed_fixtures_are_accepted(scenario):
  with patch.object(fixture,'configuration',side_effect=AssertionError('No provider config permitted')):
   with pytest.raises(ValueError,match='synthetic_scenario_invalid'):fixture.run(scenario)
