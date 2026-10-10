@@ -75,11 +75,20 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
         latest[p["resolution_item_key"]] = action
     groups = {}
     client_items = []
+    blocker_states = {f"blocker:{b.blocker_id}": b.status for b in snapshot.blockers}
+    current_availability_key = f"availability:{case.active_event_start}:{case.active_event_end}"
     for key, action in sorted(latest.items()):
         p = action.structured_payload
         owner = p["resolution_owner"]
         closed = (key in governed_resolved if p.get("governed_resolution_event_id")
                   else p.get("resolution_status") in RESOLVED)
+        # Historical bindings stay visible and keep their provider identity.
+        # A changed window retires its old check; a resolved canonical blocker
+        # retires its derived work even if an older action payload says REQUIRED.
+        retired = ((key.startswith("availability:") and case.active_event_start
+                    and case.active_event_end and key != current_availability_key)
+                   or blocker_states.get(key) in RESOLVED)
+        closed = closed or retired
         summary = _text(p.get("summary"))
         if owner == "CLIENT":
             if not closed:
@@ -92,7 +101,7 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
         if item["name"] != title or item["owner"] != owner:
             raise ValueError("Conflicting governed group identity")
         item["members"].append({"key": key, "workflow_action_id": action.workflow_action_id,
-                                "summary": summary, "resolved": closed})
+                                "summary": summary, "resolved": closed, "retired": bool(retired)})
     other_open = []
     for question in snapshot.open_questions:
         if question.status == "open":
@@ -123,7 +132,7 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
     for key, item in sorted(groups.items()):
         item["completed"] = all(m["resolved"] for m in item["members"])
         item["notes"] = owner_labels[item["owner"]] + "\n\n" + "\n".join(
-            ("Done: " if m["resolved"] else "To do: ") + m["summary"] for m in item["members"])
+            ("Retired: " if m["retired"] else "Done: " if m["resolved"] else "To do: ") + m["summary"] for m in item["members"])
         item["notes"] += "\n\nRecord the outcome for governed review before treating it as confirmed."
         work.append(item)
     opened = [w for w in work if not w["completed"]]

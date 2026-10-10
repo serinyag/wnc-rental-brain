@@ -315,3 +315,24 @@ def test_wrong_provider_project_workspace_is_blocked_before_mutation():
     transport.send_json = wrong_scope
     assert execute(repo, adapter, prepare(repo)).action_status_after == "failed"
     assert not transport.mutations
+
+
+def test_changed_window_and_resolved_blocker_retire_bound_work_without_resolving_new_checks():
+    from types import SimpleNamespace
+    repo=synthetic_repo()
+    case=repo.rental_cases[1]
+    old=f'availability:{case.active_event_start}:{case.active_event_end}'
+    new_start='2026-11-15T11:00:00+01:00';new_end='2026-11-15T16:00:00+01:00'
+    new=f'availability:{new_start}:{new_end}'
+    for aid,key in ((7,old),(8,new),(9,'blocker:123'),(10,'blocker:124')):
+        repo.create_workflow_action(work_action(aid,key,'Confirm event-specific setup' if key.startswith('blocker') else 'Confirm requested venue availability'))
+    repo.rental_cases[1]=replace(case,active_event_start=new_start,active_event_end=new_end)
+    snap=replace(repo.load_case_snapshot(1),blockers=(
+        SimpleNamespace(blocker_id=123,status='resolved'),
+        SimpleNamespace(blocker_id=124,status='open',origin_entity_type='workflow_action')))
+    plan=build_projection(snap,workspace_gid='111',project_gid='222')
+    work={w['key']:w for w in plan['work']}
+    assert work['item:'+old]['completed'] and 'Retired:' in work['item:'+old]['notes']
+    assert work['item:blocker:123']['completed']
+    assert not work['item:'+new]['completed']
+    assert not work['item:blocker:124']['completed']
