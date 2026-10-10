@@ -12,7 +12,7 @@ from tools.runtime_environment import AppRuntimeConfig, AppEnvironment
 from tools.phase_08_workflow.google_proposal import (
     ADAPTER, build_projection, binding, prepare_projection, proposal_send_block, render_template, W)
 from tools.phase_08_workflow.google_proposal_adapter import (
-    GoogleProposalAdapter, GoogleProposalConfig, GoogleFailure, DOC_MIME, paragraphs)
+    GoogleProposalAdapter, GoogleProposalConfig, GoogleTransport, GoogleFailure, DOC_MIME, paragraphs)
 from tools.phase_08_workflow.execution_runtime import execute_workflow_action, ExecutionAdapterRegistry
 from tools.phase_08_workflow.execution_types import WorkflowActionExecutionRequest
 from tools.phase_08_workflow.tests.test_asana_projection import synthetic_repo, NOW, update_case
@@ -271,3 +271,17 @@ def test_existing_word_templates_render_with_seven_sections_and_no_example_conte
     plan = prepare(repo, adapter).structured_payload['projection']; _, lines = render_template(plan)
     assert sum(line.startswith(tuple(str(i)+'. ' for i in range(1,8))) for line in lines) == 7
     assert not any('[Action]' in line or '€[ ]' in line for line in lines)
+
+
+def test_google_transport_uses_verified_tls_and_never_retries_unknown_mutation():
+    import ssl
+    repo, _, adapter = harness()
+    transport = GoogleTransport(adapter.config)
+    with patch('tools.phase_08_workflow.google_proposal_adapter.urlopen', return_value=io.BytesIO(b'{}')) as request:
+        assert transport._http('GET', 'https://docs.googleapis.com/v1/documents/synthetic', auth=False) == {}
+        context = request.call_args.kwargs['context']
+        assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
+    with patch('tools.phase_08_workflow.google_proposal_adapter.urlopen', side_effect=TimeoutError()) as request:
+        with pytest.raises(GoogleFailure) as result:
+            transport._http('POST', 'https://www.googleapis.com/upload/drive/v3/files', auth=False)
+        assert result.value.ambiguous and request.call_count == 1

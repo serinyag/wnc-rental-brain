@@ -4,6 +4,8 @@ from __future__ import annotations
 import copy
 import json
 import re
+import ssl
+import certifi
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from urllib.error import HTTPError
@@ -53,7 +55,8 @@ class GoogleTransport:
         headers = {'Accept': 'application/json', 'Content-Type': content_type}
         if auth: headers['Authorization'] = 'Bearer ' + self.token()
         try:
-            with urlopen(Request(url, data=raw, headers=headers, method=method), timeout=45) as response:
+            with urlopen(Request(url, data=raw, headers=headers, method=method), timeout=45,
+                    context=ssl.create_default_context(cafile=certifi.where())) as response:
                 data = response.read(8_000_001)
         except HTTPError as exc:
             raise GoogleFailure(f'google_http_{exc.code}', ambiguous=method != 'GET' and exc.code >= 500) from None
