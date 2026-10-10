@@ -73,6 +73,7 @@ def build_rental_working_proposal(snapshot):
         if not f.field_code.startswith('operational_resolution:')}
     requested = facts.get('requested_rental_scope')
     scope = requested.value_payload if requested else case.rental_type_code
+    venue_scope = scope
     production_scope = facts.get('production_scope')
     if production_scope and production_scope.value_payload not in ('none', 'venue_only'):
         scope = production_scope.value_payload
@@ -96,7 +97,7 @@ def build_rental_working_proposal(snapshot):
             'status': 'Not applicable' if fact and (fact.value_payload == 'none' or fact.value_payload == ['none']) else 'TBC',
             'source_reference': fact.source_reference if fact else None,
             'source_case_revision': fact.established_case_revision if fact else None})
-    row('requested_rental_scope', 'Rental scope', 'Current Scope', scope, requested)
+    row('requested_rental_scope', 'Rental scope', 'Current Scope', venue_scope, requested)
     row('event_start', 'Event start', 'Event Overview', case.active_event_start)
     row('event_end', 'Event end', 'Event Overview', case.active_event_end)
     for code, label, section, relevance in DETAILS:

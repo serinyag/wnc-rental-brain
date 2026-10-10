@@ -152,3 +152,17 @@ def test_improved_inference_preserves_existing_bound_department():
     with patch('tools.phase_08_workflow.asana_projection.prior_bindings',return_value={'item:blocker:2388':{'parent_key':'department:admin'}}):
         plan=build_projection(repo.load_case_snapshot(1),workspace_gid='111',project_gid='222',version=NUANCED_VERSION)
     assert next(w for w in plan['work'] if w['key']=='item:blocker:2388')['parent_key']=='department:admin'
+
+
+def test_production_template_does_not_replace_venue_when_scope_is_in_case_column():
+    repo=synthetic_repo()
+    repo.rental_case_facts[1]=[f for f in repo.rental_case_facts[1] if f.field_code!='requested_rental_scope']
+    repo.rental_cases[1]=replace(repo.rental_cases[1],rental_type_code='studio_space')
+    add_fact(repo,'production_scope','production_coordination')
+    add_fact(repo,'load_in_schedule',{'date':'2026-11-13','time':'09:00','status':'requested_tbc'})
+    result=build_rental_working_proposal(repo.load_case_snapshot(1))
+    assert result['template']['scope']=='production_coordination'
+    assert next(r for r in result['details'] if r['key']=='requested_rental_scope')['value']=='studio_space'
+    plan=build_projection(repo.load_case_snapshot(1),workspace_gid='111',project_gid='222')
+    assert 'Production scope (requested, TBC): production coordination' in plan['master']['notes']
+    assert 'Load-in (requested, TBC):' in plan['master']['notes'] and '09:00' in plan['master']['notes']

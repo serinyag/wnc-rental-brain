@@ -159,8 +159,20 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
     communication = "Client response is waiting on internal work." if opened or other_open else (
         "Client information is still needed." if client_items else "Review the next client response in WNC Rental Brain.")
     marker = "WNC reference: " + case.case_reference_code + " / " + digest(case.rental_case_uuid)[:12]
+    requested_details = []
+    for field, label in (("production_scope", "Production scope"), ("technical_requirements", "Technical requirements"),
+                         ("load_in_schedule", "Load-in"), ("load_out_schedule", "Load-out")):
+        value = facts.get(field)
+        if value is None:
+            continue
+        if isinstance(value, dict):
+            value = "; ".join(f"{k.replace('_', ' ')}: {v}" for k, v in value.items())
+        elif isinstance(value, list):
+            value = ", ".join(str(v) for v in value)
+        requested_details.append(f"{label} (requested, TBC): {_text(value).replace('_', ' ')}")
+    requested_text = ("\n" + "\n".join(requested_details)) if requested_details else ""
     notes = (f"CLIENT\n{client}\n\nEVENT\n{event}\nRequested timing: {timing}\n"
-             f"Requested venue / scope: {scope}\nGuests: {guests}\n\nCURRENT STATUS\n{stage}\n"
+             f"Requested venue / scope: {scope}\nGuests: {guests}{requested_text}\n\nCURRENT STATUS\n{stage}\n"
              f"{communication}\n\nOPEN ITEMS\n" + ("\n".join(open_lines) or "No unresolved operational items.")
              + "\n\nNEXT ACTIONS\n" + ("Complete the checks below and record their outcomes for review." if opened or other_open
                  else "Review the case and prepare the next appropriate client response.")
