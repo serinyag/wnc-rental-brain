@@ -255,3 +255,15 @@ def test_replacement_action_cannot_silently_contradict_current_claim(resolution)
     changed['outcomes']={r['contract']['scope']['venue']:'UNAVAILABLE'}
     with pytest.raises(ValueError,match='no_longer_current'):accept(changed)
     assert current_resolutions(repo.load_case_snapshot(cid))[0]['outcomes']==r['outcomes']
+
+
+def test_free_draft_fixture_realizes_scoped_outcomes_during_reschedule(resolution):
+    from tools.phase_08_workflow.governed_client_response import DeterministicFakeClientResponseProvider
+    conn,repo,cid,action,request,accept=resolution
+    accept();snap=repo.load_case_snapshot(cid)
+    contract=build_draft_contract(snapshot=snap,recipient_label='Synthetic client',latest_client_message='Thanks for checking. Please note the requested timing.')
+    contract=replace(contract,response_intent=replace(contract.response_intent,code='RESCHEDULE_ACKNOWLEDGEMENT'),change_or_reschedule_state=('your requested timing',))
+    draft=DeterministicFakeClientResponseProvider().generate_client_response(contract)
+    assert client_results(snap)[0]['assertion'] in draft.body
+    validation=validate_client_response_draft(contract=contract,draft=draft,current_case_revision=snap.rental_case.case_revision,current_context_hash=contract.context_hash)
+    assert validation.is_valid,validation

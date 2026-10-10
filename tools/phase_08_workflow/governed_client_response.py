@@ -470,6 +470,24 @@ class DeterministicFakeClientResponseProvider:
     """Test-only provider that makes no network request."""
 
     def generate_client_response(self, contract: DraftContract) -> ClientResponseDraft:
+        draft = self._generate_client_response(contract)
+        # Scoped operator outcomes remain mandatory in every response intent,
+        # including a reschedule acknowledgement or an interim technical reply.
+        assertions = [g.semantic_values["assertion"] for g in contract.contextual_guidance
+            if g.source_reference == "governed_operational_resolution"
+            and g.semantic_values["assertion"].casefold() not in draft.body.casefold()]
+        if assertions:
+            body = draft.body
+            split = next((marker for marker in ("\n\nWarmly,", "\n\nBest,") if marker in body), None)
+            if split:
+                prefix, suffix = body.split(split, 1)
+                body = prefix + "\n\n" + "\n".join(assertions) + split + suffix
+            else:
+                body += "\n\n" + "\n".join(assertions)
+            draft = ClientResponseDraft(draft.subject, body, draft.question_ids)
+        return draft
+
+    def _generate_client_response(self, contract: DraftContract) -> ClientResponseDraft:
         greeting = f"Hi {contract.recipient_label},"
         if contract.response_intent.code == RESPONSE_INTENT_REQUEST_CLIENT_INFORMATION:
             questions = "\n".join(f"- {question}" for _, question in contract.open_client_questions)
