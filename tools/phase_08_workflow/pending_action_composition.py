@@ -5,6 +5,7 @@ from .editorial_content_planner import EditorialRole, alias_matches, logistics_n
 
 
 CHANGE_SUBJECTS = {
+    'event schedule': ('event timing', ('event timing', 'event schedule', 'finish time', 'start time', 'timing', 'schedule')),
     'guest count': ('guest count', ('guest count', 'group size', 'group', 'headcount', 'guests', 'people')),
     'requested rental scope': ('rental scope', ('rental scope', 'full venue', 'entire venue', 'whole venue', 'studio')),
     'requested reschedule is awaiting review': ('reschedule', ('reschedule', 'new timing', 'new date', 'date and time', 'requested move', 'revised timing')),

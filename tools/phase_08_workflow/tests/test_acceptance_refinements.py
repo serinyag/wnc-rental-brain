@@ -70,3 +70,17 @@ def test_partial_to_full_followup_updates_same_doc_and_replay_without_mutation()
  assert 'Event end time' not in plan['sections']['Working Timeline']
  mutations=len(provider.mutations);assert execute(repo,adapter).already_succeeded_idempotently
  assert len(provider.mutations)==mutations
+
+def test_supplied_finish_time_followup_realizes_pending_change_and_availability():
+ from tools.phase_08_workflow.tests.test_editorial_content_planner import contract
+ from tools.phase_08_workflow.governed_client_response import DeterministicFakeClientResponseProvider
+ from tools.phase_08_workflow.context_aware_drafting import ResolutionItem
+ from tools.phase_08_workflow.required_realization import validate_required_realization
+ c=replace(contract('Our requested finish time is now 14:00. Please check availability.'),
+  change_or_reschedule_state=('event schedule',),open_client_questions=(),
+  confirmed_case_facts=('Requested active event start: 2026-11-26T09:00:00+00:00','Requested active event end: 2026-11-26T13:00:00+00:00'),
+  resolution_items=(ResolutionItem('availability:start:end','Check availability','WNC_INTERNAL','REQUIRED','INTERNAL_ONLY',True),),contextual_guidance=())
+ d=DeterministicFakeClientResponseProvider().generate_client_response(c)
+ assert all(row['realized'] for row in validate_required_realization(c.editorial_plan,d.body))
+ assert '14:00' in d.body and 'availability' in d.body
+ assert '?' not in d.body
