@@ -183,6 +183,8 @@ class TestConsoleApp:
         path: str,
     ) -> list[bytes]:
         parts = [part for part in path.split("/") if part]
+        if path == '/api/operator/asana-field-audit' and method == 'GET':
+            return self._respond_json(start_response, self.service.audit_asana_fields(rental_case_id=591))
         if path == "/api/operator/outlook-inbound/review" and method == "GET":
             if not (self.config.runtime.is_staging or self.config.runtime.is_production):
                 return self._respond_json_error(start_response, status=HTTPStatus.FORBIDDEN,
@@ -1868,6 +1870,8 @@ def build_test_console_app(*, config: TestConsoleConfig | None = None, service: 
     if service is None:
         service = TestConsoleService(config=resolved_config)
     app = TestConsoleApp(service)
+    from .automatic_projection_sync import start_worker
+    app.projection_sync_stop = start_worker(service)
     if resolved_config.runtime.is_production:
         from pathlib import Path
         from tools.production_runtime.middleware import ProductionOperatorApp
