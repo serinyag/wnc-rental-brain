@@ -1636,6 +1636,32 @@ limit 1;
         result['provider_mutations'] = 0
         return result
 
+    def reuse_asana_field(self, *, field_gid: str) -> dict:
+        """Bounded staging setup: attach one audited existing field, never create."""
+        from .asana_custom_fields import FIELDS, WORKSPACE
+        from .asana_adapter import UrllibAsanaTransport
+        from .asana_projection_adapter import AsanaProjectionAdapter
+        if not (self.config.runtime.is_staging and self.config.allow_real_providers and
+                self.config.runtime.staging_allow_real_asana and field_gid in FIELDS):
+            raise TestConsoleError('Authorized staging field reuse gate required.')
+        config = AsanaAdapterConfig.from_env()
+        if config.workspace_gid != WORKSPACE or config.default_project_gid != '1217642260793817':
+            raise TestConsoleError('Dedicated WNC staging project required.')
+        adapter = AsanaProjectionAdapter(config, UrllibAsanaTransport(), self.orchestration_repository, self.config.runtime)
+        audit = self.audit_asana_fields(rental_case_id=591)
+        reference = {x['custom_field']['gid'] for x in audit['reference']['custom_field_settings']}
+        attached = {x['custom_field']['gid'] for x in audit['staging']['custom_field_settings']}
+        if field_gid not in reference:
+            raise TestConsoleError('Audited existing field no longer present.')
+        if field_gid in attached:
+            return {'field_gid': field_gid, 'reused': True, 'provider_mutations': 0}
+        adapter._request('POST', f'/projects/{config.default_project_gid}/addCustomFieldSetting',
+                         {'custom_field': field_gid, 'is_important': True})
+        after = self.audit_asana_fields(rental_case_id=591)
+        if field_gid not in {x['custom_field']['gid'] for x in after['staging']['custom_field_settings']}:
+            raise TestConsoleError('Field reuse outcome requires reconciliation; do not retry.')
+        return {'field_gid': field_gid, 'reused': True, 'provider_mutations': 1, 'audit': after}
+
     def prepare_google_proposal(self, *, rental_case_id: int) -> dict:
         from .google_proposal import prepare_projection
         from .google_proposal_adapter import GoogleProposalConfig
@@ -1692,7 +1718,7 @@ limit 1;
         return evidence
 
     def prepare_asana_rental_projection(self, *, rental_case_id: int) -> dict:
-        from .asana_projection import prepare_projection, NUANCED_VERSION
+        from .asana_projection import prepare_projection, NUANCED_VERSION, OPERATOR_VERSION
         if not (self.config.runtime.is_staging or self.config.runtime.is_production):
             raise TestConsoleError("Hosted environment required.")
         self._load_test_case_metadata(rental_case_id)
@@ -1701,7 +1727,7 @@ limit 1;
             raise TestConsoleError("An allowlisted Asana staging project and workspace are required.")
         action = prepare_projection(self.orchestration_repository, rental_case_id=rental_case_id,
             workspace_gid=config.workspace_gid, project_gid=config.default_project_gid, now=self.now(),
-            version=NUANCED_VERSION,
+            version=OPERATOR_VERSION if self.config.runtime.is_staging else NUANCED_VERSION,
             application_origin=self.config.runtime.production.manifest['application_origin'] if self.config.runtime.is_production else None)
         return {"workflow_action_id": action.workflow_action_id, "projection": action.structured_payload["projection"],
                 "provider_called": False}

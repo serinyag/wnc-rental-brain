@@ -236,6 +236,14 @@ OBSERVATION_FIELD_DEFINITIONS = (
         default_review_posture=APPROVAL_POSTURE_HUMAN_ONLY,
     ),
     ObservationFieldDefinition(
+        field_code="primary_contact", domain_code="contacts", display_label="Primary Contact",
+        value_type_code=OBSERVATION_VALUE_TYPE_JSON_OBJECT,
+        allowed_observation_types=(OBSERVATION_TYPE_FACT_CANDIDATE, OBSERVATION_TYPE_CHANGE_CANDIDATE),
+        materiality_default=CHANGE_IMPACT_LOW, client_input_allowed=True, human_validation_required=True,
+        canonical_target_kind=OBSERVATION_TARGET_KIND_RENTAL_CASE_FACT,
+        canonical_target_reference="rental_case_facts.primary_contact", default_review_posture=APPROVAL_POSTURE_HUMAN_ONLY,
+    ),
+    ObservationFieldDefinition(
         field_code="event_day_contact",
         domain_code="contacts",
         display_label="Event-Day Contact",

@@ -111,6 +111,8 @@ def test_service_prepare_real_execution_mapping_and_observation_audit(pg):
     from unittest.mock import patch
     from tools.phase_08_workflow.test_console_service import TestConsoleService, TestConsoleConfig
     conn, repo, cid, transport, adapter, prep, run = pg
+    from tools.phase_08_workflow.tests.test_asana_operator_adapter import rich_transport
+    rich_transport(transport)
     service = TestConsoleService(query_runner=repo.query_runner,
         config=TestConsoleConfig(runtime=adapter.runtime, allow_real_providers=True))
     with patch.object(service, "_load_test_case_metadata", return_value=None), \
@@ -121,6 +123,7 @@ def test_service_prepare_real_execution_mapping_and_observation_audit(pg):
         action_id = prepared["workflow_action_id"]
         result = service.execute_action(rental_case_id=cid, workflow_action_id=action_id, execution_mode="real")
         assert result.success, result
+        assert repo.load_case_snapshot(cid).find_workflow_action(action_id).status == "succeeded"
         observation = service.observe_asana_rental_projection(rental_case_id=cid, workflow_action_id=action_id)
         assert observation["status"] == "matches_projection"
         assert conn.execute("select count(*) from public.workflow_events where rental_case_id=%s and event_type_code='asana_projection_observed'", (cid,)).fetchone()[0] == 1

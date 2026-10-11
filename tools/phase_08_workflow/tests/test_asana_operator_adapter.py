@@ -60,3 +60,17 @@ def test_ambiguous_unbound_creation_cannot_adopt_by_text_or_retry():
     update_case(repo);n=len(transport.mutations)
     assert execute(repo,adapter,operator(repo)).failure_codes==('adapter_outcome_ambiguous',)
     assert len(transport.mutations)==n
+
+
+def test_distinct_journal_bound_checks_with_identical_copy_are_not_duplicates():
+    from tools.phase_08_workflow.tests.test_asana_projection import work_action
+    repo,transport,adapter=harness();rich_transport(transport)
+    for aid,key in [(10,'technical_a'),(11,'technical_b')]:
+        repo.create_workflow_action(work_action(aid,key,'Confirm technical handover'))
+    # Their distinct source obligations have exact canonical identities even
+    # though the accepted human copy happens to be the same.
+    action=operator(repo)
+    assert execute(repo,adapter,action).action_status_after=='succeeded'
+    assert adapter.observe(action=action)['status']=='matches_projection'
+    update_case(repo)
+    assert execute(repo,adapter,operator(repo)).action_status_after=='succeeded'

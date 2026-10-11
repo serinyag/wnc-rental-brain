@@ -237,6 +237,9 @@ def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, a
         from .google_proposal import binding
         present(snapshot, value, proposal=binding(snapshot))
         value["layout_version"] = OPERATOR_VERSION
+        from .asana_custom_fields import WORKSPACE, project
+        if str(workspace_gid) == WORKSPACE:
+            value["master"]["custom_fields"] = project(snapshot)
         return value
     value = _build_flat_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid)
     if version == VERSION:

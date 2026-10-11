@@ -101,7 +101,7 @@ class AsanaProjectionAdapter:
 
     def _list(self, path):
         records, offsets = [], set()
-        params = {"limit": 100, "opt_fields": "gid,name,notes,html_notes,completed,workspace.gid,projects.gid,parent.gid"}
+        params = {"limit": 100, "opt_fields": "gid,name,notes,html_notes,completed,workspace.gid,projects.gid,parent.gid,custom_fields"}
         # Include completed items: completing a task must not make it disappear
         # from duplicate detection. Never follow provider-supplied URLs.
         if path.startswith("/projects/"):
@@ -124,8 +124,11 @@ class AsanaProjectionAdapter:
     def _read(self, gid):
         if not isinstance(gid, str) or not gid.isdecimal():
             raise ProjectionFailure("invalid_task_gid")
-        return self._request("GET", f"/tasks/{gid}?" + urlencode({
-            "opt_fields": "gid,name,notes,html_notes,completed,workspace.gid,projects.gid,parent.gid"}))["data"]
+        record = self._request("GET", f"/tasks/{gid}?" + urlencode({
+            "opt_fields": "gid,name,notes,html_notes,completed,workspace.gid,projects.gid,parent.gid,custom_fields"}))["data"]
+        if not isinstance(record, dict) or record.get("gid") != gid:
+            raise ProjectionFailure("provider_exact_identity_conflict")
+        return record
 
     def _verify(self, record, expected, *, parent=None):
         if not isinstance(record, dict) or not isinstance(record.get("gid"), str) or not record["gid"].isdecimal():
@@ -155,8 +158,27 @@ class AsanaProjectionAdapter:
                         self.values.append(tuple(self.anchor)); self.anchor = None
             parser = Links(); parser.feed(value or ''); return parser.values
         if any((links(record.get(key)) != links(value) if key == 'html_notes'
+                else self._field_drift(record, value) if key == 'custom_fields'
                 else record.get(key) != value) for key, value in expected.items()):
             raise ProjectionFailure("human_edit_requires_governed_review")
+
+    @staticmethod
+    def _field_drift(record, expected):
+        from .asana_custom_fields import values
+        actual = values(record)
+        return any(gid not in actual or actual[gid] != (sorted(value) if isinstance(value, list) else value)
+                   for gid, value in expected.items())
+
+    @staticmethod
+    def _rent(record, bound=None):
+        from .asana_custom_fields import RENT, values
+        value = values(record).get(RENT)
+        import re
+        if not isinstance(value, str) or not re.fullmatch(r'RENT-\d+', value):
+            raise ProjectionFailure('rent_identity_missing')
+        if bound and bound.get('rent_id') and bound['rent_id'] != value:
+            raise ProjectionFailure('rent_identity_drift')
+        return value
 
     @staticmethod
     def _desired(plan):
@@ -175,7 +197,7 @@ class AsanaProjectionAdapter:
             self._scope(mutation=True)
             snapshot = self.repository.load_case_snapshot(action.rental_case_id)
             plan = self._validate_plan(action, snapshot)
-            project = self._request("GET", f"/projects/{self.config.default_project_gid}?opt_fields=gid,workspace.gid,archived")["data"]
+            project = self._request("GET", f"/projects/{self.config.default_project_gid}?opt_fields=gid,workspace.gid,archived,custom_field_settings.custom_field")["data"]
             if (not isinstance(project, dict) or project.get("gid") != self.config.default_project_gid
                     or project.get("workspace", {}).get("gid") != self.config.workspace_gid
                     or project.get("archived") is not False):
@@ -185,6 +207,9 @@ class AsanaProjectionAdapter:
                 raise ProjectionFailure("prior_projection_requires_reconciliation", ambiguous=True)
             bindings = prior_bindings(snapshot)
             desired = self._desired(plan)
+            if desired['master'].get('custom_fields') is not None:
+                from .asana_custom_fields import verify_definitions
+                verify_definitions(project, desired['master']['custom_fields'])
             parents = {w['key']: w.get('parent_key', 'master') for w in plan['work']}
             desired_members = {m["key"]: w["key"] for w in plan["work"] for m in w["members"]}
             for key, binding in bindings.items():
@@ -197,7 +222,10 @@ class AsanaProjectionAdapter:
             # stop the run; a completion is not evidence of real-world resolution.
             for key, binding in bindings.items():
                 self._validate_binding_scope(binding, action.rental_case_id)
-                self._verify(self._read(binding["gid"]), binding["projected"],
+                record = self._read(binding["gid"])
+                if key == "master" and desired["master"].get("custom_fields") is not None:
+                    binding["rent_id"] = self._rent(record, binding)
+                self._verify(record, binding["projected"],
                              parent=None if key == "master" else bindings[binding.get('parent_key', 'master')]["gid"])
             if plan.get('layout_version') == OPERATOR_VERSION:
                 # Check exact copies before any write, including the legacy-to-
@@ -206,12 +234,14 @@ class AsanaProjectionAdapter:
                 for key, bound in bindings.items():
                     parent = bindings.get(bound.get('parent_key', 'master'), {}).get('gid') if key != 'master' else None
                     path = f'/projects/{self.config.default_project_gid}/tasks' if key == 'master' else f'/tasks/{parent}/subtasks'
-                    if any(t.get('gid') != bound['gid'] and all(t.get(k) == bound['projected'][k]
+                    if any(t.get('gid') not in {b['gid'] for b in bindings.values()} and all(t.get(k) == bound['projected'][k]
                            for k in ('name', 'notes', 'completed')) for t in self._list(path)):
                         raise ProjectionFailure('duplicate_content_requires_reconciliation')
             if "master" not in bindings:
                 candidates = self._list(f"/projects/{self.config.default_project_gid}/tasks")
-                if any(plan["marker"] in str(t.get("notes", "")).splitlines() for t in candidates):
+                if any(plan["marker"] in str(t.get("notes", "")).splitlines() or
+                       (plan.get("layout_version") == OPERATOR_VERSION and all(t.get(k) == desired["master"][k]
+                         for k in ("name", "notes", "completed"))) for t in candidates):
                     raise ProjectionFailure("unbound_master_requires_reconciliation", ambiguous=True)
             for key, fields in desired.items():
                 old = bindings.get(key)
@@ -225,6 +255,10 @@ class AsanaProjectionAdapter:
                 parent = bindings.get(parents[key], {}).get("gid") if key != "master" else None
                 if key != 'master' and not parent:
                     raise ProjectionFailure('parent_binding_missing')
+                if not old and key != 'master' and plan.get('layout_version') == OPERATOR_VERSION:
+                    if any(t.get('gid') not in {b['gid'] for b in bindings.values()} and all(t.get(k) == fields[k]
+                           for k in ('name', 'notes', 'completed')) for t in self._list(f'/tasks/{parent}/subtasks')):
+                        raise ProjectionFailure('unbound_work_requires_reconciliation', ambiguous=True)
                 if old:
                     method, path, payload = "PUT", f"/tasks/{old['gid']}", fields
                 elif key == "master":
@@ -249,9 +283,13 @@ class AsanaProjectionAdapter:
                     "workflow_action_id": action.workflow_action_id, "execution_attempt_id": idempotency.execution_attempt_id,
                     "semantic_key": key, "projected": fields,
                     "members": next((w["members"] for w in plan["work"] if w["key"] == key), []),
-                    "owner": next((w["owner"] for w in plan["work"] if w["key"] == key), None)}
+                    "owner": next((w["owner"] for w in plan["work"] if w["key"] == key), None),
+                    **({"rent_id": old["rent_id"]} if old and old.get("rent_id") else {})}
                 try:
-                    self._verify(self._read(gid), fields, parent=parent)
+                    record = self._read(gid)
+                    self._verify(record, fields, parent=parent)
+                    if key == "master" and fields.get("custom_fields") is not None:
+                        bindings[key]["rent_id"] = self._rent(record, bindings[key])
                 except ProjectionFailure as exc:
                     raise ProjectionFailure("mutation_verification_inconclusive", ambiguous=True) from exc
             return NormalizedExecutionResult(adapter_code=ADAPTER, attempt_status="succeeded",
@@ -341,10 +379,12 @@ class AsanaProjectionAdapter:
             try:
                 record = self._read(bound['gid'])
                 self._verify(record, expected, parent=parent)
+                if key == 'master' and expected.get('custom_fields') is not None:
+                    self._rent(record, bound)
                 observed[key] = record
                 path = f'/projects/{self.config.default_project_gid}/tasks' if key == 'master' else f'/tasks/{parent}/subtasks'
                 if path not in siblings: siblings[path] = self._list(path)
-                copies = [t for t in siblings[path] if t.get('gid') != bound['gid']
+                copies = [t for t in siblings[path] if t.get('gid') not in {b['gid'] for b in bindings.values()}
                           and all(t.get(k) == expected[k] for k in ('name', 'notes', 'completed'))]
                 if copies: differences.append({'key': key, 'reason': 'duplicate_content', 'count': len(copies)})
             except ProjectionFailure as exc:

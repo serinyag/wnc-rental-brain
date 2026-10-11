@@ -183,6 +183,9 @@ class TestConsoleApp:
         path: str,
     ) -> list[bytes]:
         parts = [part for part in path.split("/") if part]
+        if path == '/api/operator/asana-field-reuse' and method == 'POST':
+            payload = self._parse_json(environ)
+            return self._respond_json(start_response, self.service.reuse_asana_field(field_gid=payload['field_gid']))
         if path == '/api/operator/asana-field-audit' and method == 'GET':
             return self._respond_json(start_response, self.service.audit_asana_fields(rental_case_id=591))
         if path == "/api/operator/outlook-inbound/review" and method == "GET":
