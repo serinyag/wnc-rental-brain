@@ -19,6 +19,7 @@ def test_exact_field_mapping_and_explicit_removals_without_confirmation():
                  f.CONTACT: 'maria@example.com', f.ADDONS: [f.CATERING, f.TECH]}
     add_fact(repo, 'requested_rental_scope', 'entire_venue', 1)
     add_fact(repo, 'catering_arrangement', 'drinks_refreshments_only', 1)
+    add_fact(repo, 'drink_package', {'status':'requested'}, 1)
     add_fact(repo, 'technical_requirements', ['none'], 1)
     add_fact(repo, 'primary_contact', {'email': 'new@example.com'}, 1)
     add_fact(repo, 'event_type', 'uncatalogued_event', 1)
@@ -78,3 +79,12 @@ def test_adapter_fields_same_master_rent_and_replay_with_drift_fence(monkeypatch
 def test_disabled_option_is_rejected_before_mutation():
     with pytest.raises(ValueError):
         f.verify_definitions({'custom_field_settings':[]},{f.ROOM:f.ROOMS['studio_space']})
+
+
+def test_refreshments_do_not_guess_drink_package_and_staff_requires_explicit_request():
+    repo, _, _ = harness()
+    add_fact(repo, 'catering_arrangement', 'drinks_refreshments_only', 0)
+    add_fact(repo, 'staffing_requirements', {'status':'unknown'}, 0)
+    assert f.project(repo.load_case_snapshot(1))[f.ADDONS] == []
+    add_fact(repo, 'staffing_requirements', {'required':True}, 1)
+    assert f.project(repo.load_case_snapshot(1))[f.ADDONS] == [f.STAFF]

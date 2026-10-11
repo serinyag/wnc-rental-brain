@@ -15,6 +15,7 @@ EVENTS = {'pr': '1212669866280545', 'personal_private': '1212669866280546',
 CATERING = '1212669866280554'
 DRINKS = '1212669866280555'
 TECH = '1212669866280556'
+STAFF = '1212669866280558'
 
 
 def project(snapshot):
@@ -32,8 +33,14 @@ def project(snapshot):
     arrangement = facts.get('catering_arrangement')
     if arrangement in {'client_external_caterer', 'wnc_vendor', 'wnc_coordinated'}:
         addons.append(CATERING)
-    if arrangement == 'drinks_refreshments_only':
+    # Refreshments alone are not evidence of a requested drink package.
+    def requested(value):
+        return value is True or isinstance(value, dict) and (value.get('required') is True or
+            value.get('status') in {'requested', 'confirmed'})
+    if requested(facts.get('drink_package')):
         addons.append(DRINKS)
+    if requested(facts.get('staffing_requirements')):
+        addons.append(STAFF)
     if any(t != 'none' for t in facts.get('technical_requirements', [])):
         addons.append(TECH)
     event = str(facts.get('event_type', '')).strip().lower().replace(' ', '_')
