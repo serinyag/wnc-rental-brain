@@ -175,6 +175,7 @@ def build_projection(snapshot, *, folder_id, provider_identity):
     timing_labels = {unresolved_labels[k] for k in ('event_start', 'event_end', 'event_schedule')}
     unresolved = [v for v in unresolved if v not in timing_labels] + timing_missing
     start, end = (_local(rows[k]['value']) for k in ('event_start', 'event_end'))
+    event_date = start.date().isoformat() if start else (rows.get('event_schedule', {}).get('value') or {}).get('date')
     event = timing_rows
     labels = {'guest_count': 'Guests', 'event_type': 'Event format', 'requested_rental_scope': 'Space', 'layout_requirements': 'Room setup'}
     for key, label in labels.items():
@@ -192,7 +193,7 @@ def build_projection(snapshot, *, folder_id, provider_identity):
             raw = row['value']
             time = (raw.get('time') or raw.get('start')) if isinstance(raw, dict) else None
             value = 'Requested ' + ('from ' if label == 'Load-in' else 'until ') + (str(time) if time else value)
-            if isinstance(raw, dict) and raw.get('date') and (not start or raw['date'] != start.date().isoformat()):
+            if isinstance(raw, dict) and raw.get('date') and raw['date'] != event_date:
                 value += ' on ' + display(raw['date'])
             if isinstance(raw, dict) and raw.get('timezone') not in {None, 'Europe/Amsterdam'}:
                 value += ' (' + str(raw['timezone']) + ')'

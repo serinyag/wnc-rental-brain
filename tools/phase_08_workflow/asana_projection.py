@@ -56,14 +56,16 @@ def _window(start, end):
     return first + ('–' + last_time if first_date == last_date else ' to ' + last)
 
 
-def _requested_schedule(value, event_start):
+def _requested_schedule(value, event_start, event_date=None):
     """Show provided scheduling detail without workflow metadata or guessed times."""
     if not isinstance(value, dict):
         return _text(value)
-    if value.get('date') and value.get('time'):
+    supplied_time = value.get('time') or value.get('start')
+    if value.get('date') and supplied_time:
         day = datetime.fromisoformat(value['date']).strftime('%d %B %Y')
-        event_day = _timing(event_start).partition(', ')[0] if event_start else None
-        result = str(value['time']) + ((' on ' + day) if day != event_day else '')
+        event_day = _timing(event_start).partition(', ')[0] if event_start else (
+            datetime.fromisoformat(event_date).strftime('%d %B %Y') if event_date else None)
+        result = str(supplied_time) + ('–' + str(value['end']) if value.get('end') else '') + ((' on ' + day) if day != event_day else '')
         if value.get('timezone') not in {None, 'Europe/Amsterdam'}:
             result += ' (' + str(value['timezone']) + ')'
         return result
@@ -205,7 +207,7 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
         if value is None:
             continue
         if isinstance(value, dict):
-            value = _requested_schedule(value, case.active_event_start)
+            value = _requested_schedule(value, case.active_event_start, facts.get('event_schedule', {}).get('date'))
         elif isinstance(value, list):
             value = ", ".join(str(v) for v in value)
         requested_details.append(f"{label} requested: {_text(value).replace('_', ' ')}")

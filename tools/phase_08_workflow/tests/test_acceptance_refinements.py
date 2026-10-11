@@ -84,3 +84,19 @@ def test_supplied_finish_time_followup_realizes_pending_change_and_availability(
  assert all(row['realized'] for row in validate_required_realization(c.editorial_plan,d.body))
  assert '14:00' in d.body and 'availability' in d.body
  assert '?' not in d.body
+
+def test_partial_event_schedule_keeps_requested_access_and_shared_date_once():
+ repo,_,_=harness();repo.rental_cases[1]=replace(repo.rental_cases[1],active_event_start=None,active_event_end=None)
+ add_fact(repo,'event_schedule',{'date':'2026-11-26','start':'10:00'})
+ add_fact(repo,'load_in_schedule',{'date':'2026-11-26','start':'09:00','timezone':'Europe/Amsterdam','status':'requested_tbc'})
+ add_fact(repo,'load_out_schedule',{'date':'2026-11-27','time':'15:00'})
+ snap=repo.load_case_snapshot(1)
+ g=google(snap,folder_id='test',provider_identity='test');a=build_projection(snap,workspace_gid='1',project_gid='2')
+ assert 'Load-in: Requested from 09:00' in g['sections']['Current Scope']
+ assert '26 November 2026' not in g['sections']['Current Scope']
+ assert '27 November 2026' in g['sections']['Current Scope']
+ assert 'Load-in requested: 09:00' in a['master']['notes']
+ assert 'on 26 November 2026' not in a['master']['notes']
+ assert 'on 27 November 2026' in a['master']['notes']
+ assert 'Load-in timing' in g['sections']['Working Timeline']
+ assert not g['sections']['Confirmed / Still TBC']
