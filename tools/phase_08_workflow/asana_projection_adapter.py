@@ -16,8 +16,9 @@ from .execution_types import NormalizedExecutionResult
 
 
 class ProjectionFailure(Exception):
-    def __init__(self, reason, *, ambiguous=False, retry=False):
+    def __init__(self, reason, *, ambiguous=False, retry=False, diagnostics=None):
         self.reason, self.ambiguous, self.retry = reason, ambiguous, retry
+        self.diagnostics = diagnostics or {}
         super().__init__(reason)
 
 
@@ -76,6 +77,35 @@ class AsanaProjectionAdapter:
                 or not str(binding.get("gid", "")).isdecimal()):
             raise ProjectionFailure("binding_scope_conflict")
 
+    def _diagnostics(self, method, path, payload, status=None, body=None, error_class=None):
+        """Allowlisted operational details; never serialize headers/provider bodies."""
+        import re
+        route = path.split('?')[0]
+        project = re.fullmatch(r'/projects/(\d+)(?:/.*)?', route)
+        field = (payload or {}).get('custom_field')
+        result = {'http_status': status, 'provider_error_class': error_class,
+                  'request_operation': method + ' ' + re.sub(r'/\d+', '/{gid}', route),
+                  'target_project_gid': project.group(1) if project else None,
+                  'target_custom_field_gid': field if isinstance(field, str) and field.isdecimal() else None}
+        if body is not None:
+            try:
+                errors = json.loads(body).get('errors', [])
+            except (ValueError, TypeError, AttributeError):
+                errors = []
+            def safe(value):
+                if not isinstance(value, str): return None
+                value = value.replace(self.config.authorization_token(), '[redacted]')
+                value = re.sub(r'(?i)(bearer\s+|(?:token|secret|password|authorization)\s*[:=]\s*)\S+', '[redacted]', value)
+                value = re.sub(r'[^\s@]+@[^\s@]+', '[email]', value)
+                value = re.sub(r'https?://\S+', '[url]', value)
+                value = re.sub(r'[A-Za-z0-9_+/=-]{24,}', '[redacted]', value)
+                return ' '.join(value.split())[:300]
+            if isinstance(errors, list) and errors and isinstance(errors[0], dict):
+                result['provider_error_phrase'] = safe(errors[0].get('phrase'))
+                result['provider_error_message'] = safe(errors[0].get('message'))
+                result['provider_error_class'] = safe(errors[0].get('error') or errors[0].get('type')) or error_class
+        return result
+
     def _request(self, method, path, payload=None):
         self._scope(mutation=method != "GET")
         try:
@@ -86,10 +116,11 @@ class AsanaProjectionAdapter:
                 payload={} if payload is None else {"data": payload}, timeout_seconds=self.config.timeout_seconds)
         except Exception as exc:
             raise ProjectionFailure("transport_outcome_unknown", ambiguous=method != "GET",
-                                    retry=method == "GET") from exc
+                                    retry=method == "GET", diagnostics=self._diagnostics(method,path,payload,error_class="transport_exception")) from exc
         if not 200 <= status < 300:
             raise ProjectionFailure(f"provider_http_{status}", ambiguous=method != "GET" and status >= 500,
-                                    retry=status == 429 or (method == "GET" and status >= 500))
+                                    retry=status == 429 or (method == "GET" and status >= 500),
+                                    diagnostics=self._diagnostics(method,path,payload,status,body,"http_error"))
         try:
             parsed = json.loads(body)
             if not isinstance(parsed, dict) or "data" not in parsed:
@@ -97,7 +128,7 @@ class AsanaProjectionAdapter:
             return parsed
         except (ValueError, TypeError) as exc:
             raise ProjectionFailure("provider_response_unverifiable", ambiguous=method != "GET",
-                                    retry=method == "GET") from exc
+                                    retry=method == "GET", diagnostics=self._diagnostics(method,path,payload,status,error_class="response_unverifiable")) from exc
 
     def _list(self, path):
         records, offsets = [], set()
@@ -304,7 +335,8 @@ class AsanaProjectionAdapter:
                 failure_code="adapter_outcome_ambiguous" if ambiguous else "adapter_request_invalid",
                 retry_eligible=retry, response_snapshot={"provider": "asana", "reason": str(exc),
                     "bindings": bindings, "confirmed_mutations": mutations, "mutation_requests": mutation_requests,
-                    "canonical_truth_changed": False})
+                    "canonical_truth_changed": False,
+                    "safe_provider_diagnostics": getattr(exc, "diagnostics", {})})
 
     def observe(self, *, action):
         """Read-only evidence for an operator; never import or release a retry fence.

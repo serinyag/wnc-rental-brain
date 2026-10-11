@@ -1629,10 +1629,29 @@ limit 1;
         adapter._scope(mutation=False)
         result = {}
         for name, gid in [('reference', '1212669866280530'), ('staging', config.default_project_gid)]:
-            project = adapter._request('GET', f'/projects/{gid}?opt_fields=gid,name,workspace.gid,custom_field_settings.custom_field')['data']
+            project = adapter._request('GET', f'/projects/{gid}?opt_fields=gid,name,workspace.gid,team.gid,team.name,archived,resource_subtype,owner.gid,members.gid,default_access_level,minimum_access_level_for_customization,minimum_access_level_for_sharing,privacy_setting,custom_field_settings.custom_field,custom_field_settings.custom_field.is_global_to_workspace,custom_field_settings.custom_field.is_value_read_only')['data']
             if project.get('workspace', {}).get('gid') != config.workspace_gid:
                 raise TestConsoleError('Field reference workspace mismatch.')
             result[name] = project
+        result['integration_user'] = adapter._request('GET', '/users/me?opt_fields=gid,name,workspaces.gid')['data']
+        result['credential_kind'] = 'static_access_token_type_not_proven' if config.access_token else 'token_provider'
+        result['scope_evidence'] = 'Access token scopes are not observable from configuration alone; no credential broadened.'
+        from .asana_projection_adapter import ProjectionFailure
+        result['teams'] = {}
+        for project in (result['reference'], result['staging']):
+            team = project.get('team') or {}
+            if team.get('gid') and team['gid'] not in result['teams']:
+                try:
+                    result['teams'][team['gid']] = adapter._request('GET', f"/teams/{team['gid']}?opt_fields=gid,name,organization.gid,visibility")['data']
+                except ProjectionFailure as exc:
+                    result['teams'][team['gid']] = {'safe_provider_diagnostics': exc.diagnostics}
+        user_gid = result['integration_user'].get('gid')
+        if user_gid:
+            try:
+                result['workspace_membership'] = adapter._request('GET',
+                    f'/workspaces/{config.workspace_gid}/workspace_memberships?user={user_gid}&opt_fields=gid,user.gid,is_active,is_guest,is_view_only,workspace.gid')['data']
+            except ProjectionFailure as exc:
+                result['workspace_membership'] = {'safe_provider_diagnostics': exc.diagnostics}
         result['provider_mutations'] = 0
         return result
 
@@ -1640,7 +1659,7 @@ limit 1;
         """Bounded staging setup: attach one audited existing field, never create."""
         from .asana_custom_fields import FIELDS, WORKSPACE
         from .asana_adapter import UrllibAsanaTransport
-        from .asana_projection_adapter import AsanaProjectionAdapter
+        from .asana_projection_adapter import AsanaProjectionAdapter, ProjectionFailure
         if not (self.config.runtime.is_staging and self.config.allow_real_providers and
                 self.config.runtime.staging_allow_real_asana and field_gid in FIELDS):
             raise TestConsoleError('Authorized staging field reuse gate required.')
@@ -1655,8 +1674,13 @@ limit 1;
             raise TestConsoleError('Audited existing field no longer present.')
         if field_gid in attached:
             return {'field_gid': field_gid, 'reused': True, 'provider_mutations': 0}
-        adapter._request('POST', f'/projects/{config.default_project_gid}/addCustomFieldSetting',
-                         {'custom_field': field_gid, 'is_important': True})
+        try:
+            adapter._request('POST', f'/projects/{config.default_project_gid}/addCustomFieldSetting',
+                             {'custom_field': field_gid, 'is_important': True})
+        except ProjectionFailure as exc:
+            return {'status': 'OUTCOME_UNVERIFIED' if exc.ambiguous else 'PROVIDER_REJECTED',
+                    'field_gid': field_gid, 'reused': False, 'retry_permitted': False,
+                    'safe_provider_diagnostics': exc.diagnostics}
         after = self.audit_asana_fields(rental_case_id=591)
         if field_gid not in {x['custom_field']['gid'] for x in after['staging']['custom_field_settings']}:
             raise TestConsoleError('Field reuse outcome requires reconciliation; do not retry.')
