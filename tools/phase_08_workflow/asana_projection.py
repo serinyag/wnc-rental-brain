@@ -43,7 +43,32 @@ def _timing(value):
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
         raise ValueError("Governed event timing requires timezone provenance")
-    return parsed.astimezone(ZoneInfo("Europe/Amsterdam")).strftime("%d %B %Y, %H:%M %Z")
+    return parsed.astimezone(ZoneInfo("Europe/Amsterdam")).strftime("%d %B %Y, %H:%M")
+
+
+def _window(start, end):
+    first = _timing(start)
+    if not end:
+        return first
+    last = _timing(end)
+    first_date, _, _ = first.partition(', ')
+    last_date, _, last_time = last.partition(', ')
+    return first + ('–' + last_time if first_date == last_date else ' to ' + last)
+
+
+def _requested_schedule(value, event_start):
+    """Show provided scheduling detail without workflow metadata or guessed times."""
+    if not isinstance(value, dict):
+        return _text(value)
+    if value.get('date') and value.get('time'):
+        day = datetime.fromisoformat(value['date']).strftime('%d %B %Y')
+        event_day = _timing(event_start).partition(', ')[0] if event_start else None
+        result = str(value['time']) + ((' on ' + day) if day != event_day else '')
+        if value.get('timezone') not in {None, 'Europe/Amsterdam'}:
+            result += ' (' + str(value['timezone']) + ')'
+        return result
+    return '; '.join(f"{k.replace('_', ' ')}: {v}" for k,v in value.items()
+                    if k not in {'status','timezone','source_reference','evidence_reference'})
 
 
 def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limits=True):
@@ -61,7 +86,7 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
     client = _text(metadata.get("client_label") or case.client_account_ref, "Client not yet identified")
     event = _text(facts.get("event_type"), "Rental inquiry").replace("_", " ")
     date = _timing(case.active_event_start)
-    timing = date + (f" to {_timing(case.active_event_end)}" if case.active_event_end else "")
+    timing = _window(case.active_event_start, case.active_event_end)
     scope = _text(facts.get("requested_rental_scope") or (case.rental_type_code if case.rental_type_code != "custom_scope" else None), "Scope to be confirmed").replace("_", " ")
     guests = _text(facts.get("guest_count"))
     latest = {}
@@ -170,10 +195,10 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
         if value is None:
             continue
         if isinstance(value, dict):
-            value = "; ".join(f"{k.replace('_', ' ')}: {v}" for k, v in value.items())
+            value = _requested_schedule(value, case.active_event_start)
         elif isinstance(value, list):
             value = ", ".join(str(v) for v in value)
-        requested_details.append(f"{label} (requested, TBC): {_text(value).replace('_', ' ')}")
+        requested_details.append(f"{label} requested: {_text(value).replace('_', ' ')}")
     requested_text = ("\n" + "\n".join(requested_details)) if requested_details else ""
     notes = (f"CLIENT\n{client}\n\nEVENT\n{event}\nRequested timing: {timing}\n"
              f"Requested venue / scope: {scope}\nGuests: {guests}{requested_text}\n\nCURRENT STATUS\n{stage}\n"

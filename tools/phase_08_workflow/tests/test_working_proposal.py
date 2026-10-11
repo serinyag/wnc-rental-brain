@@ -164,5 +164,6 @@ def test_production_template_does_not_replace_venue_when_scope_is_in_case_column
     assert result['template']['scope']=='production_coordination'
     assert next(r for r in result['details'] if r['key']=='requested_rental_scope')['value']=='studio_space'
     plan=build_projection(repo.load_case_snapshot(1),workspace_gid='111',project_gid='222')
-    assert 'Production scope (requested, TBC): production coordination' in plan['master']['notes']
-    assert 'Load-in (requested, TBC):' in plan['master']['notes'] and '09:00' in plan['master']['notes']
+    assert 'Production scope requested: production coordination' in plan['master']['notes']
+    assert 'Load-in requested: 09:00 on 13 November 2026' in plan['master']['notes']
+    assert 'requested tbc' not in plan['master']['notes'] and 'CET' not in plan['master']['notes']
