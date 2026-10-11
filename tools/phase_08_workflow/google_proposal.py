@@ -195,7 +195,7 @@ def build_projection(snapshot, *, folder_id, provider_identity):
             if isinstance(raw, dict) and raw.get('date') and (not start or raw['date'] != start.date().isoformat()):
                 value += ' on ' + display(raw['date'])
             if isinstance(raw, dict) and raw.get('timezone') not in {None, 'Europe/Amsterdam'}:
-                value += ' (' + str(raw['timezone']) + ')' 
+                value += ' (' + str(raw['timezone']) + ')'
             unresolved.append(label + ' timing')
         if row['section'] == 'Team & Responsibilities': team.append(label + ': ' + value)
         elif key in {'primary_contact', 'event_schedule', 'event_days'}: event.append(label + ': ' + value)
