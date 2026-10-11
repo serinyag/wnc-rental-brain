@@ -185,7 +185,8 @@ def build_projection(snapshot, *, folder_id, provider_identity):
         if key in labels or key in {'event_start', 'event_end'}: continue
         label, value = row['label'], display(row['value'])
         if key == 'production_scope':
-            label, value = 'Production coordination' if row['value'] == 'production_coordination' else 'Production scope', 'Requested, scope to be confirmed'
+            label = 'Production coordination' if row['value'] == 'production_coordination' else 'Production scope'
+            value = 'Requested, scope to be confirmed' if row['value'] == 'production_coordination' else display(row['value']) + ' requested, scope to be confirmed'
             unresolved.append('Final production coordination scope' if row['value'] == 'production_coordination' else 'Final production scope')
         elif key in {'load_in_schedule', 'load_in', 'load_out_schedule', 'load_out'}:
             label = 'Load-in' if 'in' in key else 'Load-out'
@@ -218,7 +219,7 @@ def build_projection(snapshot, *, folder_id, provider_identity):
         'Confirmed / Still TBC': '\n'.join('• ' + text for text in confirmations),
         'Working Timeline': '\n'.join('• ' + text for text in dict.fromkeys(unresolved)),
         'Team & Responsibilities': '\n'.join(team),
-        'Next Steps': "We'll confirm the remaining operational details and pricing before the proposal is finalized." if unresolved else
+        'Next Steps': "We'll confirm the remaining operational details" + (' and pricing' if not prices else '') + ' before the proposal is finalized.' if unresolved else
             'Review the current scope and confirmed details before finalizing the proposal.',
     }
     headings = {'Event Overview': 'Event Details', 'Current Scope': 'Production & Technical' if technical else 'Requested Details',
