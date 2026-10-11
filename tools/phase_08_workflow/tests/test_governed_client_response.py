@@ -343,3 +343,14 @@ def test_finished_reschedules_do_not_request_another_review():
         assert not contract.change_or_reschedule_state
     snapshot = make_snapshot(reschedule_requests=(SimpleNamespace(status="proposed"),))
     assert ResponseIntentResolver().resolve(snapshot).code == RESPONSE_INTENT_RESCHEDULE_ACKNOWLEDGEMENT
+
+
+def test_free_change_fixture_realizes_pending_review_without_confirming_it():
+    from tools.phase_08_workflow.required_realization import validate_required_realization
+    for kind in ('guest_count', 'requested_rental_scope'):
+        snapshot = make_snapshot(proposed_changes=(SimpleNamespace(status='proposed',change_kind=kind),))
+        contract = build_draft_contract(snapshot=snapshot,recipient_label='Avery',latest_client_message='Please check my updated request.')
+        draft = DeterministicFakeClientResponseProvider().generate_client_response(contract)
+        assert all(r['realized'] for r in validate_required_realization(contract.editorial_plan,draft.body))
+        assert "We'll check" in draft.body
+        assert validate_client_response_draft(contract=contract,draft=draft,current_case_revision=4,current_context_hash=contract.context_hash).is_valid

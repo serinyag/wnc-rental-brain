@@ -517,6 +517,13 @@ class DeterministicFakeClientResponseProvider:
             value = item.value
             if item.topic == "operational_confirmation" and value.get("assertion"):
                 continue
+            elif item.topic == "requested_change":
+                from .pending_action_composition import CHANGE_SUBJECTS
+                change = value.get("requested_change")
+                if change not in CHANGE_SUBJECTS:
+                    return None
+                subject = CHANGE_SUBJECTS[change][0]
+                paragraphs.append("We'll check the requested " + subject + " and get back to you before confirming the arrangements.")
             elif item.topic == "projection_display" and value.get("status") == "conditional" and value.get("available_equipment") and value.get("check_required"):
                 checks = ", ".join(value["check_required"])
                 paragraphs.append(f"For projection display, the supplied equipment is {value['available_equipment']}. We'll check the {checks} for your event before confirming that arrangement.")
@@ -544,7 +551,7 @@ class DeterministicFakeClientResponseProvider:
                 return None
         greeting = f"Hi {contract.recipient_label},"
         acknowledgement = "Thanks for the update." if contract.prior_client_messages else "Thanks for your inquiry."
-        return ClientResponseDraft("Your WNC inquiry", greeting + "\n\n" + acknowledgement + "\n\n" + "\n\n".join(paragraphs))
+        return ClientResponseDraft("Your WNC inquiry", greeting + "\n\n" + acknowledgement + "\n\n" + "\n\n".join(dict.fromkeys(paragraphs)))
 
     def _generate_client_response(self, contract: DraftContract) -> ClientResponseDraft:
         greeting = f"Hi {contract.recipient_label},"
