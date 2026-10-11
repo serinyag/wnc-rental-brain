@@ -71,12 +71,19 @@ class FakeGoogle:
         # terminal newline exactly as the Docs API requires.
         texts = [p[2] for p in paragraphs(doc)]
         indexed = paragraphs(doc)
+        if (len(requests) >= 2 and 'deleteContentRange' in requests[0]
+                and requests[0]['deleteContentRange']['range']['startIndex'] == 1
+                and requests[0]['deleteContentRange']['range']['endIndex'] == indexed[-1][1]):
+            number = int(doc['revisionId'].split('_')[-1])+1
+            self.documents[doc_id] = native(requests[1]['insertText']['text'].split('\n'), doc_id, f'revision_{number}')
+            self.mutations.append(('update', doc_id))
+            return {'documentId': doc_id, 'writeControl': {'requiredRevisionId': f'revision_{number}'}}
         for request in requests:
             if 'deleteContentRange' in request:
                 r = request['deleteContentRange']['range']; start = r['startIndex']
                 i = next(i for i,p in enumerate(indexed) if p[0] == start)
                 texts[i] = ''
-            else:
+            elif 'insertText' in request:
                 r = request['insertText']; start = r['location']['index']
                 i = next(i for i,p in enumerate(indexed) if p[0] == start)
                 texts[i] = r['text']
@@ -155,7 +162,8 @@ def test_requested_facts_and_example_template_confirmations_are_never_authority(
     _, text = render_template(plan)
     content = '\n'.join(text)
     assert '999999' not in content and 'SECRET INTERNAL TRACE' not in content
-    assert '24 (TBC)' in content and 'Pricing and applicable fees: TBC' in content
+    assert 'Guests: 24' in content and '(TBC)' not in content
+    assert 'Pricing and applicable fees' in content and 'To be confirmed' in content
     assert 'catering]\nConfirmed' not in content and '21%' not in content
 
 
@@ -269,7 +277,8 @@ def test_asana_references_verified_document_naturally():
 def test_existing_word_templates_render_with_seven_sections_and_no_example_content(scope):
     repo, _, adapter = harness(); add_fact(repo, 'requested_rental_scope', scope)
     plan = prepare(repo, adapter).structured_payload['projection']; _, lines = render_template(plan)
-    assert sum(line.startswith(tuple(str(i)+'. ' for i in range(1,8))) for line in lines) == 7
+    assert 'Event Details' in lines and 'Pricing' in lines and 'Still to Confirm' in lines
+    assert 'Team & Responsibilities' not in lines and 'TBC where applicable' not in lines
     assert not any('[Action]' in line or '€[ ]' in line for line in lines)
 
 
@@ -308,5 +317,5 @@ def test_native_conversion_empty_table_separators_preserved_through_update():
     updated = prepare(repo, adapter)
     assert execute(repo, adapter, updated).action_status_after == 'succeeded'
     assert sum(p[2] == '' for p in paragraphs(provider.documents['doc_001'])) == blanks
-    assert '30 (TBC)' in str(provider.documents['doc_001'])
+    assert 'Guests: 30' in str(provider.documents['doc_001'])
     assert provider.mutations == [('create','doc_001'),('update','doc_001')]

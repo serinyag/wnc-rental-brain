@@ -247,14 +247,71 @@ class GoogleProposalAdapter:
                     raise GoogleFailure('google_manual_drift_review_required')
                 actual = managed_paragraphs(document)
                 desired = managed_text(desired)
-                if len(actual) != len(desired): raise GoogleFailure('google_layout_requires_review')
                 requests = []
                 tab_id = document.get('tabs', [{}])[0].get('tabProperties', {}).get('tabId')
                 tab_scope = {'tabId': tab_id} if tab_id else {}
-                for (start, end, before), after in reversed(list(zip(actual, desired))):
-                    if before == after: continue
-                    if end > start: requests.append({'deleteContentRange': {'range': {'startIndex': start, 'endIndex': end, **tab_scope}}})
-                    if after: requests.append({'insertText': {'location': {'index': start, **tab_scope}, 'text': after}})
+                if len(actual) != len(desired):
+                    # Presentation-only body replacement, in the SAME revision-
+                    # guarded batch. The exact fingerprint above is mandatory;
+                    # identity, journal, canonical checks and reconciliation
+                    # remain unchanged. Never replace headers or footers.
+                    all_paragraphs = paragraphs(document)
+                    if not all_paragraphs or all_paragraphs[-1][1] <= 1:
+                        raise GoogleFailure('google_layout_requires_review')
+                    end = all_paragraphs[-1][1]
+                    requests.append({'deleteContentRange': {'range': {
+                        'startIndex': 1, 'endIndex': end, **tab_scope}}})
+                    requests.append({'insertText': {'location': {'index': 1, **tab_scope},
+                        'text': '\n'.join(desired)}})
+                    full_end = 1 + len('\n'.join(desired).encode('utf-16-le')) // 2
+                    requests.append({'updateParagraphStyle': {'range': {
+                        'startIndex': 1, 'endIndex': full_end, **tab_scope},
+                        'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT',
+                            'spaceAbove': {'magnitude': 0, 'unit': 'PT'},
+                            'spaceBelow': {'magnitude': 3.5, 'unit': 'PT'}},
+                        'fields': 'namedStyleType,spaceAbove,spaceBelow'}})
+                    requests.append({'updateTextStyle': {'range': {
+                        'startIndex': 1, 'endIndex': full_end, **tab_scope},
+                        'textStyle': {'fontSize': {'magnitude': 10.5, 'unit': 'PT'},
+                            'foregroundColor': {'color': {'rgbColor': {'red': 0, 'green': 0, 'blue': 0}}},
+                            'weightedFontFamily': {'fontFamily': 'Arial'}},
+                        'fields': 'fontSize,foregroundColor,weightedFontFamily'}})
+                    offset = 1
+                    headings = set(plan.get('headings', {}).values())
+                    for index, text in enumerate(desired):
+                        length = len(text.encode('utf-16-le')) // 2
+                        style = 'TITLE' if index == 0 else 'SUBTITLE' if index == 1 else 'HEADING_1' if text in headings else None
+                        if style:
+                            requests.append({'updateParagraphStyle': {'range': {
+                                'startIndex': offset, 'endIndex': offset + length, **tab_scope},
+                                'paragraphStyle': {'namedStyleType': style}, 'fields': 'namedStyleType'}})
+                            requests.append({'updateTextStyle': {'range': {
+                                'startIndex': offset, 'endIndex': offset + length, **tab_scope},
+                                'textStyle': {'fontSize': {'magnitude': 22 if style == 'TITLE' else 12 if style == 'SUBTITLE' else 14, 'unit': 'PT'}},
+                                'fields': 'fontSize'}})
+                        offset += length + 1
+
+                else:
+                    for (start, end, before), after in reversed(list(zip(actual, desired))):
+                        if before == after: continue
+                        if end > start: requests.append({'deleteContentRange': {'range': {'startIndex': start, 'endIndex': end, **tab_scope}}})
+                        if after: requests.append({'insertText': {'location': {'index': start, **tab_scope}, 'text': after}})
+                    if requests:
+                        delta = 0
+                        headings = set(plan.get('headings', {}).values())
+                        for index, ((start, end, before), text) in enumerate(zip(actual, desired)):
+                            length = len(text.encode('utf-16-le')) // 2
+                            position = start + delta
+                            style = 'TITLE' if index == 0 else 'SUBTITLE' if index == 1 else 'HEADING_1' if text in headings else 'NORMAL_TEXT'
+                            requests.append({'updateParagraphStyle': {'range': {
+                                'startIndex': position, 'endIndex': position + length, **tab_scope},
+                                'paragraphStyle': {'namedStyleType': style}, 'fields': 'namedStyleType'}})
+                            requests.append({'updateTextStyle': {'range': {
+                                'startIndex': position, 'endIndex': position + length, **tab_scope},
+                                'textStyle': {'fontSize': {'magnitude': 22 if style == 'TITLE' else 12 if style == 'SUBTITLE' else 14 if style == 'HEADING_1' else 10.5, 'unit': 'PT'}},
+                                'fields': 'fontSize'}})
+                            delta += length - (end - start)
+
                 if requests:
                     if not document.get('revisionId'): raise GoogleFailure('google_revision_missing')
                     self._plan(action)

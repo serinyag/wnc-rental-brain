@@ -1,6 +1,6 @@
 """Client-safe, outbound proposal projection. The action journal owns identity.
 
-Provider edits never establish facts. Unknown and requested values remain TBC.
+Provider edits never establish facts. Requested details are distinct from WNC confirmations.
 The source Word template supplies the layout; its example prices/statuses do not.
 """
 from __future__ import annotations
@@ -79,22 +79,49 @@ def identity(snapshot):
 
 
 def display(value):
-    if value is None or value == 'unknown' or value == 'under_consideration':
-        return 'TBC'
+    """Human labels only; presentation never establishes confirmation."""
+    if value is None or isinstance(value, str) and value in ('unknown', 'under_consideration'):
+        return 'To be confirmed'
     if isinstance(value, dict):
+        if value.get('style'):
+            style = display(value['style'])
+            return style.capitalize() + '-style seating' if value.get('configuration_type') == 'seated' else style.capitalize()
+        dates = value.get('dates', [value['date']] if value.get('date') else [])
+        parts = [display(d) for d in dates]
+        time = value.get('time') or value.get('start')
+        if time: parts.append(str(time) + ('–' + str(value['end']) if value.get('end') else ''))
+        if parts: return ', '.join(parts)
         return '; '.join(k.replace('_', ' ').capitalize()+': '+display(v) for k,v in sorted(value.items())
-                         if k not in {'source_reference', 'evidence_reference', 'reason', 'authority_basis', 'internal_notes'}) or 'TBC'
+            if k not in {'status', 'timezone', 'configuration_type', 'source_reference', 'evidence_reference', 'reason', 'authority_basis', 'internal_notes'}) or 'To be confirmed'
     if isinstance(value, list):
-        return ', '.join(display(v) for v in value) or 'TBC'
+        return ', '.join(display(v) for v in value) or 'To be confirmed'
     if isinstance(value, str):
         try:
             parsed = datetime.fromisoformat(value)
             if parsed.tzinfo:
                 from zoneinfo import ZoneInfo
-                return parsed.astimezone(ZoneInfo('Europe/Amsterdam')).strftime('%d %B %Y at %H:%M %Z')
+                parsed = parsed.astimezone(ZoneInfo('Europe/Amsterdam'))
+                return f'{parsed.day} {parsed:%B %Y}, {parsed:%H:%M}'
+            if len(value) == 10: return f'{parsed.day} {parsed:%B %Y}'
         except ValueError: pass
-        return value.replace('_', ' ').replace('\r', ' ').replace('\n', ' ')
+        return {'studio_space': 'Studio', 'entire_venue': 'Entire venue',
+            'projection_display': 'Projection', 'production_coordination': 'Production coordination',
+            'full_production': 'Full production', 'audio_playback': 'Audio playback'}.get(value,
+            value.replace('_', ' ').replace('\r', ' ').replace('\n', ' '))
     return str(value)
+
+
+def _local(value):
+    from zoneinfo import ZoneInfo
+    try:
+        parsed = datetime.fromisoformat(value)
+        return parsed.astimezone(ZoneInfo('Europe/Amsterdam')) if parsed.tzinfo else None
+    except (ValueError, TypeError): return None
+
+
+def _confirmation(result):
+    # Keep every governed assertion's subject, polarity and exact window.
+    return result['assertion'].replace(' (Europe/Amsterdam)', '')
 
 
 def approved_prices(snapshot):
@@ -133,27 +160,84 @@ def build_projection(snapshot, *, folder_id, provider_identity):
     existing = binding(snapshot)
     # Layout identity persists even if a follow-up changes rental scope.
     template = existing['template'] if existing else model['template']
-    sections = {name: [] for name in SECTIONS}
-    for row in model['details']:
-        if row['key'] in PUBLIC_FIELDS:
-            value = display(row['value'])
-            status = 'Not applicable' if row['status'] == 'Not applicable' else 'TBC'
-            sections[row['section']].append(f"{row['label']}: {value}" + (f' ({status})' if value != 'TBC' else ''))
-    sections['Financial Summary'] = approved_prices(snapshot) or ['Pricing and applicable fees: TBC']
-    # Only typed, accepted operational evidence may be described as verified.
+    rows = {r['key']: r for r in model['details'] if r['key'] in PUBLIC_FIELDS}
+    known = {k: r for k, r in rows.items() if r['value'] is not None
+             and r['value'] not in ('unknown', 'under_consideration', 'none')
+             and r['value'] != ['none'] and display(r['value']) != 'To be confirmed'}
+    unresolved_labels = {'event_schedule': 'Remaining event-day schedule details',
+        'production_schedule': 'Production schedule', 'load_in_schedule': 'Load-in timing',
+        'load_out_schedule': 'Load-out timing', 'event_start': 'Event date and start time',
+        'event_end': 'Event end time'}
+    unresolved = [unresolved_labels.get(k, r['label']) for k, r in rows.items() if k not in known and r['status'] != 'Not applicable']
+    start, end = (_local(rows[k]['value']) for k in ('event_start', 'event_end'))
+    event = []
+    if start:
+        date = f'{start.day} {start:%B %Y}'
+        if end and end.date() != start.date(): date += f'–{end.day} {end:%B %Y}'
+        event.append('Date: ' + date)
+        event.append('Time: ' + (f'{start:%H:%M}–{end:%H:%M}' if end and end.date() == start.date()
+            else display(rows['event_start']['value']) + (' – ' + display(rows['event_end']['value']) if end else '')))
+    labels = {'guest_count': 'Guests', 'event_type': 'Event format', 'requested_rental_scope': 'Space', 'layout_requirements': 'Room setup'}
+    for key, label in labels.items():
+        if key in known: event.append(label + ': ' + display(known[key]['value']))
+    technical, team = [], []
+    for key, row in known.items():
+        if key in labels or key in {'event_start', 'event_end'}: continue
+        label, value = row['label'], display(row['value'])
+        if key == 'production_scope':
+            label, value = 'Production coordination' if row['value'] == 'production_coordination' else 'Production scope', 'Requested, scope to be confirmed'
+            unresolved.append('Final production coordination scope' if row['value'] == 'production_coordination' else 'Final production scope')
+        elif key in {'load_in_schedule', 'load_in', 'load_out_schedule', 'load_out'}:
+            label = 'Load-in' if 'in' in key else 'Load-out'
+            raw = row['value']
+            time = (raw.get('time') or raw.get('start')) if isinstance(raw, dict) else None
+            value = 'Requested ' + ('from ' if label == 'Load-in' else 'until ') + (str(time) if time else value)
+            if isinstance(raw, dict) and raw.get('date') and (not start or raw['date'] != start.date().isoformat()):
+                value += ' on ' + display(raw['date'])
+            if isinstance(raw, dict) and raw.get('timezone') not in {None, 'Europe/Amsterdam'}:
+                value += ' (' + str(raw['timezone']) + ')' 
+            unresolved.append(label + ' timing')
+        if row['section'] == 'Team & Responsibilities': team.append(label + ': ' + value)
+        elif key in {'primary_contact', 'event_schedule', 'event_days'}: event.append(label + ': ' + value)
+        else: technical.append(label + ': ' + value)
     from .operational_resolution import client_results
-    sections['Confirmed / Still TBC'].extend(result['assertion'] for result in client_results(snapshot))
-    sections['Confirmed / Still TBC'].append('Other requested details remain TBC. No booking confirmation is inferred.')
-    sections['Next Steps'] = [q.human_question_text for q in snapshot.open_questions
-        if q.status == 'open' and q.requested_from_role in {None, 'client', 'CLIENT'}]
-    sections['Next Steps'].append('Review the requested details and confirm the remaining TBC items.')
-    content = {name: ' · '.join(lines) if lines else 'TBC where applicable' for name, lines in sections.items()}
+    governed_results = client_results(snapshot)
+    confirmations = [_confirmation(result) for result in governed_results]
+    if 'technical_requirements' in known:
+        requested_technical = known['technical_requirements']['value']
+        requested_technical = requested_technical if isinstance(requested_technical, list) else [requested_technical]
+        feasible_subjects = {r.get('subject') for r in governed_results if r['outcome'] == 'FEASIBLE'}
+        if not all(isinstance(subject, str) and subject in feasible_subjects for subject in requested_technical):
+            unresolved.append('Technical feasibility')
+    prices = approved_prices(snapshot)
+    if not prices: unresolved.append('Pricing and applicable fees')
+    sections = {
+        'Event Overview': '\n'.join(event) or 'Event details are still to confirm.',
+        'Current Scope': '\n'.join(technical),
+        'Financial Summary': '\n'.join(prices) or 'To be confirmed',
+        'Confirmed / Still TBC': '\n'.join('• ' + text for text in confirmations),
+        'Working Timeline': '\n'.join('• ' + text for text in dict.fromkeys(unresolved)),
+        'Team & Responsibilities': '\n'.join(team),
+        'Next Steps': "We'll confirm the remaining operational details and pricing before the proposal is finalized." if unresolved else
+            'Review the current scope and confirmed details before finalizing the proposal.',
+    }
+    headings = {'Event Overview': 'Event Details', 'Current Scope': 'Production & Technical' if technical else 'Requested Details',
+        'Financial Summary': 'Pricing', 'Confirmed / Still TBC': 'Confirmed So Far' if confirmations else 'Confirmation Status',
+        'Working Timeline': 'Still to Confirm', 'Team & Responsibilities': 'Team & Responsibilities' if team else 'Working Proposal Status',
+        'Next Steps': 'Next Steps'}
+    subtitle = display(known['event_type']['value']).capitalize() if 'event_type' in known else 'Rental event'
+    if start: subtitle += f' | {start.day} {start:%B %Y}'
     case = snapshot.rental_case
+    status_note = 'Working proposal: this document reflects the current event scope and confirmed details.'
+    status_note += (' Booking confirmation is recorded separately.' if case.lifecycle_state in {
+        'confirmed_pre_event', 'event_ready', 'event_in_progress', 'close_out_in_progress'} else
+        ' It does not constitute a confirmed booking.')
     value = {'version': VERSION, 'rental_case_id': case.rental_case_id,
         'proposal_identity': identity(snapshot), 'source_case_revision': case.case_revision,
         'folder_id': folder_id, 'provider_identity': provider_identity, 'template': template,
-        'title': model['template']['title'], 'client': display(case.client_account_ref),
-        'sections': content, 'manual_edit_policy': MANUAL_EDIT_POLICY}
+        'title': 'Working Proposal\n' + subtitle, 'client': display(case.client_account_ref),
+        'sections': sections, 'headings': headings,
+        'status_note': status_note, 'manual_edit_policy': MANUAL_EDIT_POLICY}
     # Content hash ignores unrelated revisions, while the execution envelope is
     # still bound to the exact current case revision.
     value['projection_hash'] = digest({k: v for k, v in value.items() if k != 'source_case_revision'})
@@ -161,10 +245,10 @@ def build_projection(snapshot, *, folder_id, provider_identity):
 
 
 def render_template(plan):
-    """Retain the actual template's headings, table styles and page setup.
+    """Render human sections using the bound source's page setup and styles.
 
-    Replace example content with one managed paragraph per section. Fixed
-    paragraph layout allows revision-guarded in-place updates of native Docs.
+    This changes presentation only. Native updates retain the existing strict
+    layout/fingerprint review fence; incompatible existing layouts fail closed.
     """
     path = ROOT / plan['template']['path']
     raw = path.read_bytes()
@@ -174,56 +258,34 @@ def render_template(plan):
     with ZipFile(io.BytesIO(raw)) as archive:
         tree = ET.fromstring(archive.read('word/document.xml'))
         body = tree.find(W+'body')
-        current = None
-        placed = set()
-        for child in list(body):
-            text = ''.join(n.text or '' for n in child.iter(W+'t'))
-            heading = next((name for name in SECTIONS if text.startswith(tuple(f'{i}. {name}' for i in range(1, 8)))), None)
-            if heading and child.tag == W+'p':
-                current = heading
-                _replace_paragraph(child, f'{SECTIONS.index(heading)+1}. {heading}')
-                continue
-            if child.tag == W+'sectPr':
-                continue
-            if current:
-                if current in placed:
-                    body.remove(child)
-                    continue
-                if child.tag == W+'tbl':
-                    # Keep a styled table with one row; suppress every example.
-                    rows = child.findall(W+'tr')
-                    for row in rows[1:]: child.remove(row)
-                    cells = rows[0].findall(W+'tc')
-                    first = cells[0]
-                    # The managed section uses the full styled table width;
-                    # retain the source table's page geometry, not narrow cells.
-                    properties = first.find(W+'tcPr')
-                    if properties is None: properties = ET.SubElement(first, W+'tcPr')
-                    span = ET.SubElement(properties, W+'gridSpan', {W+'val': str(len(cells))})
-                    widths = [cell.find(W+'tcPr/'+W+'tcW') for cell in cells]
-                    if all(width is not None for width in widths):
-                        width = properties.find(W+'tcW')
-                        width.set(W+'w', str(sum(int(n.get(W+'w', '0')) for n in widths)))
-                    for cell in cells[1:]: rows[0].remove(cell)
-                    for i, cell in enumerate([first]):
-                        paragraphs = cell.findall(W+'p')
-                        for extra in paragraphs[1:]: cell.remove(extra)
-                        _replace_paragraph(paragraphs[0], plan['sections'][current] if i == 0 else '')
-                else:
-                    _replace_paragraph(child, plan['sections'][current])
-                placed.add(current)
-            elif child.tag == W+'p':
-                # Match the required Google Docs sanitizer deterministically in
-                # the hosted path, without altering retained source templates.
-                props = child.find(W+'pPr')
-                if props is not None:
-                    for border in props.findall(W+'pBdr'): props.remove(border)
-                _replace_paragraph(child, plan['title'] if text.endswith('Working Proposal') else
-                    'Client: '+plan['client'] if text.startswith('Client:') else '')
-        if placed != set(SECTIONS):
-            raise ValueError('proposal_template_layout_unsupported')
-        if list(body)[-2].tag == W+'tbl':
-            body.insert(len(body)-1, ET.Element(W+'p'))
+        setup = body.find(W+'sectPr')
+        for child in list(body): body.remove(child)
+        def paragraph(text, style=None):
+            p = ET.Element(W+'p')
+            properties = ET.SubElement(p, W+'pPr')
+            if style: ET.SubElement(properties, W+'pStyle', {W+'val': style})
+            ET.SubElement(properties, W+'spacing', {W+'before': '160' if style == 'Heading1' else '0', W+'after': '70'})
+            if style in {'Heading1', 'Title', 'Subtitle'}: ET.SubElement(properties, W+'keepNext')
+            _replace_paragraph(p, text)
+            rp = ET.Element(W+'rPr')
+            p.find(W+'r').insert(0, rp)
+            ET.SubElement(rp, W+'rFonts', {W+'ascii': 'Arial', W+'hAnsi': 'Arial'})
+            ET.SubElement(rp, W+'color', {W+'val': '000000'})
+            ET.SubElement(rp, W+'sz', {W+'val': '44' if style == 'Title' else '28' if style == 'Heading1' else '24' if style == 'Subtitle' else '21'})
+            return p
+        for index, line in enumerate(plan['title'].splitlines()):
+            body.append(paragraph(line, 'Title' if index == 0 else 'Subtitle'))
+        body.append(paragraph('Client: ' + plan['client']))
+        order = ('Event Overview', 'Current Scope', 'Team & Responsibilities',
+                 'Confirmed / Still TBC', 'Working Timeline', 'Financial Summary', 'Next Steps')
+        for name in order:
+            content = plan['sections'].get(name, '')
+            if not content: continue
+            body.append(paragraph(plan.get('headings', {}).get(name, name), 'Heading1'))
+            lines = content.splitlines()
+            for line in lines: body.append(paragraph(line))
+        body.append(paragraph(plan.get('status_note', ''), 'Normal'))
+        if setup is not None: body.append(setup)
         paragraphs = [''.join(n.text or '' for n in p.iter(W+'t')) for p in tree.iter(W+'p')]
         output = io.BytesIO()
         with ZipFile(output, 'w') as target:

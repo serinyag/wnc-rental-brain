@@ -118,11 +118,11 @@ def test_scoped_confirmation_updates_doc_and_matches_client_drafting_authority(r
     assertion = client_results(snapshot)[0]['assertion']
     contract = build_draft_contract(snapshot=snapshot, recipient_label='Synthetic Client',
                                    latest_client_message='Is the Studio available?')
-    assert assertion in text
+    assert assertion.replace(' (Europe/Amsterdam)', '') in text
     assert any(i.included and i.value.get('assertion') == assertion for i in contract.editorial_plan.items)
     conn.execute("update public.rental_cases set active_event_start=active_event_start+interval '1 day', active_event_end=active_event_end+interval '1 day',case_revision=case_revision+1 where id=%s", (cid,))
     assert run().action_status_after == 'succeeded'
-    assert assertion not in '\n'.join(p[2] for p in paragraphs(provider.get('doc_001')))
+    assert assertion.replace(' (Europe/Amsterdam)', '') not in '\n'.join(p[2] for p in paragraphs(provider.get('doc_001')))
     assert len(provider.documents) == 1
 
 
