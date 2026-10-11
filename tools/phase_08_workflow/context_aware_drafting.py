@@ -242,11 +242,13 @@ def derive_resolution_items(snapshot: Any, *, observed_fields: tuple[Any, ...] =
     case = getattr(snapshot, "rental_case", None)
     start, end = getattr(case, "active_event_start", None), getattr(case, "active_event_end", None)
     if start and end and getattr(case, "lifecycle_state", "") in {"inquiry_active", "proposal_in_progress"}:
+        from .operational_resolution import requested_venue
+        venue = requested_venue(snapshot)
         key = f"availability:{start}:{end}"
         if not any("availability" in item.message.lower() and item.resolution_owner == RESOLUTION_OWNER_WNC_INTERNAL for item in items):
             items.append(ResolutionItem(
                 proposition_key=key,
-                message=f"Confirm {getattr(case, 'rental_type_code', 'venue').replace('_', ' ')} availability for {start} to {end}",
+                message=f"Confirm {str(venue).replace('_', ' ')} availability for {start} to {end}",
                 resolution_owner=RESOLUTION_OWNER_WNC_INTERNAL,
                 resolution_status=RESOLUTION_STATUS_REQUIRED,
                 client_visibility=CLIENT_VISIBILITY_INTERNAL_ONLY,

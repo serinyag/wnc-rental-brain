@@ -37,6 +37,13 @@ def scope(snapshot):
             'start': timestamp(c.active_event_start), 'end': timestamp(c.active_event_end)}
 
 
+def requested_venue(snapshot):
+    """Read the governed request separately from the case's current classification."""
+    values = [f.value_payload for f in getattr(snapshot, 'rental_case_facts', ())
+              if f.field_code == 'requested_rental_scope']
+    return values[-1] if values else snapshot.rental_case.rental_type_code
+
+
 def obligation(snapshot, action, *, observed_fields=(), environment="staging"):
     """Derive the allowlist from the actual typed obligation, never task prose."""
     c = snapshot.rental_case
@@ -47,6 +54,8 @@ def obligation(snapshot, action, *, observed_fields=(), environment="staging"):
         raise ValueError('ineligible_operational_action')
     key = p.get('resolution_item_key', '')
     current_scope = scope(snapshot)
+    if requested_venue(snapshot) != current_scope['venue']:
+        raise ValueError('requested_venue_requires_governed_scope_review')
     from .context_aware_drafting import derive_resolution_items
     active_keys = {item.proposition_key for item in derive_resolution_items(snapshot, observed_fields=observed_fields)}
     accepted_keys = {p['contract']['resolution_item_key'] for p in current_resolutions(snapshot)
@@ -140,6 +149,10 @@ def current_resolutions(snapshot):
     try:
         current_scope = scope(snapshot)
     except (ValueError, AttributeError):
+        return ()
+    # A requested scope change cannot inherit the former venue's confirmations.
+    # Nor can presentation silently reclassify the case or approve the change.
+    if requested_venue(snapshot) != current_scope['venue']:
         return ()
     events = {e.workflow_event_id: e for e in getattr(snapshot, "workflow_events", ())
               if e.event_type_code == 'operational_resolution_accepted'}

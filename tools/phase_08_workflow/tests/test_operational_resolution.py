@@ -124,6 +124,27 @@ def test_other_case_action_scope_and_revision_fences(resolution):
     assert not current_resolutions(repo.load_case_snapshot(cid))
 
 
+def test_requested_scope_change_invalidates_old_authority_without_reclassifying_case(resolution):
+    from tools.phase_08_workflow.asana_projection import build_projection
+    conn,repo,cid,a,r,accept=resolution
+    accept()
+    s=repo.load_case_snapshot(cid)
+    assert client_results(s)
+    changed=replace(s,rental_case_facts=s.rental_case_facts+(NS(
+        field_code='requested_rental_scope',value_payload='entire_venue'),))
+    assert changed.rental_case.rental_type_code == 'studio_space'
+    assert not current_resolutions(changed)
+    assert not resolved_keys(changed)
+    assert not client_results(changed)
+    items=derive_resolution_items(changed)
+    assert any('entire venue availability' in i.message for i in items)
+    plan=build_projection(changed,workspace_gid='111',project_gid='222')
+    work=next(w for w in plan['work'] if w['key']=='item:'+r['contract']['resolution_item_key'])
+    assert not work['completed'] and 'entire venue availability' in work['name']
+    with pytest.raises(ValueError,match='requested_venue_requires_governed_scope_review'):
+        obligation(changed,a)
+
+
 def test_technical_partial_resolution_contract_is_narrow(resolution):
     conn,repo,cid,a,r,accept=resolution
     s=repo.load_case_snapshot(cid)

@@ -90,6 +90,10 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
                    or blocker_states.get(key) in RESOLVED)
         closed = closed or retired
         summary = _text(p.get("summary"))
+        if key == current_availability_key:
+            # Keep the bound work identity, but describe the current requested
+            # venue. Old action prose must not survive a scope change.
+            summary = f"Confirm {scope} availability: {timing}"
         if owner == "CLIENT":
             if not closed:
                 client_items.append(summary)
