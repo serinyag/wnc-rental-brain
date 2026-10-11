@@ -266,10 +266,11 @@ class GoogleProposalAdapter:
                     full_end = 1 + len('\n'.join(desired).encode('utf-16-le')) // 2
                     requests.append({'updateParagraphStyle': {'range': {
                         'startIndex': 1, 'endIndex': full_end, **tab_scope},
-                        'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT',
+                        'paragraphStyle': {'namedStyleType': 'NORMAL_TEXT', 'lineSpacing': 100,
+                            'keepWithNext': False, 'pageBreakBefore': False,
                             'spaceAbove': {'magnitude': 0, 'unit': 'PT'},
                             'spaceBelow': {'magnitude': 3.5, 'unit': 'PT'}},
-                        'fields': 'namedStyleType,spaceAbove,spaceBelow'}})
+                        'fields': 'namedStyleType,lineSpacing,keepWithNext,pageBreakBefore,spaceAbove,spaceBelow'}})
                     requests.append({'updateTextStyle': {'range': {
                         'startIndex': 1, 'endIndex': full_end, **tab_scope},
                         'textStyle': {'fontSize': {'magnitude': 10.5, 'unit': 'PT'},
@@ -284,7 +285,11 @@ class GoogleProposalAdapter:
                         if style:
                             requests.append({'updateParagraphStyle': {'range': {
                                 'startIndex': offset, 'endIndex': offset + length, **tab_scope},
-                                'paragraphStyle': {'namedStyleType': style}, 'fields': 'namedStyleType'}})
+                                'paragraphStyle': {'namedStyleType': style, 'lineSpacing': 100,
+                                    'keepWithNext': style != 'NORMAL_TEXT', 'pageBreakBefore': False,
+                                    'spaceAbove': {'magnitude': 8 if style == 'HEADING_1' else 0, 'unit': 'PT'},
+                                    'spaceBelow': {'magnitude': 3.5, 'unit': 'PT'}},
+                                'fields': 'namedStyleType,lineSpacing,keepWithNext,pageBreakBefore,spaceAbove,spaceBelow'}})
                             requests.append({'updateTextStyle': {'range': {
                                 'startIndex': offset, 'endIndex': offset + length, **tab_scope},
                                 'textStyle': {'fontSize': {'magnitude': 22 if style == 'TITLE' else 12 if style == 'SUBTITLE' else 14, 'unit': 'PT'}},
@@ -296,7 +301,7 @@ class GoogleProposalAdapter:
                         if before == after: continue
                         if end > start: requests.append({'deleteContentRange': {'range': {'startIndex': start, 'endIndex': end, **tab_scope}}})
                         if after: requests.append({'insertText': {'location': {'index': start, **tab_scope}, 'text': after}})
-                    if requests:
+                    if requests or existing.get('projection_hash') != plan['projection_hash']:
                         delta = 0
                         headings = set(plan.get('headings', {}).values())
                         for index, ((start, end, before), text) in enumerate(zip(actual, desired)):
@@ -305,7 +310,11 @@ class GoogleProposalAdapter:
                             style = 'TITLE' if index == 0 else 'SUBTITLE' if index == 1 else 'HEADING_1' if text in headings else 'NORMAL_TEXT'
                             requests.append({'updateParagraphStyle': {'range': {
                                 'startIndex': position, 'endIndex': position + length, **tab_scope},
-                                'paragraphStyle': {'namedStyleType': style}, 'fields': 'namedStyleType'}})
+                                'paragraphStyle': {'namedStyleType': style, 'lineSpacing': 100,
+                                    'keepWithNext': style != 'NORMAL_TEXT', 'pageBreakBefore': False,
+                                    'spaceAbove': {'magnitude': 8 if style == 'HEADING_1' else 0, 'unit': 'PT'},
+                                    'spaceBelow': {'magnitude': 3.5, 'unit': 'PT'}},
+                                'fields': 'namedStyleType,lineSpacing,keepWithNext,pageBreakBefore,spaceAbove,spaceBelow'}})
                             requests.append({'updateTextStyle': {'range': {
                                 'startIndex': position, 'endIndex': position + length, **tab_scope},
                                 'textStyle': {'fontSize': {'magnitude': 22 if style == 'TITLE' else 12 if style == 'SUBTITLE' else 14 if style == 'HEADING_1' else 10.5, 'unit': 'PT'}},

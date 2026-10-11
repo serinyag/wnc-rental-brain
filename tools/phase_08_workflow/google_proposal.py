@@ -237,7 +237,7 @@ def build_projection(snapshot, *, folder_id, provider_identity):
         'proposal_identity': identity(snapshot), 'source_case_revision': case.case_revision,
         'folder_id': folder_id, 'provider_identity': provider_identity, 'template': template,
         'title': 'Working Proposal\n' + subtitle, 'client': display(case.client_account_ref),
-        'sections': sections, 'headings': headings,
+        'sections': sections, 'headings': headings, 'presentation_style': 'human_event_proposal_v1',
         'status_note': status_note, 'manual_edit_policy': MANUAL_EDIT_POLICY}
     # Content hash ignores unrelated revisions, while the execution envelope is
     # still bound to the exact current case revision.

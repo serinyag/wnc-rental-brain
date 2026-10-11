@@ -94,3 +94,26 @@ def test_metadata_only_unknown_is_unresolved_and_confirmed_lifecycle_is_preserve
     assert 'Event day contact' in plan['sections']['Working Timeline']
     assert 'Booking confirmation is recorded separately.' in lines[-1]
     assert repo.rental_cases[1].lifecycle_state == 'confirmed_pre_event'
+
+
+def test_style_only_projection_change_is_guarded_and_does_not_rewrite_content():
+    from tools.phase_08_workflow.google_proposal import build_projection
+    from tools.phase_08_workflow.asana_projection import digest
+    repo, provider, adapter = production()
+    def legacy(*args, **kwargs):
+        plan = build_projection(*args, **kwargs); plan.pop('presentation_style')
+        plan['projection_hash'] = digest({k:v for k,v in plan.items() if k not in {'source_case_revision', 'projection_hash'}})
+        return plan
+    with patch('tools.phase_08_workflow.google_proposal.build_projection', side_effect=legacy):
+        assert execute(repo, adapter).action_status_after == 'succeeded'
+    calls = []; original = provider.update
+    def record(doc_id, requests, revision):
+        calls.append(requests); return original(doc_id, requests, revision)
+    provider.update = record
+    assert execute(repo, adapter).action_status_after == 'succeeded'
+    assert calls and not any('insertText' in r or 'deleteContentRange' in r for r in calls[0])
+    paragraph_styles = [r['updateParagraphStyle']['paragraphStyle'] for r in calls[0] if 'updateParagraphStyle' in r]
+    assert all(s['pageBreakBefore'] is False and s['lineSpacing'] == 100 for s in paragraph_styles)
+    assert all(s['keepWithNext'] is False for s in paragraph_styles if s['namedStyleType'] == 'NORMAL_TEXT')
+    assert execute(repo, adapter).already_succeeded_idempotently
+    assert provider.mutations == [('create','doc_001'),('update','doc_001')]
