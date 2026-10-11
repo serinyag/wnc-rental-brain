@@ -1,0 +1,145 @@
+{
+  "cases": [
+    {
+      "case_id": 590,
+      "revision": 4,
+      "action_id": 1703,
+      "doc_id": "10AYCm04SGmLw-XE3BwMPFsRZevqbqYzGsItoL9ORKho",
+      "status": "MATCHES_PROJECTION",
+      "authority_unchanged": true,
+      "provider_identity_unchanged": true,
+      "new_attempts": 2,
+      "replay_report": {
+        "failure_codes": [
+          "action_already_succeeded"
+        ],
+        "lines": [
+          "Action status before: succeeded",
+          "Action status after: succeeded",
+          "Reason: action_already_succeeded"
+        ],
+        "success": false,
+        "title": "Workflow Action Evaluated"
+      },
+      "projection_hash": "190cc0a4ff92322e2e72e197c96b2476666398e628a030e327441c71af471a1a",
+      "updates": [
+        {
+          "action_id": 1700,
+          "attempt_id": 58,
+          "status": "succeeded",
+          "mutation_requests": 1
+        },
+        {
+          "action_id": 1703,
+          "attempt_id": 61,
+          "status": "succeeded",
+          "mutation_requests": 1
+        }
+      ],
+      "authority_hash": "1fde3691b0163a32a380600ed0bdbafb475c6453ea88bf29ccf5be3a9a8741a8",
+      "proposal_identity": "a3bc4e5e3eee38b69451185cef8bd8aa7509bcf7d1192d89f93e4f855293e16a"
+    },
+    {
+      "case_id": 589,
+      "revision": 9,
+      "action_id": 1702,
+      "doc_id": "1WkdwiO-oZIX4xKu_LH6OelAs4ZWJD3tF1zSImnRLnX8",
+      "status": "MATCHES_PROJECTION",
+      "authority_unchanged": true,
+      "provider_identity_unchanged": true,
+      "new_attempts": 2,
+      "replay_report": {
+        "failure_codes": [
+          "action_already_succeeded"
+        ],
+        "lines": [
+          "Action status before: succeeded",
+          "Action status after: succeeded",
+          "Reason: action_already_succeeded"
+        ],
+        "success": false,
+        "title": "Workflow Action Evaluated"
+      },
+      "projection_hash": "b4e45cfdddad0da837ecf7d0c0c35bed2f8508c3577e3d8c92157fd93ff09155",
+      "updates": [
+        {
+          "action_id": 1699,
+          "attempt_id": 57,
+          "status": "succeeded",
+          "mutation_requests": 1
+        },
+        {
+          "action_id": 1702,
+          "attempt_id": 60,
+          "status": "succeeded",
+          "mutation_requests": 1
+        }
+      ],
+      "authority_hash": "fa6b1191bf903a3df75724ff943f1bf674696faa6386e61835851d2255ec1f7c",
+      "proposal_identity": "640666707de1e71d842524b1f90798b0fab10bf855e7f9fd2b576aed353e3ccd"
+    },
+    {
+      "case_id": 588,
+      "revision": 10,
+      "action_id": 1704,
+      "doc_id": "1TDmwRBeF5SUjP9wPoRD7d5cu1OIOehMOxfAs3ALFoKI",
+      "status": "MATCHES_PROJECTION",
+      "authority_unchanged": true,
+      "provider_identity_unchanged": true,
+      "new_attempts": 2,
+      "replay_report": {
+        "failure_codes": [
+          "action_already_succeeded"
+        ],
+        "lines": [
+          "Action status before: succeeded",
+          "Action status after: succeeded",
+          "Reason: action_already_succeeded"
+        ],
+        "success": false,
+        "title": "Workflow Action Evaluated"
+      },
+      "projection_hash": "46e30475774ccb4ca76d26b06559241fb8b7f942122d97a3d21051e715034215",
+      "updates": [
+        {
+          "action_id": 1701,
+          "attempt_id": 59,
+          "status": "succeeded",
+          "mutation_requests": 1
+        },
+        {
+          "action_id": 1704,
+          "attempt_id": 62,
+          "status": "succeeded",
+          "mutation_requests": 1
+        }
+      ],
+      "authority_hash": "27320cd059f900dbf8f8040f64730310060aab4f6c9b2f684c97810116da34fb",
+      "proposal_identity": "d3be6a20933b7c448e7819d1339b24538356b14172306e18cff426192eac65c6"
+    }
+  ],
+  "google_updates": 6,
+  "google_creates": 0,
+  "graph_calls": 0,
+  "asana_mutations": 0,
+  "openai_calls": 0,
+  "sends": 0,
+  "production_changes": 0,
+  "tests": {
+    "full_repository": 1096,
+    "focused": 66
+  },
+  "closure": {
+    "gates": {
+      "asana_execution_gate": "disabled",
+      "google_proposal_gate": "disabled",
+      "outlook_execution_gate": "disabled",
+      "outlook_inbound_gate": "disabled",
+      "outlook_inbound_preflight_gate": "disabled",
+      "outlook_send_gate": "disabled",
+      "real_providers_gate": "disabled"
+    },
+    "deployed_commit": "78eba0a27c7f175eea89f8be6480cc4df8f10025",
+    "deployment_id": "dep-db5kkptckfvc73ai0vi0"
+  }
+}

@@ -1,0 +1,199 @@
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 19%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 39%]
+........................................................................ [ 45%]
+........................................................................ [ 52%]
+........................................................................ [ 59%]
+........................................................................ [ 65%]
+........................................................................ [ 72%]
+........................................................................ [ 78%]
+........................................................................ [ 85%]
+........................................................................ [ 91%]
+........................................................................ [ 98%]
+................                                                         [100%]
+=============================== warnings summary ===============================
+tools/phase_08_workflow/test_console_service.py:375
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:375: PytestCollectionWarning: cannot collect test class 'TestCaseSummary' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:582
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:582: PytestCollectionWarning: cannot collect test class 'TestConsoleClockStatus' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console.py:49
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console.py:49: PytestCollectionWarning: cannot collect test class 'TestConsoleApp' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console.py)
+    class TestConsoleApp:
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_projection.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:260
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:260: PytestCollectionWarning: cannot collect test class 'TestConsoleReadError' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    class TestConsoleReadError(TestConsoleError):
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:375
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:375: PytestCollectionWarning: cannot collect test class 'TestCaseSummary' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:582
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:582: PytestCollectionWarning: cannot collect test class 'TestConsoleClockStatus' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:605
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:605: PytestCollectionWarning: cannot collect test class 'TestConsoleHealthReport' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/test_console_service.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_conversational_refinement.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_google_proposal_postgres.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_google_proposal_postgres.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_human_delivery_reconciliation.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_inquiry_response_drafting.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_inquiry_response_drafting.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_inquiry_response_drafting.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_inquiry_response_drafting.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_outlook_action_contract.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_outlook_action_contract.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_outlook_action_contract.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_outlook_recertification.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console.py:49
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console.py:49: PytestCollectionWarning: cannot collect test class 'TestConsoleApp' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    class TestConsoleApp:
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:375
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:375: PytestCollectionWarning: cannot collect test class 'TestCaseSummary' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:582
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:582: PytestCollectionWarning: cannot collect test class 'TestConsoleClockStatus' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:260
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:260: PytestCollectionWarning: cannot collect test class 'TestConsoleReadError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    class TestConsoleReadError(TestConsoleError):
+
+tools/phase_08_workflow/test_console_service.py:605
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:605: PytestCollectionWarning: cannot collect test class 'TestConsoleHealthReport' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_app.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_projection.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_projection.py:84
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_projection.py:84: PytestCollectionWarning: cannot collect test class 'TestConsoleCaseMetadata' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:605
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:605: PytestCollectionWarning: cannot collect test class 'TestConsoleHealthReport' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_service.py)
+    @dataclass(frozen=True)
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_service.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:260
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:260: PytestCollectionWarning: cannot collect test class 'TestConsoleReadError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_service.py)
+    class TestConsoleReadError(TestConsoleError):
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_test_console_service.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:243
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:243: PytestCollectionWarning: cannot collect test class 'TestConsoleError' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_wsgi.py)
+    class TestConsoleError(RuntimeError):
+
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/production_runtime/test_integration.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/production_runtime/test_integration.py)
+    @dataclass(frozen=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1096 passed, 45 warnings in 114.95s (0:01:54)

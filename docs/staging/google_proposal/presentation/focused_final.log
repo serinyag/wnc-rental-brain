@@ -1,0 +1,12 @@
+..................................................................       [100%]
+=============================== warnings summary ===============================
+tools/phase_08_workflow/test_console_service.py:746
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:746: PytestCollectionWarning: cannot collect test class 'TestConsoleService' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_google_proposal_postgres.py)
+    class TestConsoleService:
+
+tools/phase_08_workflow/test_console_service.py:311
+  /Users/serinya/Documents/WNC Rental Automation/tools/phase_08_workflow/test_console_service.py:311: PytestCollectionWarning: cannot collect test class 'TestConsoleConfig' because it has a __init__ constructor (from: tools/phase_08_workflow/tests/test_google_proposal_postgres.py)
+    @dataclass(frozen=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+66 passed, 2 warnings in 2.98s
