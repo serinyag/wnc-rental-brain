@@ -198,7 +198,7 @@ def client_results(snapshot):
         start = datetime.fromisoformat(c['scope']['start']).astimezone(ZoneInfo('Europe/Amsterdam'))
         end = datetime.fromisoformat(c['scope']['end']).astimezone(ZoneInfo('Europe/Amsterdam'))
         end_label = end.strftime('%H:%M') if start.date() == end.date() else end.strftime('%d %B %Y %H:%M')
-        interval = f"{start.day} {start.strftime('%B %Y')} from {start:%H:%M} to {end_label} (Europe/Amsterdam)"
+        interval = f"{start.day} {start.strftime('%B %Y')} from {start:%H:%M} to {end_label}"
         for subject, outcome in p['outcomes'].items():
             label = {'studio_space': 'The Studio', 'entire_venue': 'The entire venue',
                      'projection_display': 'The requested projection setup', 'microphones': 'The requested microphones',

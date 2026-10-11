@@ -217,7 +217,8 @@ def normalized_guidance(guide: Any) -> tuple[tuple[str, str, dict[str, Any]], ..
 
 def communication_evidence(item: EditorialContentItem, body: str) -> bool:
     if item.topic == 'operational_confirmation':
-        return item.value['assertion'].casefold() in body.casefold()
+        from .client_time_presentation import confirmation_witness
+        return confirmation_witness(item.value, body) is not None
     """Conservative realization witness, not a claim that an email was sent.
 
     Stable item identity/value fingerprint drive novelty. This small check avoids

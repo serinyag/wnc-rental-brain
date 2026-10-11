@@ -18,6 +18,24 @@ BODIES = {
  'C': 'STAGING SYNTHETIC CLIENT REQUEST — Google integrated journey C only.\nWe request the Studio for a team workshop for 18 guests on 14 November 2026, 10:00–14:00 Europe/Amsterdam. Theatre-style seated setup. Date, count and scope may change later. Please check availability and advise on next steps. No booking or commercial commitment.',
 }
 
+# Fixed acceptance emails only; no arbitrary recipients, message bodies or sends.
+ACCEPTANCE = {
+ 'ac1': 'Hi WNC, Avery from Cedar Studio here. We would like the Studio for a team workshop for 12 guests on 20 November 2026, 10:00–14:00, seated theatre-style. Could you check availability and advise on next steps?',
+ 'ac2': 'Hi WNC, Noor from Elm Learning here. We would like the Studio for a presentation workshop for 18 guests on 21 November 2026, 10:00–14:00, seated theatre-style. We need a basic projector and microphone. We will bring our laptop and adapters. Can you check the equipment and setup?',
+ 'ac3': 'Hi WNC, Jules from Birch Events here. We request the Studio for a production workshop for 20 guests on 22 November 2026, 10:00–14:00, seated theatre-style, with production coordination and projection. Our external caterer will deliver ready-made food for warming and plating. We request load-in on 21 November at 17:00 and load-out on 22 November at 15:00. Could you check access and supplier arrangements?',
+ 'ac4': 'Hi WNC, Casey from Maple Team here. We request the Studio for a team workshop for 24 guests on 23 November 2026, 10:00–14:00, seated theatre-style. Please check availability and the layout.',
+ 'ac4-followup': 'Hi WNC, the guest count for our existing 23 November Studio workshop is now 30 instead of 24. Date, 10:00–14:00 timing and seated theatre-style setup stay the same. Please update our request.',
+ 'ac5': 'Hi WNC, Robin from Oak Collective here. We request the Studio for a workshop for 16 guests on 24 November 2026, 10:00–14:00, seated theatre-style. Please check availability.',
+ 'ac5-followup': 'Hi WNC, please move our existing Studio workshop to 28 November 2026, 11:00–15:00. The 16 guests and seated theatre-style setup stay the same. Could you recheck availability for this new date?',
+ 'ac6': 'Hi WNC, Sam from Willow Company here. We request the Studio for a workshop for 24 guests on 25 November 2026, 10:00–14:00, seated theatre-style. Please check availability and layout.',
+ 'ac6-followup': 'Hi WNC, could we change our existing 25 November workshop request from the Studio to the Entire Venue? The 24 guests, seated theatre-style setup and 10:00–14:00 time stay the same. Please check the new venue scope.',
+ 'ac7': 'Hi WNC, Morgan from Pine Group here. We would like the Studio for a team workshop on 26 November 2026, starting at 10:00, seated theatre-style. Could you advise on next steps? We have not settled the guest count or finish time yet.',
+ 'ac8': 'Hi WNC, Alex from Spruce Media here. We request the Studio for a seated workshop for 18 guests on 27 November 2026, 10:00–14:00. We need guaranteed dedicated 500 Mbps upload for a live stream. Can you confirm whether that can be provided?',
+}
+for _scenario, _body in ACCEPTANCE.items():
+ BODIES[_scenario] = 'STAGING SYNTHETIC CLIENT ' + ('FOLLOW-UP' if _scenario.endswith('-followup') else 'REQUEST') + ' — Realistic rental acceptance ' + _scenario + ' only.\n' + _body + '\nSynthetic acceptance fixture only; no real booking or commercial commitment.'
+
+
 def run(scenario):
  import psycopg
  if scenario not in BODIES: raise ValueError('synthetic_scenario_invalid')
@@ -42,6 +60,15 @@ def run(scenario):
     sources=conn.execute("select message_id,conversation_id,envelope from public.outlook_inbound_messages where rental_case_id=588 and association_status='resolved'").fetchall()
     sources=[r for r in sources if 'Google integrated journey C only.' in r[2].get('normalized_body','') and 'CLIENT REQUEST' in r[2].get('normalized_body','')]
     if len(sources)!=1 or sources[0][2].get('from_address','').casefold()!=MAILBOX:raise ValueError('synthetic_followup_binding_invalid')
+    reply_source=sources[0]
+   if scenario.endswith('-followup') and scenario != 'C-followup':
+    parent = scenario.removesuffix('-followup')
+    receipt = conn.execute("select structured_payload from public.workflow_events where rental_case_id=587 and event_identity_key=%s", ('google-cert-20261010:inbound-fixture:'+parent+':accepted',)).fetchone()
+    if not receipt: raise ValueError('synthetic_parent_receipt_missing')
+    conversation = receipt[0]['conversation_id']
+    sources = conn.execute("select message_id,conversation_id,envelope from public.outlook_inbound_messages where conversation_id=%s and association_status='resolved'", (conversation,)).fetchall()
+    sources = [r for r in sources if BODIES[parent] == r[2].get('normalized_body','') and r[2].get('from_address','').casefold()==MAILBOX]
+    if len(sources)!=1: raise ValueError('synthetic_followup_binding_invalid')
     reply_source=sources[0]
    conn.execute("""insert into public.workflow_events(rental_case_id,event_type_code,source_type,source_reference,actor_type,actor_reference,occurred_at,recorded_at,event_identity_key,structured_payload)
     values(587,'synthetic_client_transport_started','staging_fixture',%s,'operator','authorized_google_staging_campaign',now(),now(),%s,%s::jsonb)""",

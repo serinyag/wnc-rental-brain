@@ -150,6 +150,7 @@ class ClientGenerationPayload:
         return cls(contract)
 
     def to_payload(self) -> dict[str, Any]:
+        from .client_time_presentation import confirmation_blocks
         contract = self.contract
         plan = contract.editorial_plan
         values = lambda role: [item.writing_value() for item in plan.role_items(role)]
@@ -167,6 +168,7 @@ class ClientGenerationPayload:
                                  if item.included and item.topic == "external_pending"],
             "forbidden_claims": list(contract.forbidden_claims),
             "style_profile": list(contract.style_profile),
+            "scoped_confirmation_blocks": list(confirmation_blocks([g.semantic_values for g in contract.contextual_guidance if g.source_reference == "governed_operational_resolution"])),
             "signature_policy": "Do not write a signature or valediction. End after the last useful sentence or question.",
         }
 
@@ -457,6 +459,7 @@ def build_draft_contract(
             "Write one warm, concise, human email that sounds like a helpful WNC rental operator.",
             "Use only supplied assertions and do not mention internal systems or workflow terms.",
             "Ask only the supplied open client questions and make the next step clear.",
+            "Omit Europe/Amsterdam and CET/CEST for ordinary venue times. State a shared event date once; repeat dates only for distinct dates or timing that must remain explicit.",
             "Include only relevant supplied contextual guidance and never present it as an unsupported promise.",
             "Return no signature block or valediction. Do not use an em dash.",
         ),
@@ -476,17 +479,20 @@ class DeterministicFakeClientResponseProvider:
         draft = self._generate_client_response(contract)
         # Scoped operator outcomes remain mandatory in every response intent,
         # including a reschedule acknowledgement or an interim technical reply.
-        assertions = [g.semantic_values["assertion"] for g in contract.contextual_guidance
-            if g.source_reference == "governed_operational_resolution"
-            and g.semantic_values["assertion"].casefold() not in draft.body.casefold()]
-        if assertions:
+        from .client_time_presentation import confirmation_blocks
+        values = [g.semantic_values for g in contract.contextual_guidance
+                  if g.source_reference == "governed_operational_resolution"]
+        if values:
             body = draft.body
+            for value in values:
+                body = body.replace(value['assertion'], '')
+            block = "\n\n".join(confirmation_blocks(values))
             split = next((marker for marker in ("\n\nWarmly,", "\n\nBest,") if marker in body), None)
             if split:
                 prefix, suffix = body.split(split, 1)
-                body = prefix + "\n\n" + "\n".join(assertions) + split + suffix
+                body = prefix.rstrip() + "\n\n" + block + split + suffix
             else:
-                body += "\n\n" + "\n".join(assertions)
+                body = body.rstrip() + "\n\n" + block
             draft = ClientResponseDraft(draft.subject, body, draft.question_ids)
         return draft
 
@@ -503,12 +509,14 @@ class DeterministicFakeClientResponseProvider:
         selected = requirements(contract.editorial_plan)
         if not selected or contract.open_client_questions:
             return None
-        paragraphs = []
+        from .client_time_presentation import confirmation_blocks
+        confirmations = [r.item.value for r in selected if r.item.topic == "operational_confirmation"]
+        paragraphs = list(confirmation_blocks(confirmations))
         for requirement in selected:
             item = requirement.item
             value = item.value
             if item.topic == "operational_confirmation" and value.get("assertion"):
-                paragraphs.append(value["assertion"])
+                continue
             elif item.topic == "projection_display" and value.get("status") == "conditional" and value.get("available_equipment") and value.get("check_required"):
                 checks = ", ".join(value["check_required"])
                 paragraphs.append(f"For projection display, the supplied equipment is {value['available_equipment']}. We'll check the {checks} for your event before confirming that arrangement.")
@@ -522,7 +530,7 @@ class DeterministicFakeClientResponseProvider:
                     return None
                 if start.date() != end.date() or start >= end:
                     return None
-                paragraphs.append(f"We'll check venue availability for your requested date, {start:%d %B %Y} from {start:%H:%M} to {end:%H:%M} (Europe/Amsterdam), before confirming it.")
+                paragraphs.append(f"We'll check venue availability for your requested date, {start:%d %B %Y} from {start:%H:%M} to {end:%H:%M}, before confirming it.")
             else:
                 return None
         greeting = f"Hi {contract.recipient_label},"
@@ -708,8 +716,11 @@ def validate_client_response_draft(*, contract: DraftContract, draft: ClientResp
     confirmation_body = body
     for guide in contract.contextual_guidance:
         if guide.source_reference == 'governed_operational_resolution':
-            confirmation_body = confirmation_body.replace(guide.semantic_values['assertion'].lower(), '')
-            if guide.semantic_values['assertion'].lower() not in body:
+            from .client_time_presentation import confirmation_witness
+            witness = confirmation_witness(guide.semantic_values, draft.body)
+            if witness:
+                confirmation_body = confirmation_body.replace(witness.lower(), '')
+            if not witness:
                 failures.append('governed_operational_outcome_not_realized')
     operational_guides = [g for g in contract.contextual_guidance if g.source_reference == 'governed_operational_resolution']
     if any(g.semantic_values['subject'] in {'studio_space', 'entire_venue'} for g in operational_guides):
@@ -810,13 +821,13 @@ def _provider_system_prompt() -> str:
         "For each pending_action_group, express all its subjects together in one natural WNC check and make one report-back promise for the group; do not repeat synonymous check/update closures for its individual subjects. "
         "A known client fact must be stated as known; never turn it into a future check because another item requires checking. Retain material conditions and restrictions. "
         "Use exact supplied prices. Never confirm a booking, requested change, fee adjustment or unresolved capability. "
-        "For a supplied must_say item whose topic is operational_confirmation, copy its assertion sentence verbatim, including the complete event interval. "
-        "These exact scoped sentences are the only permitted availability or operational confirmations; do not paraphrase, broaden or add confirmations. "
+        "Copy each supplied scoped_confirmation_blocks block verbatim. It states the complete interval once for its exact confirmation bullets. "
+        "These exact scoped blocks or individual supplied assertion sentences are the only permitted availability or operational confirmations; do not paraphrase, broaden or add confirmations. "
         "Without such an item, never confirm date availability. "
         "Never claim suppliers have been contacted unless external_pending records CONTACTED_AWAITING_RESPONSE. "
         "Ask only the supplied open client questions, including every genuinely missing date/time component. "
         "Start with Hi and the client's first name, followed by a natural acknowledgement specific to their new detail. "
-        "Write short connected prose; use bullets only for genuinely compound requested answers. Do not write a capability catalogue. "
+        "Omit Europe/Amsterdam and CET/CEST for ordinary venue times. State a shared date once; preserve different dates and precise times where needed. Write short connected prose; use bullets for compound answers and supplied scoped confirmation blocks. Do not write a capability catalogue. "
         "No em dash, signature, valediction, sender name, internal codes, workflow mechanics or authority reasoning. "
         "Return question_ids exactly as supplied in open_client_questions, in order. Return JSON only."
     )

@@ -267,3 +267,27 @@ def test_free_draft_fixture_realizes_scoped_outcomes_during_reschedule(resolutio
     assert client_results(snap)[0]['assertion'] in draft.body
     validation=validate_client_response_draft(contract=contract,draft=draft,current_case_revision=snap.rental_case.case_revision,current_context_hash=contract.context_hash)
     assert validation.is_valid,validation
+
+
+def test_shared_confirmation_date_is_safe_and_wrong_header_fails(resolution):
+    from tools.phase_08_workflow.client_time_presentation import confirmation_blocks
+    conn, repo, cid, action, request, accept = resolution
+    accept()
+    scope = client_results(repo.load_case_snapshot(cid))[0]['scope']
+    value = client_results(repo.load_case_snapshot(cid))[0]
+    other = {**value, 'subject': 'projection_display', 'assertion': value['assertion'].replace('The Studio is available', 'The requested projection setup is feasible')}
+    blocks = confirmation_blocks((value, other))
+    body = '\n\n'.join(blocks)
+    assert body.count('November') <= 1
+    assert 'Europe/Amsterdam' not in body
+    assert body.count('from ') == 1
+    from tools.phase_08_workflow.client_time_presentation import confirmation_witness
+    assert confirmation_witness(value, body)
+    assert confirmation_witness(other, body)
+    assert not confirmation_witness(value, body.replace('For ', 'Other date: ', 1))
+    assert not confirmation_witness(value, '- The Studio is available.\n\n'+body.split('\n', 1)[0])
+    changed = copy.deepcopy(other)
+    start = datetime.fromisoformat(scope['start']) + timedelta(days=1)
+    end = datetime.fromisoformat(scope['end']) + timedelta(days=1)
+    changed['scope'] = {**scope, 'start': start.isoformat(), 'end': end.isoformat()}
+    assert not confirmation_witness(changed, body)
