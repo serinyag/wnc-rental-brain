@@ -30,6 +30,7 @@ ACCEPTANCE = {
  'ac6': 'Hi WNC, Sam from Willow Company here. We request the Studio for a workshop for 24 guests on 25 November 2026, 10:00–14:00, seated theatre-style. Please check availability and layout.',
  'ac6-followup': 'Hi WNC, could we change our existing 25 November workshop request from the Studio to the Entire Venue? The 24 guests, seated theatre-style setup and 10:00–14:00 time stay the same. Please check the new venue scope.',
  'ac7': 'Hi WNC, Morgan from Pine Group here. We would like the Studio for a team workshop on 26 November 2026, starting at 10:00, seated theatre-style. Could you advise on next steps? We have not settled the guest count or finish time yet.',
+ 'ac7-followup': 'Hi WNC, for our existing 26 November Studio workshop, we can now confirm our requested finish time is 14:00 and we expect 16 guests. The 10:00 start and seated theatre-style setup stay the same. Please check availability for this interval. This is our request, not a confirmed booking.',
  'ac8': 'Hi WNC, Alex from Spruce Media here. We request the Studio for a seated workshop for 18 guests on 27 November 2026, 10:00–14:00. We need guaranteed dedicated 500 Mbps upload for a live stream. Can you confirm whether that can be provided?',
 }
 for _scenario, _body in ACCEPTANCE.items():

@@ -670,6 +670,12 @@ def _value_matches_definition(value: Any, field_definition: ObservationFieldDefi
     if value_type == "boolean":
         return isinstance(value, bool)
     if value_type == "json_object":
+        if field_definition.field_code == 'technical_request_details':
+            from .requested_detail_presentation import technical_details
+            try:
+                return bool(technical_details(value))
+            except ValueError:
+                return False
         return isinstance(value, dict)
     if value_type == "enum":
         return isinstance(value, str) and value in field_definition.allowed_enum_values

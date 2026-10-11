@@ -26,7 +26,7 @@ PUBLIC_FIELDS = {
     'load_in_schedule', 'load_out_schedule', 'event_day_contact', 'event_days',
     'production_days', 'production_dates', 'production_start', 'production_end',
     'load_in', 'load_out', 'build_up', 'breakdown', 'layout_requirements',
-    'technical_requirements', 'catering_requirements', 'drink_package',
+    'technical_requirements', 'technical_request_details', 'catering_requirements', 'drink_package',
     'catering_arrangement', 'facilitator_arrangement', 'staffing_requirements',
     'wnc_responsibilities', 'client_responsibilities',
 }
@@ -169,20 +169,19 @@ def build_projection(snapshot, *, folder_id, provider_identity):
         'load_out_schedule': 'Load-out timing', 'event_start': 'Event date and start time',
         'event_end': 'Event end time'}
     unresolved = [unresolved_labels.get(k, r['label']) for k, r in rows.items() if k not in known and r['status'] != 'Not applicable']
+    from .requested_detail_presentation import event_timing, technical_details, TECHNICAL_LABELS
+    timing_rows, timing_missing = event_timing(snapshot.rental_case.active_event_start,
+        snapshot.rental_case.active_event_end, rows.get('event_schedule', {}).get('value'))
+    timing_labels = {unresolved_labels[k] for k in ('event_start', 'event_end', 'event_schedule')}
+    unresolved = [v for v in unresolved if v not in timing_labels] + timing_missing
     start, end = (_local(rows[k]['value']) for k in ('event_start', 'event_end'))
-    event = []
-    if start:
-        date = f'{start.day} {start:%B %Y}'
-        if end and end.date() != start.date(): date += f'–{end.day} {end:%B %Y}'
-        event.append('Date: ' + date)
-        event.append('Time: ' + (f'{start:%H:%M}–{end:%H:%M}' if end and end.date() == start.date()
-            else display(rows['event_start']['value']) + (' – ' + display(rows['event_end']['value']) if end else '')))
+    event = timing_rows
     labels = {'guest_count': 'Guests', 'event_type': 'Event format', 'requested_rental_scope': 'Space', 'layout_requirements': 'Room setup'}
     for key, label in labels.items():
         if key in known: event.append(label + ': ' + display(known[key]['value']))
     technical, team = [], []
     for key, row in known.items():
-        if key in labels or key in {'event_start', 'event_end'}: continue
+        if key in labels or key in {'event_start', 'event_end', 'event_schedule', 'technical_requirements', 'technical_request_details'}: continue
         label, value = row['label'], display(row['value'])
         if key == 'production_scope':
             label = 'Production coordination' if row['value'] == 'production_coordination' else 'Production scope'
@@ -204,12 +203,25 @@ def build_projection(snapshot, *, folder_id, provider_identity):
     from .operational_resolution import client_results
     governed_results = client_results(snapshot)
     confirmations = [_confirmation(result) for result in governed_results]
+    specific = technical_details(known.get('technical_request_details', {}).get('value'))
     if 'technical_requirements' in known:
         requested_technical = known['technical_requirements']['value']
         requested_technical = requested_technical if isinstance(requested_technical, list) else [requested_technical]
         feasible_subjects = {r.get('subject') for r in governed_results if r['outcome'] == 'FEASIBLE'}
         if not all(isinstance(subject, str) and subject in feasible_subjects for subject in requested_technical):
             unresolved.append('Technical feasibility')
+        for subject in requested_technical:
+            label = TECHNICAL_LABELS.get(subject, display(subject))
+            technical.append(label + ': Requested' + (' — ' + specific[subject] if subject in specific else ''))
+            # A confirmation for one component cannot discharge another component,
+            # nor the client's more specific performance request.
+            if subject not in feasible_subjects: unresolved.append(label + ' feasibility')
+    for subject, detail in specific.items():
+        if subject not in known.get('technical_requirements', {}).get('value', []):
+            technical.append(TECHNICAL_LABELS[subject] + ': Requested — ' + detail)
+        unresolved.append(TECHNICAL_LABELS[subject] + ' specification: ' + detail)
+    if not any(r.get('outcome') == 'AVAILABLE' for r in governed_results):
+        unresolved.append('Venue availability' + (' after the event interval is supplied' if timing_missing else ''))
     prices = approved_prices(snapshot)
     if not prices: unresolved.append('Pricing and applicable fees')
     sections = {

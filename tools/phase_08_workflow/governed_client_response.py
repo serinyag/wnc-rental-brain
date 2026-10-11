@@ -356,7 +356,7 @@ def build_draft_contract(
         f"{getattr(fact, 'field_code')}: {_format_value(getattr(fact, 'value_payload', None))}"
         for fact in getattr(snapshot, "rental_case_facts", ())
         if getattr(fact, "field_code", "") in {
-            "event_type", "guest_count", "requested_rental_scope", "technical_requirements",
+            "event_type", "guest_count", "requested_rental_scope", "technical_requirements", "technical_request_details", "event_schedule",
             "catering_arrangement", "facilitator_arrangement", "event_layout", "configuration_type",
         }
     )
@@ -517,6 +517,10 @@ class DeterministicFakeClientResponseProvider:
             value = item.value
             if item.topic == "operational_confirmation" and value.get("assertion"):
                 continue
+            elif item.topic == 'technical_specification':
+                paragraphs.append("We'll check your requested " + value['label'].lower() + " specification: " + value['specification'] + ". It is not yet confirmed.")
+            elif item.topic == 'internet_connectivity' and value.get('status') == 'supported':
+                paragraphs.append('Standard internet connectivity is provided. This does not confirm the specific performance requested for your event.')
             elif item.topic == "requested_change":
                 from .pending_action_composition import CHANGE_SUBJECTS
                 change = value.get("requested_change")

@@ -338,6 +338,20 @@ OBSERVATION_FIELD_DEFINITIONS += tuple(
     )
 )
 
+OBSERVATION_FIELD_DEFINITIONS += (
+    ObservationFieldDefinition(
+        field_code="technical_request_details", domain_code="technical", display_label="Specific technical requests",
+        value_type_code=OBSERVATION_VALUE_TYPE_JSON_OBJECT,
+        allowed_observation_types=(OBSERVATION_TYPE_FACT_CANDIDATE, OBSERVATION_TYPE_CHANGE_CANDIDATE,
+                                   OBSERVATION_TYPE_REQUEST_CANDIDATE),
+        materiality_default=CHANGE_IMPACT_MATERIAL, client_input_allowed=True,
+        human_validation_required=True, canonical_target_kind=OBSERVATION_TARGET_KIND_RENTAL_CASE_FACT,
+        canonical_target_reference="rental_case_facts.technical_request_details",
+        default_review_posture=APPROVAL_POSTURE_HUMAN_ONLY,
+        notes="Map technical requirement enum to the exact explicit client specification (plain text). Preserve performance, connections and equipment details. Requests never establish feasibility or supplier commitments.",
+    ),
+)
+
 OBSERVATION_FIELD_DEFINITIONS_BY_CODE = {definition.field_code: definition for definition in OBSERVATION_FIELD_DEFINITIONS}
 
 

@@ -87,6 +87,13 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
     event = _text(facts.get("event_type"), "Rental inquiry").replace("_", " ")
     date = _timing(case.active_event_start)
     timing = _window(case.active_event_start, case.active_event_end)
+    from .requested_detail_presentation import event_timing, technical_details, TECHNICAL_LABELS
+    timing_rows, timing_missing = event_timing(case.active_event_start, case.active_event_end, facts.get('event_schedule'))
+    if not (case.active_event_start and case.active_event_end):
+        timing = '; '.join(timing_rows + [v + ': Still to confirm' for v in timing_missing])
+        if timing_rows:
+            date = timing_rows[0].removeprefix('Date: ')
+    specific_technical = technical_details(facts.get('technical_request_details'))
     scope = _text(facts.get("requested_rental_scope") or (case.rental_type_code if case.rental_type_code != "custom_scope" else None), "Scope to be confirmed").replace("_", " ")
     guests = _text(facts.get("guest_count"))
     latest = {}
@@ -115,6 +122,9 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
                    or blocker_states.get(key) in RESOLVED)
         closed = closed or retired
         summary = _text(p.get("summary"))
+        if specific_technical and ('technical' in summary.lower() or key == 'technical_specifications'):
+            from .requested_detail_presentation import technical_summary
+            summary = 'Review AV setup: ' + technical_summary(facts.get('technical_requirements'), specific_technical)
         if key == current_availability_key:
             # Keep the bound work identity, but describe the current requested
             # venue. Old action prose must not survive a scope change.
@@ -200,6 +210,7 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
             value = ", ".join(str(v) for v in value)
         requested_details.append(f"{label} requested: {_text(value).replace('_', ' ')}")
     requested_text = ("\n" + "\n".join(requested_details)) if requested_details else ""
+    requested_text += ''.join('\n' + TECHNICAL_LABELS[k] + ' requested: ' + v for k, v in specific_technical.items())
     notes = (f"CLIENT\n{client}\n\nEVENT\n{event}\nRequested timing: {timing}\n"
              f"Requested venue / scope: {scope}\nGuests: {guests}{requested_text}\n\nCURRENT STATUS\n{stage}\n"
              f"{communication}\n\nOPEN ITEMS\n" + ("\n".join(open_lines) or "No unresolved operational items.")

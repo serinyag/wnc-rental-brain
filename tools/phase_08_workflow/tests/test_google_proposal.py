@@ -131,7 +131,7 @@ def test_one_document_persisted_through_normal_execution_and_replay_across_resta
     assert restarted.observe(action=action)['status'] == 'MATCHES_PROJECTION'
 
 
-@pytest.mark.parametrize('field,value', [('guest_count', 30), ('event_schedule', {'date': '2026-11-13'}),
+@pytest.mark.parametrize('field,value', [('guest_count', 30), ('event_schedule', {'date': '2026-11-14'}),
     ('requested_rental_scope', 'entire_venue'), ('catering_arrangement', 'wnc_vendor'),
     ('technical_requirements', ['microphones']), ('production_scope', 'full_production')])
 def test_changed_public_scope_updates_same_document(field, value):

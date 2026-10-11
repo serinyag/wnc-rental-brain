@@ -115,6 +115,8 @@ class EditorialContentPlan:
 # A finite adapter for request topics already used by Phase 8. These selectors
 # decide attention only. All answers come from the governed contract below.
 TOPIC_TERMS = {
+    'internet_connectivity': ('internet', 'wifi', 'wi-fi', 'bandwidth', 'mbps', 'upload'),
+    'livestream_recording': ('livestream', 'live stream', 'streaming', 'recording'),
     'audio_playback': ('music', 'audio', 'sound system', 'background sound', 'amplified sound'),
     'projection_display': ('projector', 'projectors', 'projection', 'slide', 'slides', 'screen', 'screens'),
     'microphones': ('microphone', 'microphones', 'mic', 'mics'),
@@ -235,6 +237,8 @@ def communication_evidence(item: EditorialContentItem, body: str) -> bool:
         return 'kitchen' in text and any(w in text for w in ('warming', 'plating', 'ready-made'))
     if item.topic == 'audio_playback':
         return audio_fact_realized(body)
+    if item.topic == 'internet_connectivity':
+        return mentioned(item.topic, text) and bool(re.search(r'\b(?:provided|included|available)\b', text))
     if item.topic == 'projection_display':
         return mentioned(item.topic, text) and bool(re.search(r'\b(?:projector|projection)\b.{0,25}\bavailable\b', text)) and bool(re.search(r'\b(?:check|checking)\b.{0,50}\b(?:setup|arrangement)\b', text))
     if item.topic == 'microphones':
@@ -332,7 +336,7 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
                 continue
             if topic == 'operational_confirmation':
                 role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'new_governed_operational_answer', 0
-            elif topic in {'audio_playback', 'projection_display', 'microphones', 'other_technical', 'dj_sound_booth'}:
+            elif topic in {'audio_playback', 'projection_display', 'microphones', 'other_technical', 'dj_sound_booth', 'internet_connectivity', 'livestream_recording'}:
                 if topic in current_topics or (topic in requested_topics and (not contract.prior_client_drafts or
                         (topic == 'audio_playback' and value.get('status') == 'supported' and 'fact:' + key not in prior))):
                     role, reason, priority = EditorialRole.MUST_COMMUNICATE, 'requested_technical_capability', 1
@@ -391,6 +395,15 @@ def build_editorial_content_plan(contract: Any) -> EditorialContentPlan:
         if item.client_visibility == 'EXTERNAL_PENDING_VISIBLE':
             add('external:' + item.proposition_key, 'external_pending', {'subject': item.message, 'contact_status': item.resolution_status},
                 EditorialRole.MUST_COMMUNICATE, 'recorded_external_pending_state', priority=4)
+
+    for fact in contract.confirmed_case_facts:
+        if fact.startswith('technical_request_details: '):
+            from .requested_detail_presentation import technical_details, TECHNICAL_LABELS
+            for subject, specification in technical_details(json.loads(fact.split(': ', 1)[1])).items():
+                add('technical_specification:' + subject, 'technical_specification',
+                    {'action': 'check', 'subject': subject, 'label': TECHNICAL_LABELS[subject],
+                     'specification': specification, 'status': 'check_required'},
+                    EditorialRole.MUST_COMMUNICATE, 'explicit_client_specification_requires_scoped_review', priority=1)
 
     # Client-visible future next actions never claim contact or resolution. These
     # are derived from existing topic/owner semantics, not copied blocker prose.

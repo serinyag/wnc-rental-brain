@@ -40,7 +40,7 @@ def requirements(plan):
             continue
         v = item.value
         if item.role == EditorialRole.MUST_ASK: kind = RealizationKind.QUESTION
-        elif v.get('fact_state') == 'known' or v.get('status') == 'within_limits': kind = RealizationKind.KNOWN_FACT
+        elif v.get('fact_state') == 'known' or v.get('status') == 'within_limits' or item.topic == 'internet_connectivity' and v.get('status') == 'supported': kind = RealizationKind.KNOWN_FACT
         elif v.get('status') == 'not_supported' or item.topic == 'restriction': kind = RealizationKind.RESTRICTION
         elif 'booking_fee' in v: kind = RealizationKind.COMMERCIAL
         elif item.topic == 'projection_display': kind = RealizationKind.CONDITIONAL_CAPABILITY
@@ -85,6 +85,8 @@ def prospective_spans(body):
 def pending_realized(item, body):
     spans = prospective_spans(body)
     v = item.value
+    if item.topic == 'technical_specification':
+        return any(v['specification'].casefold() in s for s in spans)
     if item.topic == 'requested_change':
         if v.get('requested_change') in CHANGE_SUBJECTS:
             return any(change_subject_present(v['requested_change'], s) for s in spans)

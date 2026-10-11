@@ -7,7 +7,7 @@ It translates already-governed case state into client visibility, operator work,
 and a small, authority-filtered factual guidance set.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Protocol
 
 
@@ -240,6 +240,18 @@ def derive_resolution_items(snapshot: Any, *, observed_fields: tuple[Any, ...] =
                 items.append(ResolutionItem(key, message, RESOLUTION_OWNER_WNC_INTERNAL,
                     RESOLUTION_STATUS_REQUIRED, CLIENT_VISIBILITY_INTERNAL_ONLY, True))
     case = getattr(snapshot, "rental_case", None)
+    from .requested_detail_presentation import technical_details, TECHNICAL_LABELS
+    detail_values = {f.field_code: f.value_payload for f in getattr(snapshot, 'rental_case_facts', ())}
+    details = technical_details(detail_values.get('technical_request_details'))
+    if details:
+        from .requested_detail_presentation import technical_summary
+        detail_message = 'Review AV setup: ' + technical_summary(detail_values.get('technical_requirements'), details)
+        technical_items = [i for i in items if 'technical' in i.message.lower()]
+        if technical_items:
+            items = [replace(i, message=detail_message) if i in technical_items else i for i in items]
+        else:
+            items.append(ResolutionItem('technical_specifications', detail_message, RESOLUTION_OWNER_WNC_INTERNAL,
+                RESOLUTION_STATUS_REQUIRED, CLIENT_VISIBILITY_INTERNAL_ONLY, True))
     start, end = getattr(case, "active_event_start", None), getattr(case, "active_event_end", None)
     if start and end and getattr(case, "lifecycle_state", "") in {"inquiry_active", "proposal_in_progress"}:
         from .operational_resolution import requested_venue
