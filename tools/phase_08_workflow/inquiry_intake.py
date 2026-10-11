@@ -668,7 +668,9 @@ def _normalize_iso_timestamp(value: str) -> str | None:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
-    return parsed.isoformat().replace("+00:00", "Z")
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _distinct_values(normalized: tuple[_NormalizedObservation, ...]) -> tuple[_DistinctValue, ...]:

@@ -530,3 +530,19 @@ class InquiryIntakeTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_equivalent_amsterdam_and_utc_inquiry_windows_are_not_reschedules():
+    repo = make_repo(rental_cases=(make_case(rental_type_code="studio_space",
+        active_event_start="2026-11-23 09:00:00+00", active_event_end="2026-11-23 13:00:00+00"),))
+    ingest_candidate(repo, dedupe_key="same-amsterdam-window", reported_field_code="active_event_window",
+        observation_type=OBSERVATION_TYPE_FACT_CANDIDATE, claim_kind=OBSERVATION_CLAIM_KIND_NEW_INFORMATION,
+        candidate_value_payload={"active_event_start":"2026-11-23T10:00:00+01:00", "active_event_end":"2026-11-23T14:00:00+01:00"})
+    result = apply_inquiry_intake(repo, rental_case_id=1, actor_reference="fixture:operator", actor_type="operator", now=lambda:"2026-10-11T10:00:00Z")
+    assert not result.failure_codes
+    assert not result.created_reschedule_request_ids
+    assert not repo.reschedule_requests.get(1)
+    from tools.phase_08_workflow.inquiry_intake import _normalize_iso_timestamp
+    assert _normalize_iso_timestamp("2026-11-23T10:00:00+01:00") == "2026-11-23T09:00:00Z"
+    assert _normalize_iso_timestamp("2026-11-24T10:00:00+01:00") != _normalize_iso_timestamp("2026-11-23T10:00:00+01:00")
+    assert _normalize_iso_timestamp("2026-11-23T10:00:00") is None

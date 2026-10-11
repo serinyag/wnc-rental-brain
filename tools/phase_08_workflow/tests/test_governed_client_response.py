@@ -333,3 +333,13 @@ class GovernedClientResponseTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_finished_reschedules_do_not_request_another_review():
+    for status in ("withdrawn", "confirmed", "rejected"):
+        snapshot = make_snapshot(reschedule_requests=(SimpleNamespace(status=status),))
+        contract = build_draft_contract(snapshot=snapshot, recipient_label="Avery", latest_client_message=None)
+        assert contract.response_intent.code != RESPONSE_INTENT_RESCHEDULE_ACKNOWLEDGEMENT
+        assert not contract.change_or_reschedule_state
+    snapshot = make_snapshot(reschedule_requests=(SimpleNamespace(status="proposed"),))
+    assert ResponseIntentResolver().resolve(snapshot).code == RESPONSE_INTENT_RESCHEDULE_ACKNOWLEDGEMENT

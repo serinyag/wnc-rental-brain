@@ -298,7 +298,7 @@ class ResponseIntentResolver:
 
         reschedules = tuple(
             item for item in getattr(snapshot, "reschedule_requests", ())
-            if getattr(item, "status", None) not in {"cancelled", "superseded", "closed", "accepted", "rejected"}
+            if getattr(item, "status", None) in {"proposed", "evaluating", "offered", "awaiting_client_confirmation"}
         )
         if reschedules:
             return ResponseIntent(RESPONSE_INTENT_RESCHEDULE_ACKNOWLEDGEMENT, ("reschedule_pending",))
@@ -403,7 +403,7 @@ def build_draft_contract(
     ) + tuple(
         "requested reschedule is awaiting review"
         for item in getattr(snapshot, "reschedule_requests", ())
-        if getattr(item, "status", None) not in {"cancelled", "superseded", "closed", "accepted", "rejected"}
+        if getattr(item, "status", None) in {"proposed", "evaluating", "offered", "awaiting_client_confirmation"}
     )
     forbidden = [
         "Do not confirm booking. State availability only using the exact supplied scoped operational assertion; no broader confirmation." if operational else "Do not confirm venue availability or booking.",
@@ -520,6 +520,13 @@ class DeterministicFakeClientResponseProvider:
             elif item.topic == "projection_display" and value.get("status") == "conditional" and value.get("available_equipment") and value.get("check_required"):
                 checks = ", ".join(value["check_required"])
                 paragraphs.append(f"For projection display, the supplied equipment is {value['available_equipment']}. We'll check the {checks} for your event before confirming that arrangement.")
+            elif item.topic == "projection_detail" and value.get("check_required"):
+                paragraphs.append("We'll check the " + value["check_required"] + " for the requested projection setup.")
+            elif value.get("status") == "not_supported" and value.get("capability") and value.get("supplier_requirement") == "external supplier":
+                paragraphs.append(value["capability"].capitalize() + " require an external supplier.")
+            elif item.topic == "catering_kitchen" and value.get("suitable_for") and value.get("limitation"):
+                uses = ", ".join(value["suitable_for"])
+                paragraphs.append(f"The kitchen is suited to {uses}, {value['limitation']}.")
             elif item.topic == "next_step" and value.get("action") == "check" and value.get("subjects") == ["requested date and venue availability"]:
                 window = value.get("requested_event_window", [])
                 if len(window) != 2:
@@ -531,6 +538,8 @@ class DeterministicFakeClientResponseProvider:
                 if start.date() != end.date() or start >= end:
                     return None
                 paragraphs.append(f"We'll check venue availability for your requested date, {start:%d %B %Y} from {start:%H:%M} to {end:%H:%M}, before confirming it.")
+            elif item.topic == "next_step" and value.get("action") == "check" and value.get("subjects"):
+                paragraphs.append("We'll check " + ", ".join(value["subjects"]) + " and get back to you.")
             else:
                 return None
         greeting = f"Hi {contract.recipient_label},"
