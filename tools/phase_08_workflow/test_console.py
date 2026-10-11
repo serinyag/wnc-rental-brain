@@ -321,6 +321,8 @@ class TestConsoleApp:
         if len(parts) == 5 and parts[4] == "operational-resolutions" and method == "POST":
             return self._respond_json(start_response, self.service.submit_operational_resolution(
                 rental_case_id=rental_case_id, submission=self._parse_json(environ)))
+        if len(parts) == 5 and parts[4] == 'asana-fields' and method == 'GET':
+            return self._respond_json(start_response, self.service.audit_asana_fields(rental_case_id=rental_case_id))
         if len(parts) == 5 and parts[4] == "asana-projection" and method == "POST":
             return self._respond_json(start_response, self.service.prepare_asana_rental_projection(rental_case_id=rental_case_id))
         if len(parts) == 5 and parts[4] == 'google-proposal' and method == 'POST':

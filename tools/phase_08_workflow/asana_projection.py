@@ -17,6 +17,7 @@ ADAPTER = "asana_projection"
 VERSION = "asana_rental_projection_v1"
 DEPARTMENT_VERSION = "asana_rental_projection_departments_v2"
 NUANCED_VERSION = "asana_rental_projection_nuanced_v3"
+OPERATOR_VERSION = "asana_rental_projection_operator_v4"
 DEPARTMENTS = ("Admin", "Logistics", "Experience", "Post-event")
 OWNERS = {"CLIENT", "WNC_INTERNAL", "EXTERNAL_PARTY", "GOVERNED_DECISION"}
 RESOLVED = {"resolved", "completed", "cancelled", "superseded"}
@@ -230,6 +231,13 @@ def _build_flat_projection(snapshot, *, workspace_gid, project_gid, enforce_limi
 
 
 def build_projection(snapshot, *, workspace_gid, project_gid, version=VERSION, application_origin=None):
+    if version == OPERATOR_VERSION:
+        value = build_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid, version=NUANCED_VERSION)
+        from .asana_operator_presentation import present
+        from .google_proposal import binding
+        present(snapshot, value, proposal=binding(snapshot))
+        value["layout_version"] = OPERATOR_VERSION
+        return value
     value = _build_flat_projection(snapshot, workspace_gid=workspace_gid, project_gid=project_gid)
     if version == VERSION:
         return value  # Preserve the exact certified plans and their replay keys.

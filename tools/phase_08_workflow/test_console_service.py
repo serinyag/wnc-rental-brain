@@ -1617,6 +1617,25 @@ limit 1;
             failure_codes=result.failure_codes,
         )
 
+    def audit_asana_fields(self, *, rental_case_id: int) -> dict:
+        """Read only the explicitly authorized WNC reference and staging projects."""
+        from .asana_adapter import UrllibAsanaTransport
+        from .asana_projection_adapter import AsanaProjectionAdapter
+        self._load_test_case_metadata(rental_case_id)
+        if not self.config.runtime.is_staging:
+            raise TestConsoleError('Field certification is staging-only.')
+        config = AsanaAdapterConfig.from_env()
+        adapter = AsanaProjectionAdapter(config, UrllibAsanaTransport(), self.orchestration_repository, self.config.runtime)
+        adapter._scope(mutation=False)
+        result = {}
+        for name, gid in [('reference', '1212669866280530'), ('staging', config.default_project_gid)]:
+            project = adapter._request('GET', f'/projects/{gid}?opt_fields=gid,name,workspace.gid,custom_field_settings.custom_field')['data']
+            if project.get('workspace', {}).get('gid') != config.workspace_gid:
+                raise TestConsoleError('Field reference workspace mismatch.')
+            result[name] = project
+        result['provider_mutations'] = 0
+        return result
+
     def prepare_google_proposal(self, *, rental_case_id: int) -> dict:
         from .google_proposal import prepare_projection
         from .google_proposal_adapter import GoogleProposalConfig

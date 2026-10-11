@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from urllib.parse import urlencode
 
 from .asana_adapter import AsanaAdapterConfig, AsanaTransportProtocol, DEFAULT_ASANA_API_BASE_URL
-from .asana_projection import ADAPTER, digest, validate_projection, projection_attempts, prior_bindings
+from .asana_projection import ADAPTER, digest, validate_projection, projection_attempts, prior_bindings, OPERATOR_VERSION
 from .execution_types import NormalizedExecutionResult
 
 
@@ -101,7 +101,7 @@ class AsanaProjectionAdapter:
 
     def _list(self, path):
         records, offsets = [], set()
-        params = {"limit": 100, "opt_fields": "gid,name,notes,completed,workspace.gid,projects.gid,parent.gid"}
+        params = {"limit": 100, "opt_fields": "gid,name,notes,html_notes,completed,workspace.gid,projects.gid,parent.gid"}
         # Include completed items: completing a task must not make it disappear
         # from duplicate detection. Never follow provider-supplied URLs.
         if path.startswith("/projects/"):
@@ -125,7 +125,7 @@ class AsanaProjectionAdapter:
         if not isinstance(gid, str) or not gid.isdecimal():
             raise ProjectionFailure("invalid_task_gid")
         return self._request("GET", f"/tasks/{gid}?" + urlencode({
-            "opt_fields": "gid,name,notes,completed,workspace.gid,projects.gid,parent.gid"}))["data"]
+            "opt_fields": "gid,name,notes,html_notes,completed,workspace.gid,projects.gid,parent.gid"}))["data"]
 
     def _verify(self, record, expected, *, parent=None):
         if not isinstance(record, dict) or not isinstance(record.get("gid"), str) or not record["gid"].isdecimal():
@@ -139,13 +139,32 @@ class AsanaProjectionAdapter:
                 raise ProjectionFailure("provider_project_conflict")
         elif (record.get("parent") or {}).get("gid") != parent:
             raise ProjectionFailure("provider_parent_conflict")
-        if any(record.get(key) != value for key, value in expected.items()):
+        # Rich-text serialization can normalize HTML. Compare exact visible text
+        # plus exact link targets/labels; no title/description identity matching.
+        def links(value):
+            from html.parser import HTMLParser
+            class Links(HTMLParser):
+                def __init__(self):
+                    super().__init__(); self.values = []; self.anchor = None
+                def handle_starttag(self, tag, attrs):
+                    if tag == 'a': self.anchor = [dict(attrs).get('href'), '']
+                def handle_data(self, data):
+                    if self.anchor is not None: self.anchor[1] += data
+                def handle_endtag(self, tag):
+                    if tag == 'a' and self.anchor is not None:
+                        self.values.append(tuple(self.anchor)); self.anchor = None
+            parser = Links(); parser.feed(value or ''); return parser.values
+        if any((links(record.get(key)) != links(value) if key == 'html_notes'
+                else record.get(key) != value) for key, value in expected.items()):
             raise ProjectionFailure("human_edit_requires_governed_review")
 
     @staticmethod
     def _desired(plan):
         desired = {"master": dict(plan["master"])}
         for item in plan["work"]:
+            if plan.get('layout_version') == OPERATOR_VERSION:
+                desired[item['key']] = {k: item[k] for k in ('name', 'notes', 'completed')}
+                continue
             desired[item["key"]] = {"name": item["name"], "notes": item["notes"] + "\n\n" + plan["marker"]
                 + " / work " + digest(item["key"])[:12], "completed": item["completed"]}
         return desired
@@ -180,6 +199,16 @@ class AsanaProjectionAdapter:
                 self._validate_binding_scope(binding, action.rental_case_id)
                 self._verify(self._read(binding["gid"]), binding["projected"],
                              parent=None if key == "master" else bindings[binding.get('parent_key', 'master')]["gid"])
+            if plan.get('layout_version') == OPERATOR_VERSION:
+                # Check exact copies before any write, including the legacy-to-
+                # operator transition. Content is only duplicate evidence; the
+                # journal GID remains the sole identity authority.
+                for key, bound in bindings.items():
+                    parent = bindings.get(bound.get('parent_key', 'master'), {}).get('gid') if key != 'master' else None
+                    path = f'/projects/{self.config.default_project_gid}/tasks' if key == 'master' else f'/tasks/{parent}/subtasks'
+                    if any(t.get('gid') != bound['gid'] and all(t.get(k) == bound['projected'][k]
+                           for k in ('name', 'notes', 'completed')) for t in self._list(path)):
+                        raise ProjectionFailure('duplicate_content_requires_reconciliation')
             if "master" not in bindings:
                 candidates = self._list(f"/projects/{self.config.default_project_gid}/tasks")
                 if any(plan["marker"] in str(t.get("notes", "")).splitlines() for t in candidates):
@@ -206,6 +235,8 @@ class AsanaProjectionAdapter:
                     method, path, payload = "POST", f"/tasks/{parent}/subtasks", fields
                 self._validate_plan(action, self.repository.load_case_snapshot(action.rental_case_id))
                 mutation_requests += 1
+                if 'html_notes' in payload:
+                    payload = {k: v for k, v in payload.items() if k != 'notes'}
                 response = self._request(method, path, payload)["data"]
                 mutations += 1
                 gid = response.get("gid") if isinstance(response, dict) else None
@@ -247,6 +278,8 @@ class AsanaProjectionAdapter:
         plan = action.structured_payload["projection"]
         if plan["workspace_gid"] != self.config.workspace_gid or plan["project_gid"] != self.config.default_project_gid:
             raise ProjectionFailure("observation_scope_conflict")
+        if plan.get('layout_version') == OPERATOR_VERSION:
+            return self._observe_bound(action, plan)
         masters = [t for t in self._list(f"/projects/{self.config.default_project_gid}/tasks")
                    if plan["marker"] in str(t.get("notes", "")).splitlines()]
         if len(masters) != 1:
@@ -283,3 +316,39 @@ class AsanaProjectionAdapter:
         return {"status": "review_required" if differences else "matches_projection",
                 "observed": observed, "differences": differences, "canonical_truth_changed": False,
                 "retry_fence_released": False}
+
+    def _observe_bound(self, action, plan):
+        """Exact journal IDs replace visible markers, never provider text adoption.
+
+        A missing binding remains inconclusive. Started/ambiguous attempts retain
+        their fences; read-only observation cannot adopt a task or allow retry.
+        Exact content copies are duplicate evidence, not identity candidates.
+        """
+        bindings = prior_bindings(self.repository.load_case_snapshot(action.rental_case_id))
+        if 'master' not in bindings:
+            return {'status': 'inconclusive', 'master_candidates': 0, 'canonical_truth_changed': False,
+                    'retry_fence_released': False}
+        desired = self._desired(plan)
+        observed, differences, siblings = {}, [], {}
+        for key, expected in desired.items():
+            bound = bindings.get(key)
+            if not bound:
+                if key != 'master' and expected['completed'] and not key.startswith('department:'):
+                    continue
+                differences.append({'key': key, 'reason': 'binding_missing'}); continue
+            self._validate_binding_scope(bound, action.rental_case_id)
+            parent = None if key == 'master' else bindings.get(bound.get('parent_key', 'master'), {}).get('gid')
+            try:
+                record = self._read(bound['gid'])
+                self._verify(record, expected, parent=parent)
+                observed[key] = record
+                path = f'/projects/{self.config.default_project_gid}/tasks' if key == 'master' else f'/tasks/{parent}/subtasks'
+                if path not in siblings: siblings[path] = self._list(path)
+                copies = [t for t in siblings[path] if t.get('gid') != bound['gid']
+                          and all(t.get(k) == expected[k] for k in ('name', 'notes', 'completed'))]
+                if copies: differences.append({'key': key, 'reason': 'duplicate_content', 'count': len(copies)})
+            except ProjectionFailure as exc:
+                differences.append({'key': key, 'reason': exc.reason})
+        return {'status': 'review_required' if differences else 'matches_projection',
+                'observed': observed, 'differences': differences, 'canonical_truth_changed': False,
+                'retry_fence_released': False}
